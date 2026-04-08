@@ -15,7 +15,7 @@ public class Subcategoria {
         this.categoria = categoria;
     }
 
-    // Métodos (sin implementación real por ahora)
+    // Métodos 
     public void cambiarCategoriaPadre(Categoria nuevaCategoria) {}
 
     // Getters y setters
