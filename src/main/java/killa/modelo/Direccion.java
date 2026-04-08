@@ -8,4 +8,5 @@ public class Direccion {
     private String pais;
     private String codigoPostal;
     private String referencia;
+    public Direccion(){};
 }
