@@ -9,4 +9,20 @@ public class Categoria {
 	public Categoria() {
 		this.subcategorias = new ArrayList<>();
 	}
+
+	public int getIdCategoria() {
+    	return idCategoria;
+	}
+
+	public String getNombre() {
+   		return nombre;
+	}
+
+	public void setIdCategoria(int idCategoria) {
+    	this.idCategoria = idCategoria;
+	}
+
+	public void setNombre(String nombre) {
+    	this.nombre = nombre;
+	}
 }
