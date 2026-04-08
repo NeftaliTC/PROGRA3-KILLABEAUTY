@@ -1,3 +1,4 @@
+package killa.modelo;
 public class Direccion {
     private int id;
     private String calle;
