@@ -7,7 +7,7 @@ public class Carro {
 
     private int idCarrito;
     private Date fechaDeCreacion;
-    private String estado; // con un enum tambien
+    private String estado; 
 
 
     private Cliente cliente;
