@@ -9,6 +9,18 @@ public class Categoria {
 	public Categoria() {
 		this.subcategorias = new ArrayList<>();
 	}
+	public void agregarSubcategoria(Subcategoria subcategoria) {
+    	subcategorias.add(subcategoria);
+	}
+	//por ver
+	public void eliminarSubcategoriaPorId(int idSubcategoria) {
+    	for (int i = 0; i < subcategorias.size(); i++) {
+        	if (subcategorias.get(i).getIdSubcategoria() == idSubcategoria) {
+           		subcategorias.remove(i);
+            	break;
+        	}
+    	}
+	}	
 
 	public int getIdCategoria() {
     	return idCategoria;
