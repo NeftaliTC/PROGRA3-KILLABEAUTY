@@ -8,7 +8,7 @@ public class Producto {
     private double precioLista;
     private String marca;
 
-    // Un producto tiene una categoría y varias escalas de precio
+    // <Un producto tiene una categoría y varias escalas de precio
     private Categoria categoria;
     private List<EscalaPrecio> escalas;
 
