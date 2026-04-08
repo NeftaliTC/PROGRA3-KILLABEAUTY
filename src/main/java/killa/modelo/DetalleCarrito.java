@@ -1,5 +1,7 @@
+package killa.modelo;
+
 public class DetalleCarrito {
-    private int id_detalleCarrito;
+    private int idDetalleCarrito;
     private int cantidad;
 //navegación
     private Producto producto;
