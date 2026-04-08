@@ -6,13 +6,14 @@ public class Pedido {
     private int id_pedido;
     private Date fechaDePedido;
     private String estado;
+    private String metodoDePago;
     private double subtotal;
     private double igv;
     private double total;
 
-    // Navegabilidad
     private Cliente cliente;
-    private Descuento descuento; // FK id_descuento en tu imagen
+    private Direccion direccionEnvio;
+    private Cupon cupon;
     private List<DetallePedido> detalles;
 
     public Pedido() {

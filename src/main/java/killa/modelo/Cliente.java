@@ -11,11 +11,19 @@ public class Cliente {
     private Date fechaDeInscripcion;
     private String contrasena;
     private String telefono;
-    private String estado;
-    // Navegabilidad: Un cliente puede ver sus pedidos realizados
+    private String estado; // activo - inactivo
+    private Direccion direccion;
     private List<Pedido> pedidos;
+    private Carro carritoActivo;
 
     public Cliente() {
         this.pedidos = new ArrayList<>();
     }
+}
+class Direccion {
+    private int id_direccion;
+    private String distrito;
+    private String telefono;
+    private String direccion;
+    private String referencias;
 }

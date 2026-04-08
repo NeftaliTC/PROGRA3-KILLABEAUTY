@@ -5,9 +5,10 @@ public class DetallePedido {
     private int cantidad;
     private double precioAplicado;
 
-    // Navegabilidad
-    private Pedido pedido;
-    private Producto producto;
 
+    //private Pedido pedido;
+
+    private Producto producto;
+    private Descuento descuentoAplicado;
     public DetallePedido() {}
 }

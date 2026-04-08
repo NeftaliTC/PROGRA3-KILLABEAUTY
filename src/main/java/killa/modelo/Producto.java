@@ -6,14 +6,18 @@ public class Producto {
     private int idProducto;
     private String nombre;
     private double precioLista;
-    private String marca;
+    private int stock;
 
     // <Un producto tiene una categoría y varias escalas de precio
+
+    private Marca marca;
     private Categoria categoria;
     private List<EscalaPrecio> escalas;
+    private List<Resena> resenas;
 
     public Producto() {
         this.escalas = new ArrayList<>();
+        this.resenas = new ArrayList<>();
     }
 
     public void registrarProducto() {}
