@@ -16,6 +16,10 @@ public class Carro {
     public Carro() {
         this.items = new ArrayList<>();
     }
+    
+    public void agregarItem(DetalleCarrito item) {
+    items.add(item);
+    }
         
     public int getIdCarrito() {
         return idCarrito; 
