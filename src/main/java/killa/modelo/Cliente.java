@@ -12,7 +12,7 @@ public class Cliente {
     private String contrasena;
     private String telefono;
     private String estado; // activo - inactivo
-    private Direccion direccion;
+    private List<Direccion> direcciones;
     private List<Pedido> pedidos;
     private Carro carritoActivo;
 
