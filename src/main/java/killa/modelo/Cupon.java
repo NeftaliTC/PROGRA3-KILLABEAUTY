@@ -1,5 +1,6 @@
 package killa.modelo;
 import java.util.Date;
+
 public class Cupon {
 
     private int idCupon;
@@ -10,19 +11,23 @@ public class Cupon {
     private Date fechaFin;
     private boolean activo;
 
-    //Constructores
+    // Constructores
     public Cupon() {}
-    
+
     public Cupon(int idCupon, String codigo, double porcentajeDeDescuento) {
         this.idCupon = idCupon;
         this.codigo = codigo;
         this.porcentajeDeDescuento = porcentajeDeDescuento;
     }
 
-    //Metodos
+    // Métodos
+    public boolean esVigente(Date fecha) {
+        return false;
+    }
+
     public void validarVigencia() {}
 
-    //Getters y setters
+    // Getters y setters
     public int getIdCupon() {
         return idCupon;
     }
@@ -45,6 +50,10 @@ public class Cupon {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public double getPorcentajeDescuento() {
+        return porcentajeDeDescuento;
     }
 
     public double getPorcentajeDeDescuento() {
