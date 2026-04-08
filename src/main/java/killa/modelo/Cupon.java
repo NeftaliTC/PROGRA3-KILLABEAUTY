@@ -14,10 +14,13 @@ public class Cupon {
     // Constructores
     public Cupon() {}
 
-    public Cupon(int idCupon, String codigo, double porcentajeDeDescuento) {
+    public Cupon(int idCupon, String codigo, double porcentajeDeDescuento, Date fechaInicio, Date fechaFin, boolean activo) {
         this.idCupon = idCupon;
         this.codigo = codigo;
         this.porcentajeDeDescuento = porcentajeDeDescuento;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        this.activo = activo;
     }
 
     // Métodos
