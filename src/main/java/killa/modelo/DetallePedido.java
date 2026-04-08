@@ -7,14 +7,19 @@ public class DetallePedido {
     private Producto producto;
     private Descuento descuentoAplicado;
 
-    //Constructor
+    // Constructor
     public DetallePedido() {}
 
-    //Metodos
-    public double calcularSubtotal() {}
-    public double calcularTotalConDescuento() {}
+    // Métodos 
+    public double calcularSubtotal() {
+        return 0.0;
+    }
 
-    //Getters y setters
+    public double calcularTotalConDescuento() {
+        return 0.0;
+    }
+
+    // Getters y setters
     public int getIdDetallePedido() {
         return idDetallePedido;
     }
