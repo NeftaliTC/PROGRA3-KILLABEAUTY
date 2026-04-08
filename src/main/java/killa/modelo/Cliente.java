@@ -18,6 +18,7 @@ public class Cliente {
 
     public Cliente() {
         this.pedidos = new ArrayList<>();
+        this.direcciones = new ArrayList<>();
     }
 }
 class Direccion {
