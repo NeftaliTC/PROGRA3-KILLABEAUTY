@@ -5,4 +5,38 @@ public class Subcategoria {
     private String nombre;
     // Navegación
     private Categoria categoria; // categoría a la que pertenece subcategoría
+
+    //Constructores
+    public Subcategoria() {}
+
+    public Subcategoria(int idSubcategoria, String nombre, Categoria categoria) {
+        this.idSubcategoria = idSubcategoria;
+        this.nombre = nombre;
+        this.categoria = categoria;
+    }
+
+    //Getters y setters
+    public int getIdSubcategoria() {
+        return idSubcategoria;
+    }
+
+    public void setIdSubcategoria(int idSubcategoria) {
+        this.idSubcategoria = idSubcategoria;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
+    }
 }
