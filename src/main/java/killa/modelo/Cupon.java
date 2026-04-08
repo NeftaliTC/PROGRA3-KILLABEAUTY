@@ -21,8 +21,6 @@ public class Cupon {
 
     //Metodos
     public void validarVigencia() {}
-    public void calcularDescuentoCupon(double subtotal) {} //Calcula el monto a descontar
-    
 
     //Getters y setters
     public int getIdCupon() {
