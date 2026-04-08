@@ -18,7 +18,7 @@ public class Carro {
     }
     
     public void agregarItem(DetalleCarrito item) {
-    items.add(item);
+        items.add(item);
     }
         
     public int getIdCarrito() {
