@@ -15,6 +15,9 @@ public class Subcategoria {
         this.categoria = categoria;
     }
 
+    //Metodos
+    public void cambiarCategoriaPadre(Categoria nuevaCategoria) {}
+    
     //Getters y setters
     public int getIdSubcategoria() {
         return idSubcategoria;
