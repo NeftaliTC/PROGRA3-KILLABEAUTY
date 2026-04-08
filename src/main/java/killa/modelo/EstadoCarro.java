@@ -1,7 +1,5 @@
-public enum EstadoCarrito {
-    ACTIVO,
-    PENDIENTE_PAGO,
-    PAGADO,
-    CANCELADO,
-    ABANDONADO
+public enum EstadoCarro {
+    ACTIVO, //carro sigue en uso
+    CONVERTIDO, //ya pasó a pedido
+    ABANDONADO //se dejó sin terminar
 }
