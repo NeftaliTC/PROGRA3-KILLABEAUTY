@@ -17,8 +17,8 @@ public class Carro {
         this.items = new ArrayList<>();
     }
         
-    public int getId_carrito() {
-        return id_carrito; 
+    public int getIdCarrito() {
+        return idCarrito; 
     }
     public Date getFechaDeCreacion() { 
         return fechaDeCreacion; 
@@ -29,8 +29,8 @@ public class Carro {
     public Cliente getCliente() {
         return cliente;
     }
-    public void setId_carrito(int id_carrito) {
-        this.id_carrito = id_carrito;
+    public void setIdCarrito(int idCarrito) {
+        this.idCarrito = idCarrito;
     }
     public void setFechaDeCreacion(Date fechaDeCreacion) {
         this.fechaDeCreacion = fechaDeCreacion;
