@@ -16,11 +16,3 @@ public class Carro {
         this.items = new ArrayList<>();
     }
 }
-class DetalleCarrito {
-    private int id_detalleCarrito;
-    private int cantidad;
-
-    // Navegabilidad
-    private Producto producto;
-    private Carro carro;
-}
