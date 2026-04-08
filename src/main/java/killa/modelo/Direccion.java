@@ -9,6 +9,12 @@ public class Direccion {
     private String referencia;
         
     public Direccion(){};
+
+    public String mostrarDireccion() {
+    return calle + " " + numero + ", " + distrito + ", " + departamento +
+           ", CP: " + codigoPostal +
+           ", Ref: " + referencia;
+    }
     
     public int getIdDireccion() {
         return idDireccion;
@@ -65,5 +71,6 @@ public class Direccion {
     public void setReferencia(String referencia) {
         this.referencia = referencia;
     }
+    
 }
 
