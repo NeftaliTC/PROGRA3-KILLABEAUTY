@@ -1,13 +1,59 @@
 package killa.modelo;
 
 public class DetallePedido {
-    private int id_detallePedido;
+    private int idDetallePedido;
     private int cantidad;
     private double precioAplicado;
-
-
-    private Pedido pedido;
     private Producto producto;
     private Descuento descuentoAplicado;
+
     public DetallePedido() {}
+
+    public int getIdDetallePedido() {
+        return idDetallePedido;
+    }
+
+    public void setIdDetallePedido(int idDetallePedido) {
+        this.idDetallePedido = idDetallePedido;
+    }
+
+    public int getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public double getPrecioAplicado() {
+        return precioAplicado;
+    }
+
+    public void setPrecioAplicado(double precioAplicado) {
+        this.precioAplicado = precioAplicado;
+    }
+
+    public Producto getProducto() {
+        return producto;
+    }
+
+    public void setProducto(Producto producto) {
+        this.producto = producto;
+    }
+
+    public Descuento getDescuentoAplicado() {
+        return descuentoAplicado;
+    }
+
+    public void setDescuentoAplicado(Descuento descuentoAplicado) {
+        this.descuentoAplicado = descuentoAplicado;
+    }
+
+    public double calcularSubtotal() {
+        return 0.0;
+    }
+
+    public double calcularTotalConDescuento() {
+        return 0.0;
+    }
 }
