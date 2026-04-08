@@ -7,7 +7,7 @@ public class DetallePedido {
 
 
     private Pedido pedido;
-
+    //
     private Producto producto;
     private Descuento descuentoAplicado;
     public DetallePedido() {}
