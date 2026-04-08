@@ -7,7 +7,7 @@ public class Carro {
 
     private int idCarrito;
     private Date fechaDeCreacion;
-    private String estado; 
+    private EstadoCarro estado; 
 
 
     private Cliente cliente;
@@ -15,6 +15,7 @@ public class Carro {
 
     public Carro() {
         this.items = new ArrayList<>();
+        this.estado = EstadoCarro.ACTIVO;
     }
     
     public void agregarItem(DetalleCarrito item) {
@@ -27,7 +28,7 @@ public class Carro {
     public Date getFechaDeCreacion() { 
         return fechaDeCreacion; 
     }
-    public String getEstado() {
+    public EstadoCarro getEstado() {
         return estado;
     }
     public Cliente getCliente() {
@@ -42,8 +43,8 @@ public class Carro {
     public void setFechaDeCreacion(Date fechaDeCreacion) {
         this.fechaDeCreacion = fechaDeCreacion;
     }
-    public void setEstado(String estado) {
-        this.estado = estado; 
+    public void setEstado(EstadoCarro estado) {
+        this.estado = estado;
     }
     public void setCliente(Cliente cliente) {
         this.cliente = cliente; 
