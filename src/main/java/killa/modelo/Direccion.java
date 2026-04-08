@@ -1,6 +1,6 @@
 package killa.modelo;
 public class Direccion {
-    private int id_direccion;
+    private int idDireccion;
     private String calle;
     private String numero;
     private String distrito;
@@ -10,8 +10,8 @@ public class Direccion {
         
     public Direccion(){};
     
-    public int getId_direccion() {
-        return id_direccion;
+    public int getIdDireccion() {
+        return idDireccion;
     }
 
     public String getCalle() {
@@ -38,8 +38,8 @@ public class Direccion {
         return referencia;
     }
 
-    public void setId_direccion(int id_direccion) {
-        this.id_direccion = id_direccion;
+    public void setIdDireccion(int idDireccion) {
+        this.idDireccion = idDireccion;
     }
 
     public void setCalle(String calle) {
