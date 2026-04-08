@@ -29,7 +29,10 @@ public class Carro {
     public Cliente getCliente() {
         return cliente;
     }
-    public void setIdCarrito(int idCarrito) {
+    public void setItems(List<DetalleCarrito> items) {
+        this.items = items;
+    }
+     public void setIdCarrito(int idCarrito) {
         this.idCarrito = idCarrito;
     }
     public void setFechaDeCreacion(Date fechaDeCreacion) {
@@ -41,4 +44,9 @@ public class Carro {
     public void setCliente(Cliente cliente) {
         this.cliente = cliente; 
     }
+    
+    public List<DetalleCarrito> getItems() {
+        return items;
+    }
+
 }
