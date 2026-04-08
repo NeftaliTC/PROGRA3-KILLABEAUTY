@@ -1,12 +1,12 @@
-
 package killa.modelo;
+
 public class Subcategoria {
-    private int id;
+    private int idSubcategoria;
     private String nombre;
     // Navegación
     private Categoria categoria; // categoría a la que pertenece subcategoría
 
-    //Constructores
+    // Constructores
     public Subcategoria() {}
 
     public Subcategoria(int idSubcategoria, String nombre, Categoria categoria) {
@@ -15,10 +15,10 @@ public class Subcategoria {
         this.categoria = categoria;
     }
 
-    //Metodos
+    // Métodos (sin implementación real por ahora)
     public void cambiarCategoriaPadre(Categoria nuevaCategoria) {}
-    
-    //Getters y setters
+
+    // Getters y setters
     public int getIdSubcategoria() {
         return idSubcategoria;
     }
