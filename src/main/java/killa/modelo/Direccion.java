@@ -5,7 +5,7 @@ public class Direccion {
     private String numero;
     private String distrito;
     private String departamento;
-    private String pais;
     private String codigoPostal;
     private String referencia;
+    public Direccion(){};
 }
