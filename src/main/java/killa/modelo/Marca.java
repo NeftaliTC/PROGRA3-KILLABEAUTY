@@ -8,11 +8,10 @@ public class Marca {
     //Constructores
     public Marca() {};
 
-    public Marca(int idMarca, String nombre, String descripcion, boolean activo) {
+    public Marca(int idMarca, String descripcion, String paisDeOrigen) {
         this.idMarca = idMarca;
-        this.nombre = nombre;
         this.descripcion = descripcion;
-        this.activo = activo;
+        this.paisDeOrigen = paisDeOrigen;
     }
     
     //Getters y setters
