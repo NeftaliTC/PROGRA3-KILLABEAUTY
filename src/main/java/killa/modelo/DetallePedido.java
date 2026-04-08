@@ -6,7 +6,7 @@ public class DetallePedido {
     private double precioAplicado;
 
 
-    //private Pedido pedido;
+    private Pedido pedido;
 
     private Producto producto;
     private Descuento descuentoAplicado;
