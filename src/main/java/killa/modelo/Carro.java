@@ -23,7 +23,7 @@ public class Carro {
     public Date getFechaDeCreacion() { 
         return fechaDeCreacion; 
     }
-    public EstadoCarrito getEstado() {
+    public String getEstado() {
         return estado;
     }
     public Cliente getCliente() {
@@ -35,7 +35,7 @@ public class Carro {
     public void setFechaDeCreacion(Date fechaDeCreacion) {
         this.fechaDeCreacion = fechaDeCreacion;
     }
-    public void setEstado(EstadoCarrito estado) {
+    public void setEstado(String estado) {
         this.estado = estado; 
     }
     public void setCliente(Cliente cliente) {
