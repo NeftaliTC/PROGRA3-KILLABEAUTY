@@ -4,10 +4,11 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Producto {
-    private int idProducto;
+    private int id;
     private String nombre;
     private double precioLista;
     private int stock;
+    private boolean disponible;
     private Marca marca;
     private Categoria categoria;
     private List<EscalaPrecio> escalas;
@@ -19,11 +20,11 @@ public class Producto {
     }
 
     public int getIdProducto() {
-        return idProducto;
+        return id;
     }
 
-    public void setIdProducto(int idProducto) {
-        this.idProducto = idProducto;
+    public void setIdProducto(int id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -49,6 +50,10 @@ public class Producto {
     public void setStock(int stock) {
         this.stock = stock;
     }
+
+    public boolean getDisponible(){return disponible;}
+
+    public void setDisponible(boolean disponible){this.disponible = disponible;}
 
     public Marca getMarca() {
         return marca;

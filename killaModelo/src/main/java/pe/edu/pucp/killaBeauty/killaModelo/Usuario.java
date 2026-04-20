@@ -12,10 +12,11 @@ public class Usuario {
     private LocalDateTime fechaDeInscripcion;
     private String contrasena; //-> estado
     private String telefono;
-    private String estado; // activo - inactivo
+    private boolean activo; // activo - inactivo
     private List<Direccion> direcciones;
     private List<Pedido> pedidos;
     private CarritoDeCompras carritoActivo;
+    private TipoUsuario tipoUsuario;
 
     //Constructores
     public Usuario() {
@@ -23,20 +24,12 @@ public class Usuario {
         this.direcciones = new ArrayList<>();
     }
 
-    //Metodos
-    public void registrarse() {}
-    public void iniciarSesion(String correoElectronico, String contrasena) {}
-    public void realizarPedido() {}
-    public void actualizarDatos() {}
-    public void agregarDireccion(Direccion direccionNueva) {}
-    public void agregarPedido(Pedido pedidoNuevo) {}
-
     //Getters y setters
-    public int getId() {
+    public int getIdUsuario() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setIdUsuario(int id) {
         this.id = id;
     }
 
@@ -80,12 +73,12 @@ public class Usuario {
         this.telefono = telefono;
     }
 
-    public String getEstado() {
-        return estado;
+    public boolean isActivo() {
+        return activo;
     }
 
-    public void setEstado(String estado) {
-        this.estado = estado;
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 
     public List<Direccion> getDirecciones() {
@@ -112,4 +105,7 @@ public class Usuario {
         this.carritoActivo = carritoActivo;
     }
 
+    public TipoUsuario getTipoUsuario(){return tipoUsuario;}
+
+    public void setTipoUsuario(TipoUsuario tipoUsuario){this.tipoUsuario = tipoUsuario;}
 }

@@ -1,23 +1,23 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
 
 public class DetallePedido {
-    private int idDetallePedido;
+    private int id;
     private int cantidad;
     private double precioAplicado;
     private double subtotal;
     private Producto producto;
     private Descuento descuentoAplicado;
-    private Pedido idPedido;
+    private Pedido pedido;
     // Constructor
     public DetallePedido() {}
 
     // Getters y setters
     public int getIdDetallePedido() {
-        return idDetallePedido;
+        return id;
     }
 
-    public void setIdDetallePedido(int idDetallePedido) {
-        this.idDetallePedido = idDetallePedido;
+    public void setIdDetallePedido(int id) {
+        this.id = id;
     }
 
     public int getCantidad() {
@@ -52,7 +52,7 @@ public class DetallePedido {
         this.descuentoAplicado = descuentoAplicado;
     }
 
-    public Pedido getIdPedido(){return idPedido;}
+    public Pedido getPedido(){return pedido;}
 
-    public void setIdPedido(Pedido pedido){};
+    public void setPedido(Pedido pedido){this.pedido = pedido;}
 }

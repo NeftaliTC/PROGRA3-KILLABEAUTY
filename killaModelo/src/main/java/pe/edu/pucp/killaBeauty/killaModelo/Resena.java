@@ -3,7 +3,7 @@ package pe.edu.pucp.killaBeauty.killaModelo;
 import java.time.LocalDateTime;
 
 public class Resena {
-    private int idResena;
+    private int id;
     private String comentario;
     private int calificacion;
     private boolean verificado;
@@ -15,11 +15,11 @@ public class Resena {
     public Resena() {}
 
     public int getIdResena() {
-        return idResena;
+        return id;
     }
 
-    public void setIdResena(int idResena) {
-        this.idResena = idResena;
+    public void setIdResena(int id) {
+        this.id = id;
     }
 
     public String getComentario() {

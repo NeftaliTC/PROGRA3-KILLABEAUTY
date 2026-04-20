@@ -5,10 +5,8 @@ import java.util.ArrayList;
 import java.time.LocalDateTime;
 
 public class Pedido {
-    private int idPedido;
+    private int id;
     private LocalDateTime fechaPedido;
-    private String estado;
-    private String metodoPago;
     private double subtotal;
     private double igv;
     private double total;
@@ -24,11 +22,11 @@ public class Pedido {
     }
 
     public int getIdPedido() {
-        return idPedido;
+        return id;
     }
 
-    public void setIdPedido(int idPedido) {
-        this.idPedido = idPedido;
+    public void setIdPedido(int id) {
+        this.id = id;
     }
 
     public LocalDateTime getFechaPedido() {
@@ -37,22 +35,6 @@ public class Pedido {
 
     public void setFechaPedido(LocalDateTime fechaPedido) {
         this.fechaPedido = fechaPedido;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
-
-    public String getMetodoPago() {
-        return metodoPago;
-    }
-
-    public void setMetodoPago(String metodoPago) {
-        this.metodoPago = metodoPago;
     }
 
     public double getSubtotal() {
