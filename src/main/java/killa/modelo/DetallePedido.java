@@ -6,7 +6,7 @@ public class DetallePedido {
     private double precioAplicado;
     private Producto producto;
     private Descuento descuentoAplicado;
-
+    private double subtotal; 
     // Constructor
     public DetallePedido() {}
 

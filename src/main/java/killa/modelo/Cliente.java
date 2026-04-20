@@ -9,7 +9,7 @@ public class Cliente {
     private String nombre;
     private String correoElectronico;
     private Date fechaDeInscripcion;
-    private String contrasena;
+    private String contrasena; //-> estado
     private String telefono;
     private String estado; // activo - inactivo
     private List<Direccion> direcciones;

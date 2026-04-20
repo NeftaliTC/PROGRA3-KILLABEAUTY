@@ -3,9 +3,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
+// usen Date -> usar localDate
+
+
 public class Carro {
 
-    private int idCarrito;
+    private int idCarrito; // redundante
     private Date fechaDeCreacion;
     private EstadoCarro estado; 
 
