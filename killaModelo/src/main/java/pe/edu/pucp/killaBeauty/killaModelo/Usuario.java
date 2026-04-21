@@ -3,8 +3,8 @@ package pe.edu.pucp.killaBeauty.killaModelo;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
-
-public class Cliente {
+// REVISADA
+public class Usuario {
     private int idCliente;
     private String nombre;
     private String correoElectronico;
@@ -14,10 +14,10 @@ public class Cliente {
     private String estado; // activo - inactivo
     private List<Direccion> direcciones;
     private List<Pedido> pedidos;
-    private Carro carritoActivo;
+    private Carrito carritoActivo;
 
     //Constructores
-    public Cliente() {
+    public Usuario() {
         this.pedidos = new ArrayList<>();
         this.direcciones = new ArrayList<>();
     }
@@ -103,11 +103,11 @@ public class Cliente {
         this.pedidos = pedidos;
     }
 
-    public Carro getCarritoActivo() {
+    public Carrito getCarritoActivo() {
         return carritoActivo;
     }
 
-    public void setCarritoActivo(Carro carritoActivo) {
+    public void setCarritoActivo(Carrito carritoActivo) {
         this.carritoActivo = carritoActivo;
     }
 }

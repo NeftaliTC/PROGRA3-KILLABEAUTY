@@ -6,7 +6,7 @@ import java.util.ArrayList;
 // usen Date -> usar localDate
 
 
-public class Carro {
+public class Carrito {
 
     private int idCarrito; // redundante
     private Date fechaDeCreacion;
@@ -16,7 +16,7 @@ public class Carro {
     private Cliente cliente;
     private List<DetalleCarrito> items;
 
-    public Carro() {
+    public Carrito() {
         this.items = new ArrayList<>();
         this.estado = EstadoCarro.ACTIVO;
     }
