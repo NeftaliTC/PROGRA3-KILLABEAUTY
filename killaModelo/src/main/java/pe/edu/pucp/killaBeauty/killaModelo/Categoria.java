@@ -1,4 +1,4 @@
-package killa.modelo;
+package pe.edu.pucp.killaBeauty.killaModelo;
 import java.util.List;
 import java.util.ArrayList;
 public class Categoria {

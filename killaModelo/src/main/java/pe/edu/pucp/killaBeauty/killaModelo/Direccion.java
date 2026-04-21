@@ -1,4 +1,4 @@
-package killa.modelo;
+package pe.edu.pucp.killaBeauty.killaModelo;
 public class Direccion {
     private int idDireccion;
     private String calle;

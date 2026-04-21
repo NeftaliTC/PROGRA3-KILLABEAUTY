@@ -1,4 +1,4 @@
-package killa.modelo;
+package pe.edu.pucp.killaBeauty.killaModelo;
 
 public class Subcategoria {
     private int idSubcategoria;
