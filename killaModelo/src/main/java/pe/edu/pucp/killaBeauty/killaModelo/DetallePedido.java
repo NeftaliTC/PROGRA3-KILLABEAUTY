@@ -5,7 +5,7 @@ public class DetallePedido {
     private int cantidad;
     private double precioAplicado;
     private Producto producto;
-    private Descuento descuentoAplicado;
+    //private Descuento descuentoAplicado;
     private double subtotal; 
     // Constructor
     public DetallePedido() {}
@@ -52,11 +52,7 @@ public class DetallePedido {
         this.producto = producto;
     }
 
-    public Descuento getDescuentoAplicado() {
-        return descuentoAplicado;
-    }
+    //public Descuento getDescuentoAplicado() { return descuentoAplicado;    }
 
-    public void setDescuentoAplicado(Descuento descuentoAplicado) {
-        this.descuentoAplicado = descuentoAplicado;
-    }
+    //public void setDescuentoAplicado(Descuento descuentoAplicado) {this.descuentoAplicado = descuentoAplicado;}
 }

@@ -11,7 +11,7 @@ public class Pedido {
     private double igv;
     private double total;
 
-    private Cliente cliente;
+    private Usuario cliente;
     private Direccion direccionEnvio;
     private Cupon cupon;
     private List<DetallePedido> detalles;
@@ -65,11 +65,11 @@ public class Pedido {
         return total;
     }
 
-    public Cliente getCliente() {
+    public Usuario getCliente() {
         return cliente;
     }
 
-    public void setCliente(Cliente cliente) {
+    public void setCliente(Usuario cliente) {
         this.cliente = cliente;
     }
 

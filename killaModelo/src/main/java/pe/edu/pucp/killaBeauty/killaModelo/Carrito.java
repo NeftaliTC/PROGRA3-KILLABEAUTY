@@ -13,7 +13,7 @@ public class Carrito {
     private EstadoCarro estado; 
 
 
-    private Cliente cliente;
+    private Usuario cliente;
     private List<DetalleCarrito> items;
 
     public Carrito() {
@@ -34,7 +34,7 @@ public class Carrito {
     public EstadoCarro getEstado() {
         return estado;
     }
-    public Cliente getCliente() {
+    public Usuario getCliente() {
         return cliente;
     }
     public void setItems(List<DetalleCarrito> items) {
@@ -49,7 +49,7 @@ public class Carrito {
     public void setEstado(EstadoCarro estado) {
         this.estado = estado;
     }
-    public void setCliente(Cliente cliente) {
+    public void setCliente(Usuario cliente) {
         this.cliente = cliente; 
     }
     

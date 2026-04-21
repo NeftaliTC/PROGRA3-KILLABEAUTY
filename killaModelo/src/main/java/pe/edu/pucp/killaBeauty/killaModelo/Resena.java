@@ -7,7 +7,7 @@ public class Resena {
     private boolean verificado;
     private Date fechaPublicacion;
 
-    private Cliente cliente;
+    private Usuario cliente;
     private Producto producto;
 
     public Resena() {}
@@ -52,11 +52,11 @@ public class Resena {
         this.fechaPublicacion = fechaPublicacion;
     }
 
-    public Cliente getCliente() {
+    public Usuario getCliente() {
         return cliente;
     }
 
-    public void setCliente(Cliente cliente) {
+    public void setCliente(Usuario cliente) {
         this.cliente = cliente;
     }
 
