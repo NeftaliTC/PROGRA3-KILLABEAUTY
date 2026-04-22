@@ -14,16 +14,16 @@ public class Categoria {
     	subcategorias.add(subcategoria);
 	}
 	//por ver
-	public void eliminarSubcategoriaPorId(int idSubcategoria) {
+	public void eliminarSubcategoriaPorId(int id) {
     	for (int i = 0; i < subcategorias.size(); i++) {
-        	if (subcategorias.get(i).getIdSubcategoria() == idSubcategoria) {
+        	if (subcategorias.get(i).getId() == id) {
            		subcategorias.remove(i);
             	break;
         	}
     	}
 	}	
 
-	public int getIdCategoria() {
+	public int getId() {
     	return id;
 	}
 
@@ -34,8 +34,8 @@ public class Categoria {
     	return subcategorias;
 	}
 
-	public void setIdCategoria(int idCategoria) {
-    	this.id = idCategoria;
+	public void setId(int id) {
+    	this.id = id;
 	}
 
 	public void setNombre(String nombre) {
