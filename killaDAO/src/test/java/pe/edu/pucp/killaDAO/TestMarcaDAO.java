@@ -37,12 +37,12 @@ public class TestMarcaDAO {
                 System.out.println(" - " + m.getId() + " | " + m.getDescripcion() + " | " + m.getPaisDeOrigen());
             }
 
-//            // 5) REMOVE
-//            if (cargada != null) {
-//                marcaDAO.remove(cargada);
-//                Marca eliminada = marcaDAO.load(cargada.getId());
-//                System.out.println("REMOVE OK -> " + (eliminada == null ? "eliminada" : "aun existe"));
-//            }
+            // 5) REMOVE
+            if (cargada != null) {
+                marcaDAO.remove(cargada);
+                Marca eliminada = marcaDAO.load(cargada.getId());
+                System.out.println("REMOVE OK -> " + (eliminada == null ? "eliminada" : "aun existe"));
+            }
 
         } catch (SQLException e) {
             System.err.println("Error SQL: " + e.getMessage());
