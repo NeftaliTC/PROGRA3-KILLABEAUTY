@@ -5,14 +5,18 @@ import java.util.List;
 public class Producto {
     private int id;
     private String nombre;
-    private double precioLista;
+    private double precioBase;
     private int stock;
+    private boolean disponible;
+    private boolean promocion;
     private Marca marca;
     private Categoria categoria;
     private List<EscalaPrecio> escalas;
     private List<Resena> resenas;
 
     public Producto() {
+        this.marca = new Marca();
+        this.categoria = new Categoria();
         this.escalas = new ArrayList<>();
         this.resenas = new ArrayList<>();
     }
@@ -33,12 +37,12 @@ public class Producto {
         this.nombre = nombre;
     }
 
-    public double getPrecioLista() {
-        return precioLista;
+    public double getPrecioBase() {
+        return precioBase;
     }
 
-    public void setPrecioLista(double precioLista) {
-        this.precioLista = precioLista;
+    public void setPrecioBase(double precioBase) {
+        this.precioBase = precioBase;
     }
 
     public int getStock() {
@@ -48,6 +52,14 @@ public class Producto {
     public void setStock(int stock) {
         this.stock = stock;
     }
+
+    public boolean getDisponible() { return disponible; }
+
+    public void setDisponible(boolean disponible) { this.disponible = disponible; }
+
+    public boolean getPromocion() { return promocion; }
+
+    public void setPromocion(boolean promocion) { this.promocion = promocion; }
 
     public Marca getMarca() {
         return marca;
