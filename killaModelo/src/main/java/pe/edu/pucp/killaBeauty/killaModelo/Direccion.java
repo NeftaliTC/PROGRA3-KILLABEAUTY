@@ -1,31 +1,23 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
+
 public class Direccion {
     private int id;
-    private String calle;
-    private String numero;
     private String distrito;
+    private String provincia;
     private String departamento;
-    private String codigoPostal;
+    private String direccionExacta;
     private String referencia;
+    private int idUsuario;
         
     public Direccion(){};
 
     public String mostrarDireccion() {
-    return calle + " " + numero + ", " + distrito + ", " + departamento +
-           ", CP: " + codigoPostal +
-           ", Ref: " + referencia;
+        return direccionExacta + " (Ref: " + referencia + "), " +
+                distrito + ", " + provincia + ", " + departamento;
     }
     
     public int getIdDireccion() {
         return id;
-    }
-
-    public String getCalle() {
-        return calle;
-    }
-
-    public String getNumero() {
-        return numero;
     }
 
     public String getDistrito() {
@@ -36,24 +28,18 @@ public class Direccion {
         return departamento;
     }
 
-    public String getCodigoPostal() {
-        return codigoPostal;
-    }
+    public String getProvincia() { return provincia; }
+
+    public String getDireccionExacta() { return direccionExacta; }
 
     public String getReferencia() {
         return referencia;
     }
 
+    public int getIdUsuario() { return idUsuario; }
+
     public void setIdDireccion(int idDireccion) {
         this.id = idDireccion;
-    }
-
-    public void setCalle(String calle) {
-        this.calle = calle;
-    }
-
-    public void setNumero(String numero) {
-        this.numero = numero;
     }
 
     public void setDistrito(String distrito) {
@@ -64,13 +50,14 @@ public class Direccion {
         this.departamento = departamento;
     }
 
-    public void setCodigoPostal(String codigoPostal) {
-        this.codigoPostal = codigoPostal;
-    }
+    public void setProvincia(String provincia) { this.provincia = provincia; }
+
+    public void setDireccionExacta(String direccionExacta) { this.direccionExacta = direccionExacta; }
 
     public void setReferencia(String referencia) {
         this.referencia = referencia;
     }
-    
+
+    public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
 }
 
