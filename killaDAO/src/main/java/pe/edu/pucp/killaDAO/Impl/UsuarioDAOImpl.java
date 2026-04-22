@@ -4,7 +4,7 @@ package pe.edu.pucp.killaDAO.Impl;
 
 import java.sql.*;
 
-import pe.edu.pucp.dbManager.dbManager;
+import pe.edu.pucp.dbManager.DBManager;
 import pe.edu.pucp.killaBeauty.killaModelo.Usuario;
 import pe.edu.pucp.killaDAO.UsuarioDAO;
 
@@ -20,7 +20,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
                 "correo_electronico, fecha_de_inscripcion, contrasena, telefono, activo, id_tipoUsuario " +
                 "FROM Usuario " +
                 "WHERE activo = TRUE";
-        try(Connection connection=dbManager.getInstance().getConnection();
+        try(Connection connection=DBManager.getInstance().getConnection();
             Statement stm=connection.createStatement(); ResultSet rs=stm.executeQuery(sql)) {
             while(rs.next()){
                 Usuario usuario=new Usuario();
@@ -49,7 +49,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
                 "correo_electronico, fecha_de_inscripcion, contrasena, telefono, activo, id_tipoUsuario " +
                 "FROM Usuario " +
                 "WHERE id_usuario = ?";
-        try(Connection connection=dbManager.getInstance().getConnection();
+        try(Connection connection=DBManager.getInstance().getConnection();
             PreparedStatement pstmt=connection.prepareStatement(sql)) {
             pstmt.setInt(1,id);
             try(ResultSet rs=pstmt.executeQuery()) {
@@ -79,7 +79,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         String sql="INSERT INTO Usuario " +
                 "(nombre, apellido_materno, apellido_paterno, correo_electronico, contrasena, telefono, activo, id_tipoUsuario) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection connection=dbManager.getInstance().getConnection();
+        try (Connection connection=DBManager.getInstance().getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
             pstmt.setString(1, usuario.getNombre());
             pstmt.setString(2, usuario.getApellidoMaterno());
@@ -110,7 +110,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         String sql = "UPDATE Usuario SET nombre = ?, apellido_materno = ?, apellido_paterno = ?, " +
                 "correo_electronico = ?, contrasena = ?, telefono = ?, activo = ?, id_tipoUsuario= ?" +
                 "WHERE id_usuario = ?";
-        try (Connection connection = dbManager.getInstance().getConnection();
+        try (Connection connection = DBManager.getInstance().getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, usuario.getNombre());
             pstmt.setString(2, usuario.getApellidoMaterno());
@@ -133,7 +133,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         usuario.setEstado(false);
         String sql = "UPDATE Usuario SET activo = ? WHERE id_usuario = ?";
 
-        try (Connection connection = dbManager.getInstance().getConnection();
+        try (Connection connection = DBManager.getInstance().getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
             pstmt.setBoolean(1, usuario.getEstado());

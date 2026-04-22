@@ -1,9 +1,10 @@
 package pe.edu.pucp.killaDAO.Impl;
 
 
+import pe.edu.pucp.dbManager.DBManager;
 import pe.edu.pucp.killaDAO.MarcaDAO;
 import pe.edu.pucp.killaBeauty.killaModelo.Marca;
-import pe.edu.pucp.dbManager.dbManager;
+import pe.edu.pucp.dbManager.DBManager;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class MarcaDAOImpl implements MarcaDAO {
     public List<Marca> listAll() throws SQLException {
         List<Marca> marcas = new ArrayList<>();
         String sql = "SELECT id_marca, descripcion, pais_origen FROM Marca";
-        try (Connection connection = dbManager.getInstance().getConnection();
+        try (Connection connection = DBManager.getInstance().getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
@@ -34,7 +35,7 @@ public class MarcaDAOImpl implements MarcaDAO {
     @Override
     public Marca load(Integer id) throws SQLException {
         String sql = "SELECT id_marca, descripcion, pais_origen FROM Marca WHERE id_marca = ?";
-        try (Connection connection = dbManager.getInstance().getConnection();
+        try (Connection connection = DBManager.getInstance().getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
@@ -55,7 +56,7 @@ public class MarcaDAOImpl implements MarcaDAO {
     @Override
     public Marca save(Marca marca) throws SQLException {
         String sql = "INSERT INTO Marca (descripcion, pais_origen) VALUES (?, ?)";
-        try (Connection connection = dbManager.getInstance().getConnection();
+        try (Connection connection = DBManager.getInstance().getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, marca.getDescripcion());
@@ -76,7 +77,7 @@ public class MarcaDAOImpl implements MarcaDAO {
     @Override
     public Marca update(Marca marca) throws SQLException {
         String sql = "UPDATE Marca SET descripcion = ?, pais_origen = ? WHERE id_marca = ?";
-        try (Connection connection = dbManager.getInstance().getConnection();
+        try (Connection connection = DBManager.getInstance().getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
             pstmt.setString(1, marca.getDescripcion());
@@ -93,7 +94,7 @@ public class MarcaDAOImpl implements MarcaDAO {
         // Como tu tabla Marca no tiene campo "activo", aquí va borrado físico.
         // Si luego agregan "activo", lo cambiamos a borrado lógico.
         String sql = "DELETE FROM Marca WHERE id_marca = ?";
-        try (Connection connection = dbManager.getInstance().getConnection();
+        try (Connection connection = DBManager.getInstance().getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
             pstmt.setInt(1, marca.getId());
