@@ -1,6 +1,6 @@
-package pe.edu.pucp.killaDAO.baseDao;
+package pe.edu.pucp.killaDAO.Base;
 import java.sql.SQLException;
-public interface baseDao<T, ID> {
+public interface BaseDAO<T, ID> {
     T load(ID id) throws SQLException;
     T save(ID id)throws SQLException;
     T update(ID id)throws SQLException;
