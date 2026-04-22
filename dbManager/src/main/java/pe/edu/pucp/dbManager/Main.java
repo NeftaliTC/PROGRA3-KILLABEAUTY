@@ -9,7 +9,7 @@ public class Main {
 
         try {
 
-            dbManager manager = dbManager.getInstance();
+            DBManager manager = DBManager.getInstance();
 
 
             Connection con = manager.getConnection();
