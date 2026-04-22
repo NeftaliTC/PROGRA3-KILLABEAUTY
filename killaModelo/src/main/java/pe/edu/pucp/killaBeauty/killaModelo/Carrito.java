@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class Carrito {
 
-    private int idCarrito; // redundante
+    private int id; // redundante
     private Date fechaDeCreacion;
     private EstadoCarro estado; 
 
@@ -26,7 +26,7 @@ public class Carrito {
     }
         
     public int getIdCarrito() {
-        return idCarrito; 
+        return id;
     }
     public Date getFechaDeCreacion() { 
         return fechaDeCreacion; 
@@ -41,7 +41,7 @@ public class Carrito {
         this.items = items;
     }
      public void setIdCarrito(int idCarrito) {
-        this.idCarrito = idCarrito;
+        this.id = idCarrito;
     }
     public void setFechaDeCreacion(Date fechaDeCreacion) {
         this.fechaDeCreacion = fechaDeCreacion;
