@@ -15,7 +15,7 @@ public class Marca {
     }
     
     //Getters y setters
-    public int getIdMarca() {
+    public int getId() {
         return id;
     }
 
@@ -27,7 +27,7 @@ public class Marca {
         return paisDeOrigen;
     }
 
-    public void setIdMarca(int id) {
+    public void setId(int id) {
         this.id = id;
     }
 
