@@ -46,7 +46,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     public Usuario load(Integer id) throws SQLException {
 
         String sql = "SELECT id_usuario, nombre, apellido_materno, apellido_paterno, " +
-                "correo_electronico, fecha_de_inscripcion, contrasena, telefono, activo, id_tipoUsuario " +
+                "correo_electronico, fecha_de_inscripcion, contrasena, telefono, activo " +
                 "FROM Usuario " +
                 "WHERE id_usuario = ?";
         try(Connection connection=DBManager.getInstance().getConnection();
@@ -64,7 +64,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
                     usuario.setContrasena(rs.getString(7));
                     usuario.setTelefono(rs.getString(8));
                     usuario.setEstado(rs.getBoolean(9));
-                    usuario.setId_tipoUsuario(rs.getInt(10));
+
                     return usuario;
 
                 }
@@ -77,7 +77,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     public Usuario save(Usuario usuario) throws SQLException {
         usuario.setEstado(true);
         String sql="INSERT INTO Usuario " +
-                "(nombre, apellido_materno, apellido_paterno, correo_electronico, contrasena, telefono, activo, id_tipoUsuario) " +
+                "(nombre, apellido_materno, apellido_paterno, correo_electronico, contrasena, telefono, activo) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection=DBManager.getInstance().getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
@@ -88,7 +88,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
             pstmt.setString(5, usuario.getContrasena());
             pstmt.setString(6, usuario.getTelefono());
             pstmt.setBoolean(7, usuario.getEstado());
-            pstmt.setInt(8, usuario.getId_tipoUsuario());
+
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
@@ -108,7 +108,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     @Override
     public Usuario update(Usuario usuario) throws SQLException {
         String sql = "UPDATE Usuario SET nombre = ?, apellido_materno = ?, apellido_paterno = ?, " +
-                "correo_electronico = ?, contrasena = ?, telefono = ?, activo = ?, id_tipoUsuario= ?" +
+                "correo_electronico = ?, contrasena = ?, telefono = ?, activo = ?" +
                 "WHERE id_usuario = ?";
         try (Connection connection = DBManager.getInstance().getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -119,7 +119,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
             pstmt.setString(5, usuario.getContrasena());
             pstmt.setString(6, usuario.getTelefono());
             pstmt.setBoolean(7, usuario.getEstado());
-            pstmt.setInt(8, usuario.getId_tipoUsuario());
+
             pstmt.executeUpdate();
             return usuario;
         } catch (SQLException e){
