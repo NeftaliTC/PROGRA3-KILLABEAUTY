@@ -1,8 +1,8 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Pedido {
     private int id;
@@ -22,8 +22,8 @@ public class Pedido {
         this.detalles = new ArrayList<>();
         this.fechaPedido = LocalDate.now();
     }
-	
-	public int getIdPedido() {
+
+    public int getIdPedido() {
         return id;
     }
 
@@ -59,12 +59,24 @@ public class Pedido {
         return subtotal;
     }
 
+    public void setSubtotal(double subtotal) {
+        this.subtotal = subtotal;
+    }
+
     public double getIgv() {
         return igv;
     }
 
+    public void setIgv(double igv) {
+        this.igv = igv;
+    }
+
     public double getTotal() {
         return total;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
     }
 
     public Usuario getCliente() {
@@ -108,7 +120,8 @@ public class Pedido {
     }
 
     public void recalcularTotales() {
-        this.subtotal = 0;
+        this.subtotal = 0.0;
+
         for (DetallePedido d : detalles) {
             if (d != null) this.subtotal += d.calcularTotalConDescuento();
         }
