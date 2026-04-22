@@ -5,21 +5,20 @@ public class DetallePedido {
     private int cantidad;
     private double precioAplicado;
     private Producto producto;
-    //private Descuento descuentoAplicado;
-    private double subtotal; 
-    // Constructor
+    private double subtotal;
+
     public DetallePedido() {}
 
-    // Métodos 
     public double calcularSubtotal() {
-        return 0.0;
+        this.subtotal = this.cantidad * this.precioAplicado;
+        return this.subtotal;
     }
 
     public double calcularTotalConDescuento() {
-        return 0.0;
+        // Por ahora no hay descuento por ítem
+        return calcularSubtotal();
     }
 
-    // Getters y setters
     public int getIdDetallePedido() {
         return id;
     }
@@ -33,7 +32,7 @@ public class DetallePedido {
     }
 
     public void setCantidad(int cantidad) {
-        this.cantidad = cantidad;
+        this.cantidad = Math.max(0, cantidad);
     }
 
     public double getPrecioAplicado() {
@@ -41,7 +40,7 @@ public class DetallePedido {
     }
 
     public void setPrecioAplicado(double precioAplicado) {
-        this.precioAplicado = precioAplicado;
+        this.precioAplicado = Math.max(0, precioAplicado);
     }
 
     public Producto getProducto() {
@@ -52,7 +51,7 @@ public class DetallePedido {
         this.producto = producto;
     }
 
-    //public Descuento getDescuentoAplicado() { return descuentoAplicado;    }
-
-    //public void setDescuentoAplicado(Descuento descuentoAplicado) {this.descuentoAplicado = descuentoAplicado;}
+    public double getSubtotal() {
+        return subtotal;
+    }
 }
