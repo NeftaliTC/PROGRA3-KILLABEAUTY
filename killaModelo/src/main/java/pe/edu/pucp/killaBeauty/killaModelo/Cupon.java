@@ -3,10 +3,10 @@ import java.util.Date;
 
 public class Cupon {
 
-    private int idCupon;
+    private int id;
     private String codigo;
     private String descripcion;
-    private double porcentajeDeDescuento;
+    private double porcentaje;
     private Date fechaInicio;
     private Date fechaFin;
     private boolean activo;
@@ -15,9 +15,9 @@ public class Cupon {
     public Cupon() {}
 
     public Cupon(int idCupon, String codigo, double porcentajeDeDescuento, Date fechaInicio, Date fechaFin, boolean activo) {
-        this.idCupon = idCupon;
+        this.id = idCupon;
         this.codigo = codigo;
-        this.porcentajeDeDescuento = porcentajeDeDescuento;
+        this.porcentaje = porcentajeDeDescuento;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
         this.activo = activo;
@@ -32,11 +32,11 @@ public class Cupon {
 
     // Getters y setters
     public int getIdCupon() {
-        return idCupon;
+        return id;
     }
 
     public void setIdCupon(int idCupon) {
-        this.idCupon = idCupon;
+        this.id = idCupon;
     }
 
     public String getCodigo() {
@@ -56,15 +56,15 @@ public class Cupon {
     }
 
     public double getPorcentajeDescuento() {
-        return porcentajeDeDescuento;
+        return porcentaje;
     }
 
     public double getPorcentajeDeDescuento() {
-        return porcentajeDeDescuento;
+        return porcentaje;
     }
 
     public void setPorcentajeDeDescuento(double porcentajeDeDescuento) {
-        this.porcentajeDeDescuento = porcentajeDeDescuento;
+        this.porcentaje = porcentajeDeDescuento;
     }
 
     public Date getFechaInicio() {

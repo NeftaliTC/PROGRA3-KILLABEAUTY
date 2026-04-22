@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Producto {
-    private int idProducto;
+    private int id;
     private String nombre;
     private double precioLista;
     private int stock;
@@ -18,11 +18,11 @@ public class Producto {
     }
 
     public int getIdProducto() {
-        return idProducto;
+        return id;
     }
 
     public void setIdProducto(int idProducto) {
-        this.idProducto = idProducto;
+        this.id = idProducto;
     }
 
     public String getNombre() {

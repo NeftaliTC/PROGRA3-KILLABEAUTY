@@ -1,6 +1,6 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
 public class Direccion {
-    private int idDireccion;
+    private int id;
     private String calle;
     private String numero;
     private String distrito;
@@ -17,7 +17,7 @@ public class Direccion {
     }
     
     public int getIdDireccion() {
-        return idDireccion;
+        return id;
     }
 
     public String getCalle() {
@@ -45,7 +45,7 @@ public class Direccion {
     }
 
     public void setIdDireccion(int idDireccion) {
-        this.idDireccion = idDireccion;
+        this.id = idDireccion;
     }
 
     public void setCalle(String calle) {

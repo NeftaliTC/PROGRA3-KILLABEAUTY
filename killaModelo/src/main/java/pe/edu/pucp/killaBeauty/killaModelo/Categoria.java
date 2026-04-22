@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Categoria {
-    private int idCategoria;
+    private int id;
     private String nombre;
     private List<Subcategoria> subcategorias;
 	
@@ -24,7 +24,7 @@ public class Categoria {
 	}	
 
 	public int getIdCategoria() {
-    	return idCategoria;
+    	return id;
 	}
 
 	public String getNombre() {
@@ -35,7 +35,7 @@ public class Categoria {
 	}
 
 	public void setIdCategoria(int idCategoria) {
-    	this.idCategoria = idCategoria;
+    	this.id = idCategoria;
 	}
 
 	public void setNombre(String nombre) {

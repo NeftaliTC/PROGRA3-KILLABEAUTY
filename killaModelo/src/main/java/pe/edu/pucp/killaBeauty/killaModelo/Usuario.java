@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 // REVISADA
 public class Usuario {
-    private int idCliente;
+    private int id;
     private String nombre;
     private String correoElectronico;
     private Date fechaDeInscripcion;
@@ -32,11 +32,11 @@ public class Usuario {
     
     //Getters y setters
     public int getIdCliente() {
-        return idCliente;
+        return id;
     }
 
     public void setIdCliente(int idCliente) {
-        this.idCliente = idCliente;
+        this.id = idCliente;
     }
 
     public String getNombre() {

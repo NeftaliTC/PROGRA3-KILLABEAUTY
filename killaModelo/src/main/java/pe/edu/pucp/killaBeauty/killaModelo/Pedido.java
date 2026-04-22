@@ -3,7 +3,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 public class Pedido {
-    private int idPedido;
+    private int id;
     private Date fechaPedido;
     private String estado;
     private String metodoPago;
@@ -22,11 +22,11 @@ public class Pedido {
     }
 	
 	public int getIdPedido() {
-        return idPedido;
+        return id;
     }
 
-    public void setIdPedido(int idPedido) {
-        this.idPedido = idPedido;
+    public void setIdPedido(int id) {
+        this.id = id;
     }
 
     public Date getFechaPedido() {

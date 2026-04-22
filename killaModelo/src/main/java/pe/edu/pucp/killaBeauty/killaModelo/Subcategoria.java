@@ -1,7 +1,7 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
 
 public class Subcategoria {
-    private int idSubcategoria;
+    private int id;
     private String nombre;
     // Navegación
     private Categoria categoria; // categoría a la que pertenece subcategoría
@@ -10,7 +10,7 @@ public class Subcategoria {
     public Subcategoria() {}
 
     public Subcategoria(int idSubcategoria, String nombre, Categoria categoria) {
-        this.idSubcategoria = idSubcategoria;
+        this.id = idSubcategoria;
         this.nombre = nombre;
         this.categoria = categoria;
     }
@@ -20,11 +20,11 @@ public class Subcategoria {
 
     // Getters y setters
     public int getIdSubcategoria() {
-        return idSubcategoria;
+        return id;
     }
 
     public void setIdSubcategoria(int idSubcategoria) {
-        this.idSubcategoria = idSubcategoria;
+        this.id = idSubcategoria;
     }
 
     public String getNombre() {

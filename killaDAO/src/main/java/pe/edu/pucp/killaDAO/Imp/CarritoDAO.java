@@ -7,5 +7,5 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface CarritoDAO extends BaseDAO<Carrito,Integer> {
-    List<Carrito> lsitAll() throws SQLException;
+    List<Carrito> listAll() throws SQLException;
 }

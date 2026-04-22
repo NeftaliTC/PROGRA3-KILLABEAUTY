@@ -1,7 +1,7 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
 
 public class DetallePedido {
-    private int idDetallePedido;
+    private int id;
     private int cantidad;
     private double precioAplicado;
     private Producto producto;
@@ -21,11 +21,11 @@ public class DetallePedido {
 
     // Getters y setters
     public int getIdDetallePedido() {
-        return idDetallePedido;
+        return id;
     }
 
     public void setIdDetallePedido(int idDetallePedido) {
-        this.idDetallePedido = idDetallePedido;
+        this.id = idDetallePedido;
     }
 
     public int getCantidad() {
