@@ -1,0 +1,10 @@
+package pe.edu.pucp.killaDAO.Imp;
+
+import pe.edu.pucp.killaBeauty.killaModelo.Usuario;
+import pe.edu.pucp.killaDAO.Base.BaseDAO;
+
+import java.sql.SQLException;
+import java.util.List;
+public interface UsuarioDAO extends BaseDAO<Usuario,Integer> {
+    List<Usuario> listAll() throws SQLException;
+}

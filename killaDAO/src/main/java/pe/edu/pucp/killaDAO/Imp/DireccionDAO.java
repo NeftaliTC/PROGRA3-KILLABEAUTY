@@ -1,0 +1,10 @@
+package pe.edu.pucp.killaDAO.Imp;
+
+import pe.edu.pucp.killaBeauty.killaModelo.Direccion;
+import pe.edu.pucp.killaDAO.Base.BaseDAO;
+
+import java.sql.SQLException;
+import java.util.List;
+public interface DireccionDAO extends BaseDAO<Direccion,Integer> {
+    List<Direccion> listAll() throws SQLException;
+}
