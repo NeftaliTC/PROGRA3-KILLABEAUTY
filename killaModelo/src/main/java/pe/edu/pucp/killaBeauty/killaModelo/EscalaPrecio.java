@@ -3,7 +3,25 @@ package pe.edu.pucp.killaBeauty.killaModelo;
 public class EscalaPrecio {
     private int cantidadMinima;
     private double precioUnitario;
-    
+    private int id;
+    private boolean activo;
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public EscalaPrecio(){};
 
     public int getCantidadMinima() {
