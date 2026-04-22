@@ -1,19 +1,21 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
 
 public class DetalleCarrito {
-    private int idDetalleCarrito;
+    private int id;
     private int cantidad;
     private Producto producto;
+    private int idCarrito;
 
-
-    public DetalleCarrito() {}
+    public DetalleCarrito() {
+        this.producto = new Producto();
+    }
 
     public int getIdDetalleCarrito() {
-        return idDetalleCarrito;
+        return id;
     }
 
     public void setIdDetalleCarrito(int idDetalleCarrito) {
-        this.idDetalleCarrito = idDetalleCarrito;
+        this.id = idDetalleCarrito;
     }
 
     public int getCantidad() {
@@ -32,7 +34,12 @@ public class DetalleCarrito {
         this.producto = producto;
     }
 
+    public int getIdCarrito() { return idCarrito; }
+
+    public void setIdCarrito(int idCarrito) { this.idCarrito = idCarrito; }
+
     public double calcularSubtotal() {
+        if (producto != null) return cantidad * producto.getPrecioBase();
         return 0.0;
     }
 }
