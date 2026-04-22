@@ -8,13 +8,16 @@ public class Usuario {
     private int id;
     private String nombre;
     private String correoElectronico;
+    private String apellidoMaterno;
+    private String apellidoPaterno;
     private Date fechaDeInscripcion;
     private String contrasena; //-> estado
     private String telefono;
-    private String estado; // activo - inactivo
+    private boolean estado; // 1=activo - 0=inactivo
     private List<Direccion> direcciones;
     private List<Pedido> pedidos;
     private Carrito carritoActivo;
+    private int id_tipoUsuario;
 
     //Constructores
     public Usuario() {
@@ -31,12 +34,12 @@ public class Usuario {
     public void agregarPedido(Pedido pedidoNuevo) {}
     
     //Getters y setters
-    public int getIdCliente() {
+    public int getId() {
         return id;
     }
 
-    public void setIdCliente(int idCliente) {
-        this.id = idCliente;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -79,11 +82,11 @@ public class Usuario {
         this.telefono = telefono;
     }
 
-    public String getEstado() {
+    public boolean getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(boolean estado) {
         this.estado = estado;
     }
 
@@ -109,5 +112,29 @@ public class Usuario {
 
     public void setCarritoActivo(Carrito carritoActivo) {
         this.carritoActivo = carritoActivo;
+    }
+
+    public String getApellidoMaterno() {
+        return apellidoMaterno;
+    }
+
+    public void setApellidoMaterno(String apellidoMaterno) {
+        this.apellidoMaterno = apellidoMaterno;
+    }
+
+    public String getApellidoPaterno() {
+        return apellidoPaterno;
+    }
+
+    public void setApellidoPaterno(String apellidoPaterno) {
+        this.apellidoPaterno = apellidoPaterno;
+    }
+
+    public int getId_tipoUsuario() {
+        return id_tipoUsuario;
+    }
+
+    public void setId_tipoUsuario(int id_tipoUsuario) {
+        this.id_tipoUsuario = id_tipoUsuario;
     }
 }

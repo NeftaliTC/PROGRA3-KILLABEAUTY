@@ -1,6 +1,7 @@
 package pe.edu.pucp.killaDAO.Impl;
 
 
+import pe.edu.pucp.dbManager.DBManager;
 import pe.edu.pucp.killaDAO.MarcaDAO;
 import pe.edu.pucp.killaBeauty.killaModelo.Marca;
 import pe.edu.pucp.dbManager.DBManager;
