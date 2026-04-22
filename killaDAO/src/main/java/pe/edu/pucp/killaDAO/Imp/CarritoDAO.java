@@ -1,5 +1,7 @@
 package pe.edu.pucp.killaDAO.Imp;
 
-public interface CarritoDAO extends baseDao {
+import pe.edu.pucp.killaDAO.Base.BaseDAO;
+
+public interface CarritoDAO extends BaseDAO {
 
 }
