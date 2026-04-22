@@ -1,18 +1,17 @@
-package pe.edu.pucp.killaDAO.Imp;
+package pe.edu.pucp.killaDAO.Impl;
 
 
 
 import java.sql.*;
 
 import pe.edu.pucp.dbManager.dbManager;
-import pe.edu.pucp.killaBeauty.killaModelo.TipoUsuario;
 import pe.edu.pucp.killaBeauty.killaModelo.Usuario;
 import pe.edu.pucp.killaDAO.UsuarioDAO;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class UsuarioDAOImp implements UsuarioDAO {
+public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
     public List<Usuario> listAll() throws SQLException {
