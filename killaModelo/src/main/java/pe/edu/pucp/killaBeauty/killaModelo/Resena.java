@@ -1,16 +1,22 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
-import java.util.Date;
+import java.time.LocalDate;
+
 public class Resena {
     private int id;
+    private String titulo;
     private String comentario;
     private int calificacion;
     private boolean verificado;
-    private Date fechaPublicacion;
+    private LocalDate fechaPublicacion;
 
     private Usuario cliente;
     private Producto producto;
 
-    public Resena() {}
+    public Resena() {
+        this.fechaPublicacion = LocalDate.now();
+        this.cliente = new Usuario();
+        this.producto = new Producto();
+    }
 
     public int getIdResena() {
         return id;
@@ -19,6 +25,10 @@ public class Resena {
     public void setIdResena(int idResena) {
         this.id = idResena;
     }
+
+    public String getTitulo() { return titulo; }
+
+    public void setTitulo(String titulo) { this.titulo = titulo; }
 
     public String getComentario() {
         return comentario;
@@ -44,11 +54,11 @@ public class Resena {
         this.verificado = verificado;
     }
 
-    public Date getFechaPublicacion() {
+    public LocalDate getFechaPublicacion() {
         return fechaPublicacion;
     }
 
-    public void setFechaPublicacion(Date fechaPublicacion) {
+    public void setFechaPublicacion(LocalDate fechaPublicacion) {
         this.fechaPublicacion = fechaPublicacion;
     }
 
@@ -69,4 +79,5 @@ public class Resena {
     }
 
     public void validarCalificacion() {}
+
 }
