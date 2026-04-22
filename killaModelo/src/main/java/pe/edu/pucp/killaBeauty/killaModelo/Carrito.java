@@ -1,4 +1,4 @@
-package killa.modelo;
+package pe.edu.pucp.killaBeauty.killaModelo;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
@@ -6,17 +6,17 @@ import java.util.ArrayList;
 // usen Date -> usar localDate
 
 
-public class Carro {
+public class Carrito {
 
     private int idCarrito; // redundante
     private Date fechaDeCreacion;
     private EstadoCarro estado; 
 
 
-    private Cliente cliente;
+    private Usuario cliente;
     private List<DetalleCarrito> items;
 
-    public Carro() {
+    public Carrito() {
         this.items = new ArrayList<>();
         this.estado = EstadoCarro.ACTIVO;
     }
@@ -34,7 +34,7 @@ public class Carro {
     public EstadoCarro getEstado() {
         return estado;
     }
-    public Cliente getCliente() {
+    public Usuario getCliente() {
         return cliente;
     }
     public void setItems(List<DetalleCarrito> items) {
@@ -49,7 +49,7 @@ public class Carro {
     public void setEstado(EstadoCarro estado) {
         this.estado = estado;
     }
-    public void setCliente(Cliente cliente) {
+    public void setCliente(Usuario cliente) {
         this.cliente = cliente; 
     }
     

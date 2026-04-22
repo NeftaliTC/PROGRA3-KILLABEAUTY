@@ -1,4 +1,5 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
+<<<<<<< HEAD
 
 import java.util.List;
 import java.util.ArrayList;
@@ -9,6 +10,16 @@ public class Producto {
     private double precioLista;
     private int stock;
     private boolean disponible;
+=======
+import java.util.ArrayList;
+import java.util.List;
+
+public class Producto {
+    private int idProducto;
+    private String nombre;
+    private double precioLista;
+    private int stock;
+>>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
     private Marca marca;
     private Categoria categoria;
     private List<EscalaPrecio> escalas;
@@ -20,11 +31,19 @@ public class Producto {
     }
 
     public int getIdProducto() {
+<<<<<<< HEAD
         return id;
     }
 
     public void setIdProducto(int id) {
         this.id = id;
+=======
+        return idProducto;
+    }
+
+    public void setIdProducto(int idProducto) {
+        this.idProducto = idProducto;
+>>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
     }
 
     public String getNombre() {
@@ -51,10 +70,13 @@ public class Producto {
         this.stock = stock;
     }
 
+<<<<<<< HEAD
     public boolean getDisponible(){return disponible;}
 
     public void setDisponible(boolean disponible){this.disponible = disponible;}
 
+=======
+>>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
     public Marca getMarca() {
         return marca;
     }
@@ -87,4 +109,18 @@ public class Producto {
         this.resenas = resenas;
     }
 
+<<<<<<< HEAD
+=======
+    public void registrarProducto() {}
+
+    public void actualizarStock(int cantidad) {}
+
+    public double obtenerPrecioParaCantidad(int cantidad) {
+        return 0.0;
+    }
+
+    public void agregarEscala(EscalaPrecio escala) {}
+
+    public void agregarResena(Resena resena) {}
+>>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
 }
