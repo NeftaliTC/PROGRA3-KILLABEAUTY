@@ -10,9 +10,7 @@ public class Carrito {
 
     private int id; // redundante
     private Date fechaDeCreacion;
-    private EstadoCarro estado; 
-
-
+    private EstadoCarro estado;
     private Usuario cliente;
     private List<DetalleCarrito> items;
 
@@ -25,7 +23,7 @@ public class Carrito {
         items.add(item);
     }
         
-    public int getIdCarrito() {
+    public int getId() {
         return id;
     }
     public Date getFechaDeCreacion() { 
@@ -40,8 +38,8 @@ public class Carrito {
     public void setItems(List<DetalleCarrito> items) {
         this.items = items;
     }
-     public void setIdCarrito(int idCarrito) {
-        this.id = idCarrito;
+     public void setId(int id) {
+        this.id = id;
     }
     public void setFechaDeCreacion(Date fechaDeCreacion) {
         this.fechaDeCreacion = fechaDeCreacion;
