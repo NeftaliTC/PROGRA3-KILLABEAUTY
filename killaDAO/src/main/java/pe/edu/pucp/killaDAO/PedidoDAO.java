@@ -1,4 +1,4 @@
-package pe.edu.pucp.killaDAO.Imp;
+package pe.edu.pucp.killaDAO;
 
 import pe.edu.pucp.killaBeauty.killaModelo.Pedido;
 import pe.edu.pucp.killaDAO.Base.BaseDAO;
