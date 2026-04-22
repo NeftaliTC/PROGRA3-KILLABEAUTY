@@ -1,10 +1,12 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
-import java.util.Date;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.ArrayList;
+
 public class Pedido {
     private int id;
-    private Date fechaPedido;
+    private LocalDate fechaPedido;
     private String estado;
     private String metodoPago;
     private double subtotal;
@@ -18,7 +20,7 @@ public class Pedido {
 
     public Pedido() {
         this.detalles = new ArrayList<>();
-        this.fechaPedido = new Date();
+        this.fechaPedido = LocalDate.now();
     }
 	
 	public int getIdPedido() {
@@ -29,11 +31,11 @@ public class Pedido {
         this.id = id;
     }
 
-    public Date getFechaPedido() {
+    public LocalDate getFechaPedido() {
         return fechaPedido;
     }
 
-    public void setFechaPedido(Date fechaPedido) {
+    public void setFechaPedido(LocalDate fechaPedido) {
         this.fechaPedido = fechaPedido;
     }
 
@@ -111,7 +113,7 @@ public class Pedido {
             if (d != null) this.subtotal += d.calcularTotalConDescuento();
         }
 
-        if (cupon != null && cupon.esVigente(new Date())) {
+        if (cupon != null && cupon.esVigente(LocalDate.now())) {
             this.subtotal = this.subtotal * (1 - cupon.getPorcentajeDescuento() / 100.0);
         }
 

@@ -1,5 +1,5 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Cupon {
 
@@ -7,14 +7,16 @@ public class Cupon {
     private String codigo;
     private String descripcion;
     private double porcentaje;
-    private Date fechaInicio;
-    private Date fechaFin;
+    private LocalDate fechaInicio;
+    private LocalDate fechaFin;
     private boolean activo;
+    private double montoMaximo;
+    private double montoMinimoCompra;
 
     // Constructores
     public Cupon() {}
 
-    public Cupon(int idCupon, String codigo, double porcentajeDeDescuento, Date fechaInicio, Date fechaFin, boolean activo) {
+    public Cupon(int idCupon, String codigo, double porcentajeDeDescuento, LocalDate fechaInicio, LocalDate fechaFin, boolean activo) {
         this.id = idCupon;
         this.codigo = codigo;
         this.porcentaje = porcentajeDeDescuento;
@@ -24,7 +26,7 @@ public class Cupon {
     }
 
     // Métodos
-    public boolean esVigente(Date fecha) {
+    public boolean esVigente(LocalDate fecha) {
         return false;
     }
 
@@ -67,19 +69,19 @@ public class Cupon {
         this.porcentaje = porcentajeDeDescuento;
     }
 
-    public Date getFechaInicio() {
+    public LocalDate getFechaInicio() {
         return fechaInicio;
     }
 
-    public void setFechaInicio(Date fechaInicio) {
+    public void setFechaInicio(LocalDate fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
-    public Date getFechaFin() {
+    public LocalDate getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(Date fechaFin) {
+    public void setFechaFin(LocalDate fechaFin) {
         this.fechaFin = fechaFin;
     }
 
@@ -90,4 +92,12 @@ public class Cupon {
     public void setActivo(boolean activo) {
         this.activo = activo;
     }
+
+    public double getMontoMaximo() { return montoMaximo; }
+
+    public void setMontoMaximo(double montoMaximo) { this.montoMaximo = montoMaximo; }
+
+    public double getMontoMinimoCompra() { return montoMinimoCompra; }
+
+    public void setMontoMinimoCompra(double montoMinimoCompra) { this.montoMinimoCompra = montoMinimoCompra; }
 }
