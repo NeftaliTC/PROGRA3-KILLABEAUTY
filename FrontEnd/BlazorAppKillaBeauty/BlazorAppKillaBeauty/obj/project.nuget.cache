@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "wWYp3JgM5lI=",
+  "success": true,
+  "projectFilePath": "C:\\PUCP\\KillaBeauty-Angelina\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ANGELINA\\.nuget\\packages\\bootstrap\\5.3.8\\bootstrap.5.3.8.nupkg.sha512",
+    "C:\\Users\\ANGELINA\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.8\\microsoft.aspnetcore.app.internal.assets.10.0.8.nupkg.sha512"
+  ],
+  "logs": []
+}
