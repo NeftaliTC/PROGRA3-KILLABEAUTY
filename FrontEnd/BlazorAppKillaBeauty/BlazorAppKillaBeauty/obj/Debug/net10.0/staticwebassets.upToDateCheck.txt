@@ -46,7 +46,9 @@ wwwroot\app.css
 wwwroot\css\home.css
 wwwroot\css\login.css
 wwwroot\css\Navbar.css
+wwwroot\css\register.css
 wwwroot\Images\Cerave.jpg
+wwwroot\Images\check.png
 wwwroot\Images\CuidadoCabello.png
 wwwroot\Images\CuidadoPiel.png
 wwwroot\Images\Fondo1.png
@@ -59,6 +61,7 @@ wwwroot\Images\LoriniqueCabello.jpg
 wwwroot\Images\Maquillaje.png
 wwwroot\Images\Mascara.jpg
 wwwroot\Images\Original.png
+wwwroot\Images\Registro.png
 wwwroot\Images\Seguridad.png
 wwwroot\Images\Serum.jpg
 wwwroot\Images\Transporte.png
@@ -71,4 +74,5 @@ C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\C
 C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\wwwroot\css\Navbar.css
 C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\wwwroot\css\login.css
 C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\wwwroot\css\home.css
+C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\wwwroot\css\register.css
 C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\wwwroot\app.css

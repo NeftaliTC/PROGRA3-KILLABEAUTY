@@ -1,10 +1,16 @@
 ﻿@page "/login"
+@rendermode InteractiveServer
 
 <PageTitle>Iniciar Sesión - Killa Beauty</PageTitle>
 
 <section class="login-page">
 
     <div class="login-card">
+
+        <NavLink href="/" class="back-home">
+            <i class="bi bi-arrow-left"></i>
+            Volver al inicio
+        </NavLink>
 
         <div class="login-icon">
             <img src="Images/ImagenInicio.png" alt="Inicio sesión" />
@@ -38,9 +44,10 @@
 
         <p class="register-text">
             ¿No tienes cuenta?
-            <a href="/registro">Regístrate aquí</a>
+            <a href="/register">Regístrate aquí</a>
         </p>
 
     </div>
 
 </section>
+

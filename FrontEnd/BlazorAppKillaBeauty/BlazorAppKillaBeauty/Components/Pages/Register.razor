@@ -1,0 +1,196 @@
+﻿@page "/register"
+@rendermode InteractiveServer
+
+<PageTitle>Registro - Killa Beauty</PageTitle>
+
+<section class="register-page">
+
+    <div class="register-card">
+
+        <div class="register-icon">
+            <img src="Images/Registro.png" alt="Crear cuenta" />
+        </div>
+
+        <h1>Crear Cuenta</h1>
+
+        <p class="register-subtitle">
+            Únete a Killa Beauty
+        </p>
+
+        <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" placeholder="Nombre" @bind="nombre"/>
+        </div>
+
+        <div class="form-group">
+            <label>Apellido Paterno</label>
+            <input type="text" placeholder="Apellido Paterno" @bind="apellidoPaterno" />
+        </div>
+
+        <div class="form-group">
+            <label>Apellido Materno</label>
+            <input type="text" placeholder="Apellido Materno" @bind="apellidoMaterno" />
+        </div>
+
+        <div class="form-group">
+            <label>Correo Electrónico</label>
+            <input type="email" placeholder="ejemplo@correo.com" @bind="correo"/>
+        </div>
+
+        <div class="form-group">
+            <label>Usuario</label>
+            <input type="text" placeholder="Elige un nombre de usuario" @bind="usuario" />
+        </div>
+
+        <div class="form-group">
+            <label>Celular</label>
+            <input type="text" placeholder="999888777" @bind="celular" />
+        </div>
+
+        <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" placeholder="Crea una contraseña" @bind="password" />
+        </div>
+
+        @if (!string.IsNullOrEmpty(mensajeError))
+        {
+            <p class="validation-message">@mensajeError</p>
+        }
+
+        <button type="button"
+                class="register-button"
+                @onclick="RegistrarUsuario">
+            Registrarse
+        </button>
+
+        <p class="login-text">
+            ¿Ya tienes cuenta?
+            <a href="/login">Inicia sesión</a>
+        </p>
+
+    </div>
+
+</section>
+
+@if (mostrarMensaje)
+{
+    <div class="popup-overlay">
+        <div class="popup-card">
+
+            <img src="Images/check.png"
+                 class="popup-check"
+                 alt="Éxito" />
+
+            <h3>Cuenta creada con éxito</h3>
+
+            <p>
+                Redirigiendo al inicio de sesión...
+            </p>
+
+        </div>
+    </div>
+}
+
+@code {
+
+    [Inject]
+    private NavigationManager Navigation { get; set; } = default!;
+
+    private bool mostrarMensaje = false;
+
+    private string nombre = "";
+    private string apellidoPaterno = "";
+    private string apellidoMaterno = "";
+    private string correo = "";
+    private string usuario = "";
+    private string celular = "";
+    private string password = "";
+
+    private string mensajeError = "";
+
+    private async Task RegistrarUsuario()
+    {
+        mensajeError = "";
+
+        // Lista de campos vacíos
+        List<string> camposFaltantes = new();
+
+        if (string.IsNullOrWhiteSpace(nombre))
+            camposFaltantes.Add("nombre");
+
+        if (string.IsNullOrWhiteSpace(apellidoPaterno))
+            camposFaltantes.Add("apellido paterno");
+
+        if (string.IsNullOrWhiteSpace(apellidoMaterno))
+            camposFaltantes.Add("apellido materno");
+
+        if (string.IsNullOrWhiteSpace(correo))
+            camposFaltantes.Add("correo electrónico");
+
+        if (string.IsNullOrWhiteSpace(usuario))
+            camposFaltantes.Add("usuario");
+
+        if (string.IsNullOrWhiteSpace(celular))
+            camposFaltantes.Add("teléfono");
+
+        if (string.IsNullOrWhiteSpace(password))
+            camposFaltantes.Add("contraseña");
+
+        /// Si faltan TODOS los campos
+        if (camposFaltantes.Count == 7)
+        {
+            mensajeError =
+                "Falta completar todos los campos.";
+            return;
+        }
+
+        // Si falta 1 campo
+        if (camposFaltantes.Count == 1)
+        {
+            mensajeError =
+                $"Falta completar el {camposFaltantes[0]}.";
+            return;
+        }
+
+        // Si faltan varios (pero no todos)
+        if (camposFaltantes.Count > 1)
+        {
+            mensajeError =
+                $"Falta completar: {string.Join(", ", camposFaltantes)}.";
+            return;
+        }
+
+        // Validar correo
+        if (!correo.Contains("@") ||
+            !correo.Contains("."))
+        {
+            mensajeError =
+                "Ingrese un correo válido.";
+            return;
+        }
+
+        // Validar teléfono
+        if (celular.Length != 9 ||
+            !celular.All(char.IsDigit))
+        {
+            mensajeError =
+                "Ingrese un teléfono válido.";
+            return;
+        }
+
+        // Validar contraseña
+        if (password.Length < 8)
+        {
+            mensajeError =
+                "La contraseña debe tener mínimo 8 caracteres.";
+            return;
+        }
+
+        // Mostrar popup
+        mostrarMensaje = true;
+
+        await Task.Delay(700);
+
+        Navigation.NavigateTo("/login");
+    }
+}
