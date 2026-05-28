@@ -58,7 +58,7 @@ public class EscalaPrecioDAOImpl implements EscalaPrecioDAO {
 
             pstmt.setInt(1, ep.getCantidadMinima());
             pstmt.setDouble(2, ep.getPrecioUnitario());
-            pstmt.setBoolean(3, ep.isActivo());
+            pstmt.setBoolean(3, ep.getActivo());
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
@@ -80,7 +80,7 @@ public class EscalaPrecioDAOImpl implements EscalaPrecioDAO {
              PreparedStatement pstmt=connection.prepareStatement(sql)){
             pstmt.setInt(1, ep.getCantidadMinima());
             pstmt.setDouble(2, ep.getPrecioUnitario());
-            pstmt.setBoolean(3, ep.isActivo());
+            pstmt.setBoolean(3, ep.getActivo());
             pstmt.setInt(4, ep.getId());
             pstmt.executeUpdate();
             return ep;
@@ -89,15 +89,19 @@ public class EscalaPrecioDAOImpl implements EscalaPrecioDAO {
         }
     }
 
+
     @Override
     public void remove(EscalaPrecio ep) throws SQLException {
-        String sql = "UPDATE EscalaPrecio SET activo = false WHERE id_escala = ?";
+        ep.setActivo(false);
+        String sql = "UPDATE EscalaPrecio SET activo = ? WHERE id_escala = ?";
         try (Connection connection = DBManager.getInstance().getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, ep.getId());
+            pstmt.setBoolean(1, ep.getActivo());
+            pstmt.setInt(2, ep.getId());
             pstmt.executeUpdate();
         }
     }
+
 }
 
 

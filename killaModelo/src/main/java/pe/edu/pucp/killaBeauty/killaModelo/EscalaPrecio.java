@@ -4,15 +4,8 @@ public class EscalaPrecio {
     private int cantidadMinima;
     private double precioUnitario;
     private int id;
-    private boolean activo;
+    private Boolean activo;
 
-    public boolean isActivo() {
-        return activo;
-    }
-
-    public void setActivo(boolean activo) {
-        this.activo = activo;
-    }
 
     public int getId() {
         return id;
@@ -40,5 +33,11 @@ public class EscalaPrecio {
         this.precioUnitario = precioUnitario;
     }
 
-    
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
 }
