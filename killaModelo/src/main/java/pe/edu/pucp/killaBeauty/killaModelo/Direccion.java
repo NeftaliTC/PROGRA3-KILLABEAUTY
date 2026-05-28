@@ -1,51 +1,23 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
-<<<<<<< HEAD
 
 public class Direccion {
     private int id;
-=======
-public class Direccion {
-    private int idDireccion;
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
-    private String calle;
-    private String numero;
     private String distrito;
+    private String provincia;
     private String departamento;
-    private String codigoPostal;
+    private String direccionExacta;
     private String referencia;
-<<<<<<< HEAD
-
-    public Direccion(){};
-
-    public String mostrarDireccion() {
-        return calle + " " + numero + ", " + distrito + ", " + departamento +
-                ", CP: " + codigoPostal +
-                ", Ref: " + referencia;
-    }
-
-    public int getIdDireccion() {
-        return id;
-=======
+    private int idUsuario;
         
     public Direccion(){};
 
     public String mostrarDireccion() {
-    return calle + " " + numero + ", " + distrito + ", " + departamento +
-           ", CP: " + codigoPostal +
-           ", Ref: " + referencia;
+        return direccionExacta + " (Ref: " + referencia + "), " +
+                distrito + ", " + provincia + ", " + departamento;
     }
     
     public int getIdDireccion() {
-        return idDireccion;
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
-    }
-
-    public String getCalle() {
-        return calle;
-    }
-
-    public String getNumero() {
-        return numero;
+        return id;
     }
 
     public String getDistrito() {
@@ -56,29 +28,18 @@ public class Direccion {
         return departamento;
     }
 
-    public String getCodigoPostal() {
-        return codigoPostal;
-    }
+    public String getProvincia() { return provincia; }
+
+    public String getDireccionExacta() { return direccionExacta; }
 
     public String getReferencia() {
         return referencia;
     }
 
-<<<<<<< HEAD
-    public void setIdDireccion(int id) {
-        this.id = id;
-=======
+    public int getIdUsuario() { return idUsuario; }
+
     public void setIdDireccion(int idDireccion) {
-        this.idDireccion = idDireccion;
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
-    }
-
-    public void setCalle(String calle) {
-        this.calle = calle;
-    }
-
-    public void setNumero(String numero) {
-        this.numero = numero;
+        this.id = idDireccion;
     }
 
     public void setDistrito(String distrito) {
@@ -89,17 +50,14 @@ public class Direccion {
         this.departamento = departamento;
     }
 
-    public void setCodigoPostal(String codigoPostal) {
-        this.codigoPostal = codigoPostal;
-    }
+    public void setProvincia(String provincia) { this.provincia = provincia; }
+
+    public void setDireccionExacta(String direccionExacta) { this.direccionExacta = direccionExacta; }
 
     public void setReferencia(String referencia) {
         this.referencia = referencia;
     }
-<<<<<<< HEAD
-}
-=======
-    
+
+    public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
 }
 
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8

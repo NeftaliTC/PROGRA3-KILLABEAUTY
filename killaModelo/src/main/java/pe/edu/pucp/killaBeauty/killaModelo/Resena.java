@@ -1,46 +1,34 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
-<<<<<<< HEAD
-
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class Resena {
     private int id;
+    private String titulo;
     private String comentario;
     private int calificacion;
     private boolean verificado;
-    private LocalDateTime fechaPublicacion;
-
-    private Usuario usuario;
-=======
-import java.util.Date;
-public class Resena {
-    private int idResena;
-    private String comentario;
-    private int calificacion;
-    private boolean verificado;
-    private Date fechaPublicacion;
+    private LocalDate fechaPublicacion;
 
     private Usuario cliente;
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
     private Producto producto;
 
-    public Resena() {}
+    public Resena() {
+        this.fechaPublicacion = LocalDate.now();
+        this.cliente = new Usuario();
+        this.producto = new Producto();
+    }
 
     public int getIdResena() {
-<<<<<<< HEAD
         return id;
     }
 
-    public void setIdResena(int id) {
-        this.id = id;
-=======
-        return idResena;
+    public void setIdResena(int idResena) {
+        this.id = idResena;
     }
 
-    public void setIdResena(int idResena) {
-        this.idResena = idResena;
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
-    }
+    public String getTitulo() { return titulo; }
+
+    public void setTitulo(String titulo) { this.titulo = titulo; }
 
     public String getComentario() {
         return comentario;
@@ -66,27 +54,11 @@ public class Resena {
         this.verificado = verificado;
     }
 
-<<<<<<< HEAD
-    public LocalDateTime getFechaPublicacion() {
+    public LocalDate getFechaPublicacion() {
         return fechaPublicacion;
     }
 
-    public void setFechaPublicacion(LocalDateTime fechaPublicacion) {
-        this.fechaPublicacion = fechaPublicacion;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-=======
-    public Date getFechaPublicacion() {
-        return fechaPublicacion;
-    }
-
-    public void setFechaPublicacion(Date fechaPublicacion) {
+    public void setFechaPublicacion(LocalDate fechaPublicacion) {
         this.fechaPublicacion = fechaPublicacion;
     }
 
@@ -96,7 +68,6 @@ public class Resena {
 
     public void setCliente(Usuario cliente) {
         this.cliente = cliente;
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
     }
 
     public Producto getProducto() {
@@ -107,8 +78,6 @@ public class Resena {
         this.producto = producto;
     }
 
-<<<<<<< HEAD
-=======
     public void validarCalificacion() {}
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
+
 }

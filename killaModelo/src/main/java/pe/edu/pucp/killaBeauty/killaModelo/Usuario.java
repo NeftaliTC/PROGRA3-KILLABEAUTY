@@ -1,40 +1,23 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
 
-<<<<<<< HEAD
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.ArrayList;
-
-public class Usuario {
-
-    private int id;
-    private String nombre;
-    private String correoElectronico;
-    private LocalDateTime fechaDeInscripcion;
-    private String contrasena; //-> estado
-    private String telefono;
-    private boolean activo; // activo - inactivo
-    private List<Direccion> direcciones;
-    private List<Pedido> pedidos;
-    private CarritoDeCompras carritoActivo;
-    private TipoUsuario tipoUsuario;
-=======
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 // REVISADA
 public class Usuario {
-    private int idCliente;
+    private int id;
     private String nombre;
     private String correoElectronico;
+    private String apellidoMaterno;
+    private String apellidoPaterno;
     private Date fechaDeInscripcion;
     private String contrasena; //-> estado
     private String telefono;
-    private String estado; // activo - inactivo
+    private boolean estado; // 1=activo - 0=inactivo
     private List<Direccion> direcciones;
     private List<Pedido> pedidos;
     private Carrito carritoActivo;
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
+    private int id_tipoUsuario;
 
     //Constructores
     public Usuario() {
@@ -42,15 +25,6 @@ public class Usuario {
         this.direcciones = new ArrayList<>();
     }
 
-<<<<<<< HEAD
-    //Getters y setters
-    public int getIdUsuario() {
-        return id;
-    }
-
-    public void setIdUsuario(int id) {
-        this.id = id;
-=======
     //Metodos
     public void registrarse() {}
     public void iniciarSesion(String correoElectronico, String contrasena) {}
@@ -60,13 +34,12 @@ public class Usuario {
     public void agregarPedido(Pedido pedidoNuevo) {}
     
     //Getters y setters
-    public int getIdCliente() {
-        return idCliente;
+    public int getId() {
+        return id;
     }
 
-    public void setIdCliente(int idCliente) {
-        this.idCliente = idCliente;
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -85,19 +58,11 @@ public class Usuario {
         this.correoElectronico = correoElectronico;
     }
 
-<<<<<<< HEAD
-    public LocalDateTime getFechaDeInscripcion() {
-        return fechaDeInscripcion;
-    }
-
-    public void setFechaDeInscripcion(LocalDateTime fechaDeInscripcion) {
-=======
     public Date getFechaDeInscripcion() {
         return fechaDeInscripcion;
     }
 
     public void setFechaDeInscripcion(Date fechaDeInscripcion) {
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
         this.fechaDeInscripcion = fechaDeInscripcion;
     }
 
@@ -117,21 +82,12 @@ public class Usuario {
         this.telefono = telefono;
     }
 
-<<<<<<< HEAD
-    public boolean isActivo() {
-        return activo;
-    }
-
-    public void setActivo(boolean activo) {
-        this.activo = activo;
-=======
-    public String getEstado() {
+    public boolean getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(boolean estado) {
         this.estado = estado;
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
     }
 
     public List<Direccion> getDirecciones() {
@@ -150,19 +106,6 @@ public class Usuario {
         this.pedidos = pedidos;
     }
 
-<<<<<<< HEAD
-    public CarritoDeCompras getCarritoActivo() {
-        return carritoActivo;
-    }
-
-    public void setCarritoActivo(CarritoDeCompras carritoActivo) {
-        this.carritoActivo = carritoActivo;
-    }
-
-    public TipoUsuario getTipoUsuario(){return tipoUsuario;}
-
-    public void setTipoUsuario(TipoUsuario tipoUsuario){this.tipoUsuario = tipoUsuario;}
-=======
     public Carrito getCarritoActivo() {
         return carritoActivo;
     }
@@ -170,5 +113,28 @@ public class Usuario {
     public void setCarritoActivo(Carrito carritoActivo) {
         this.carritoActivo = carritoActivo;
     }
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
+
+    public String getApellidoMaterno() {
+        return apellidoMaterno;
+    }
+
+    public void setApellidoMaterno(String apellidoMaterno) {
+        this.apellidoMaterno = apellidoMaterno;
+    }
+
+    public String getApellidoPaterno() {
+        return apellidoPaterno;
+    }
+
+    public void setApellidoPaterno(String apellidoPaterno) {
+        this.apellidoPaterno = apellidoPaterno;
+    }
+
+    public int getId_tipoUsuario() {
+        return id_tipoUsuario;
+    }
+
+    public void setId_tipoUsuario(int id_tipoUsuario) {
+        this.id_tipoUsuario = id_tipoUsuario;
+    }
 }

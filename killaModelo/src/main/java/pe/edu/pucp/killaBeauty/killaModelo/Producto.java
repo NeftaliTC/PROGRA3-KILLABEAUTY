@@ -1,49 +1,32 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
-<<<<<<< HEAD
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Producto {
     private int id;
     private String nombre;
-    private double precioLista;
+    private double precioBase;
     private int stock;
     private boolean disponible;
-=======
-import java.util.ArrayList;
-import java.util.List;
-
-public class Producto {
-    private int idProducto;
-    private String nombre;
-    private double precioLista;
-    private int stock;
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
+    private boolean promocion;
     private Marca marca;
     private Categoria categoria;
     private List<EscalaPrecio> escalas;
     private List<Resena> resenas;
 
     public Producto() {
+        this.marca = new Marca();
+        this.categoria = new Categoria();
         this.escalas = new ArrayList<>();
         this.resenas = new ArrayList<>();
     }
 
     public int getIdProducto() {
-<<<<<<< HEAD
         return id;
     }
 
-    public void setIdProducto(int id) {
-        this.id = id;
-=======
-        return idProducto;
-    }
-
     public void setIdProducto(int idProducto) {
-        this.idProducto = idProducto;
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
+        this.id = idProducto;
     }
 
     public String getNombre() {
@@ -54,12 +37,12 @@ public class Producto {
         this.nombre = nombre;
     }
 
-    public double getPrecioLista() {
-        return precioLista;
+    public double getPrecioBase() {
+        return precioBase;
     }
 
-    public void setPrecioLista(double precioLista) {
-        this.precioLista = precioLista;
+    public void setPrecioBase(double precioBase) {
+        this.precioBase = precioBase;
     }
 
     public int getStock() {
@@ -70,13 +53,14 @@ public class Producto {
         this.stock = stock;
     }
 
-<<<<<<< HEAD
-    public boolean getDisponible(){return disponible;}
+    public boolean getDisponible() { return disponible; }
 
-    public void setDisponible(boolean disponible){this.disponible = disponible;}
+    public void setDisponible(boolean disponible) { this.disponible = disponible; }
 
-=======
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
+    public boolean getPromocion() { return promocion; }
+
+    public void setPromocion(boolean promocion) { this.promocion = promocion; }
+
     public Marca getMarca() {
         return marca;
     }
@@ -109,8 +93,6 @@ public class Producto {
         this.resenas = resenas;
     }
 
-<<<<<<< HEAD
-=======
     public void registrarProducto() {}
 
     public void actualizarStock(int cantidad) {}
@@ -122,5 +104,4 @@ public class Producto {
     public void agregarEscala(EscalaPrecio escala) {}
 
     public void agregarResena(Resena resena) {}
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
 }

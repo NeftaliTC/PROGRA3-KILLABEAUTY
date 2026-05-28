@@ -6,10 +6,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
-public class dbManager {
+public class DBManager {
 // publica para q los otros modelos puedan usar la clase
 
-    private static dbManager instance;
+    private static DBManager instance;
     private Properties properties;
     private final String url;
     private final String user;
@@ -17,7 +17,7 @@ public class dbManager {
     private final String DB_CREDENTIALS_FILE = "db.properties";
 
 
-    private dbManager() {
+    private DBManager() {
 
         // clase q se diseño para leer archivo .properties como el de db.properties
 
@@ -36,9 +36,9 @@ public class dbManager {
         this.password = properties.getProperty("password");
     }
 
-    public static dbManager getInstance() {
+    public static DBManager getInstance() {
         if (instance == null)
-            instance = new dbManager();
+            instance = new DBManager();
         return instance;
     }
 

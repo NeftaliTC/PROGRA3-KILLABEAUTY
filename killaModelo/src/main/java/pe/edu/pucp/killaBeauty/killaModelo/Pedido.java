@@ -1,40 +1,26 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
-<<<<<<< HEAD
 
-import java.util.List;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.time.LocalDateTime;
+import java.util.List;
 
 public class Pedido {
     private int id;
-    private LocalDateTime fechaPedido;
-=======
-import java.util.Date;
-import java.util.List;
-import java.util.ArrayList;
-public class Pedido {
-    private int idPedido;
-    private Date fechaPedido;
+    private LocalDate fechaPedido;
     private String estado;
     private String metodoPago;
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
     private double subtotal;
     private double igv;
     private double total;
 
-<<<<<<< HEAD
-    private Usuario usuario;
-=======
     private Usuario cliente;
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
     private Direccion direccionEnvio;
     private Cupon cupon;
     private List<DetallePedido> detalles;
 
     public Pedido() {
         this.detalles = new ArrayList<>();
-<<<<<<< HEAD
-        this.fechaPedido = LocalDateTime.now();
+        this.fechaPedido = LocalDate.now();
     }
 
     public int getIdPedido() {
@@ -45,31 +31,11 @@ public class Pedido {
         this.id = id;
     }
 
-    public LocalDateTime getFechaPedido() {
+    public LocalDate getFechaPedido() {
         return fechaPedido;
     }
 
-    public void setFechaPedido(LocalDateTime fechaPedido) {
-        this.fechaPedido = fechaPedido;
-    }
-
-=======
-        this.fechaPedido = new Date();
-    }
-	
-	public int getIdPedido() {
-        return idPedido;
-    }
-
-    public void setIdPedido(int idPedido) {
-        this.idPedido = idPedido;
-    }
-
-    public Date getFechaPedido() {
-        return fechaPedido;
-    }
-
-    public void setFechaPedido(Date fechaPedido) {
+    public void setFechaPedido(LocalDate fechaPedido) {
         this.fechaPedido = fechaPedido;
     }
 
@@ -89,34 +55,36 @@ public class Pedido {
         this.metodoPago = metodoPago;
     }
 
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
     public double getSubtotal() {
         return subtotal;
+    }
+
+    public void setSubtotal(double subtotal) {
+        this.subtotal = subtotal;
     }
 
     public double getIgv() {
         return igv;
     }
 
+    public void setIgv(double igv) {
+        this.igv = igv;
+    }
+
     public double getTotal() {
         return total;
     }
 
-<<<<<<< HEAD
-    public Usuario getUsuario() {
-        return usuario;
+    public void setTotal(double total) {
+        this.total = total;
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-=======
     public Usuario getCliente() {
         return cliente;
     }
 
     public void setCliente(Usuario cliente) {
         this.cliente = cliente;
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
     }
 
     public Direccion getDireccionEnvio() {
@@ -142,8 +110,6 @@ public class Pedido {
     public void setDetalles(List<DetallePedido> detalles) {
         this.detalles = (detalles != null) ? detalles : new ArrayList<>();
     }
-<<<<<<< HEAD
-=======
 
     public void agregarDetalle(DetallePedido detalle) {
         if (detalle != null) this.detalles.add(detalle);
@@ -154,17 +120,17 @@ public class Pedido {
     }
 
     public void recalcularTotales() {
-        this.subtotal = 0;
+        this.subtotal = 0.0;
+
         for (DetallePedido d : detalles) {
             if (d != null) this.subtotal += d.calcularTotalConDescuento();
         }
 
-        if (cupon != null && cupon.esVigente(new Date())) {
+        if (cupon != null && cupon.esVigente(LocalDate.now())) {
             this.subtotal = this.subtotal * (1 - cupon.getPorcentajeDescuento() / 100.0);
         }
 
         this.igv = this.subtotal * 0.18;
         this.total = this.subtotal + this.igv;
     }
->>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
 }

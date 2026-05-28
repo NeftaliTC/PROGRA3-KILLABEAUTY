@@ -15,7 +15,25 @@ public class EscalaPrecio {
 =======
     private int cantidadMinima;
     private double precioUnitario;
-    
+    private int id;
+    private boolean activo;
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public EscalaPrecio(){};
 
 >>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
