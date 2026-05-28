@@ -4,25 +4,7 @@
 <PageTitle>KILLA Beauty – Belleza que Inspira</PageTitle>
 
 <link href="css/home.css" rel="stylesheet" />
-
-<nav class="navbar-killa">
-    <img src="Images/Logo.png"
-         class="logo"
-         alt="Logo" />
-
-    <div class="search-box">
-        Buscar productos, marcas...
-    </div>
-
-    <div class="nav-links">
-        <a href="">Catálogo</a>
-        <a href="">Ingresar</a>
-
-        <button class="btn-register">
-            Registrarse
-        </button>
-    </div>
-</nav>
+<Navbar CantidadCarrito="@productosAgregados.Count" />
 
 <section class="hero">
     <div class="hero-content">
@@ -194,7 +176,12 @@
                         <button type="button"
                                 class="cart-btn @(productosAgregados.Contains(index) ? "cart-added" : "")"
                                 @onclick="() => AgregarCarrito(index)">
-                            @(productosAgregados.Contains(index) ? "✓" : "🛒")
+
+                            <i class="bi @(productosAgregados.Contains(index)
+                                       ? "bi-check-lg"
+                                       : "bi-cart3")">
+                            </i>
+
                         </button>
 
                     </div>

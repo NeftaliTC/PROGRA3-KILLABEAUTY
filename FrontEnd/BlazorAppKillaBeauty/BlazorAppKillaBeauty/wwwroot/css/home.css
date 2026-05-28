@@ -31,58 +31,6 @@ body {
     background: var(--white);
 }
 
-/* NAVBAR: barra superior con logo, buscador y enlaces */
-.navbar-killa {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 40px;
-    background: var(--white);
-    border-bottom: 1px solid #f2dce3;
-}
-
-.logo {
-    width: 180px;
-}
-
-.search-box {
-    flex: 1;
-    max-width: 420px;
-    background: var(--gray-light);
-    border-radius: 30px;
-    padding: 12px 20px;
-    color: var(--gray-text);
-    margin: 0 30px;
-}
-
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-}
-.cart-counter {
-    background: var(--rose-pale);
-    color: var(--rose);
-    padding: 8px 14px;
-    border-radius: 20px;
-    font-weight: bold;
-}
-
-    .nav-links a {
-        text-decoration: none;
-        color: black;
-        font-size: 15px;
-    }
-
-.btn-register {
-    border: none;
-    background: var(--rose-soft);
-    color: var(--white);
-    padding: 10px 18px;
-    border-radius: 30px;
-    cursor: pointer;
-}
-
 /* HERO: Sección principal de bienvenida */
 
 .hero {

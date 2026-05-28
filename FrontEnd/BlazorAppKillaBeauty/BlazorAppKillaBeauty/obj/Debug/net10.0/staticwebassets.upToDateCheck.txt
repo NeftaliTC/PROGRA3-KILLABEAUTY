@@ -58,11 +58,13 @@ wwwroot\Images\Original.png
 wwwroot\Images\Seguridad.png
 wwwroot\Images\Serum.jpg
 wwwroot\Images\Transporte.png
+wwwroot\css\Navbar.css
 Components\Layout\ReconnectModal.razor.js
 C:\Users\ANGELINA\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.8\build\..\_framework\blazor.web.js
 C:\Users\ANGELINA\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.8\build\..\_framework\blazor.server.js
 C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\wwwroot\app.css
+C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\wwwroot\css\home.css
 C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\Components\Layout\ReconnectModal.razor.js
 C:\Users\ANGELINA\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.8\_framework\blazor.web.js
 C:\Users\ANGELINA\.nuget\packages\microsoft.aspnetcore.app.internal.assets\10.0.8\_framework\blazor.server.js
-C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\wwwroot\css\home.css
+C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\wwwroot\css\Navbar.css

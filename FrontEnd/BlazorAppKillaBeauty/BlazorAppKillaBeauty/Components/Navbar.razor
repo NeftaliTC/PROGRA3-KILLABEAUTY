@@ -1,0 +1,46 @@
+﻿<link rel="stylesheet" href="@Assets["app.css"]" />
+<link href="css/Navbar.css" rel="stylesheet" />
+
+<nav class="navbar-killa">
+    <img src="Images/Logo.png"
+         class="logo"
+         alt="Logo" />
+
+    <div class="search-container">
+
+        <i class="bi bi-search search-icon"></i>
+
+        <input type="text"
+               class="search-box"
+               placeholder="Buscar productos, marcas..." />
+
+    </div>
+
+    <div class="nav-links">
+        <a href="">Catálogo</a>
+
+        <button class="cart-navbar-btn">
+
+            <i class="bi bi-cart3"></i>
+
+            @if (CantidadCarrito > 0)
+            {
+                <span class="cart-badge">
+                    @CantidadCarrito
+                </span>
+            }
+
+        </button>
+
+        <a href="">Ingresar</a>
+
+        <button class="btn-register">
+            Registrarse
+        </button>
+    </div>
+</nav>
+
+@code {
+    [Parameter]
+    public int CantidadCarrito { get; set; }
+}

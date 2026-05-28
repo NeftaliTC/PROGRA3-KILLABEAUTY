@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\PUCP\\KillaBeauty-Angelina\\FrontEnd\\BlazorAppKillaBeauty\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{12759B1B-F3FE-B65E-B3A2-5983E647025F}|BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj|c:\\pucp\\killabeauty-angelina\\frontend\\blazorappkillabeauty\\blazorappkillabeauty\\components\\pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{12759B1B-F3FE-B65E-B3A2-5983E647025F}|BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj|solutionrelative:blazorappkillabeauty\\components\\pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{12759B1B-F3FE-B65E-B3A2-5983E647025F}|BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj|c:\\pucp\\killabeauty-angelina\\frontend\\blazorappkillabeauty\\blazorappkillabeauty\\wwwroot\\css\\navbar.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{12759B1B-F3FE-B65E-B3A2-5983E647025F}|BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj|solutionrelative:blazorappkillabeauty\\wwwroot\\css\\navbar.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{12759B1B-F3FE-B65E-B3A2-5983E647025F}|BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj|c:\\pucp\\killabeauty-angelina\\frontend\\blazorappkillabeauty\\blazorappkillabeauty\\wwwroot\\css\\home.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
-      "RelativeMoniker": "D:0:0:{12759B1B-F3FE-B65E-B3A2-5983E647025F}|BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj|solutionrelative:blazorappkillabeauty\\wwwroot\\css\\home.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+      "AbsoluteMoniker": "D:0:0:{12759B1B-F3FE-B65E-B3A2-5983E647025F}|BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj|c:\\pucp\\killabeauty-angelina\\frontend\\blazorappkillabeauty\\blazorappkillabeauty\\components\\pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{12759B1B-F3FE-B65E-B3A2-5983E647025F}|BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj|solutionrelative:blazorappkillabeauty\\components\\pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,32 +18,32 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Home.razor",
               "DocumentMoniker": "C:\\PUCP\\KillaBeauty-Angelina\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\Components\\Pages\\Home.razor",
               "RelativeDocumentMoniker": "BlazorAppKillaBeauty\\Components\\Pages\\Home.razor",
               "ToolTip": "C:\\PUCP\\KillaBeauty-Angelina\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\Components\\Pages\\Home.razor",
               "RelativeToolTip": "BlazorAppKillaBeauty\\Components\\Pages\\Home.razor",
-              "ViewState": "AgIAAM0AAAAAAAAAAAAuwNsAAAAOAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-05-27T04:49:00.338Z",
+              "WhenOpened": "2026-05-28T00:34:32.53Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "home.css",
-              "DocumentMoniker": "C:\\PUCP\\KillaBeauty-Angelina\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\wwwroot\\css\\home.css",
-              "RelativeDocumentMoniker": "BlazorAppKillaBeauty\\wwwroot\\css\\home.css",
-              "ToolTip": "C:\\PUCP\\KillaBeauty-Angelina\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\wwwroot\\css\\home.css",
-              "RelativeToolTip": "BlazorAppKillaBeauty\\wwwroot\\css\\home.css",
-              "ViewState": "AgIAANUAAAAAAAAAAAAqwOoAAAAaAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "Navbar.css",
+              "DocumentMoniker": "C:\\PUCP\\KillaBeauty-Angelina\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\wwwroot\\css\\Navbar.css",
+              "RelativeDocumentMoniker": "BlazorAppKillaBeauty\\wwwroot\\css\\Navbar.css",
+              "ToolTip": "C:\\PUCP\\KillaBeauty-Angelina\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\wwwroot\\css\\Navbar.css",
+              "RelativeToolTip": "BlazorAppKillaBeauty\\wwwroot\\css\\Navbar.css",
+              "ViewState": "AgIAAGQAAAAAAAAAAAAqwHkAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2026-05-27T02:33:25.952Z",
+              "WhenOpened": "2026-05-27T22:43:19.364Z",
               "EditorCaption": ""
             }
           ]

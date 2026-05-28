@@ -84,4 +84,5 @@ C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\
 C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\BlazorAppKillaBeauty.pdb
 C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\BlazorAppKillaBeauty.genruntimeconfig.cache
 C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\ref\BlazorAppKillaBeauty.dll
-C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\9xgxftju9b-{0}-yyuy1wa4cs-yyuy1wa4cs.gz
+C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\9xgxftju9b-{0}-rjlxv59tlm-rjlxv59tlm.gz
+C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\k2859ehgcq-{0}-dqiufqpzf8-dqiufqpzf8.gz
