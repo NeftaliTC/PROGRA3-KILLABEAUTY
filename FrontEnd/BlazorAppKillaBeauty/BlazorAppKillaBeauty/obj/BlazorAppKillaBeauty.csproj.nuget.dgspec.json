@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\PUCP\\KillaBeauty-Angelina\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj": {}
+    "C:\\PUCP\\PROGRA3-KILLABEAUTY\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj": {}
   },
   "projects": {
-    "C:\\PUCP\\KillaBeauty-Angelina\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj": {
+    "C:\\PUCP\\PROGRA3-KILLABEAUTY\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\PUCP\\KillaBeauty-Angelina\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj",
+        "projectUniqueName": "C:\\PUCP\\PROGRA3-KILLABEAUTY\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj",
         "projectName": "BlazorAppKillaBeauty",
-        "projectPath": "C:\\PUCP\\KillaBeauty-Angelina\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj",
+        "projectPath": "C:\\PUCP\\PROGRA3-KILLABEAUTY\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj",
         "packagesPath": "C:\\Users\\ANGELINA\\.nuget\\packages\\",
-        "outputPath": "C:\\PUCP\\KillaBeauty-Angelina\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\obj\\",
+        "outputPath": "C:\\PUCP\\PROGRA3-KILLABEAUTY\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
