@@ -1,0 +1,252 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+<PageTitle>KILLA Beauty – Belleza que Inspira</PageTitle>
+
+<Navbar CantidadCarrito="@productosAgregados.Count" />
+
+<section class="hero">
+    <div class="hero-content">
+        <h1>
+            Descubre tu Belleza Natural
+        </h1>
+
+        <p>
+            Los mejores productos de skincare,
+            maquillaje y cuidado capilar
+        </p>
+
+        <div class="hero-buttons">
+            <button class="btn-primary">
+                Explorar Catálogo
+            </button>
+
+            <button class="btn-secondary">
+                Registrarse Ahora
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- BENEFICIOS -->
+<section class="benefits">
+
+    <div class="benefit-card">
+        <img src="Images/Original.png"
+             alt="Originales" />
+
+        <h3>Productos Originales</h3>
+
+        <p>
+            100% auténticos de las mejores marcas
+        </p>
+    </div>
+
+    <div class="benefit-card">
+        <img src="Images/Transporte.png"
+             alt="Envío" />
+
+        <h3>Envío Rápido</h3>
+
+        <p>
+            Delivery en 24–48 horas en Lima
+        </p>
+    </div>
+
+    <div class="benefit-card">
+        <img src="Images/Seguridad.png"
+             alt="Seguridad" />
+
+        <h3>Compra Segura</h3>
+
+        <p>
+            Pago protegido y garantizado
+        </p>
+    </div>
+
+</section>
+
+<!-- CATEGORÍAS -->
+<section class="categories">
+
+    <h2 class="section-title">Categorías Destacadas</h2>
+    <p class="section-subtitle">Encuentra lo que necesitas</p>
+
+    <div class="category-grid">
+
+        <div class="category-card">
+
+            <img src="Images/CuidadoPiel.png"
+                 alt="Skincare" />
+
+            <h3>Skincare</h3>
+
+            <p>
+                Cuidado de la piel
+            </p>
+
+        </div>
+
+        <div class="category-card">
+
+            <img src="Images/Maquillaje.png"
+                 alt="Maquillaje" />
+
+            <h3>Maquillaje</h3>
+
+            <p>
+                Productos de maquillaje
+            </p>
+
+        </div>
+
+        <div class="category-card">
+
+            <img src="Images/CuidadoCabello.png"
+                 alt="Cabello" />
+
+            <h3>Cuidado del Cabello</h3>
+
+            <p>
+                Productos para el cabello
+            </p>
+
+        </div>
+
+        <div class="category-card">
+
+            <img src="Images/Fragancia.png"
+                 alt="Fragancias" />
+
+            <h3>Fragancias</h3>
+
+            <p>
+                Perfumes y colonias
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- PRODUCTOS -->
+<section class="products">
+
+    <h2 class="section-title">Productos Populares</h2>
+    <p class="section-subtitle">Nuestros favoritos</p>
+
+    <div class="product-grid">
+
+        @for (int i = 0; i < productos.Count; i++)
+        {
+            var producto = productos[i];
+            var index = i;
+
+            <div class="product-card">
+
+                <div class="product-image">
+
+                    <img src="@producto.Imagen" alt="@producto.Nombre" />
+
+                </div>
+
+                <div class="product-info">
+
+                    <h3>@producto.Nombre</h3>
+
+                    <div class="stars">
+                        <span>★</span>
+                        <span>★</span>
+                        <span>★</span>
+                        <span>★</span>
+                        <span class="star-empty">★</span>
+                    </div>
+
+                    <div class="product-footer">
+
+                        <span class="price">
+                            S/ @producto.Precio
+                        </span>
+
+                        <button type="button"
+                                class="cart-btn @(productosAgregados.Contains(index) ? "cart-added" : "")"
+                                @onclick="() => AgregarCarrito(index)">
+
+                            <i class="bi @(productosAgregados.Contains(index)
+                                       ? "bi-check-lg"
+                                       : "bi-cart3")">
+                            </i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</section>
+
+<!-- DISTRIBUIDORES -->
+<section class="distributor">
+
+    <h2>
+        ¿Eres distribuidor?
+    </h2>
+
+    <p>
+        Ofrecemos precios especiales para compras al por mayor.
+        <br />
+        Cotiza desde media docena hasta cajones completos.
+    </p>
+
+    <button class="btn-distributor">
+        Ver precios mayoristas
+    </button>
+
+</section>
+
+@code {
+    private int cantidadCarrito = 0;
+
+    private List<Producto> productos = new()
+    {
+        new Producto("Sérum Vitamina C Gold Kiwi", "89.90", "Images/Serum.jpg"),
+        new Producto("Crema Hidratante Facial CeraVe", "69.90", "Images/Cerave.jpg"),
+        new Producto("Labial Matte Ink Mood PERIPERA", "45.90", "Images/LabialPeripera.jpg"),
+        new Producto("Máscara Essence Prince False Lash Effect", "52.90", "Images/Mascara.jpg"),
+        new Producto("L03 Professional Protein Treatment LORINIQUE", "42.50", "Images/LoriniqueCabello.jpg")
+    };
+
+    private List<int> ratings = new() { 4, 4, 4, 4 };
+
+    private HashSet<int> productosAgregados = new();
+
+
+    private void AgregarCarrito(int index)
+    {
+        if (!productosAgregados.Contains(index))
+        {
+            productosAgregados.Add(index);
+            cantidadCarrito++;
+        }
+    }
+
+    private class Producto
+    {
+        public string Nombre { get; set; }
+        public string Precio { get; set; }
+        public string Imagen { get; set; }
+
+        public Producto(string nombre, string precio, string imagen)
+        {
+            Nombre = nombre;
+            Precio = precio;
+            Imagen = imagen;
+        }
+    }
+}

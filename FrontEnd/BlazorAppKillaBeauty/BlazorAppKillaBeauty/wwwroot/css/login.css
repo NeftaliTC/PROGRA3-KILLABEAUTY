@@ -1,0 +1,135 @@
+/* LOGIN PAGE */
+
+html,
+body {
+    margin: 0;
+    background: var(--rose-pale);
+}
+
+.login-page {
+    min-height: calc(100vh - 80px);
+    background: var(--rose-pale);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px 20px;
+}
+
+/* CARD LOGIN */
+
+.login-card {
+    width: 100%;
+    max-width: 660px;
+    background: var(--white);
+    border: 1px solid var(--rose-light);
+    border-radius: 38px;
+    padding: 24px 55px;
+    text-align: center;
+}
+
+/* ICONO */
+
+.login-icon {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 10px;
+}
+
+    .login-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+/* TITULOS */
+
+.login-card h1 {
+    font-size: 38px;
+    margin-bottom: 6px;
+}
+
+.login-subtitle {
+    font-size: 17px;
+    color: var(--gray-soft);
+    margin-bottom: 22px;
+}
+
+/* FORMULARIO */
+
+.form-group {
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto 16px;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+    .form-group label {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .form-group input {
+        width: 100%;
+        height: 56px;
+        border: 1px solid var(--rose-light);
+        border-radius: 26px;
+        background: var(--cream);
+        padding: 0 28px;
+        font-size: 18px;
+        color: black;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+        .form-group input::placeholder {
+            color: var(--gray-text);
+        }
+
+/* OLVIDASTE CONTRASEÑA */
+
+.forgot-password {
+    max-width: 560px;
+    margin: -2px auto 18px;
+    text-align: right;
+}
+
+    .forgot-password a {
+        color: var(--rose-soft);
+        text-decoration: underline;
+    }
+
+/* BOTÓN LOGIN */
+
+.login-button {
+    width: 100%;
+    max-width: 560px;
+    height: 56px;
+    border: none;
+    border-radius: 26px;
+    background: var(--rose-soft);
+    color: var(--white);
+    font-size: 22px;
+    font-weight: 700;
+    display: block;
+    margin: 0 auto 16px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+    .login-button:hover {
+        background: var(--rose);
+    }
+
+/* REGISTRO */
+
+.register-text {
+    color: var(--gray-soft);
+}
+
+    .register-text a {
+        color: var(--rose-soft);
+        text-decoration: underline;
+    }
