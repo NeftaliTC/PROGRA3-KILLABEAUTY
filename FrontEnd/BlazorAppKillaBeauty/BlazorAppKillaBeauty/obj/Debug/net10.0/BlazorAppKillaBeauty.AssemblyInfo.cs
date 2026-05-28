@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BlazorAppKillaBeauty")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f2cf441b1c485aa9dc4dafc63505a5d264561255")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3e2ad0308b448576bc8c62d1a776338290b131cd")]
 [assembly: System.Reflection.AssemblyProductAttribute("BlazorAppKillaBeauty")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BlazorAppKillaBeauty")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,3 +1,20 @@
+:root {
+    --rose: #e8607a;
+    --rose-soft: #ef9db5;
+    --rose-light: #f5dce4;
+    --rose-pale: #fde7ee;
+    --cream: #fdfbf9;
+    --white: #ffffff;
+    --gray-light: #f9f3f5;
+    --gray: #7a6b72;
+    --gray-soft: #666;
+    --gray-text: #999;
+    --gray-border: #ddd;
+    --success: #6fcf97;
+    --radius: 18px;
+    --shadow: 0 4px 24px rgba(232,96,122,0.13);
+}
+
 h1:focus {
     outline: none;
 }

@@ -67,7 +67,6 @@ C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\
 C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\c06o9wa5ty-{0}-ir474ug6zy-ir474ug6zy.gz
 C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\girkzgtoxc-{0}-5cl6jzyzps-5cl6jzyzps.gz
 C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\ewf6wabyeo-{0}-a2c1phmbzv-a2c1phmbzv.gz
-C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\yht3mcgq6u-{0}-4kywy7iv6g-4kywy7iv6g.gz
 C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\9ke61x1xwk-{0}-abdmv1u4y3-abdmv1u4y3.gz
 C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\v0jaa1mfs9-{0}-ej96puwv3k-ej96puwv3k.gz
 C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\79hex7cvgs-{0}-cj5793hgrt-cj5793hgrt.gz
@@ -84,5 +83,7 @@ C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\
 C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\BlazorAppKillaBeauty.pdb
 C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\BlazorAppKillaBeauty.genruntimeconfig.cache
 C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\ref\BlazorAppKillaBeauty.dll
-C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\9xgxftju9b-{0}-rjlxv59tlm-rjlxv59tlm.gz
 C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\k2859ehgcq-{0}-dqiufqpzf8-dqiufqpzf8.gz
+C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\yht3mcgq6u-{0}-9i3kbthmaf-9i3kbthmaf.gz
+C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\9xgxftju9b-{0}-wwlqe2zlb3-wwlqe2zlb3.gz
+C:\PUCP\KillaBeauty-Angelina\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\2s8ygne6zz-{0}-5lrbuj2zem-5lrbuj2zem.gz

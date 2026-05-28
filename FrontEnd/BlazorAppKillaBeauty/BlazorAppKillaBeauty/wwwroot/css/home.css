@@ -1,24 +1,3 @@
-:root {
-    /* COLORES PRINCIPALES */
-    --rose: #e8607a;
-    --rose-soft: #ef9db5;
-    --rose-light: #f5dce4;
-    --rose-pale: #fde7ee;
-    /* FONDOS */
-    --cream: #fdfbf9;
-    --white: #ffffff;
-    --gray-light: #f9f3f5;
-    /* TEXTO */
-    --gray: #7a6b72;
-    --gray-soft: #666;
-    --gray-text: #999;
-    --gray-border: #ddd;
-    /* OTROS */
-    --success: #6fcf97;
-    --radius: 18px;
-    --shadow: 0 4px 24px rgba(232,96,122,0.13);
-}
-
 /* RESET */
 * {
     margin: 0;
@@ -186,7 +165,7 @@ body {
 
 .btn-distributor {
     border: none;
-    background: #ef9db5;
+    background: var(--rose-soft);
     color: var(--white);
     padding: 16px 28px;
     border-radius: 30px;
@@ -300,7 +279,7 @@ body {
 }
 
     .stars span {
-        color: #ef9db5;
+        color: var(--rose-soft);
         font-size: 22px;
     }
 
