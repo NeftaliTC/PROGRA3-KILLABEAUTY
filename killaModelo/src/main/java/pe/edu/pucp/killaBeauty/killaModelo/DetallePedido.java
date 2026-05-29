@@ -6,6 +6,7 @@ public class DetallePedido {
     private double precioAplicado;
     private Producto producto;
     private double subtotal;
+    private Boolean activo;
 
     public DetallePedido() {}
 
@@ -53,5 +54,13 @@ public class DetallePedido {
 
     public double getSubtotal() {
         return subtotal;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 }

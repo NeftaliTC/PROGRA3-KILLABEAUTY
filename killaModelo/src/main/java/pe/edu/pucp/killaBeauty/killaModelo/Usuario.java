@@ -19,6 +19,7 @@ public class Usuario {
     private Carrito carritoActivo;
     private int id_tipoUsuario;
 
+
     //Constructores
     public Usuario() {
         this.pedidos = new ArrayList<>();
@@ -137,4 +138,6 @@ public class Usuario {
     public void setId_tipoUsuario(int id_tipoUsuario) {
         this.id_tipoUsuario = id_tipoUsuario;
     }
+
+
 }
