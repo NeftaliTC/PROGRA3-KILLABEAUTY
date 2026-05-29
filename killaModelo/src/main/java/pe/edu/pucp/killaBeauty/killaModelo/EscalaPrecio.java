@@ -6,6 +6,7 @@ public class EscalaPrecio {
     private int cantidadMinima;
     private double precioUnitario;
     private Producto producto;
+    private Boolean activo;
 
     public EscalaPrecio(){};
 
@@ -31,5 +32,11 @@ public class EscalaPrecio {
         this.precioUnitario = precioUnitario;
     }
 
+    public Boolean getActivo() {
+        return activo;
+    }
 
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
 }
