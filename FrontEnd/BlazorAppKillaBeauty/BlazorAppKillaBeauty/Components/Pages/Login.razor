@@ -1,5 +1,7 @@
 ﻿@page "/login"
 @rendermode InteractiveServer
+@inject AuthService AuthService
+@inject NavigationManager Navigation
 
 <PageTitle>Iniciar Sesión - Killa Beauty</PageTitle>
 
@@ -25,20 +27,27 @@
         <div class="form-group">
             <label>Usuario</label>
             <input type="text"
-                   placeholder="Ingresa tu usuario" />
+                   placeholder="Ingresa tu usuario" @bind="usuario"/>
         </div>
 
         <div class="form-group">
             <label>Contraseña</label>
             <input type="password"
-                   placeholder="Ingresa tu contraseña" />
+                   placeholder="Ingresa tu contraseña" @bind="password"/>
         </div>
 
         <div class="forgot-password">
             <a href="#">¿Olvidaste tu contraseña?</a>
         </div>
 
-        <button class="login-button">
+        @if (!string.IsNullOrEmpty(mensajeError))
+        {
+            <p class="validation-message">@mensajeError</p>
+        }
+
+        <button type="button"
+                class="login-button"
+                @onclick="IniciarSesion">
             Iniciar Sesión
         </button>
 
@@ -50,4 +59,49 @@
     </div>
 
 </section>
+
+@code {
+    private string usuario = "";
+    private string password = "";
+
+    private string mensajeError = "";
+
+    private void IniciarSesion()
+    {
+        mensajeError = "";
+
+        // Validar vacíos
+        if (string.IsNullOrWhiteSpace(usuario) ||
+            string.IsNullOrWhiteSpace(password))
+        {
+            mensajeError =
+                "Ingrese usuario y contraseña.";
+            return;
+        }
+
+        // LOGIN CLIENTE
+        if (usuario == "cliente" &&
+            password == "cliente123")
+        {
+            AuthService.LoginCliente("Cliente");
+
+            Navigation.NavigateTo("/");
+            return;
+        }
+
+        // LOGIN ADMIN
+        if (usuario == "admin" &&
+            password == "admin123")
+        {
+            AuthService.LoginAdmin("Administrador");
+
+            Navigation.NavigateTo("/admin");
+            return;
+        }
+
+        // ERROR
+        mensajeError =
+            "Usuario o contraseña incorrectos.";
+    }
+}
 
