@@ -21,7 +21,7 @@
     <dependencies>
         <dependency>
             <groupId>pe.edu.pucp.killaBeauty</groupId>
-            <artifactId>killaDAO</artifactId>
+            <artifactId>killaModelo</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
