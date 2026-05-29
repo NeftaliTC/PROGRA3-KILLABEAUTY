@@ -1,4 +1,9 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
+<<<<<<< HEAD
+
+public enum TipoUsuario {
+    ADMINISTRADOR, VENDEDOR, CLIENTE
+=======
 // CORREGIDA
 public enum TipoUsuario {
     ADMINISTRADOR(1, "Administrador"),
@@ -20,4 +25,5 @@ public enum TipoUsuario {
         }
         return null;
     }
+>>>>>>> a9af6bf1bc00f06ed32a6e4560954ef4086471c8
 }
