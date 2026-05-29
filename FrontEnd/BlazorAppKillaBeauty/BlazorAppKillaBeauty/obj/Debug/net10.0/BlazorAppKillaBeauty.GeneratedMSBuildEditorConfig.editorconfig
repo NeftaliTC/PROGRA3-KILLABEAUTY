@@ -12,53 +12,53 @@ build_property.EntryPointFilePath =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = BlazorAppKillaBeauty
 build_property.RootNamespace = BlazorAppKillaBeauty
-build_property.ProjectDir = C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\
+build_property.ProjectDir = C:\Users\fabia\Documents\GitHub\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 10.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty
+build_property.MSBuildProjectDirectory = C:\Users\fabia\Documents\GitHub\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/PUCP/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/App.razor]
+[C:/Users/fabia/Documents/GitHub/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/App.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/PUCP/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/Navbar.razor]
+[C:/Users/fabia/Documents/GitHub/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/Navbar.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xOYXZiYXIucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/PUCP/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/Pages/Error.razor]
+[C:/Users/fabia/Documents/GitHub/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/Pages/Error.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xFcnJvci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/PUCP/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/Pages/Home.razor]
+[C:/Users/fabia/Documents/GitHub/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIb21lLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/PUCP/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/Pages/Login.razor]
+[C:/Users/fabia/Documents/GitHub/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/Pages/Login.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xMb2dpbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/PUCP/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/Pages/NotFound.razor]
+[C:/Users/fabia/Documents/GitHub/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/Pages/NotFound.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xOb3RGb3VuZC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/PUCP/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/Routes.razor]
+[C:/Users/fabia/Documents/GitHub/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/Routes.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSb3V0ZXMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/PUCP/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/_Imports.razor]
+[C:/Users/fabia/Documents/GitHub/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xfSW1wb3J0cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/PUCP/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/Layout/MainLayout.razor]
+[C:/Users/fabia/Documents/GitHub/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/Layout/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTWFpbkxheW91dC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-kk3htansbq
 
-[C:/PUCP/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/Layout/ReconnectModal.razor]
+[C:/Users/fabia/Documents/GitHub/PROGRA3-KILLABEAUTY/FrontEnd/BlazorAppKillaBeauty/BlazorAppKillaBeauty/Components/Layout/ReconnectModal.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcUmVjb25uZWN0TW9kYWwucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-01x0tlj5po

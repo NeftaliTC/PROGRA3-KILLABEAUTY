@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\PUCP\\PROGRA3-KILLABEAUTY\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj": {}
+    "C:\\Users\\fabia\\Documents\\GitHub\\PROGRA3-KILLABEAUTY\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj": {}
   },
   "projects": {
-    "C:\\PUCP\\PROGRA3-KILLABEAUTY\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj": {
+    "C:\\Users\\fabia\\Documents\\GitHub\\PROGRA3-KILLABEAUTY\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\PUCP\\PROGRA3-KILLABEAUTY\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj",
+        "projectUniqueName": "C:\\Users\\fabia\\Documents\\GitHub\\PROGRA3-KILLABEAUTY\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj",
         "projectName": "BlazorAppKillaBeauty",
-        "projectPath": "C:\\PUCP\\PROGRA3-KILLABEAUTY\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj",
-        "packagesPath": "C:\\Users\\ANGELINA\\.nuget\\packages\\",
-        "outputPath": "C:\\PUCP\\PROGRA3-KILLABEAUTY\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\obj\\",
+        "projectPath": "C:\\Users\\fabia\\Documents\\GitHub\\PROGRA3-KILLABEAUTY\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty.csproj",
+        "packagesPath": "C:\\Users\\fabia\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\fabia\\Documents\\GitHub\\PROGRA3-KILLABEAUTY\\FrontEnd\\BlazorAppKillaBeauty\\BlazorAppKillaBeauty\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\ANGELINA\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\fabia\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
