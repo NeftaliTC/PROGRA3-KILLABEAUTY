@@ -27,4 +27,6 @@ public class RolPermiso {
     public void setPermiso(Permiso permiso) {
         this.permiso = permiso;
     }
+
+
 }

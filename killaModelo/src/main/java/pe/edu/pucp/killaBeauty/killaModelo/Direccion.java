@@ -8,6 +8,7 @@ public class Direccion {
     private String direccionExacta;
     private String referencia;
     private int idUsuario;
+    private Boolean activo;
         
     public Direccion(){};
 
@@ -59,5 +60,13 @@ public class Direccion {
     }
 
     public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
 }
 

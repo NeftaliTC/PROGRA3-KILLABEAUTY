@@ -8,6 +8,7 @@ public class Resena {
     private int calificacion;
     private boolean verificado;
     private LocalDate fechaPublicacion;
+    private Boolean activo;
 
     private Usuario cliente;
     private Producto producto;
@@ -80,4 +81,11 @@ public class Resena {
 
     public void validarCalificacion() {}
 
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
 }

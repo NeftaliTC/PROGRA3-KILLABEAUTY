@@ -18,7 +18,7 @@ public class EscalaPrecioDAOImpl implements EscalaPrecioDAO {
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 EscalaPrecio ep = new EscalaPrecio();
-                ep.setId(rs.getInt(1));
+                ep.setEscalaPrecio(rs.getInt(1));
                 ep.setCantidadMinima(rs.getInt(2));
                 ep.setPrecioUnitario(rs.getDouble(3));
                 ep.setActivo(rs.getBoolean(4));
@@ -38,7 +38,7 @@ public class EscalaPrecioDAOImpl implements EscalaPrecioDAO {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     EscalaPrecio ep = new EscalaPrecio();
-                    ep.setId(rs.getInt(1));
+                    ep.setEscalaPrecio(rs.getInt(1));
                     ep.setCantidadMinima(rs.getInt(2));
                     ep.setPrecioUnitario(rs.getDouble(3));
                     ep.setActivo(rs.getBoolean(4));
@@ -58,13 +58,13 @@ public class EscalaPrecioDAOImpl implements EscalaPrecioDAO {
 
             pstmt.setInt(1, ep.getCantidadMinima());
             pstmt.setDouble(2, ep.getPrecioUnitario());
-            pstmt.setBoolean(3, ep.isActivo());
+            pstmt.setBoolean(3, ep.getActivo());
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet keys = pstmt.getGeneratedKeys()) {
                     if (keys.next()) {
-                        ep.setId(keys.getInt(1));
+                        ep.setEscalaPrecio(keys.getInt(1));
                     }
                 }
             }
@@ -80,8 +80,8 @@ public class EscalaPrecioDAOImpl implements EscalaPrecioDAO {
              PreparedStatement pstmt=connection.prepareStatement(sql)){
             pstmt.setInt(1, ep.getCantidadMinima());
             pstmt.setDouble(2, ep.getPrecioUnitario());
-            pstmt.setBoolean(3, ep.isActivo());
-            pstmt.setInt(4, ep.getId());
+            pstmt.setBoolean(3, ep.getActivo());
+            pstmt.setInt(4, ep.getIdEscalaPrecio());
             pstmt.executeUpdate();
             return ep;
         }catch (SQLException e){
@@ -89,15 +89,19 @@ public class EscalaPrecioDAOImpl implements EscalaPrecioDAO {
         }
     }
 
+
     @Override
     public void remove(EscalaPrecio ep) throws SQLException {
-        String sql = "UPDATE EscalaPrecio SET activo = false WHERE id_escala = ?";
+        ep.setActivo(false);
+        String sql = "UPDATE EscalaPrecio SET activo = ? WHERE id_escala = ?";
         try (Connection connection = DBManager.getInstance().getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, ep.getId());
+            pstmt.setBoolean(1, ep.getActivo());
+            pstmt.setInt(2, ep.getIdEscalaPrecio());
             pstmt.executeUpdate();
         }
     }
+
 }
 
 

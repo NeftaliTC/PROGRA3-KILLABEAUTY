@@ -133,4 +133,6 @@ public class Pedido {
         this.igv = this.subtotal * 0.18;
         this.total = this.subtotal + this.igv;
     }
+
+
 }

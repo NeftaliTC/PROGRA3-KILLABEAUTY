@@ -4,6 +4,7 @@ public class Marca {
     private int id;
     private String descripcion;
     private String paisDeOrigen;
+    private Boolean activo;
 
     //Constructores
     public Marca() {};
@@ -38,5 +39,12 @@ public class Marca {
     public void setPaisDeOrigen(String paisDeOrigen) {
         this.paisDeOrigen = paisDeOrigen;
     }
-    
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
 }

@@ -3,6 +3,7 @@ package pe.edu.pucp.killaBeauty.killaModelo;
 public class Subcategoria {
     private int id;
     private String nombre;
+    private Boolean activo;
 
     public Subcategoria() {}
 
@@ -25,5 +26,13 @@ public class Subcategoria {
 
     public void setNombre(String descripcion) {
         this.nombre = descripcion;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 }

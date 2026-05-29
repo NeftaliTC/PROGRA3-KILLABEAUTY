@@ -13,6 +13,7 @@ public class Carrito {
     private EstadoCarro estado;
     private Usuario cliente;
     private List<DetalleCarrito> items;
+    private Boolean activo;
 
     public Carrito() {
         this.items = new ArrayList<>();
@@ -50,7 +51,15 @@ public class Carrito {
     public void setCliente(Usuario cliente) {
         this.cliente = cliente; 
     }
-    
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
+
     public List<DetalleCarrito> getItems() {
         return items;
     }

@@ -7,6 +7,7 @@ public class DetallePedido {
     private Producto producto;
     private double subtotal;
 
+
     public DetallePedido() {}
 
     public double calcularSubtotal() {
@@ -54,4 +55,6 @@ public class DetallePedido {
     public double getSubtotal() {
         return subtotal;
     }
+
+
 }

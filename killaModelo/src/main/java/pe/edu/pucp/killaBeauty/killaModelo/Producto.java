@@ -12,7 +12,9 @@ public class Producto {
     private Marca marca;
     private Categoria categoria;
     private List<EscalaPrecio> escalas;
+    private Boolean activo;
     private List<Resena> resenas;
+
 
     public Producto() {
         this.marca = new Marca();
@@ -104,4 +106,12 @@ public class Producto {
     public void agregarEscala(EscalaPrecio escala) {}
 
     public void agregarResena(Resena resena) {}
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
 }

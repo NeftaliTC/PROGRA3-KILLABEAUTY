@@ -6,6 +6,7 @@ public class DetalleCarrito {
     private Producto producto;
     private int idCarrito;
 
+
     public DetalleCarrito() {
         this.producto = new Producto();
     }
@@ -42,5 +43,7 @@ public class DetalleCarrito {
         if (producto != null) return cantidad * producto.getPrecioBase();
         return 0.0;
     }
+
+
 }
 

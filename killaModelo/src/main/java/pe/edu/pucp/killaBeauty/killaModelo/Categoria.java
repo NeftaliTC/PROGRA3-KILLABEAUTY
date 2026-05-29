@@ -6,6 +6,7 @@ public class Categoria {
     private int id;
     private String nombre;
     private List<Subcategoria> subcategorias;
+	private Boolean activo;
 	
 	public Categoria() {
 		this.subcategorias = new ArrayList<>();
@@ -44,5 +45,12 @@ public class Categoria {
 	public void setSubcategorias(List<Subcategoria> subcategorias) {
     	this.subcategorias = subcategorias;
 	}
-	
+
+	public Boolean getActivo() {
+		return activo;
+	}
+
+	public void setActivo(Boolean activo) {
+		this.activo = activo;
+	}
 }
