@@ -5,7 +5,7 @@ public class DetalleCarrito {
     private int cantidad;
     private Producto producto;
     private int idCarrito;
-    private Boolean activo;
+
 
     public DetalleCarrito() {
         this.producto = new Producto();
@@ -44,12 +44,6 @@ public class DetalleCarrito {
         return 0.0;
     }
 
-    public Boolean getActivo() {
-        return activo;
-    }
 
-    public void setActivo(Boolean activo) {
-        this.activo = activo;
-    }
 }
 

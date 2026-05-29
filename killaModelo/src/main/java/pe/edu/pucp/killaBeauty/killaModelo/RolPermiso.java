@@ -4,7 +4,6 @@ public class RolPermiso {
 
     private TipoUsuario tipoUsuario;
     private Permiso permiso;
-    private Boolean activo;
 
     public RolPermiso() {}
 
@@ -29,11 +28,5 @@ public class RolPermiso {
         this.permiso = permiso;
     }
 
-    public Boolean getActivo() {
-        return activo;
-    }
 
-    public void setActivo(Boolean activo) {
-        this.activo = activo;
-    }
 }

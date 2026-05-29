@@ -12,7 +12,6 @@ public class Pedido {
     private double subtotal;
     private double igv;
     private double total;
-    private Boolean activo;
 
     private Usuario cliente;
     private Direccion direccionEnvio;
@@ -135,11 +134,5 @@ public class Pedido {
         this.total = this.subtotal + this.igv;
     }
 
-    public Boolean getActivo() {
-        return activo;
-    }
 
-    public void setActivo(Boolean activo) {
-        this.activo = activo;
-    }
 }
