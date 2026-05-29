@@ -1,4 +1,5 @@
 using BlazorAppKillaBeauty.Components;
+using BlazorAppKillaBeauty.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,8 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// TU SERVICE
+// SERVICE
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<CartService>();
 
 var app = builder.Build();
 

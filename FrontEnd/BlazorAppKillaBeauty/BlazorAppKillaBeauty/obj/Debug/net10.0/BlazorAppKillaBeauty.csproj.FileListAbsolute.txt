@@ -172,8 +172,10 @@ C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\o
 C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\BlazorAppKillaBeauty.pdb
 C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\BlazorAppKillaBeauty.genruntimeconfig.cache
 C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\ref\BlazorAppKillaBeauty.dll
-C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\9xgxftju9b-{0}-hnlj0rulyf-hnlj0rulyf.gz
 C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\yht3mcgq6u-{0}-lgdo4aidbq-lgdo4aidbq.gz
 C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\42o4xuaqm0-{0}-3tj7ggc5za-3tj7ggc5za.gz
-C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\2s8ygne6zz-{0}-i41he3s636-i41he3s636.gz
-C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\k2859ehgcq-{0}-cls6vfl08i-cls6vfl08i.gz
+C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\dukvk8113z-{0}-zy38x5j2ce-zy38x5j2ce.gz
+C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\9xgxftju9b-{0}-3l8ivxedzi-3l8ivxedzi.gz
+C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\k2859ehgcq-{0}-uqvgo64822-uqvgo64822.gz
+C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\4mgffdftwr-{0}-a1u9oalkmn-a1u9oalkmn.gz
+C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\2s8ygne6zz-{0}-d05j21lz5u-d05j21lz5u.gz

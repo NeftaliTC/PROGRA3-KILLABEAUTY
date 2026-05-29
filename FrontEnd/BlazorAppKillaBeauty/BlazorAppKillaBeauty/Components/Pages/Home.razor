@@ -1,9 +1,11 @@
 ﻿@page "/"
 @rendermode InteractiveServer
+@using BlazorAppKillaBeauty.Services
+@inject CartService CartService
 
 <PageTitle>KILLA Beauty – Belleza que Inspira</PageTitle>
 
-<Navbar CantidadCarrito="@cantidadCarrito" />
+<Navbar CantidadCarrito="@CartService.CantidadTotal" />
 
 <!-- BANNER PRINCIPAL -->
 <section class="hero">
@@ -231,7 +233,11 @@
 
     private async Task AgregarCarrito(int index)
     {
-        cantidadCarrito++;
+        CartService.AgregarProducto(
+            productos[index].Nombre,
+            decimal.Parse(productos[index].Precio),
+            productos[index].Imagen
+        );
 
         productosAnimados.Add(index);
         StateHasChanged();

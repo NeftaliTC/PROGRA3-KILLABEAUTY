@@ -1,0 +1,52 @@
+﻿@page "/cart"
+@using BlazorAppKillaBeauty.Services
+@inject CartService CartService
+
+<Navbar CantidadCarrito="@CantidadCarrito" />
+
+<section class="cart-page">
+
+    @if (CartService.Productos.Count == 0)
+    {
+        <div class="empty-cart">
+
+            <i class="bi bi-bag empty-cart-icon"></i>
+
+            <h1>Tu carrito está vacío</h1>
+
+            <p>Agrega productos para comenzar tu compra</p>
+
+            <NavLink href="/" class="cart-button">
+                Explorar productos
+            </NavLink>
+
+        </div>
+    }
+    else
+    {
+        @foreach (var producto in CartService.Productos)
+        {
+            <div class="cart-item">
+                <img src="@producto.Imagen" />
+
+                <div>
+                    <h3>@producto.Nombre</h3>
+                    <p>S/ @producto.Precio</p>
+                    <p>Cantidad: @producto.Cantidad</p>
+                </div>
+            </div>
+        }
+
+        <h3>Total: S/ @CartService.Total</h3>
+    }
+
+</section>
+
+@code {
+    private int CantidadCarrito => CartService.CantidadTotal;
+
+    private IReadOnlyList<CartItem> productosCarrito =>
+        CartService.Productos;
+
+    private decimal Total => CartService.Total;
+}
