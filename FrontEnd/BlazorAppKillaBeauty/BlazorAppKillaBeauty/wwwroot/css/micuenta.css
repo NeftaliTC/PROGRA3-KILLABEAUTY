@@ -1,0 +1,261 @@
+﻿/* RESETEO TOTAL PARA EVITAR FILTRACIONES DE BORDES BLANCOS */
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #fdfafb !important;
+}
+
+.page-background-wrapper {
+    background-color: #fdfafb;
+    width: 100%;
+    min-height: calc(100vh - 80px);
+    padding: 30px 0 60px 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    box-sizing: border-box;
+}
+
+.account-main-container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.main-page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #000000;
+    margin: 0 0 25px 5px;
+}
+
+.account-layout-grid {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* TARJETA IZQUIERDA */
+.account-sidebar-card {
+    flex: 0 0 270px;
+    background: #ffffff;
+    border-radius: 28px;
+    padding: 30px 15px;
+    border: 1px solid #fdebee;
+    box-shadow: 0 4px 20px rgba(233, 82, 130, 0.02);
+    box-sizing: border-box;
+}
+
+.profile-avatar-zone {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.avatar-circle {
+    width: 68px;
+    height: 68px;
+    background: #f1b7c7;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 auto 12px auto;
+}
+
+.avatar-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 4px 0;
+}
+
+.avatar-email {
+    font-size: 13px;
+    color: #9aa3af;
+}
+
+.sidebar-menu-links {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.menu-link-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 13px 20px;
+    border: none;
+    background: transparent;
+    border-radius: 50px;
+    text-align: left;
+    font-size: 14px;
+    color: #222222;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+    .menu-link-item.active {
+        background: #fde8ec;
+        color: #e95282;
+        font-weight: 600;
+    }
+
+.sidebar-divider {
+    border: 0;
+    height: 1px;
+    background: #f5dfe3;
+    margin: 12px 0;
+}
+
+.menu-link-item.logout-btn {
+    color: #ff4d4d;
+}
+
+/* TARJETA DERECHA */
+.account-content-card {
+    flex: 1;
+    background: #ffffff;
+    border-radius: 28px;
+    padding: 35px 40px;
+    border: 1px solid #fdebee;
+    box-shadow: 0 4px 20px rgba(233, 82, 130, 0.02);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-inside-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #000000;
+    margin: 0 0 25px 0;
+}
+
+.profile-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 30px;
+    row-gap: 18px;
+}
+
+.form-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-input-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #000000;
+}
+
+/* COMPONENTES DE FORMULARIO CON BORDE ROSA CLARO (Normal) */
+.form-input-group input,
+.custom-select-field {
+    width: 100%;
+    height: 44px;
+    padding: 0 15px;
+    /* CORRECCIÓN: Rosa ceniza muy claro para alto contraste con el rojo */
+    border: 1px solid #FBEAEF; 
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333333;
+    background-color: #ffffff;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+    /* Estado Focus: Rosa corporativo vibrante para resaltar selección */
+    .form-input-group input:focus,
+    .custom-select-field:focus {
+        border-color: #e95282;
+        box-shadow: 0 0 0 3px rgba(233, 82, 130, 0.1); /* Brillo sutil rosa */
+    }
+
+    /* Estado Bloqueado: Mismo rosa claro pero con fondo sombreado */
+    .form-input-group input:disabled,
+    .custom-select-field:disabled {
+        background-color: #F9F9F9;
+        border-color: #FBEAEF !important; /* Mantenemos el rosa claro */
+        color: #9ca3af;
+        cursor: not-allowed;
+        opacity: 1;
+        -webkit-text-fill-color: #9ca3af;
+    }
+
+/* CONTENEDOR NUEVO PARA FECHA KILLA (3 COMBOS FLEXIBLES) */
+.killa-date-picker-combo {
+    display: flex;
+    gap: 10px;
+}
+
+    .killa-date-picker-combo select {
+        flex: 1;
+        cursor: pointer;
+    }
+
+/* TRATAMIENTO DE CAMPO CON ERROR (Rojo vibrante - Contraste garantizado) */
+.form-input-group.has-error label {
+    color: #ff4d4d;
+}
+
+.form-input-group.has-error input,
+.form-input-group.has-error select {
+    /* Este rojo ahora resaltará muchísimo sobre el rosa claro base */
+    border: 1px solid #ff4d4d !important;
+    background-color: #fffafb;
+}
+
+.error-hint-text {
+    color: #ff4d4d;
+    font-size: 12px;
+    margin-top: 2px;
+    font-weight: 500;
+}
+
+/* BOTÓN DE ACCIÓN */
+.form-actions-area {
+    margin-top: 35px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.killa-save-button {
+    width: 100%;
+    height: 48px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+    /* Estado Desactivado (Inactivo / Sin cambios) */
+    .killa-save-button.state-disabled {
+        background-color: #e5e7eb;
+        color: #9ca3af;
+        cursor: not-allowed;
+    }
+
+    /* Estado Activado (Formulario modificado bien) */
+    .killa-save-button.state-active {
+        background-color: #f197ab;
+        color: #ffffff;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(241, 151, 171, 0.3);
+    }
+
+        .killa-save-button.state-active:hover {
+            background-color: #e95282;
+        }
+
+.empty-space-block {
+    visibility: hidden;
+}
