@@ -1,0 +1,117 @@
+﻿@page "/account/coupons"
+@layout AccountLayout
+@rendermode InteractiveServer
+
+<div class="account-content-container">
+    <h2 class="content-section-title">Cupones Disponibles</h2>
+
+    <div class="coupons-list">
+        <div class="ticket-card">
+            <div class="cutout-container left">
+                <div class="ticket-side-pink"></div>
+                <div class="cutout-shape"></div>
+            </div>
+            <div class="ticket-main-content">
+                <h3 class="ticket-title">20% OFF Día de la Madre</h3>
+                <p class="ticket-subtitle grey-text">Compra mínima S/ 100<br /> Tope de S/ 30<br /> Cupón: MAMA20</p>
+                <div class="ticket-separator"></div>
+                <div class="ticket-footer grey-text">
+                    <span><i class="bi bi-clock"></i> Vence 12 de Mayo</span>
+                    <button class="ver-btn" @onclick='() => MostrarModal("MAMA20")'>Ver</button>
+                </div>
+            </div>
+            <div class="cutout-container right">
+                <div class="ticket-side-pink"></div>
+                <div class="cutout-shape"></div>
+            </div>
+        </div>
+    
+        <div class="ticket-card">
+            <div class="cutout-container left">
+                <div class="ticket-side-pink"></div>
+                <div class="cutout-shape"></div>
+            </div>
+            <div class="ticket-main-content">
+                <h3 class="ticket-title">S/. 15 OFF primera compra</h3>
+                <p class="ticket-subtitle grey-text">Compra mínima S/ 15<br /> Cupón: Bienvenido2026</p>
+                <div class="ticket-separator"></div>
+                <div class="ticket-footer grey-text">
+                    <span><i class="bi bi-clock"></i> Vence 31 de Diciembre</span>
+                    <button class="ver-btn" @onclick='() => MostrarModal("BIENVENIDO")'>Ver</button>
+                </div>
+            </div>
+            <div class="cutout-container right">
+                <div class="ticket-side-pink"></div>
+                <div class="cutout-shape"></div>
+            </div>
+        </div>
+
+        <div class="ticket-card">
+            <div class="cutout-container left">
+                <div class="ticket-side-pink"></div>
+                <div class="cutout-shape"></div>
+            </div>
+            <div class="ticket-main-content">
+                <h3 class="ticket-title">30% OFF CyberWOW</h3>
+                <p class="ticket-subtitle grey-text">Compra mínima S/ 250<br /> Tope de S/ 100<br /> Cupón: CYBERWOW30</p>
+                <div class="ticket-separator"></div>
+                <div class="ticket-footer grey-text">
+                    <span><i class="bi bi-clock"></i> Vence 14 de Octubre</span>
+                    <button class="ver-btn" @onclick='() => MostrarModal("CYBERWOW")'>Ver</button>
+                </div>
+            </div>
+            <div class="cutout-container right">
+                <div class="ticket-side-pink"></div>
+                <div class="cutout-shape"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (mostrarModal)
+{
+    <div class="modal-backdrop-transparent fade-in" @onclick="CerrarModal">
+        <div class="modal-content-wrapper scale-up" @onclick:stopPropagation="true">
+            <button class="modal-close-x" @onclick="CerrarModal">×</button>
+            
+            @if (cuponActivo == "MAMA20")
+            {
+                <h3 class="modal-title">20% OFF Día de la Madre</h3>
+                <div class="modal-body-text">
+                    CAMPAÑA DÍA DE LA MADRE 2026. Beneficio válido únicamente para compras realizadas a través de la tienda virtual desde el 07/05/2026 hasta el 12/05/2026, incluyendo ambas fechas; o hasta agotar el stock de cupones disponibles; o hasta alcanzar el monto máximo destinado a descuentos de la campaña, lo que ocurra primero. El beneficio consiste en un 20% de descuento sobre el total de la compra, con una compra mínima de S/. 100 y un tope máximo de descuento de S/. 30 por usuario. El cupón MAMA20 es válido para una sola compra por usuario y no es acumulable con otras promociones, descuentos, beneficios o cupones vigentes. La campaña aplica únicamente para compras virtuales y está sujeta a disponibilidad, validación del pedido y condiciones comerciales de la tienda.
+                </div>
+            }
+            else if (cuponActivo == "BIENVENIDO")
+            {
+                <h3 class="modal-title">S/. 15 OFF primera compra</h3>
+                <div class="modal-body-text">
+                    CAMPAÑA BIENVENIDA 2026. Beneficio válido únicamente para nuevos usuarios que realicen su primera compra a través de la tienda virtual desde el 01/01/2026 hasta el 31/12/2026; o hasta agotar el stock de cupones disponibles; o hasta alcanzar el monto máximo destinado a descuentos de la campaña, lo que ocurra primero. El beneficio consiste en un descuento directo de S/. 15 sobre el total de la compra, con una compra mínima de S/. 75. El cupón BIENVENIDO2026 es válido para una sola compra por usuario y no es acumulable con otras promociones, descuentos, beneficios o cupones vigentes. La campaña aplica únicamente para compras virtuales y está sujeta a disponibilidad, validación del pedido y condiciones comerciales de la tienda.
+                </div>
+            }
+            else if (cuponActivo == "CYBERWOW")
+            {
+                <h3 class="modal-title">30% OFF CyberWOW</h3>
+                <div class="modal-body-text">
+                    CAMPAÑA CYBERWOW 2026. Beneficio válido únicamente para compras realizadas a través de la tienda virtual durante las fechas oficiales de la campaña CyberWOW; o hasta agotar el stock de cupones disponibles; o hasta alcanzar el monto máximo destinado a descuentos de la campaña, lo que ocurra primero. El beneficio consiste en un 30% de descuento sobre el total de la compra, con una compra mínima de S/. 250 y un tope máximo de descuento de S/. 100 por usuario. El cupón CYBERWOW30 es válido para una sola compra por usuario y no es acumulable con otras promociones, descuentos, beneficios o cupones vigentes. La campaña aplica únicamente para compras virtuales y está sujeta a disponibilidad, validación del pedido y condiciones comerciales de la tienda.
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private bool mostrarModal = false;
+    private string cuponActivo = "";
+
+    private void MostrarModal(string idCupon)
+    {
+        cuponActivo = idCupon;
+        mostrarModal = true;
+    }
+
+    private void CerrarModal()
+    {
+        mostrarModal = false;
+        cuponActivo = "";
+    }
+}

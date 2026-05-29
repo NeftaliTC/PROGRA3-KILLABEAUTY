@@ -96,12 +96,22 @@ html, body {
     color: #222222;
     font-weight: 500;
     cursor: pointer;
+    text-decoration: none !important; /* Elimina la línea azul */
+    box-sizing: border-box;
 }
 
+    /* Evita que cambie a morado o azul al pasar el mouse si no está activo */
+    .menu-link-item:hover {
+        text-decoration: none !important;
+        background-color: #fdf5f6;
+    }
+
+    /* Estado Activo */
     .menu-link-item.active {
         background: #fde8ec;
-        color: #e95282;
+        color: #e95282 !important; /* Fuerza el rosa corporativo */
         font-weight: 600;
+        text-decoration: none !important;
     }
 
 .sidebar-divider {
