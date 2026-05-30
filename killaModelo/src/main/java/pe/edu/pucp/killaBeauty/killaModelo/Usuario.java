@@ -17,7 +17,7 @@ public class Usuario {
     private List<Direccion> direcciones;
     private List<Pedido> pedidos;
     private Carrito carritoActivo;
-    private int id_tipoUsuario;
+    private TipoUsuario tipoUsuario;
 
 
     //Constructores
@@ -131,12 +131,12 @@ public class Usuario {
         this.apellidoPaterno = apellidoPaterno;
     }
 
-    public int getId_tipoUsuario() {
-        return id_tipoUsuario;
+    public TipoUsuario getTipoUsuario() {
+        return tipoUsuario;
     }
 
-    public void setId_tipoUsuario(int id_tipoUsuario) {
-        this.id_tipoUsuario = id_tipoUsuario;
+    public void setTipoUsuario(TipoUsuario tipoUsuario) {
+        this.tipoUsuario = tipoUsuario;
     }
 
 
