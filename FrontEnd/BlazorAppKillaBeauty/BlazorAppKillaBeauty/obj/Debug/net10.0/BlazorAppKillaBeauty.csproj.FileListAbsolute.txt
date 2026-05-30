@@ -177,5 +177,5 @@ C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\o
 C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\dukvk8113z-{0}-zy38x5j2ce-zy38x5j2ce.gz
 C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\9xgxftju9b-{0}-3l8ivxedzi-3l8ivxedzi.gz
 C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\k2859ehgcq-{0}-uqvgo64822-uqvgo64822.gz
-C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\4mgffdftwr-{0}-a1u9oalkmn-a1u9oalkmn.gz
 C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\2s8ygne6zz-{0}-d05j21lz5u-d05j21lz5u.gz
+C:\PUCP\PROGRA3-KILLABEAUTY\FrontEnd\BlazorAppKillaBeauty\BlazorAppKillaBeauty\obj\Debug\net10.0\compressed\4mgffdftwr-{0}-h5de3va7fz-h5de3va7fz.gz

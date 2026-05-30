@@ -1,4 +1,5 @@
 ﻿@page "/cart"
+@rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
 @inject CartService CartService
 
@@ -8,36 +9,119 @@
 
     @if (CartService.Productos.Count == 0)
     {
-        <div class="empty-cart">
+        <div class="empty-cart-wrapper">
 
-            <i class="bi bi-bag empty-cart-icon"></i>
+            <div class="empty-cart">
 
-            <h1>Tu carrito está vacío</h1>
+                <i class="bi bi-bag empty-cart-icon"></i>
 
-            <p>Agrega productos para comenzar tu compra</p>
+                <h1>Tu carrito está vacío</h1>
 
-            <NavLink href="/" class="cart-button">
-                Explorar productos
-            </NavLink>
+                <p>Agrega productos para comenzar tu compra</p>
+
+                <NavLink href="/" class="cart-button">
+                    Explorar productos
+                </NavLink>
+
+            </div>
 
         </div>
     }
     else
     {
-        @foreach (var producto in CartService.Productos)
-        {
-            <div class="cart-item">
-                <img src="@producto.Imagen" />
+        <div class="cart-container">
 
-                <div>
-                    <h3>@producto.Nombre</h3>
-                    <p>S/ @producto.Precio</p>
-                    <p>Cantidad: @producto.Cantidad</p>
-                </div>
+            <div class="cart-list">
+
+                <h1>Carrito de Compras</h1>
+
+                @foreach (var producto in CartService.Productos)
+                {
+                    <div class="cart-item">
+
+                        <img src="@producto.Imagen"
+                             alt="@producto.Nombre"
+                             class="cart-item-img" />
+
+                        <div class="cart-item-info">
+                            <h3>@producto.Nombre</h3>
+
+                            <span class="cart-tag">
+                                @producto.TipoCompra
+                            </span>
+
+                            <p>
+                                Precio unitario:
+                                S/ @producto.PrecioUnitario.ToString("0.00")
+
+                                @if (producto.PrecioUnitario < producto.PrecioOriginal)
+                                {
+                                    <span class="old-price">
+                                        S/ @producto.PrecioOriginal.ToString("0.00")
+                                    </span>
+                                }
+                            </p>
+                        </div>
+
+                        <div class="cart-actions">
+                            <button @onclick="() => CartService.DisminuirCantidad(producto.Nombre)">
+                                -
+                            </button>
+
+                            <span>@producto.Cantidad</span>
+
+                            <button @onclick="() => CartService.AumentarCantidad(producto.Nombre)">
+                                +
+                            </button>
+                        </div>
+
+                        <div class="cart-subtotal">
+                            <small>Subtotal</small>
+                            <strong>
+                                S/ @producto.Subtotal.ToString("0.00")
+                            </strong>
+                        </div>
+
+                        <button class="delete-btn"
+                                @onclick="() => CartService.EliminarProducto(producto.Nombre)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+
+                    </div>
+                }
+
             </div>
-        }
 
-        <h3>Total: S/ @CartService.Total</h3>
+            <div class="cart-summary">
+                <h2>Resumen del Pedido</h2>
+
+                <div class="summary-row">
+                    <span>Subtotal productos</span>
+                    <strong>S/ @CartService.Total.ToString("0.00")</strong>
+                </div>
+
+                <div class="summary-row discount">
+                    <span>Descuento por volumen</span>
+                    <strong>S/ @CartService.DescuentoTotal.ToString("0.00")</strong>
+                </div>
+
+                <hr />
+
+                <div class="summary-total">
+                    <span>Total a pagar</span>
+                    <strong>S/ @CartService.Total.ToString("0.00")</strong>
+                </div>
+
+                <button class="pay-button">
+                    Proceder al pago
+                </button>
+
+                <NavLink href="/" class="continue-link">
+                    Continuar comprando
+                </NavLink>
+            </div>
+
+        </div>
     }
 
 </section>
