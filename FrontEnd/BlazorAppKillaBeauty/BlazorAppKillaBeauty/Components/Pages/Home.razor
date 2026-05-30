@@ -1,10 +1,13 @@
 ﻿@page "/"
 @rendermode InteractiveServer
+@using BlazorAppKillaBeauty.Services
+@inject CartService CartService
 
 <PageTitle>KILLA Beauty – Belleza que Inspira</PageTitle>
 
-<Navbar CantidadCarrito="@productosAgregados.Count" />
+<Navbar CantidadCarrito="@CartService.CantidadTotal" />
 
+<!-- BANNER PRINCIPAL -->
 <section class="hero">
     <div class="hero-content">
         <h1>
@@ -170,13 +173,17 @@
                         </span>
 
                         <button type="button"
-                                class="cart-btn @(productosAgregados.Contains(index) ? "cart-added" : "")"
+                                class="cart-btn @(productosAnimados.Contains(index) ? "cart-added" : "")"
                                 @onclick="() => AgregarCarrito(index)">
 
-                            <i class="bi @(productosAgregados.Contains(index)
-                                       ? "bi-check-lg"
-                                       : "bi-cart3")">
-                            </i>
+                            @if (productosAnimados.Contains(index))
+                            {
+                                <i class="bi bi-check-lg"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-cart3"></i>
+                            }
 
                         </button>
 
@@ -222,18 +229,23 @@
         new Producto("L03 Professional Protein Treatment LORINIQUE", "42.50", "Images/LoriniqueCabello.jpg")
     };
 
-    private List<int> ratings = new() { 4, 4, 4, 4 };
+    private HashSet<int> productosAnimados = new();
 
-    private HashSet<int> productosAgregados = new();
-
-
-    private void AgregarCarrito(int index)
+    private async Task AgregarCarrito(int index)
     {
-        if (!productosAgregados.Contains(index))
-        {
-            productosAgregados.Add(index);
-            cantidadCarrito++;
-        }
+        CartService.AgregarProducto(
+            productos[index].Nombre,
+            decimal.Parse(productos[index].Precio),
+            productos[index].Imagen
+        );
+
+        productosAnimados.Add(index);
+        StateHasChanged();
+
+        await Task.Delay(300);
+
+        productosAnimados.Remove(index);
+        StateHasChanged();
     }
 
     private class Producto

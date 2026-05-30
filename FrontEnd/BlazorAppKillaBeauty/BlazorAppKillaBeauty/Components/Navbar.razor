@@ -1,4 +1,5 @@
-﻿<link rel="stylesheet" href="@Assets["app.css"]" />
+﻿@inject AuthService AuthService
+<link rel="stylesheet" href="@Assets["app.css"]" />
 
 <nav class="navbar-killa">
     <img src="Images/Logo.png"
@@ -16,9 +17,12 @@
     </div>
 
     <div class="nav-links">
-        <a href="">Catálogo</a>
 
-        <button class="cart-navbar-btn">
+        <NavLink href="/catalogo">
+            Catálogo
+        </NavLink>
+
+        <NavLink href="/cart" class="cart-navbar-btn">
 
             <i class="bi bi-cart3"></i>
 
@@ -29,15 +33,37 @@
                 </span>
             }
 
-        </button>
-
-        <NavLink href="/login">
-            Ingresar
         </NavLink>
 
-        <button class="btn-register">
-            Registrarse
-        </button>
+        @if (AuthService.EstaLogueado)
+        {
+            <a href="/pedidos" class="nav-user-link">
+                <i class="bi bi-box-seam"></i>
+                Pedidos
+            </a>
+
+            <div class="user-profile">
+
+                <div class="user-avatar">
+                    @AuthService.NombreUsuario.Substring(0, 1).ToUpper()
+                </div>
+
+                <span class="user-name">
+                    @AuthService.NombreUsuario
+                </span>
+
+            </div>
+        }
+        else
+        {
+            <NavLink href="/login">
+                Iniciar Sesión
+            </NavLink>
+
+            <NavLink href="/register" class="btn-register">
+                Registrarse
+            </NavLink>
+        }
     </div>
 </nav>
 
