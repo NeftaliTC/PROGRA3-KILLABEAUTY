@@ -106,17 +106,17 @@ html, body {
     box-sizing: border-box;
 }
 
-    .menu-link-item:hover {
-        text-decoration: none !important;
-        background-color: #fdf5f6;
-    }
+.menu-link-item:hover {
+    text-decoration: none !important;
+    background-color: #fdf5f6;
+}
 
-    .menu-link-item.active {
-        background: #fde8ec;
-        color: #e95282 !important;
-        font-weight: 600;
-        text-decoration: none !important;
-    }
+.menu-link-item.active {
+    background: #fde8ec;
+    color: #e95282 !important;
+    font-weight: 600;
+    text-decoration: none !important;
+}
 
 .sidebar-divider {
     border: 0;
@@ -169,72 +169,86 @@ account-content-inner {
     gap: 6px;
 }
 
-    .form-input-group label {
-        font-size: 13px;
-        font-weight: 600;
-        color: #000000;
-    }
+.form-input-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #000000;
+}
 
-    .form-input-group input, .custom-select-field, .form-control, select.form-control {
-        width: 100%;
-        height: 44px;
-        padding: 0 15px;
-        border: 1px solid #d1d5db !important;
-        border-radius: 8px;
-        background-color: white !important;
-        font-size: 14px;
-        color: #374151;
-        appearance: none;
-        outline: none;
-        cursor: pointer;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
+.form-input-group input, .custom-select-field, .form-control, select.form-control {
+    width: 100%;
+    height: 44px;
+    padding: 0 15px;
+    border: 1px solid #d1d5db !important;
+    border-radius: 8px;
+    background-color: white !important;
+    font-size: 14px;
+    color: #374151;
+    appearance: none;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
 
-        .form-input-group input:focus, .custom-select-field:focus, .form-control:focus, select.form-control:focus {
-            border-color: #e95282 !important;
-            box-shadow: 0 0 0 3px rgba(233, 82, 130, 0.1);
-        }
+.form-input-group input:focus, .custom-select-field:focus, .form-control:focus, select.form-control:focus {
+    border-color: #e95282 !important;
+    box-shadow: 0 0 0 3px rgba(233, 82, 130, 0.1);
+}
 
-        select.form-control option {
-            color: #374151;
-            background: white;
-        }
+select.form-control option {
+    color: #374151;
+    background: white;
+}
 
-        .form-input-group input:disabled, .custom-select-field:disabled {
-            background-color: #F9F9F9;
-            border-color: #FBEAEF !important;
-            color: #9ca3af;
-            cursor: not-allowed;
-            opacity: 1;
-            -webkit-text-fill-color: #9ca3af;
-        }
+.form-input-group input:disabled, .custom-select-field:disabled {
+    background-color: #F9F9F9;
+    border-color: #FBEAEF !important;
+    color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 1;
+    -webkit-text-fill-color: #9ca3af;
+}
 
 /* Componentes especiales */
 .select-wrapper {
     position: relative;
-    display: block;
+    display: flex;
+    flex: 1;
 }
 
-    .select-wrapper::after {
-        content: "⌵";
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-60%);
-        color: #f1b7c7;
-        pointer-events: none;
-        font-size: 20px;
-    }
+.select-wrapper::after {
+    content: "⌵";
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-60%);
+    color: #f1b7c7;
+    pointer-events: none;
+    font-size: 20px;
+}
+
+input[type="date"] {
+    border: 1px solid #f1b7c7;
+    border-radius: 8px;
+    padding: 10px;
+    width: 100%;
+}
+
+.custom-select-field {
+    width: 100%;
+    appearance: none;
+    padding-right: 30px;
+}
 
 .killa-date-picker-combo {
     display: flex;
     gap: 10px;
 }
 
-    .killa-date-picker-combo select {
-        flex: 1;
-        cursor: pointer;
-    }
+.killa-date-picker-combo select {
+    flex: 1;
+    cursor: pointer;
+}
 
 /* Errores */
 .form-input-group.has-error label {
@@ -274,22 +288,22 @@ account-content-inner {
     transition: all 0.2s ease;
 }
 
-    .killa-save-button.state-disabled {
-        background-color: #e5e7eb;
-        color: #9ca3af;
-        cursor: not-allowed;
-    }
+.killa-save-button.state-disabled {
+    background-color: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
 
-    .killa-save-button.state-active {
-        background-color: #f197ab;
-        color: #ffffff;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(241, 151, 171, 0.3);
-    }
+.killa-save-button.state-active {
+    background-color: #f197ab;
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(241, 151, 171, 0.3);
+}
 
-        .killa-save-button.state-active:hover {
-            background-color: #e95282;
-        }
+.killa-save-button.state-active:hover {
+    background-color: #e95282;
+}
 
 .empty-space-block {
     visibility: hidden;
@@ -303,10 +317,10 @@ account-content-inner {
     width: 100%;
 }
 
-    /* El input debe tener un padding derecho para el ojo */
-    .password-wrapper .form-control {
-        padding-right: 40px !important; /* Espacio para el icono */
-    }
+/* El input debe tener un padding derecho para el ojo */
+.password-wrapper .form-control {
+    padding-right: 40px !important; /* Espacio para el icono */
+}
 
 /* Botón del ojo */
 .password-toggle-btn {
@@ -325,9 +339,9 @@ account-content-inner {
     transition: color 0.2s ease;
 }
 
-    .password-toggle-btn:hover {
-        color: #e95282; /* Rosa más intenso al pasar el mouse */
-    }
+.password-toggle-btn:hover {
+    color: #e95282; /* Rosa más intenso al pasar el mouse */
+}
 
 /* --- LISTA DE PISTAS DE CONTRASEÑA --- */
 .password-hints {
@@ -338,26 +352,26 @@ account-content-inner {
     gap: 4px;
 }
 
-    .password-hints p {
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 6px; /* Espacio entre icono y texto */
-        font-weight: 500;
-        transition: color 0.2s ease;
-    }
+.password-hints p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Espacio entre icono y texto */
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
 
-        /* Estado inválido (Rojo, como en tu original) */
-        .password-hints p.hint-invalid {
-            color: #ff4d4d;
-        }
+/* Estado inválido (Rojo, como en tu original) */
+.password-hints p.hint-invalid {
+    color: #ff4d4d;
+}
 
-        /* Estado válido (Verde, como en image_1.png) */
-        .password-hints p.hint-valid {
-            color: #10b981; /* Un verde suave profesional */
-        }
+/* Estado válido (Verde, como en image_1.png) */
+.password-hints p.hint-valid {
+    color: #10b981; /* Un verde suave profesional */
+}
 
-    /* Iconos dentro de las pistas */
-    .password-hints i {
-        font-size: 14px;
-    }
+/* Iconos dentro de las pistas */
+.password-hints i {
+    font-size: 14px;
+}

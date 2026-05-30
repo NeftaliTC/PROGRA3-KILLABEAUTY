@@ -42,50 +42,28 @@
     
     <div class="form-input-group @(hasFechaError ? "has-error" : "")">
         <label>Fecha de nacimiento</label>
-        <div class="killa-date-picker-combo">
-            <select class="custom-select-field" value="@selDay" @onchange="OnDayChanged">
-                @for (int d = 1; d <= 31; d++)
-                {
-                    <option value="@d">@d.ToString("D2")</option>
-                }
-            </select>
-            
-            <select class="custom-select-field" value="@selMonth" @onchange="OnMonthChanged">
-                <option value="1">Enero</option>
-                <option value="2">Febrero</option>
-                <option value="3">Marzo</option>
-                <option value="4">Abril</option>
-                <option value="5">Mayo</option>
-                <option value="6">Junio</option>
-                <option value="7">Julio</option>
-                <option value="8">Agosto</option>
-                <option value="9">Septiembre</option>
-                <option value="10">Octubre</option>
-                <option value="11">Noviembre</option>
-                <option value="12">Diciembre</option>
-            </select>
-            
-            <select class="custom-select-field" value="@selYear" @onchange="OnYearChanged">
-                @for (int y = 2008; y >= 1920; y--)
-                {
-                    <option value="@y">@y</option>
-                }
-            </select>
-        </div>
+    
+        <input type="date"
+               class="custom-select-field"
+               value="@profile.FechaNacimiento?.ToString("yyyy-MM-dd")"
+               @onchange="OnDateChange" />
+
         @if (hasFechaError)
         {
-            <span class="error-hint-text">⚠️ Selecciona una combinación de fecha válida</span>
+            <span class="error-hint-text">⚠️ @(profile.FechaNacimiento == null ? "Fecha inexistente" : "Debes ser mayor de 18 años")</span>
         }
     </div>
-    
+
     <div class="form-input-group">
         <label>Género</label>
-        <select class="custom-select-field" value="@profile.Genero" @onchange="OnGeneroChange">
-            <option value="Selecciona">Selecciona</option>
-            <option value="Masculino">Masculino</option>
-            <option value="Femenino">Femenino</option>
-            <option value="Otro">Otro</option>
-        </select>
+        <div class="select-wrapper">
+            <select class="custom-select-field" value="@profile.Genero" @onchange="OnGeneroChange">
+                <option value="Selecciona">Selecciona</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Otro">Otro</option>
+            </select>
+        </div>
     </div>
     
     <div class="form-input-group @(hasCelularError ? "has-error" : "")">
@@ -194,10 +172,22 @@
         StateHasChanged();
     }
 
-    private void OnNombresInput(ChangeEventArgs e) { profile.Nombres = e.Value?.ToString() ?? ""; ValidateForm(); }
-    private void OnPaternoInput(ChangeEventArgs e) { profile.ApellidoPaterno = e.Value?.ToString() ?? ""; ValidateForm(); }
-    private void OnMaternoInput(ChangeEventArgs e) { profile.ApellidoMaterno = e.Value?.ToString() ?? ""; ValidateForm(); }
-    private void OnGeneroChange(ChangeEventArgs e) { profile.Genero = e.Value?.ToString() ?? "Selecciona"; ValidateForm(); }
+    private void OnNombresInput(ChangeEventArgs e) {
+        profile.Nombres = e.Value?.ToString() ?? "";
+        ValidateForm();
+    }
+    private void OnPaternoInput(ChangeEventArgs e) {
+        profile.ApellidoPaterno = e.Value?.ToString() ?? "";
+        ValidateForm();
+    }
+    private void OnMaternoInput(ChangeEventArgs e) {
+        profile.ApellidoMaterno = e.Value?.ToString() ?? "";
+        ValidateForm();
+    }
+    private void OnGeneroChange(ChangeEventArgs e) {
+        profile.Genero = e.Value?.ToString() ?? "Selecciona";
+        ValidateForm();
+    }
 
     private void OnCelularInput(ChangeEventArgs e)
     {
@@ -206,18 +196,19 @@
         ValidateForm();
     }
 
-    private void OnDayChanged(ChangeEventArgs e) { if (int.TryParse(e.Value?.ToString(), out int val)) { selDay = val; RebuildDate(); } }
-    private void OnMonthChanged(ChangeEventArgs e) { if (int.TryParse(e.Value?.ToString(), out int val)) { selMonth = val; RebuildDate(); } }
-    private void OnYearChanged(ChangeEventArgs e) { if (int.TryParse(e.Value?.ToString(), out int val)) { selYear = val; RebuildDate(); } }
-
-    private void RebuildDate()
+    private void OnDateChange(ChangeEventArgs e)
     {
-        try
+        if (DateTime.TryParse(e.Value?.ToString(), out DateTime nuevaFecha))
         {
-            profile.FechaNacimiento = new DateTime(selYear, selMonth, selDay);
-            hasFechaError = false;
+            profile.FechaNacimiento = nuevaFecha;
+        
+            // Lógica de validación de edad (18 años)
+            int edad = DateTime.Today.Year - nuevaFecha.Year;
+            if (nuevaFecha.Date > DateTime.Today.AddYears(-edad)) edad--;
+
+            hasFechaError = (edad < 18);
         }
-        catch (ArgumentOutOfRangeException)
+        else
         {
             profile.FechaNacimiento = null;
             hasFechaError = true;
