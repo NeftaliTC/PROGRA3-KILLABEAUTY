@@ -11,6 +11,7 @@ public class Usuario {
     private String apellidoMaterno;
     private String apellidoPaterno;
     private Date fechaDeInscripcion;
+    private Date fechaNacimiento;
     private String contrasena; //-> estado
     private String telefono;
     private boolean estado; // 1=activo - 0=inactivo
@@ -65,6 +66,14 @@ public class Usuario {
 
     public void setFechaDeInscripcion(Date fechaDeInscripcion) {
         this.fechaDeInscripcion = fechaDeInscripcion;
+    }
+
+    public Date getFechaNacimiento() {
+        return fechaNacimiento;
+    }
+
+    public void setFechaNacimiento(Date fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
     }
 
     public String getContrasena() {
