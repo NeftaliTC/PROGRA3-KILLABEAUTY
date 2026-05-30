@@ -1,0 +1,94 @@
+﻿@page "/orders"
+@rendermode InteractiveServer
+@using BlazorAppKillaBeauty.Services
+@inject CartService CartService
+
+<Navbar CantidadCarrito="@CartService.CantidadTotal" />
+
+<div class="orders-page-container">
+    <section class="orders-header">
+        <h1>Mis pedidos</h1>
+        <p>@pedidos.Count pedido(s) realizado(s)</p>
+    </section>
+
+    @if (pedidos.Count == 0)
+    {
+        <div class="empty-state-card">
+            <i class="bi bi-box"></i>
+            <p>Aún no tienes pedidos realizados.</p>
+            <a href="/" class="btn-shop-solid">Ir a comprar</a>
+        </div>
+    }
+    else
+    {
+        <section class="orders-list">
+            @foreach (var p in pedidos)
+            {
+                <div class="order-card">
+                    <div class="card-header">
+                        <span class="date">@p.Fecha</span>
+                        <span class="status-badge @GetStatusClass(p.Estado)">@p.Estado</span>
+                    </div>
+                    
+                    <h3>Pedido @p.Id</h3>
+                    
+                    <div class="product-preview">
+                        @foreach (var img in p.ImagenesProductos)
+                        {
+                            <img src="@img" alt="Producto" class="thumb" />
+                        }
+                    </div>
+
+                    <div class="order-footer">
+                        <div class="order-info-group">
+                            <span class="item-count">@p.TotalArticulos artículo(s)</span>
+                            <span class="total-price">S/ @p.TotalPrecio.ToString("F2")</span>
+                        </div>
+    
+                        <a href="/orders/order-detail/@p.Id" class="btn-outline">Ver detalle ></a>
+                    </div>
+                </div>
+            }
+        </section>
+    }
+</div>
+
+@code {
+    private List<Pedido> pedidos = new()
+    {
+        new Pedido("KIL-202610081", "30 Mayo, 2026", "En proceso", "status-orange", new List<string> { "Images/Serum.jpg", "Images/Cerave.jpg" }, 2, 159.80m),
+        new Pedido("KIL-202605002", "25 Mayo, 2026", "Entregado", "status-green", new List<string> { "Images/LabialPeripera.jpg", "Images/Mascara.jpg", "Images/LoriniqueCabello.jpg" }, 3, 178.20m),
+        new Pedido("KIL-202604115", "10 Mayo, 2026", "Listo para recoger", "status-purple", new List<string> { "Images/Fragancia.png" }, 1, 120.00m)
+    };
+
+    private string GetStatusClass(string estado) => estado switch
+    {
+        "Entregado" => "status-green",
+        "Listo para recoger" => "status-purple",
+        "En proceso" => "status-orange",
+        _ => "status-default"
+    };
+    
+    public class Pedido
+    {
+        public string Id { get; set; }
+        public string Fecha { get; set; }
+        public string Estado { get; set; }
+        public string ClaseEstado { get; set; } // <--- AGREGADO
+        public List<string> ImagenesProductos { get; set; }
+        public int TotalArticulos { get; set; }
+        public decimal TotalPrecio { get; set; }
+
+        public Pedido(string id, string fecha, string estado, string claseEstado,
+                      List<string> imagenes, int totalArticulos, decimal totalPrecio)
+        {
+            Id = id;
+            Fecha = fecha;
+            Estado = estado;
+            ClaseEstado = claseEstado; // <--- AGREGADO
+            ImagenesProductos = imagenes;
+            TotalArticulos = totalArticulos;
+            TotalPrecio = totalPrecio;
+        }
+    }
+}
