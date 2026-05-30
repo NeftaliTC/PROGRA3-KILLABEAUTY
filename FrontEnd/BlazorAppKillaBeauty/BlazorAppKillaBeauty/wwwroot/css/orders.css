@@ -135,7 +135,7 @@
     font-size: 1.2rem;
 }
 
-.btn-outline {
+.btn-outline-order-detail {
     border: 1px solid var(--rose);
     color: var(--rose);
     padding: 10px 20px;
