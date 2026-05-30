@@ -1,0 +1,227 @@
+﻿@page "/account/profile"
+@layout AccountLayout
+@rendermode InteractiveServer
+
+<h2 class="card-inside-title">Mi Perfil</h2>
+
+<div class="profile-form-grid">
+    <div class="form-input-group">
+        <label>Nombres</label>
+        <input type="text" value="@profile.Nombres" @oninput="OnNombresInput" />
+    </div>
+    
+    <div class="form-input-group">
+        <label>Apellido Paterno</label>
+        <input type="text" value="@profile.ApellidoPaterno" @oninput="OnPaternoInput" />
+    </div>
+    
+    <div class="form-input-group">
+        <label>Apellido Materno</label>
+        <input type="text" value="@profile.ApellidoMaterno" @oninput="OnMaternoInput" />
+    </div>
+    
+    <div class="form-input-group">
+        <label>Correo electrónico</label>
+        <input type="email" value="@profile.Correo" disabled />
+    </div>
+    
+    <div class="form-input-group">
+        <label>Tipo de documento</label>
+        <select class="custom-select-field" value="@profile.TipoDocumento" disabled>
+            <option value="DNI">DNI</option>
+            <option value="RUC">RUC</option>
+            <option value="Pasaporte">Pasaporte</option>
+            <option value="Carné de Extranjería">Carné de Extranjería</option>
+        </select>
+    </div>
+    
+    <div class="form-input-group">
+        <label>Número de documento</label>
+        <input type="text" value="@profile.NumeroDocumento" disabled />
+    </div>
+    
+    <div class="form-input-group @(hasFechaError ? "has-error" : "")">
+        <label>Fecha de nacimiento</label>
+    
+        <input type="date"
+               class="custom-select-field"
+               value="@profile.FechaNacimiento?.ToString("yyyy-MM-dd")"
+               @onchange="OnDateChange" />
+
+        @if (hasFechaError)
+        {
+            <span class="error-hint-text">⚠️ @(profile.FechaNacimiento == null ? "Fecha inexistente" : "Debes ser mayor de 18 años")</span>
+        }
+    </div>
+
+    <div class="form-input-group">
+        <label>Género</label>
+        <div class="select-wrapper">
+            <select class="custom-select-field" value="@profile.Genero" @onchange="OnGeneroChange">
+                <option value="Selecciona">Selecciona</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Otro">Otro</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="form-input-group @(hasCelularError ? "has-error" : "")">
+        <label>Número de celular</label>
+        <input type="text"
+               value="@profile.Celular"
+               @oninput="OnCelularInput"
+               maxlength="9"
+               inputmode="numeric" />
+        @if (hasCelularError)
+        {
+            <span class="error-hint-text">⚠️ Introduce un celular válido (9 dígitos)</span>
+        }
+    </div>
+    
+    <div class="form-input-group empty-space-block"></div>
+</div>
+
+<div class="form-actions-area">
+    <button class="killa-save-button @(canSave ? "state-active" : "state-disabled")"
+            disabled="@(!canSave)"
+            @onclick="ProcessFormSave">
+        Guardar cambios
+    </button>
+</div>
+
+@code {
+    private class UserProfileData
+    {
+        public string Nombres { get; set; } = "";
+        public string ApellidoPaterno { get; set; } = "";
+        public string ApellidoMaterno { get; set; } = "";
+        public string Correo { get; set; } = "";
+        public string TipoDocumento { get; set; } = "DNI";
+        public string NumeroDocumento { get; set; } = "";
+        public DateTime? FechaNacimiento { get; set; }
+        public string Genero { get; set; } = "Selecciona";
+        public string Celular { get; set; } = "";
+    }
+
+    private UserProfileData profile = new();
+    private UserProfileData originalSnapshot = new();
+
+    private int selDay = 15;
+    private int selMonth = 4;
+    private int selYear = 2004;
+
+    private bool hasFechaError = false;
+    private bool hasCelularError = false;
+    private bool canSave = false;
+
+    protected override void OnInitialized()
+    {
+        profile = new UserProfileData
+        {
+            Nombres = "Ana",
+            ApellidoPaterno = "Diaz",
+            ApellidoMaterno = "Moscoso",
+            Correo = "cliente@example.com",
+            TipoDocumento = "DNI",
+            NumeroDocumento = "72817267",
+            FechaNacimiento = new DateTime(2004, 04, 15),
+            Genero = "Femenino",
+            Celular = "964245541"
+        };
+
+        selDay = profile.FechaNacimiento.Value.Day;
+        selMonth = profile.FechaNacimiento.Value.Month;
+        selYear = profile.FechaNacimiento.Value.Year;
+
+        TakeDataSnapshot();
+        ValidateForm();
+    }
+
+    private void TakeDataSnapshot()
+    {
+        originalSnapshot = new UserProfileData
+        {
+            Nombres = profile.Nombres,
+            ApellidoPaterno = profile.ApellidoPaterno,
+            ApellidoMaterno = profile.ApellidoMaterno,
+            Correo = profile.Correo,
+            TipoDocumento = profile.TipoDocumento,
+            NumeroDocumento = profile.NumeroDocumento,
+            FechaNacimiento = profile.FechaNacimiento,
+            Genero = profile.Genero,
+            Celular = profile.Celular
+        };
+    }
+
+    private void ValidateForm()
+    {
+        hasCelularError = string.IsNullOrEmpty(profile.Celular) ||
+                          profile.Celular.Length < 9 ||
+                          !profile.Celular.StartsWith("9");
+
+        bool isDirty = profile.Nombres != originalSnapshot.Nombres ||
+                       profile.ApellidoPaterno != originalSnapshot.ApellidoPaterno ||
+                       profile.ApellidoMaterno != originalSnapshot.ApellidoMaterno ||
+                       profile.FechaNacimiento != originalSnapshot.FechaNacimiento ||
+                       profile.Genero != originalSnapshot.Genero ||
+                       profile.Celular != originalSnapshot.Celular;
+
+        canSave = isDirty && !hasFechaError && !hasCelularError;
+        
+        StateHasChanged();
+    }
+
+    private void OnNombresInput(ChangeEventArgs e) {
+        profile.Nombres = e.Value?.ToString() ?? "";
+        ValidateForm();
+    }
+    private void OnPaternoInput(ChangeEventArgs e) {
+        profile.ApellidoPaterno = e.Value?.ToString() ?? "";
+        ValidateForm();
+    }
+    private void OnMaternoInput(ChangeEventArgs e) {
+        profile.ApellidoMaterno = e.Value?.ToString() ?? "";
+        ValidateForm();
+    }
+    private void OnGeneroChange(ChangeEventArgs e) {
+        profile.Genero = e.Value?.ToString() ?? "Selecciona";
+        ValidateForm();
+    }
+
+    private void OnCelularInput(ChangeEventArgs e)
+    {
+        string rawValue = e.Value?.ToString() ?? "";
+        profile.Celular = new string(rawValue.Where(char.IsDigit).ToArray());
+        ValidateForm();
+    }
+
+    private void OnDateChange(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value?.ToString(), out DateTime nuevaFecha))
+        {
+            profile.FechaNacimiento = nuevaFecha;
+        
+            // Lógica de validación de edad (18 años)
+            int edad = DateTime.Today.Year - nuevaFecha.Year;
+            if (nuevaFecha.Date > DateTime.Today.AddYears(-edad)) edad--;
+
+            hasFechaError = (edad < 18);
+        }
+        else
+        {
+            profile.FechaNacimiento = null;
+            hasFechaError = true;
+        }
+        ValidateForm();
+    }
+
+    private void ProcessFormSave()
+    {
+        if (canSave)
+        {
+            TakeDataSnapshot();
+            ValidateForm();
+        }
+    }
+}

@@ -1,0 +1,270 @@
+﻿@page "/account/addresses"
+@layout AccountLayout
+@rendermode InteractiveServer
+
+<div class="addresses-content">
+    <div class="section-header">
+        <h2>Mis direcciones</h2>
+        <button class="btn-new-address" @onclick="() => AbrirModal()">+ Nueva dirección</button>
+    </div>
+    <span class="description-text">Administra tus direcciones de entrega</span>
+
+    @foreach (var addr in UserAddresses)
+    {
+        <div class="address-card">
+            <div class="house-icon"><i class="bi bi-house-door-fill"></i></div>
+            <div style="flex-grow: 1;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                    <strong>@addr.Title</strong>
+                    @if (addr.IsDefault)
+                    {
+                        <span class="badge-default"><i class="bi bi-star-fill"></i> Predeterminada</span>
+                    }
+                </div>
+                <p style="margin:0; font-size: 14px; color: #555;">
+                    @addr.StreetAddress<br />
+                    @addr.District, @addr.Province<br />
+                    @addr.Reference<br />
+                    <i class="bi bi-telephone"></i> @addr.Phone<br />
+                </p>
+                <div class="card-actions">
+                    @if (!addr.IsDefault)
+                    {
+                        <button class="btn-action btn-purple" @onclick="() => MarcarPredeterminada(addr)"><i class="bi bi-star-fill"></i> Predeterminar</button>
+                    }
+                    <button class="btn-action btn-outline" @onclick="() => AbrirModal(addr)"><i class="bi bi-pencil"></i> Editar</button>
+                    <button class="btn-action btn-delete" @onclick="() => ConfirmarEliminar(addr)"><i class="bi bi-trash"></i> Eliminar</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="security-banner">
+        <i class="bi bi-shield-check security-icon"></i>
+        <div>
+            <strong>Tu información está segura</strong>
+            <span>Tus direcciones solo se usan para envíos.</span>
+        </div>
+    </div>
+</div>
+
+@if (showModal)
+{
+    <div class="modal-overlay">
+        <div class="modal-box">
+            <h4>@(editingAddress.Id == 0 ? "Nueva Dirección" : "Editar Dirección")</h4>
+
+            <div class="profile-form-grid">
+                <div class="form-input-group">
+                    <label>Título (Casa/Oficina)</label>
+                    <input @bind="editingAddress.Title" class="form-control" />
+                </div>
+                <div class="form-input-group @(isPhoneError ? "has-error" : "")">
+                    <label>Teléfono</label>
+                    <input @bind="editingAddress.Phone" class="form-control" maxlength="9" />
+                    @if (isPhoneError)
+                    {
+                        <p class="error-hint-text"><i class="bi bi-exclamation-circle"></i> Ingrese un celular válido (9 dígitos)</p>
+                    }
+                </div>
+            </div>
+
+            <div class="form-input-group">
+                <label>Dirección</label>
+                <input @bind="editingAddress.StreetAddress" class="form-control" />
+            </div>
+
+            <div class="profile-form-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="form-input-group">
+                    <label>Departamento</label>
+                    <div class="select-wrapper">
+                        <select class="form-control" value="@editingAddress.Department" @onchange="OnDeptoChanged">
+                            <option value="">Seleccione...</option>
+                            @foreach (var d in DataHelper.Departamentos)
+                            {
+                                <option value="@d">@d</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="form-input-group">
+                    <label>Provincia</label>
+                    <div class="select-wrapper">
+                        <select class="form-control" value="@editingAddress.Province" @onchange="OnProvChanged" disabled="@string.IsNullOrEmpty(editingAddress.Department)">
+                            <option value="">Seleccione...</option>
+                            @foreach (var p in GetProvincias())
+                            {
+                                <option value="@p">@p</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="distrito-half-width">
+                <label>Distrito</label>
+                <div class="select-wrapper">
+                    <select class="form-control" @bind="editingAddress.District" disabled="@string.IsNullOrEmpty(editingAddress.Province)">
+                        <option value="">Seleccione...</option>
+                        @foreach (var d in GetDistritos())
+                        {
+                            <option value="@d">@d</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-input-group">
+                <label>Referencia</label>
+                <input @bind="editingAddress.Reference" class="form-control" />
+            </div>
+
+            @if (isError)
+            {
+                <p class="error-hint-text"><i class="bi bi-exclamation-circle"></i> Complete todos los campos obligatorios.</p>
+            }
+
+            <div class="modal-footer">
+                <button class="btn-modal-cancel" @onclick="CerrarModal">Cancelar</button>
+                <button class="btn-modal-save" @onclick="GuardarDireccion">Guardar</button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showDeleteModal)
+{
+    <div class="modal-overlay">
+        <div class="modal-box" style="text-align: center; padding: 30px;">
+            <h4 style="font-size: 20px; font-weight: 700; margin-bottom: 15px;">¿Eliminar dirección?</h4>
+            
+            <p style="color: #6b7280; font-size: 14px; margin-bottom: 25px;">
+                Esta acción no se puede deshacer.
+            </p>
+
+            <div class="modal-footer" style="display: flex; justify-content: center; gap: 15px;">
+                <button class="btn-modal-cancel" @onclick="() => showDeleteModal = false">Cancelar</button>
+                <button class="btn-modal-save" style="background:#f197ab" @onclick="EjecutarEliminar">Confirmar</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    // Lista con datos de prueba iniciales
+    private List<Address> UserAddresses = new() {
+        new Address {
+            Id = 1,
+            Title = "Casa",
+            StreetAddress = "Av. Javier Prado 123",
+            District = "Miraflores",
+            Province = "Lima",
+            Department = "Lima",
+            Phone = "987654321",
+            Reference = "Frente al parque",
+            IsDefault = true
+        },
+        new Address {
+            Id = 2,
+            Title = "Trabajo",
+            StreetAddress = "Calle Las Begonias 456",
+            District = "San Isidro",
+            Province = "Lima",
+            Department = "Lima",
+            Phone = "912345678",
+            Reference = "Frente al parque Las Magnolias",
+            IsDefault = false
+        }
+    };
+    private Address editingAddress = new();
+    private Address addressToDelete;
+    private bool showModal, showDeleteModal, isError, isPhoneError;
+
+    private void OnDeptoChanged(ChangeEventArgs e) {
+        editingAddress.Department = e.Value.ToString();
+        editingAddress.Province = "";
+        editingAddress.District = "";
+    }
+    private void OnProvChanged(ChangeEventArgs e) {
+        editingAddress.Province = e.Value.ToString();
+        editingAddress.District = "";
+    }
+    private IEnumerable<string> GetProvincias() => string.IsNullOrEmpty(editingAddress.Department) ? new() : DataHelper.Provincias.GetValueOrDefault(editingAddress.Department, new());
+    private IEnumerable<string> GetDistritos() => string.IsNullOrEmpty(editingAddress.Province) ? new() : DataHelper.Distritos.GetValueOrDefault(editingAddress.Province, new());
+
+    private void GuardarDireccion()
+    {
+        // Validar si hay campos vacíos (esto es para el aviso de "Completar todos los campos")
+        isError = string.IsNullOrEmpty(editingAddress.Title) ||
+                  string.IsNullOrEmpty(editingAddress.StreetAddress) ||
+                  string.IsNullOrEmpty(editingAddress.District) ||
+                  string.IsNullOrEmpty(editingAddress.Phone) ||
+                  string.IsNullOrEmpty(editingAddress.Reference);
+
+        // Validar formato de teléfono (esto es para el aviso específico de "9 dígitos")
+        isPhoneError = !string.IsNullOrEmpty(editingAddress.Phone) && editingAddress.Phone.Length != 9;
+
+        // Si hay errores, no guardamos
+        if (isError || isPhoneError) return;
+
+        // Guardar
+        if (editingAddress.Id == 0)
+        {
+            editingAddress.Id = UserAddresses.Count + 1;
+            UserAddresses.Add(editingAddress);
+        }
+        else
+        {
+            var index = UserAddresses.FindIndex(a => a.Id == editingAddress.Id);
+            editingAddress.IsDefault = UserAddresses[index].IsDefault;
+            UserAddresses[index] = editingAddress;
+        }
+    
+        CerrarModal();
+    }
+    private void AbrirModal(Address addr = null) {
+        editingAddress = addr != null ? new Address { Id = addr.Id, Title = addr.Title, StreetAddress = addr.StreetAddress, Department = addr.Department, Province = addr.Province, District = addr.District, Phone = addr.Phone, Reference = addr.Reference } : new Address();
+        showModal = true;
+    }
+    private void CerrarModal() => showModal = false;
+    private void ConfirmarEliminar(Address addr) {
+        addressToDelete = addr;
+        showDeleteModal = true;
+    }
+    private void EjecutarEliminar() {
+        // Verificamos si la que vamos a borrar es la predeterminada
+        bool eraPredeterminada = addressToDelete.IsDefault;
+
+        UserAddresses.Remove(addressToDelete); // Eliminar dirección
+
+        if (eraPredeterminada && UserAddresses.Count > 0)
+        {
+            UserAddresses[0].IsDefault = true;
+        }
+
+        showDeleteModal = false;
+        addressToDelete = null;
+    }
+    private void MarcarPredeterminada(Address addr) {
+        UserAddresses.ForEach(a => a.IsDefault = false);
+        addr.IsDefault = true;
+    }
+
+    public class Address {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string StreetAddress { get; set; }
+        public string District { get; set; }
+        public string Province { get; set; }
+        public string Department { get; set; }
+        public string Phone { get; set; }
+        public string Reference { get; set; }
+        public bool IsDefault { get; set; }
+    }
+    public static class DataHelper
+    {
+        public static List<string> Departamentos = new() { "Lima" };
+        public static Dictionary<string, List<string>> Provincias = new() { { "Lima", new() { "Lima" } } };
+        public static Dictionary<string, List<string>> Distritos = new() { { "Lima", new() { "Miraflores", "Pueblo Libre", "San Miguel", "San Isidro" } } };
+    }
+}

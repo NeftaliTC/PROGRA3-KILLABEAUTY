@@ -42,17 +42,19 @@
                 Pedidos
             </a>
 
-            <div class="user-profile">
+            <NavLink href="/account/profile" class="user-profile-menu-link">
+                <div class="user-profile">
 
-                <div class="user-avatar">
-                    @AuthService.NombreUsuario.Substring(0, 1).ToUpper()
+                    <div class="user-avatar">
+                        @AuthService.NombreUsuario.Substring(0, 1).ToUpper()
+                    </div>
+
+                    <span class="user-name">
+                        @AuthService.NombreUsuario
+                    </span>
+
                 </div>
-
-                <span class="user-name">
-                    @AuthService.NombreUsuario
-                </span>
-
-            </div>
+            </NavLink>
         }
         else
         {

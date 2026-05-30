@@ -37,3 +37,20 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Carpetas de configuración de Visual Studio
+.vs/
+*.suo
+*.user
+*.slnx/
+
+# Carpetas de compilación (La súper basura)
+**/bin/
+**/obj/
+*.exe
+*.dll
+*.pdb
+
+# Caché y archivos temporales
+*.cache
+*.metadata

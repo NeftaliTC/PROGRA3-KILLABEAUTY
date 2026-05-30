@@ -1,0 +1,38 @@
+﻿@inherits LayoutComponentBase
+@layout MainLayout
+@inject AuthService AuthService
+
+<Navbar CantidadCarrito="0" />
+
+<div class="page-background-wrapper">
+    <div class="account-main-container">
+        <h1 class="main-page-title">Mi Cuenta</h1>
+        
+        <div class="account-layout-grid">
+            <div class="account-sidebar-card">
+                <div class="profile-avatar-zone">
+                    <div class="avatar-circle">C</div>
+                    <h2 class="avatar-name">@AuthService.NombreUsuarioCuenta</h2>
+                    <span class="avatar-email">cliente@ejemplo.com</span>
+                </div>
+                
+                <SidebarMenu />
+            </div>
+
+            <div class="account-content-card">
+                @Body
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        // Esto llena el servicio con datos de prueba si están vacíos
+        if (string.IsNullOrEmpty(AuthService.NombreUsuario))
+        {
+            AuthService.LoginCliente("cliente");
+        }
+    }
+}
