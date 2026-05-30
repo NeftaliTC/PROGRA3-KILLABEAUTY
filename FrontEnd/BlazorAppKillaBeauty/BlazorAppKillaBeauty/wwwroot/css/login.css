@@ -29,7 +29,7 @@ body {
     }
 
 .login-page {
-    min-height: 100vh;
+    min-height: 97vh;
     background: var(--rose-bg);
     display: flex;
     justify-content: center;
