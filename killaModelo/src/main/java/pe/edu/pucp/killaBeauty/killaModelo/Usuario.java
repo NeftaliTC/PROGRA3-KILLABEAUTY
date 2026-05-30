@@ -19,6 +19,7 @@ public class Usuario {
     private List<Pedido> pedidos;
     private Carrito carritoActivo;
     private TipoUsuario tipoUsuario;
+    private int dni;
 
 
     //Constructores
@@ -92,7 +93,7 @@ public class Usuario {
         this.telefono = telefono;
     }
 
-    public boolean getEstado() {
+    public boolean isEstado() {
         return estado;
     }
 
@@ -148,5 +149,11 @@ public class Usuario {
         this.tipoUsuario = tipoUsuario;
     }
 
+    public int getDni() {
+        return dni;
+    }
 
+    public void setDni(int dni) {
+        this.dni = dni;
+    }
 }
