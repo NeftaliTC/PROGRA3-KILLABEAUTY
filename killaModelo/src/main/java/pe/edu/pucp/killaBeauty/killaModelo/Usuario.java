@@ -14,7 +14,7 @@ public class Usuario {
     private Date fechaNacimiento;
     private String contrasena; //-> estado
     private String telefono;
-    private boolean estado; // 1=activo - 0=inactivo
+    private Boolean estado; // 1=activo - 0=inactivo
     private List<Direccion> direcciones;
     private List<Pedido> pedidos;
     private Carrito carritoActivo;
@@ -93,11 +93,11 @@ public class Usuario {
         this.telefono = telefono;
     }
 
-    public boolean isEstado() {
+    public Boolean getEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(Boolean estado) {
         this.estado = estado;
     }
 

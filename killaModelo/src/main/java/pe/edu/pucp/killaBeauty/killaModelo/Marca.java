@@ -3,41 +3,43 @@ package pe.edu.pucp.killaBeauty.killaModelo;
 public class Marca {
     private int id;
     private String descripcion;
-    private String paisDeOrigen;
+    private Pais pais;
     private Boolean activo;
 
     //Constructores
-    public Marca() {};
+    public Marca() {
+    }
 
-    public Marca(int id, String descripcion, String paisDeOrigen) {
+
+    public Marca(int id, String descripcion, Pais pais) {
         this.id = id;
         this.descripcion = descripcion;
-        this.paisDeOrigen = paisDeOrigen;
+        this.pais = pais;
     }
-    
+
     //Getters y setters
     public int getId() {
         return id;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public String getPaisDeOrigen() {
-        return paisDeOrigen;
     }
 
     public void setId(int id) {
         this.id = id;
     }
 
+    public String getDescripcion() {
+        return descripcion;
+    }
+
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
 
-    public void setPaisDeOrigen(String paisDeOrigen) {
-        this.paisDeOrigen = paisDeOrigen;
+    public Pais getPais() {
+        return pais;
+    }
+
+    public void setPais(Pais pais) {
+        this.pais = pais;
     }
 
     public Boolean getActivo() {
