@@ -20,7 +20,7 @@ public class ProductoDAOImpl implements ProductoDAO {
             ps.setBoolean(4, p.getDisponible());
             ps.setBoolean(5, p.getPromocion());
             ps.setInt(6, p.getMarca().getId()); // Composición
-            ps.setInt(7, p.getCategoria().getId());
+            ps.setInt(7, p.getSubcategoria().getId());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) p.setIdProducto(rs.getInt(1));
@@ -45,7 +45,7 @@ public class ProductoDAOImpl implements ProductoDAO {
                     p.setDisponible(rs.getBoolean("disponible"));
                     p.setPromocion(rs.getBoolean("promocion"));
                     p.getMarca().setId(rs.getInt("id_marca"));
-                    p.getCategoria().setId(rs.getInt("id_categoria"));
+                    p.getSubcategoria().setId(rs.getInt("id_categoria"));
                     return p;
                 }
             }
@@ -69,7 +69,7 @@ public class ProductoDAOImpl implements ProductoDAO {
                 p.setDisponible(rs.getBoolean("disponible"));
                 p.setPromocion(rs.getBoolean("promocion"));
                 p.getMarca().setId(rs.getInt("id_marca"));
-                p.getCategoria().setId(rs.getInt("id_categoria"));
+                p.getSubcategoria().setId(rs.getInt("id_categoria"));
                 lista.add(p);
             }
         }

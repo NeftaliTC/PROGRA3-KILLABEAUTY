@@ -5,45 +5,31 @@ import java.util.ArrayList;
 public class Categoria {
     private int id;
     private String nombre;
-    private List<Subcategoria> subcategorias;
 	private Boolean activo;
-	
+
 	public Categoria() {
-		this.subcategorias = new ArrayList<>();
 	}
-	public void agregarSubcategoria(Subcategoria subcategoria) {
-    	subcategorias.add(subcategoria);
+
+	public Categoria(int id, String nombre, Boolean activo) {
+		this.id = id;
+		this.nombre = nombre;
+		this.activo = activo;
 	}
-	//por ver
-	public void eliminarSubcategoriaPorId(int id) {
-    	for (int i = 0; i < subcategorias.size(); i++) {
-        	if (subcategorias.get(i).getId() == id) {
-           		subcategorias.remove(i);
-            	break;
-        	}
-    	}
-	}	
 
 	public int getId() {
-    	return id;
-	}
-
-	public String getNombre() {
-   		return nombre;
-	}
-	public List<Subcategoria> getSubcategorias() {
-    	return subcategorias;
+		return id;
 	}
 
 	public void setId(int id) {
-    	this.id = id;
+		this.id = id;
+	}
+
+	public String getNombre() {
+		return nombre;
 	}
 
 	public void setNombre(String nombre) {
-    	this.nombre = nombre;
-	}
-	public void setSubcategorias(List<Subcategoria> subcategorias) {
-    	this.subcategorias = subcategorias;
+		this.nombre = nombre;
 	}
 
 	public Boolean getActivo() {
