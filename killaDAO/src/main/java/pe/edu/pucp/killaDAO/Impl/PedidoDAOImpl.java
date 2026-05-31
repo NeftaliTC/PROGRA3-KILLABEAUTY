@@ -93,7 +93,7 @@ public class PedidoDAOImpl implements PedidoDAO {
             if (pedido.getDireccionEnvio() == null) {
                 throw new SQLException("Pedido.save: direccionEnvio es null");
             }
-            ps.setInt(7, pedido.getDireccionEnvio().getIdDireccion());
+            ps.setInt(7, pedido.getDireccionEnvio().getId());
 
             ps.setString(8, pedido.getEstado());
 
@@ -144,7 +144,7 @@ public class PedidoDAOImpl implements PedidoDAO {
             if (pedido.getDireccionEnvio() == null) {
                 throw new SQLException("Pedido.update: direccionEnvio es null");
             }
-            ps.setInt(7, pedido.getDireccionEnvio().getIdDireccion());
+            ps.setInt(7, pedido.getDireccionEnvio().getId());
 
             ps.setString(8, pedido.getEstado());
             ps.setInt(9, pedido.getIdPedido());
@@ -187,7 +187,7 @@ public class PedidoDAOImpl implements PedidoDAO {
         p.setCliente(u);
 
         Direccion d = new Direccion();
-        d.setIdDireccion(rs.getInt("id_direccion"));
+        d.setId(rs.getInt("id_direccion"));
         p.setDireccionEnvio(d);
 
         int idCupon = rs.getInt("id_cupon");

@@ -11,4 +11,5 @@ public interface DireccionBL {
     void remove(Direccion d) throws BusinessLogicException;
     Direccion load(Integer id) throws BusinessLogicException;
     List<Direccion> listAll() throws BusinessLogicException;
+    List<Direccion> listarPorUsuario(Integer idUsuario) throws BusinessLogicException;
 }
