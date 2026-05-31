@@ -2,64 +2,92 @@ package pe.edu.pucp.killaBeauty.killaModelo;
 
 public class Direccion {
     private int id;
+    private String alias;
+    private String direccionDetalle;
+    private String telefono;
     private String distrito;
     private String provincia;
     private String departamento;
-    private String direccionExacta;
+    private String codigoPostal;
     private String referencia;
-    private int idUsuario;
     private Boolean activo;
-        
-    public Direccion(){};
+    private Boolean esPredeterminada;
 
-    public String mostrarDireccion() {
-        return direccionExacta + " (Ref: " + referencia + "), " +
-                distrito + ", " + provincia + ", " + departamento;
+    private Usuario usuario;
+
+    public Direccion(){}
+
+    public String getAlias() {
+        return alias;
     }
-    
-    public int getIdDireccion() {
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getDireccionDetalle() {
+        return direccionDetalle;
+    }
+
+    public void setDireccionDetalle(String direccionDetalle) {
+        this.direccionDetalle = direccionDetalle;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
     }
 
     public String getDistrito() {
         return distrito;
     }
 
-    public String getDepartamento() {
-        return departamento;
-    }
-
-    public String getProvincia() { return provincia; }
-
-    public String getDireccionExacta() { return direccionExacta; }
-
-    public String getReferencia() {
-        return referencia;
-    }
-
-    public int getIdUsuario() { return idUsuario; }
-
-    public void setIdDireccion(int idDireccion) {
-        this.id = idDireccion;
-    }
-
     public void setDistrito(String distrito) {
         this.distrito = distrito;
+    }
+
+    public String getProvincia() {
+        return provincia;
+    }
+
+    public void setProvincia(String provincia) {
+        this.provincia = provincia;
+    }
+
+    public String getDepartamento() {
+        return departamento;
     }
 
     public void setDepartamento(String departamento) {
         this.departamento = departamento;
     }
 
-    public void setProvincia(String provincia) { this.provincia = provincia; }
+    public String getCodigoPostal() {
+        return codigoPostal;
+    }
 
-    public void setDireccionExacta(String direccionExacta) { this.direccionExacta = direccionExacta; }
+    public void setCodigoPostal(String codigoPostal) {
+        this.codigoPostal = codigoPostal;
+    }
+
+    public String getReferencia() {
+        return referencia;
+    }
 
     public void setReferencia(String referencia) {
         this.referencia = referencia;
     }
-
-    public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
 
     public Boolean getActivo() {
         return activo;
@@ -67,6 +95,26 @@ public class Direccion {
 
     public void setActivo(Boolean activo) {
         this.activo = activo;
+    }
+
+    public Boolean getEsPredeterminada() {
+        return esPredeterminada;
+    }
+
+    public void setEsPredeterminada(Boolean esPredeterminada) {
+        this.esPredeterminada = esPredeterminada;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public String obtenerUbicacion() {
+        return this.distrito + ", " + this.provincia + ", " + this.departamento;
     }
 }
 
