@@ -61,7 +61,7 @@
         new Pedido("KIL-202604115", "10 Mayo, 2026", "Listo para recoger", "status-purple", new List<string> { "Images/Fragancia.png" }, 1, 120.00m)
     };
 
-    private string GetStatusClass(string estado) => estado switch
+    private string GetStatusClass(string activo) => activo switch
     {
         "Entregado" => "status-green",
         "Listo para recoger" => "status-purple",
@@ -79,12 +79,12 @@
         public int TotalArticulos { get; set; }
         public decimal TotalPrecio { get; set; }
 
-        public Pedido(string id, string fecha, string estado, string claseEstado,
+        public Pedido(string id, string fecha, string activo, string claseEstado,
                       List<string> imagenes, int totalArticulos, decimal totalPrecio)
         {
             Id = id;
             Fecha = fecha;
-            Estado = estado;
+            Estado = activo;
             ClaseEstado = claseEstado; // <--- AGREGADO
             ImagenesProductos = imagenes;
             TotalArticulos = totalArticulos;

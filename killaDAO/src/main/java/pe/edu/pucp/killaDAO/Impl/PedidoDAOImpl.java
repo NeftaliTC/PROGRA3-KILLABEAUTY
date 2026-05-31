@@ -95,7 +95,7 @@ public class PedidoDAOImpl implements PedidoDAO {
             }
             ps.setInt(7, pedido.getDireccionEnvio().getId());
 
-            ps.setString(8, pedido.getEstado());
+            ps.setString(8, pedido.getEstadoPedido().name());
 
             int affected = ps.executeUpdate();
             if (affected > 0) {
@@ -146,7 +146,7 @@ public class PedidoDAOImpl implements PedidoDAO {
             }
             ps.setInt(7, pedido.getDireccionEnvio().getId());
 
-            ps.setString(8, pedido.getEstado());
+            ps.setString(8, pedido.getEstadoPedido().name());
             ps.setInt(9, pedido.getIdPedido());
 
             ps.executeUpdate();
@@ -180,7 +180,7 @@ public class PedidoDAOImpl implements PedidoDAO {
         p.setSubtotal(rs.getDouble("subtotal"));
         p.setIgv(rs.getDouble("igv"));
         p.setTotal(rs.getDouble("total"));
-        p.setEstado(rs.getString("estado_pedido"));
+        p.setEstadoPedido(rs.getString("estado_pedido"));
 
         Usuario u = new Usuario();
         u.setId(rs.getInt("id_usuario"));

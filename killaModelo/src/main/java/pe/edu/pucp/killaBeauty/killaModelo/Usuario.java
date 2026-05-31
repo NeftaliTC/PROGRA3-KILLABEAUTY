@@ -12,9 +12,9 @@ public class Usuario {
     private String apellidoPaterno;
     private Date fechaDeInscripcion;
     private Date fechaNacimiento;
-    private String contrasena; //-> estado
+    private String contrasena; //-> activo
     private String telefono;
-    private Boolean estado; // 1=activo - 0=inactivo
+    private Boolean activo; // 1=activo - 0=inactivo
     private List<Direccion> direcciones;
     private List<Pedido> pedidos;
     private CarritoDeCompras carritoActivo;
@@ -86,12 +86,12 @@ public class Usuario {
         this.telefono = telefono;
     }
 
-    public Boolean getEstado() {
-        return estado;
+    public Boolean getActivo() {
+        return activo;
     }
 
-    public void setEstado(Boolean estado) {
-        this.estado = estado;
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 
     public List<Direccion> getDirecciones() {

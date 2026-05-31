@@ -32,7 +32,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
                 usuario.setFechaDeInscripcion(rs.getDate(6));
                 usuario.setContrasena(rs.getString(7));
                 usuario.setTelefono(rs.getString(8));
-                usuario.setEstado(rs.getBoolean(9));
+                usuario.setActivo(rs.getBoolean(9));
                 list.add(usuario);
 
 
@@ -63,7 +63,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
                     usuario.setFechaDeInscripcion(rs.getDate(6));
                     usuario.setContrasena(rs.getString(7));
                     usuario.setTelefono(rs.getString(8));
-                    usuario.setEstado(rs.getBoolean(9));
+                    usuario.setActivo(rs.getBoolean(9));
 
                     return usuario;
 
@@ -75,7 +75,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
     public Usuario save(Usuario usuario) throws SQLException {
-        usuario.setEstado(true);
+        usuario.setActivo(true);
         String sql="INSERT INTO Usuario " +
                 "(nombre, apellido_materno, apellido_paterno, correo_electronico, contrasena, telefono, activo) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -87,7 +87,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
             pstmt.setString(4, usuario.getCorreoElectronico());
             pstmt.setString(5, usuario.getContrasena());
             pstmt.setString(6, usuario.getTelefono());
-            pstmt.setBoolean(7, usuario.getEstado());
+            pstmt.setBoolean(7, usuario.getActivo());
 
 
             int affectedRows = pstmt.executeUpdate();
@@ -118,7 +118,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
             pstmt.setString(4, usuario.getCorreoElectronico());
             pstmt.setString(5, usuario.getContrasena());
             pstmt.setString(6, usuario.getTelefono());
-            pstmt.setBoolean(7, usuario.getEstado());
+            pstmt.setBoolean(7, usuario.getActivo());
 
             pstmt.executeUpdate();
             return usuario;
@@ -130,13 +130,13 @@ public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
     public void remove(Usuario usuario) throws SQLException {
-        usuario.setEstado(false);
+        usuario.setActivo(false);
         String sql = "UPDATE Usuario SET activo = ? WHERE id_usuario = ?";
 
         try (Connection connection = DBManager.getInstance().getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
-            pstmt.setBoolean(1, usuario.getEstado());
+            pstmt.setBoolean(1, usuario.getActivo());
             pstmt.setInt(2, usuario.getId());
             pstmt.executeUpdate();
         }

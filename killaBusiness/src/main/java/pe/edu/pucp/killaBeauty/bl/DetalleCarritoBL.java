@@ -6,9 +6,9 @@ import pe.edu.pucp.killaBeauty.killaModelo.DetalleCarrito;
 import java.util.List;
 
 public interface DetalleCarritoBL {
-    DetalleCarrito create(DetalleCarrito d) throws BusinessLogicException;
-    DetalleCarrito update(DetalleCarrito d) throws BusinessLogicException;
-    void remove(DetalleCarrito d) throws BusinessLogicException;
-    DetalleCarrito load(Integer id) throws BusinessLogicException;
-    List<DetalleCarrito> listAll() throws BusinessLogicException;
+    DetalleCarrito create(DetalleCarrito detalle) throws BusinessLogicException;
+    DetalleCarrito update(DetalleCarrito detalle) throws BusinessLogicException;
+    void remove(DetalleCarrito detalle) throws BusinessLogicException;
+    DetalleCarrito load(int id) throws BusinessLogicException;
+    List<DetalleCarrito> listByCarritoId(int idCarrito) throws BusinessLogicException;
 }
