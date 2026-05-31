@@ -28,14 +28,7 @@ public class Usuario {
         this.direcciones = new ArrayList<>();
     }
 
-    //Metodos
-    public void registrarse() {}
-    public void iniciarSesion(String correoElectronico, String contrasena) {}
-    public void realizarPedido() {}
-    public void actualizarDatos() {}
-    public void agregarDireccion(Direccion direccionNueva) {}
-    public void agregarPedido(Pedido pedidoNuevo) {}
-    
+
     //Getters y setters
     public int getId() {
         return id;

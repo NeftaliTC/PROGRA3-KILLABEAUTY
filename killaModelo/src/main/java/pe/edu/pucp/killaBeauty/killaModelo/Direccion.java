@@ -2,15 +2,50 @@ package pe.edu.pucp.killaBeauty.killaModelo;
 
 public class Direccion {
     private int id;
+    private String alias;
     private String distrito;
     private String provincia;
     private String departamento;
+    private String codigoPostal;
+    private int telefono;
     private String direccionExacta;
     private String referencia;
-    private int idUsuario;
+    private Usuario usuario;
     private Boolean activo;
         
     public Direccion(){};
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public String getCodigoPostal() {
+        return codigoPostal;
+    }
+
+    public void setCodigoPostal(String codigoPostal) {
+        this.codigoPostal = codigoPostal;
+    }
+
+    public int getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(int telefono) {
+        this.telefono = telefono;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
 
     public String mostrarDireccion() {
         return direccionExacta + " (Ref: " + referencia + "), " +
@@ -37,8 +72,6 @@ public class Direccion {
         return referencia;
     }
 
-    public int getIdUsuario() { return idUsuario; }
-
     public void setIdDireccion(int idDireccion) {
         this.id = idDireccion;
     }
@@ -58,8 +91,6 @@ public class Direccion {
     public void setReferencia(String referencia) {
         this.referencia = referencia;
     }
-
-    public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
 
     public Boolean getActivo() {
         return activo;

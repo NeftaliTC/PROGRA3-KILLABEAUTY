@@ -7,7 +7,7 @@ import java.util.List;
 public class Pedido {
     private int id;
     private LocalDate fechaPedido;
-    private String estado;
+    private EstadoPedido estadoPedido;
     private String metodoPago;
     private double subtotal;
     private double igv;
@@ -21,6 +21,14 @@ public class Pedido {
     public Pedido() {
         this.detalles = new ArrayList<>();
         this.fechaPedido = LocalDate.now();
+    }
+
+    public EstadoPedido getEstadoPedido() {
+        return estadoPedido;
+    }
+
+    public void setEstadoPedido(EstadoPedido estadoPedido) {
+        this.estadoPedido = estadoPedido;
     }
 
     public int getIdPedido() {
@@ -37,14 +45,6 @@ public class Pedido {
 
     public void setFechaPedido(LocalDate fechaPedido) {
         this.fechaPedido = fechaPedido;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
     }
 
     public String getMetodoPago() {
