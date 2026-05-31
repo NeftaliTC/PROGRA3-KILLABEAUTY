@@ -1,7 +1,6 @@
 package pe.edu.pucp.killaBeauty.bl;
 
 import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
-import pe.edu.pucp.killaBeauty.killaModelo.Carrito;
 
 import java.util.List;
 

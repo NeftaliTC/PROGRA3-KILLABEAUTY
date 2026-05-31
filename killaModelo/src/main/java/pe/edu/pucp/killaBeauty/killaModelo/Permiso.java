@@ -4,7 +4,7 @@ public class Permiso {
     private int id;
     private String nombre;
     private String descripcion;
-    private Boolean activo;
+
 
     public Permiso() {
     }
@@ -39,11 +39,4 @@ public class Permiso {
         this.descripcion = descripcion;
     }
 
-    public Boolean getActivo() {
-        return activo;
-    }
-
-    public void setActivo(Boolean activo) {
-        this.activo = activo;
-    }
 }

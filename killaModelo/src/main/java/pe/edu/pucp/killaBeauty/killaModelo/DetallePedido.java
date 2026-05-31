@@ -5,10 +5,23 @@ public class DetallePedido {
     private int cantidad;
     private double precioAplicado;
     private Producto producto;
+    private Pedido pedido;
     private double subtotal;
 
 
     public DetallePedido() {}
+
+    public Pedido getPedido() {
+        return pedido;
+    }
+
+    public void setSubtotal(double subtotal) {
+        this.subtotal = subtotal;
+    }
+
+    public void setPedido(Pedido pedido) {
+        this.pedido = pedido;
+    }
 
     public double calcularSubtotal() {
         this.subtotal = this.cantidad * this.precioAplicado;
