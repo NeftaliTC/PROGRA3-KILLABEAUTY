@@ -7,4 +7,5 @@ import java.sql.SQLException;
 import java.util.List;
 public interface EscalaPrecioDAO extends BaseDAO<EscalaPrecio,Integer> {
     List<EscalaPrecio> listAll() throws SQLException;
+    List<EscalaPrecio> listByProductoId(Integer idProducto) throws SQLException;
 }
