@@ -11,13 +11,15 @@ public class Usuario {
     private String apellidoMaterno;
     private String apellidoPaterno;
     private Date fechaDeInscripcion;
+    private Date fechaNacimiento;
     private String contrasena; //-> estado
     private String telefono;
-    private boolean estado; // 1=activo - 0=inactivo
+    private Boolean estado; // 1=activo - 0=inactivo
     private List<Direccion> direcciones;
     private List<Pedido> pedidos;
     private Carrito carritoActivo;
-    private int id_tipoUsuario;
+    private TipoUsuario tipoUsuario;
+    private int dni;
 
 
     //Constructores
@@ -67,6 +69,14 @@ public class Usuario {
         this.fechaDeInscripcion = fechaDeInscripcion;
     }
 
+    public Date getFechaNacimiento() {
+        return fechaNacimiento;
+    }
+
+    public void setFechaNacimiento(Date fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
+    }
+
     public String getContrasena() {
         return contrasena;
     }
@@ -83,11 +93,11 @@ public class Usuario {
         this.telefono = telefono;
     }
 
-    public boolean getEstado() {
+    public Boolean getEstado() {
         return estado;
     }
 
-    public void setEstado(boolean estado) {
+    public void setEstado(Boolean estado) {
         this.estado = estado;
     }
 
@@ -131,13 +141,19 @@ public class Usuario {
         this.apellidoPaterno = apellidoPaterno;
     }
 
-    public int getId_tipoUsuario() {
-        return id_tipoUsuario;
+    public TipoUsuario getTipoUsuario() {
+        return tipoUsuario;
     }
 
-    public void setId_tipoUsuario(int id_tipoUsuario) {
-        this.id_tipoUsuario = id_tipoUsuario;
+    public void setTipoUsuario(TipoUsuario tipoUsuario) {
+        this.tipoUsuario = tipoUsuario;
     }
 
+    public int getDni() {
+        return dni;
+    }
 
+    public void setDni(int dni) {
+        this.dni = dni;
+    }
 }
