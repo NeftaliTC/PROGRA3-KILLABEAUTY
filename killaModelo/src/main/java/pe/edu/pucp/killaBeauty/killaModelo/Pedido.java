@@ -1,5 +1,7 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
 
+import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Cupon;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +129,7 @@ public class Pedido {
         }
 
         if (cupon != null && cupon.esVigente(LocalDate.now())) {
-            this.subtotal = this.subtotal * (1 - cupon.getPorcentajeDescuento() / 100.0);
+//            this.subtotal = this.subtotal * (1 - cupon.getPorcentajeDescuento() / 100.0);
         }
 
         this.igv = this.subtotal * 0.18;
