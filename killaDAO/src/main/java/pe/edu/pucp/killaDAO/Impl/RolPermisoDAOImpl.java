@@ -33,9 +33,7 @@ public class RolPermisoDAOImpl implements RolPermisoDAO {
                 permiso.setNombre(rs.getString("nombre"));
                 permiso.setDescripcion(rs.getString("descripcion"));
 
-                RolPermiso rp = new RolPermiso();
-                rp.setTipoUsuario(tipo);
-                rp.setPermiso(permiso);
+                RolPermiso rp = new RolPermiso(tipo, permiso);
 
                 lista.add(rp);
             }
@@ -44,23 +42,21 @@ public class RolPermisoDAOImpl implements RolPermisoDAO {
     }
 
     @Override
-    public RolPermiso load(Integer idPermiso) throws SQLException {
-        // Como BaseDAO pide solo 1 ID, aquí cargamos por id_permiso
+    public List<RolPermiso> listarPorTipoUsuario(Integer idTipoUsuario) throws SQLException {
+        List<RolPermiso> lista = new ArrayList<>();
         String sql = """
             SELECT rp.id_tipoUsuario, p.id_permiso, p.nombre, p.descripcion
             FROM Rol_Permiso rp
             INNER JOIN Permiso p ON p.id_permiso = rp.id_permiso
-            WHERE rp.id_permiso = ?
-            LIMIT 1
+            WHERE rp.id_tipoUsuario = ?
         """;
 
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
 
-            ps.setInt(1, idPermiso);
-
+            ps.setInt(1, idTipoUsuario);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
+                while (rs.next()) {
                     TipoUsuario tipo = TipoUsuario.fromId(rs.getInt("id_tipoUsuario"));
 
                     Permiso permiso = new Permiso();
@@ -68,11 +64,17 @@ public class RolPermisoDAOImpl implements RolPermisoDAO {
                     permiso.setNombre(rs.getString("nombre"));
                     permiso.setDescripcion(rs.getString("descripcion"));
 
-                    return new RolPermiso(tipo, permiso);
+                    RolPermiso rp = new RolPermiso(tipo, permiso);
+                    lista.add(rp);
                 }
             }
         }
-        return null;
+        return lista;
+    }
+
+    @Override
+    public RolPermiso load(Integer idPermiso) throws SQLException {
+        throw new UnsupportedOperationException("No se puede buscar por un solo ID en esta tabla. Usar listarPorTipoUsuario");
     }
 
     @Override
