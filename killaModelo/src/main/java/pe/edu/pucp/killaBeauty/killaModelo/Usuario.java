@@ -17,7 +17,7 @@ public class Usuario {
     private Boolean estado; // 1=activo - 0=inactivo
     private List<Direccion> direcciones;
     private List<Pedido> pedidos;
-    private Carrito carritoActivo;
+    private CarritoDeCompras carritoActivo;
     private TipoUsuario tipoUsuario;
     private int dni;
 
@@ -110,11 +110,11 @@ public class Usuario {
         this.pedidos = pedidos;
     }
 
-    public Carrito getCarritoActivo() {
+    public CarritoDeCompras getCarritoActivo() {
         return carritoActivo;
     }
 
-    public void setCarritoActivo(Carrito carritoActivo) {
+    public void setCarritoActivo(CarritoDeCompras carritoActivo) {
         this.carritoActivo = carritoActivo;
     }
 
