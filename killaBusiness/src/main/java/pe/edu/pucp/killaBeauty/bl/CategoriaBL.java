@@ -6,9 +6,9 @@ import pe.edu.pucp.killaBeauty.killaModelo.Categoria;
 import java.util.List;
 
 public interface CategoriaBL {
-    Categoria create(Categoria c) throws BusinessLogicException;
-    Categoria update(Categoria c) throws BusinessLogicException;
-    void remove(Categoria c) throws BusinessLogicException;
-    Categoria load(Integer id) throws BusinessLogicException;
+    Categoria create(Categoria categoria) throws BusinessLogicException;
+    Categoria update(Categoria categoria) throws BusinessLogicException;
+    void remove(Categoria categoria) throws BusinessLogicException;
     List<Categoria> listAll() throws BusinessLogicException;
+    Categoria load(int id) throws BusinessLogicException;
 }

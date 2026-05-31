@@ -9,6 +9,6 @@ public interface CuponBL {
     Cupon create(Cupon c) throws BusinessLogicException;
     Cupon update(Cupon c) throws BusinessLogicException;
     void remove(Cupon c) throws BusinessLogicException;
-    Cupon load(Integer id) throws BusinessLogicException;
+    Cupon load(int id) throws BusinessLogicException;
     List<Cupon> listAll() throws BusinessLogicException;
 }

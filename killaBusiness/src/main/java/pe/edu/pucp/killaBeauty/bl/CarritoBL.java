@@ -1,13 +1,14 @@
 package pe.edu.pucp.killaBeauty.bl;
 
 import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
+import pe.edu.pucp.killaBeauty.killaModelo.CarritoDeCompras;
 
 import java.util.List;
 
 public interface CarritoBL {
-    Carrito create(Carrito c) throws BusinessLogicException;
-    Carrito update(Carrito c) throws BusinessLogicException;
-    void remove(Carrito c) throws BusinessLogicException;
-    Carrito load(Integer id) throws BusinessLogicException;
-    List<Carrito> listAll() throws BusinessLogicException;
+    CarritoDeCompras create(CarritoDeCompras c) throws BusinessLogicException;
+    CarritoDeCompras update(CarritoDeCompras c) throws BusinessLogicException;
+    void remove(CarritoDeCompras c) throws BusinessLogicException;
+    CarritoDeCompras load(Integer id) throws BusinessLogicException;
+    List<CarritoDeCompras> listAll() throws BusinessLogicException;
 }
