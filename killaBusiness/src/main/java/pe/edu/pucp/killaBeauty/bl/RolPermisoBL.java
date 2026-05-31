@@ -10,4 +10,5 @@ public interface RolPermisoBL {
     void remove(RolPermiso rp) throws BusinessLogicException;
     RolPermiso load(Integer id) throws BusinessLogicException;
     List<RolPermiso> listAll() throws BusinessLogicException;
+    List<RolPermiso> listarPorTipoUsuario(Integer idTipoUsuario) throws BusinessLogicException;
 }
