@@ -1,4 +1,4 @@
-package pe.edu.pucp.killaBeauty.bl.impl;
+package pe.edu.pucp.killaBeauty.bl.Impl;
 
 import pe.edu.pucp.dbManager.TransactionContext;
 import pe.edu.pucp.killaBeauty.bl.DireccionBL;
@@ -16,11 +16,23 @@ public class DireccionBLImpl implements DireccionBL {
     @Override
     public Direccion create(Direccion d) throws BusinessLogicException {
         try {
-            // Al crear, por defecto no es predeterminada
-            d.setEsPredeterminada(false);
-            return direccionDAO.save(d);
+            TransactionContext.getConnection();
+            List<Direccion> lista = direccionDAO.listarPorUsuario(d.getUsuario().getId());
+            if(lista.isEmpty()){
+                // Si es la primera, se marca como predeterminada automáticamente
+                d.setEsPredeterminada(true);
+            } else{
+                // Al crear una cuando ya hay otras, por defecto no es predeterminada
+                d.setEsPredeterminada(false);
+            }
+            Direccion guardada = direccionDAO.save(d);
+            TransactionContext.commit();
+            return guardada;
         } catch (Exception ex) {
+            TransactionContext.rollback();
             throw new BusinessLogicException("Error al crear la dirección: " + ex.getMessage());
+        } finally {
+            TransactionContext.close();
         }
     }
 
@@ -78,7 +90,9 @@ public class DireccionBLImpl implements DireccionBL {
     @Override
     public List<Direccion> listarPorUsuario(Integer idUsuario) throws BusinessLogicException {
         try {
-            return direccionDAO.listarPorUsuario(idUsuario);
+            List<Direccion> lista = direccionDAO.listarPorUsuario(idUsuario);
+            lista.sort((d1, d2) -> Boolean.compare(d2.getEsPredeterminada(), d1.getEsPredeterminada()));
+            return lista;
         } catch (Exception e) {
             throw new BusinessLogicException("Error al listar las direcciones del usuario: " + e.getMessage());
         }

@@ -4,14 +4,16 @@ public class Permiso {
     private int id;
     private String nombre;
     private String descripcion;
-
+    private Boolean activo;
 
     public Permiso() {
+        this.activo = true;
     }
     public Permiso(int id, String nombre, String descripcion) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
+        this.activo = true;
     }
 
     // Getters y Setters
@@ -39,4 +41,11 @@ public class Permiso {
         this.descripcion = descripcion;
     }
 
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
 }

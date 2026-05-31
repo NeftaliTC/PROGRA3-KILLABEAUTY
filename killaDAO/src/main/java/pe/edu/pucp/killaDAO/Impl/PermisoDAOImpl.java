@@ -13,7 +13,7 @@ public class PermisoDAOImpl implements PermisoDAO {
     @Override
     public List<Permiso> listAll() throws SQLException {
         List<Permiso> lista = new ArrayList<>();
-        String sql = "SELECT id_permiso, nombre, descripcion FROM Permiso";
+        String sql = "SELECT id_permiso, nombre, descripcion, activo FROM Permiso";
 
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql);
@@ -24,6 +24,7 @@ public class PermisoDAOImpl implements PermisoDAO {
                 p.setId(rs.getInt("id_permiso"));
                 p.setNombre(rs.getString("nombre"));
                 p.setDescripcion(rs.getString("descripcion"));
+                p.setActivo(rs.getBoolean("activo"));
                 lista.add(p);
             }
         }
@@ -32,7 +33,7 @@ public class PermisoDAOImpl implements PermisoDAO {
 
     @Override
     public Permiso load(Integer id) throws SQLException {
-        String sql = "SELECT id_permiso, nombre, descripcion FROM Permiso WHERE id_permiso = ?";
+        String sql = "SELECT id_permiso, nombre, descripcion, activo FROM Permiso WHERE id_permiso = ?";
 
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
@@ -45,6 +46,7 @@ public class PermisoDAOImpl implements PermisoDAO {
                     p.setId(rs.getInt("id_permiso"));
                     p.setNombre(rs.getString("nombre"));
                     p.setDescripcion(rs.getString("descripcion"));
+                    p.setActivo(rs.getBoolean("activo"));
                     return p;
                 }
             }
@@ -54,7 +56,7 @@ public class PermisoDAOImpl implements PermisoDAO {
 
     @Override
     public Permiso save(Permiso permiso) throws SQLException {
-        String sql = "INSERT INTO Permiso (nombre, descripcion) VALUES (?, ?)";
+        String sql = "INSERT INTO Permiso (nombre, descripcion, activo) VALUES (?, ?, 1)";
 
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -76,14 +78,15 @@ public class PermisoDAOImpl implements PermisoDAO {
 
     @Override
     public Permiso update(Permiso permiso) throws SQLException {
-        String sql = "UPDATE Permiso SET nombre = ?, descripcion = ? WHERE id_permiso = ?";
+        String sql = "UPDATE Permiso SET nombre = ?, descripcion = ?, activo = ? WHERE id_permiso = ?";
 
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
 
             ps.setString(1, permiso.getNombre());
             ps.setString(2, permiso.getDescripcion());
-            ps.setInt(3, permiso.getId());
+            ps.setBoolean(3, permiso.getActivo());
+            ps.setInt(4, permiso.getId());
 
             ps.executeUpdate();
         }
@@ -92,7 +95,7 @@ public class PermisoDAOImpl implements PermisoDAO {
 
     @Override
     public void remove(Permiso permiso) throws SQLException {
-        String sql = "DELETE FROM Permiso WHERE id_permiso = ?";
+        String sql = "UPDATE Permiso SET activo = 0 WHERE id_permiso = ?";
 
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
