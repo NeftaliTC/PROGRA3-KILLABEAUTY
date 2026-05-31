@@ -2,6 +2,7 @@ package pe.edu.pucp.killaDAO.Impl;
 
 
 import pe.edu.pucp.dbManager.DBManager;
+import pe.edu.pucp.killaBeauty.killaModelo.Pais;
 import pe.edu.pucp.killaDAO.MarcaDAO;
 import pe.edu.pucp.killaBeauty.killaModelo.Marca;
 import pe.edu.pucp.dbManager.DBManager;
@@ -14,39 +15,39 @@ public class MarcaDAOImpl implements MarcaDAO {
 
     @Override
     public List<Marca> listAll() throws SQLException {
-        List<Marca> marcas = new ArrayList<>();
-        String sql = "SELECT id_marca, descripcion, pais_origen FROM Marca";
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+        List<Marca> lista = new ArrayList<>();
+        String sql = "SELECT id_marca, descripcion, pais, activo FROM Marca";
 
+        try (Connection cn = DBManager.getInstance().getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Marca marca = new Marca();
-                marca.setId(rs.getInt("id_marca"));
-                marca.setDescripcion(rs.getString("descripcion"));
-                marca.setPaisDeOrigen(rs.getString("pais_origen"));
-                marcas.add(marca);
+                Marca m = new Marca();
+                m.setId(rs.getInt("id_marca"));
+                m.setDescripcion(rs.getString("descripcion"));
+                m.setPais(Pais.valueOf(rs.getString("pais"))); // Enum
+                m.setActivo(rs.getBoolean("activo"));
+                lista.add(m);
             }
         }
-        return marcas;
+        return lista;
     }
 
     @Override
     public Marca load(Integer id) throws SQLException {
-        String sql = "SELECT id_marca, descripcion, pais_origen FROM Marca WHERE id_marca = ?";
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql)) {
-
-            pstmt.setInt(1, id);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
+        String sql = "SELECT id_marca, descripcion, pais, activo FROM Marca WHERE id_marca = ?";
+        try (Connection cn = DBManager.getInstance().getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    Marca marca = new Marca();
-                    marca.setId(rs.getInt("id_marca"));
-                    marca.setDescripcion(rs.getString("descripcion"));
-                    marca.setPaisDeOrigen(rs.getString("pais_origen"));
-                    return marca;
+                    Marca m = new Marca();
+                    m.setId(rs.getInt("id_marca"));
+                    m.setDescripcion(rs.getString("descripcion"));
+                    m.setPais(Pais.valueOf(rs.getString("pais")));
+                    m.setActivo(rs.getBoolean("activo"));
+                    return m;
                 }
             }
         }
@@ -54,51 +55,44 @@ public class MarcaDAOImpl implements MarcaDAO {
     }
 
     @Override
-    public Marca save(Marca marca) throws SQLException {
-        String sql = "INSERT INTO Marca (descripcion, pais_origen) VALUES (?, ?)";
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            pstmt.setString(1, marca.getDescripcion());
-            pstmt.setString(2, marca.getPaisDeOrigen());
-
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                try (ResultSet keys = pstmt.getGeneratedKeys()) {
-                    if (keys.next()) {
-                        marca.setId(keys.getInt(1));
-                    }
-                }
+    public Marca save(Marca m) throws SQLException {
+        String sql = "INSERT INTO Marca (descripcion, pais, activo) VALUES (?, ?, ?)";
+        try (Connection cn = DBManager.getInstance().getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, m.getDescripcion());
+            ps.setString(2, m.getPais().name());
+            ps.setBoolean(3, m.getActivo());
+            ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) m.setId(keys.getInt(1));
             }
         }
-        return marca;
+        return m;
     }
 
     @Override
-    public Marca update(Marca marca) throws SQLException {
-        String sql = "UPDATE Marca SET descripcion = ?, pais_origen = ? WHERE id_marca = ?";
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql)) {
-
-            pstmt.setString(1, marca.getDescripcion());
-            pstmt.setString(2, marca.getPaisDeOrigen());
-            pstmt.setInt(3, marca.getId());
-
-            pstmt.executeUpdate();
+    public Marca update(Marca m) throws SQLException {
+        String sql = "UPDATE Marca SET descripcion = ?, pais = ?, activo = ? WHERE id_marca = ?";
+        try (Connection cn = DBManager.getInstance().getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, m.getDescripcion());
+            ps.setString(2, m.getPais().name());
+            ps.setBoolean(3, m.getActivo());
+            ps.setInt(4, m.getId());
+            ps.executeUpdate();
         }
-        return marca;
+        return m;
     }
 
     @Override
-    public void remove(Marca marca) throws SQLException {
-        // Como tu tabla Marca no tiene campo "activo", aquí va borrado físico.
-        // Si luego agregan "activo", lo cambiamos a borrado lógico.
-        String sql = "DELETE FROM Marca WHERE id_marca = ?";
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql)) {
-
-            pstmt.setInt(1, marca.getId());
-            pstmt.executeUpdate();
+    public void remove(Marca m) throws SQLException {
+        m.setActivo(false);
+        String sql = "UPDATE Marca SET activo = ? WHERE id_marca = ?";
+        try (Connection cn = DBManager.getInstance().getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setBoolean(1, m.getActivo());
+            ps.setInt(2, m.getId());
+            ps.executeUpdate();
         }
     }
 }
