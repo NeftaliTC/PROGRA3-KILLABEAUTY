@@ -4,28 +4,31 @@ public class Subcategoria {
     private int id;
     private String nombre;
     private Boolean activo;
+    private Categoria categoria;
 
     public Subcategoria() {}
 
-    public Subcategoria(int id, String nombre) {
+    public Subcategoria(int id, String nombre, Boolean activo, Categoria categoria) {
         this.id = id;
         this.nombre = nombre;
+        this.activo = activo;
+        this.categoria = categoria;
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int idSubcategoria) {
-        this.id = idSubcategoria;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getNombre() {
         return nombre;
     }
 
-    public void setNombre(String descripcion) {
-        this.nombre = descripcion;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public Boolean getActivo() {
@@ -34,5 +37,13 @@ public class Subcategoria {
 
     public void setActivo(Boolean activo) {
         this.activo = activo;
+    }
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
     }
 }

@@ -6,18 +6,16 @@ public class Marca {
     private Pais pais;
     private Boolean activo;
 
-    //Constructores
     public Marca() {
     }
 
-
-    public Marca(int id, String descripcion, Pais pais) {
+    public Marca(int id, String descripcion, Pais pais, Boolean activo) {
         this.id = id;
         this.descripcion = descripcion;
         this.pais = pais;
+        this.activo = activo;
     }
 
-    //Getters y setters
     public int getId() {
         return id;
     }

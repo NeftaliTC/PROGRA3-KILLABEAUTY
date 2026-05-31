@@ -4,8 +4,12 @@ public class DetalleCarrito {
     private int id;
     private int cantidad;
     private Producto producto;
+    private CarritoDeCompras carrito;
     private int idCarrito;
 
+    public CarritoDeCompras getCarrito() {return carrito;}
+
+    public void setCarrito(CarritoDeCompras carrito) {this.carrito = carrito;}
 
     public DetalleCarrito() {
         this.producto = new Producto();
