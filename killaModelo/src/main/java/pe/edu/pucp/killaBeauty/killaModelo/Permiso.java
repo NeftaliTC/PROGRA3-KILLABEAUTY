@@ -7,11 +7,13 @@ public class Permiso {
     private Boolean activo;
 
     public Permiso() {
+        this.activo = true;
     }
     public Permiso(int id, String nombre, String descripcion) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
+        this.activo = true;
     }
 
     // Getters y Setters

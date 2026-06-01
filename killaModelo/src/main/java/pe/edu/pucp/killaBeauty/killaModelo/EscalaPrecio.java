@@ -8,28 +8,40 @@ public class EscalaPrecio {
     private Producto producto;
     private Boolean activo;
 
-    public EscalaPrecio(){};
+    public EscalaPrecio(){
+        this.producto = new Producto();
+    };
 
-    public int getIdEscalaPrecio() {return id;}
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public int getCantidadMinima() {
         return cantidadMinima;
+    }
+
+    public void setCantidadMinima(int cantidadMinima) {
+        this.cantidadMinima = cantidadMinima;
     }
 
     public double getPrecioUnitario() {
         return precioUnitario;
     }
 
-    public Producto getProducto(){return producto;}
-
-    public void setEscalaPrecio(int id){this.id = id;}
-
-    public void setCantidadMinima(int cantidadMinima) {
-        this.cantidadMinima = cantidadMinima;
-    }
-
     public void setPrecioUnitario(double precioUnitario) {
         this.precioUnitario = precioUnitario;
+    }
+
+    public Producto getProducto() {
+        return producto;
+    }
+
+    public void setProducto(Producto producto) {
+        this.producto = producto;
     }
 
     public Boolean getActivo() {

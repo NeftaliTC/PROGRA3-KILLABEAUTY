@@ -18,13 +18,13 @@ public class TestProductoDAO {
             p.setDisponible(true);
             p.setPromocion(false);
             p.getMarca().setId(1);     // Debe existir Marca en BD
-            p.getCategoria().setId(1); // Debe existir Categoria en BD
+            p.getSubcategoria().setId(1); // Debe existir Categoria en BD
 
             Producto guardado = dao.save(p);
-            System.out.println("SAVE OK -> id: " + guardado.getIdProducto());
+            System.out.println("SAVE OK -> id: " + guardado.getId());
 
             // 2) LOAD
-            Producto cargado = dao.load(guardado.getIdProducto());
+            Producto cargado = dao.load(guardado.getId());
             System.out.println("LOAD OK -> " + (cargado != null ? cargado.getNombre() : "null"));
 
             // 3) UPDATE

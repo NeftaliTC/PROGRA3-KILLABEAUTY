@@ -6,5 +6,5 @@ import pe.edu.pucp.killaDAO.Base.BaseDAO;
 import java.sql.SQLException;
 import java.util.List;
 public interface DetalleCarritoDAO extends BaseDAO<DetalleCarrito,Integer> {
-    List<DetalleCarrito> listAll() throws SQLException;
+    List<DetalleCarrito> listByCarritoId(int idCarrito) throws SQLException;
 }

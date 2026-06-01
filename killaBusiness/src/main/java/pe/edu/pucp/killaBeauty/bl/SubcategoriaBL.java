@@ -6,10 +6,10 @@ import pe.edu.pucp.killaBeauty.killaModelo.Subcategoria;
 import java.util.List;
 
 public interface SubcategoriaBL {
-    Subcategoria create(Subcategoria s, Integer idCategoria) throws BusinessLogicException;
-    Subcategoria update(Subcategoria s, Integer idCategoria) throws BusinessLogicException;
-    void remove(Subcategoria s) throws BusinessLogicException;
-    Subcategoria load(Integer id) throws BusinessLogicException;
+    Subcategoria create(Subcategoria subcategoria) throws BusinessLogicException;
+    Subcategoria update(Subcategoria subcategoria) throws BusinessLogicException;
+    void remove(Subcategoria subcategoria) throws BusinessLogicException;
     List<Subcategoria> listAll() throws BusinessLogicException;
-    List<Subcategoria> listByCategoriaId(Integer idCategoria) throws BusinessLogicException;
+    List<Subcategoria> listByCategoriaId(int idCategoria) throws BusinessLogicException;
+    Subcategoria load(int id) throws BusinessLogicException;
 }

@@ -1,0 +1,12 @@
+@page "/admin"
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+
+<PageTitle>Panel Administrador - Killa Beauty</PageTitle>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Navigation.NavigateTo("/admin/productos", replace: true);
+    }
+}

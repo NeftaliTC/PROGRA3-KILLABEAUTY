@@ -1,55 +1,66 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
 public class CarritoDeCompras {
     private int id; // redundante
-    private LocalDateTime fechaDeCreacion;
+    private Date fechaDeCreacion;
     private EstadoCarrito estado;
 
     private Usuario usuario;
-    private List<DetalleCarrito> items;
+    private List<DetalleCarrito> detalleCarritoList;
 
     public CarritoDeCompras() {
-        this.items = new ArrayList<>();
-        this.estado = EstadoCarrito.ACTIVO;
     }
 
-    public void agregarItem(DetalleCarrito item) {
-        items.add(item);
+    public CarritoDeCompras(int id, Date fechaDeCreacion, EstadoCarrito estado, Usuario usuario, List<DetalleCarrito> detalleCarritoList) {
+        this.id = id;
+        this.fechaDeCreacion = fechaDeCreacion;
+        this.estado = estado;
+        this.usuario = usuario;
+        this.detalleCarritoList = detalleCarritoList;
     }
 
-    public int getIdCarrito() {
+    public int getId() {
         return id;
     }
-    public LocalDateTime getFechaDeCreacion() {
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Date getFechaDeCreacion() {
         return fechaDeCreacion;
     }
+
+    public void setFechaDeCreacion(Date fechaDeCreacion) {
+        this.fechaDeCreacion = fechaDeCreacion;
+    }
+
     public EstadoCarrito getEstado() {
         return estado;
     }
-    public Usuario getUsuario() {
-        return usuario;
-    }
-    public void setItems(List<DetalleCarrito> items) {
-        this.items = items;
-    }
-    public void setIdCarrito(int idCarrito) {
-        this.id = idCarrito;
-    }
-    public void setFechaDeCreacion(LocalDateTime fechaDeCreacion) {
-        this.fechaDeCreacion = fechaDeCreacion;
-    }
+
     public void setEstado(EstadoCarrito estado) {
         this.estado = estado;
     }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
 
-    public List<DetalleCarrito> getItems() {
-        return items;
+    public List<DetalleCarrito> getDetalleCarritoList() {
+        return detalleCarritoList;
+    }
+
+    public void setDetalleCarritoList(List<DetalleCarrito> detalleCarritoList) {
+        this.detalleCarritoList = detalleCarritoList;
     }
 }

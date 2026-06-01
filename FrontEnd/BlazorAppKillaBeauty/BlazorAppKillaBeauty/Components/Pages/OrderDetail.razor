@@ -1,0 +1,42 @@
+﻿@page "/orders/order-detail/{OrderId}"
+@rendermode InteractiveServer
+@using BlazorAppKillaBeauty.Services
+@inject CartService CartService
+
+<Navbar CantidadCarrito="@CartService.CantidadTotal" />
+<div class="order-detail-container">
+    <div class="breadcrumb">
+        <a href="/orders"><i class="bi bi-arrow-left"></i> Volver a mis pedidos</a>
+    </div>
+
+    <div class="header-section">
+        <h1>Pedido #@OrderId</h1>
+        <span class="status-pill">En Proceso</span>
+    </div>
+
+    <div class="detail-grid">
+        <div class="products-card">
+            <h3>Productos</h3>
+            @foreach (var item in new string[] { "Producto 1", "Producto 2" })
+            {
+                <div class="product-item">
+                    <div class="product-info">
+                        <span class="product-name">@item</span>
+                    </div>
+                    <a href="/review/@OrderId" class="btn-review">Reseñar</a>
+                </div>
+            }
+        </div>
+
+        <div class="summary-card">
+            <h3>Resumen</h3>
+            <div class="total-row">
+                <span>Total</span>
+                <span class="total-amount">S/ 230.00</span>
+            </div>
+            <button class="btn-download-invoice">Descargar factura</button>
+        </div>
+    </div>
+</div>
+
+@code { [Parameter] public string OrderId { get; set; } }

@@ -4,19 +4,24 @@ public class DetalleCarrito {
     private int id;
     private int cantidad;
     private Producto producto;
-    private int idCarrito;
-
+    private CarritoDeCompras carritoDeCompras;
 
     public DetalleCarrito() {
-        this.producto = new Producto();
     }
 
-    public int getIdDetalleCarrito() {
+    public DetalleCarrito(int id, int cantidad, Producto producto, CarritoDeCompras carritoDeCompras) {
+        this.id = id;
+        this.cantidad = cantidad;
+        this.producto = producto;
+        this.carritoDeCompras = carritoDeCompras;
+    }
+
+    public int getId() {
         return id;
     }
 
-    public void setIdDetalleCarrito(int idDetalleCarrito) {
-        this.id = idDetalleCarrito;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getCantidad() {
@@ -35,15 +40,12 @@ public class DetalleCarrito {
         this.producto = producto;
     }
 
-    public int getIdCarrito() { return idCarrito; }
-
-    public void setIdCarrito(int idCarrito) { this.idCarrito = idCarrito; }
-
-    public double calcularSubtotal() {
-        if (producto != null) return cantidad * producto.getPrecioBase();
-        return 0.0;
+    public CarritoDeCompras getCarritoDeCompras() {
+        return carritoDeCompras;
     }
 
-
+    public void setCarritoDeCompras(CarritoDeCompras carritoDeCompras) {
+        this.carritoDeCompras = carritoDeCompras;
+    }
 }
 

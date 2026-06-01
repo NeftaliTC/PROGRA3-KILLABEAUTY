@@ -4,6 +4,7 @@ import pe.edu.pucp.dbManager.DBManager;
 import pe.edu.pucp.killaBeauty.killaModelo.Cupon;
 import pe.edu.pucp.killaBeauty.killaModelo.Direccion;
 import pe.edu.pucp.killaBeauty.killaModelo.Pedido;
+import pe.edu.pucp.killaBeauty.killaModelo.EstadoPedido;
 import pe.edu.pucp.killaBeauty.killaModelo.Usuario;
 import pe.edu.pucp.killaDAO.PedidoDAO;
 
@@ -77,7 +78,7 @@ public class PedidoDAOImpl implements PedidoDAO {
             ps.setDouble(2, pedido.getSubtotal());
 
             if (pedido.getCupon() != null) {
-                ps.setInt(3, pedido.getCupon().getIdCupon());
+                ps.setInt(3, pedido.getCupon().getId());
             } else {
                 ps.setNull(3, Types.INTEGER);
             }
@@ -93,15 +94,15 @@ public class PedidoDAOImpl implements PedidoDAO {
             if (pedido.getDireccionEnvio() == null) {
                 throw new SQLException("Pedido.save: direccionEnvio es null");
             }
-            ps.setInt(7, pedido.getDireccionEnvio().getIdDireccion());
+            ps.setInt(7, pedido.getDireccionEnvio().getId());
 
-            ps.setString(8, pedido.getEstado());
+            ps.setString(8, pedido.getEstadoPedido().name());
 
             int affected = ps.executeUpdate();
             if (affected > 0) {
                 try (ResultSet keys = ps.getGeneratedKeys()) {
                     if (keys.next()) {
-                        pedido.setIdPedido(keys.getInt(1));
+                        pedido.setId(keys.getInt(1));
                     }
                 }
             }
@@ -128,7 +129,7 @@ public class PedidoDAOImpl implements PedidoDAO {
             ps.setDouble(2, pedido.getSubtotal());
 
             if (pedido.getCupon() != null) {
-                ps.setInt(3, pedido.getCupon().getIdCupon());
+                ps.setInt(3, pedido.getCupon().getId());
             } else {
                 ps.setNull(3, Types.INTEGER);
             }
@@ -144,10 +145,10 @@ public class PedidoDAOImpl implements PedidoDAO {
             if (pedido.getDireccionEnvio() == null) {
                 throw new SQLException("Pedido.update: direccionEnvio es null");
             }
-            ps.setInt(7, pedido.getDireccionEnvio().getIdDireccion());
+            ps.setInt(7, pedido.getDireccionEnvio().getId());
 
-            ps.setString(8, pedido.getEstado());
-            ps.setInt(9, pedido.getIdPedido());
+            ps.setString(8, pedido.getEstadoPedido().name());
+            ps.setInt(9, pedido.getId());
 
             ps.executeUpdate();
         }
@@ -162,7 +163,7 @@ public class PedidoDAOImpl implements PedidoDAO {
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
 
-            ps.setInt(1, pedido.getIdPedido());
+            ps.setInt(1, pedido.getId());
             ps.executeUpdate();
         }
     }
@@ -170,7 +171,7 @@ public class PedidoDAOImpl implements PedidoDAO {
     private Pedido mapRowToPedido(ResultSet rs) throws SQLException {
         Pedido p = new Pedido();
 
-        p.setIdPedido(rs.getInt("id_pedido"));
+        p.setId(rs.getInt("id_pedido"));
 
         Timestamp ts = rs.getTimestamp("fecha_pedido");
         if (ts != null) {
@@ -180,20 +181,20 @@ public class PedidoDAOImpl implements PedidoDAO {
         p.setSubtotal(rs.getDouble("subtotal"));
         p.setIgv(rs.getDouble("igv"));
         p.setTotal(rs.getDouble("total"));
-        p.setEstado(rs.getString("estado_pedido"));
+        p.setEstadoPedido(EstadoPedido.valueOf(rs.getString("estado_pedido")));
 
         Usuario u = new Usuario();
         u.setId(rs.getInt("id_usuario"));
         p.setCliente(u);
 
         Direccion d = new Direccion();
-        d.setIdDireccion(rs.getInt("id_direccion"));
+        d.setId(rs.getInt("id_direccion"));
         p.setDireccionEnvio(d);
 
         int idCupon = rs.getInt("id_cupon");
         if (!rs.wasNull()) {
             Cupon c = new Cupon();
-            c.setIdCupon(idCupon);
+            c.setId(idCupon);
             p.setCupon(c);
         } else {
             p.setCupon(null);

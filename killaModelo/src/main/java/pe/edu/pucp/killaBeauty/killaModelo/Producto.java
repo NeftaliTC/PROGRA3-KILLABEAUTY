@@ -7,28 +7,26 @@ public class Producto {
     private String nombre;
     private double precioBase;
     private int stock;
-    private boolean disponible;
-    private boolean promocion;
+    private Boolean disponible;
+    private Boolean promocion;
     private Marca marca;
-    private Categoria categoria;
-    private List<EscalaPrecio> escalas;
+    private Subcategoria subcategoria;
     private Boolean activo;
     private List<Resena> resenas;
 
 
     public Producto() {
         this.marca = new Marca();
-        this.categoria = new Categoria();
-        this.escalas = new ArrayList<>();
+        this.subcategoria = new Subcategoria();
         this.resenas = new ArrayList<>();
     }
 
-    public int getIdProducto() {
+    public int getId() {
         return id;
     }
 
-    public void setIdProducto(int idProducto) {
-        this.id = idProducto;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -55,13 +53,21 @@ public class Producto {
         this.stock = stock;
     }
 
-    public boolean getDisponible() { return disponible; }
+    public Boolean getDisponible() {
+        return disponible;
+    }
 
-    public void setDisponible(boolean disponible) { this.disponible = disponible; }
+    public void setDisponible(Boolean disponible) {
+        this.disponible = disponible;
+    }
 
-    public boolean getPromocion() { return promocion; }
+    public Boolean getPromocion() {
+        return promocion;
+    }
 
-    public void setPromocion(boolean promocion) { this.promocion = promocion; }
+    public void setPromocion(Boolean promocion) {
+        this.promocion = promocion;
+    }
 
     public Marca getMarca() {
         return marca;
@@ -71,20 +77,20 @@ public class Producto {
         this.marca = marca;
     }
 
-    public Categoria getCategoria() {
-        return categoria;
+    public Subcategoria getSubcategoria() {
+        return subcategoria;
     }
 
-    public void setCategoria(Categoria categoria) {
-        this.categoria = categoria;
+    public void setSubcategoria(Subcategoria subcategoria) {
+        this.subcategoria = subcategoria;
     }
 
-    public List<EscalaPrecio> getEscalas() {
-        return escalas;
+    public Boolean getActivo() {
+        return activo;
     }
 
-    public void setEscalas(List<EscalaPrecio> escalas) {
-        this.escalas = escalas;
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 
     public List<Resena> getResenas() {
@@ -93,25 +99,5 @@ public class Producto {
 
     public void setResenas(List<Resena> resenas) {
         this.resenas = resenas;
-    }
-
-    public void registrarProducto() {}
-
-    public void actualizarStock(int cantidad) {}
-
-    public double obtenerPrecioParaCantidad(int cantidad) {
-        return 0.0;
-    }
-
-    public void agregarEscala(EscalaPrecio escala) {}
-
-    public void agregarResena(Resena resena) {}
-
-    public Boolean getActivo() {
-        return activo;
-    }
-
-    public void setActivo(Boolean activo) {
-        this.activo = activo;
     }
 }

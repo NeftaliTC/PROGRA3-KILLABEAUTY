@@ -7,4 +7,5 @@ import java.sql.SQLException;
 import java.util.List;
 public interface RolPermisoDAO extends BaseDAO<RolPermiso,Integer> {
     List<RolPermiso> listAll() throws SQLException;
+    List<RolPermiso> listarPorTipoUsuario(Integer idTipoUsuario) throws SQLException;
 }

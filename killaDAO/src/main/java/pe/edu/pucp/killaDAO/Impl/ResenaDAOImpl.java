@@ -20,7 +20,7 @@ public class ResenaDAOImpl implements ResenaDAO {
             ps.setBoolean(4, r.isVerificado());
             ps.setDate(5, Date.valueOf(r.getFechaPublicacion())); // LocalDate a SQL Date
             ps.setInt(6, r.getCliente().getId());
-            ps.setInt(7, r.getProducto().getIdProducto());
+            ps.setInt(7, r.getProducto().getId());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) r.setIdResena(rs.getInt(1));
@@ -46,7 +46,7 @@ public class ResenaDAOImpl implements ResenaDAO {
                     if (rs.getDate("fecha_de_publicacion") != null)
                         r.setFechaPublicacion(rs.getDate("fecha_de_publicacion").toLocalDate());
                     r.getCliente().setId(rs.getInt("id_usuario"));
-                    r.getProducto().setIdProducto(rs.getInt("id_producto"));
+                    r.getProducto().setId(rs.getInt("id_producto"));
                     return r;
                 }
             }
@@ -71,7 +71,7 @@ public class ResenaDAOImpl implements ResenaDAO {
                 if (rs.getDate("fecha_de_publicacion") != null)
                     r.setFechaPublicacion(rs.getDate("fecha_de_publicacion").toLocalDate());
                 r.getCliente().setId(rs.getInt("id_usuario"));
-                r.getProducto().setIdProducto(rs.getInt("id_producto"));
+                r.getProducto().setId(rs.getInt("id_producto"));
                 lista.add(r);
             }
         }

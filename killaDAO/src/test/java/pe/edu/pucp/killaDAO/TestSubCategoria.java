@@ -28,7 +28,7 @@ public class TestSubCategoria {
             // 1) SAVE Subcategoria
             Subcategoria nueva = new Subcategoria();
             nueva.setNombre("Subcategoria Test");
-            subcategoriaCreada = subCategoriaDAO.save(nueva, idCategoria);
+            subcategoriaCreada = subCategoriaDAO.save(nueva);
             System.out.println("SUBCATEGORIA SAVE OK -> id: " + subcategoriaCreada.getId());
 
             // 2) LOAD
@@ -38,7 +38,7 @@ public class TestSubCategoria {
             // 3) UPDATE
             if (cargada != null) {
                 cargada.setNombre("Subcategoria Test Updated");
-                subCategoriaDAO.update(cargada, idCategoria);
+                subCategoriaDAO.update(cargada);
 
                 Subcategoria actualizada = subCategoriaDAO.load(cargada.getId());
                 System.out.println("UPDATE OK -> " + (actualizada != null ? actualizada.getNombre() : "null"));

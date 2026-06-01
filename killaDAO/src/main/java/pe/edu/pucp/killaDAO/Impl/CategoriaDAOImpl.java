@@ -13,17 +13,18 @@ public class CategoriaDAOImpl implements CategoriaDAO {
     @Override
     public List<Categoria> listAll() throws SQLException {
         List<Categoria> categorias = new ArrayList<>();
-        String sql = "SELECT id_categoria, descripcion FROM Categoria";
+        String sql = "SELECT id_categoria, nombre, activo FROM Categoria";
 
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+        try (Connection cn = DBManager.getInstance().getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Categoria categoria = new Categoria();
-                categoria.setId(rs.getInt("id_categoria"));
-                categoria.setNombre(rs.getString("descripcion"));
-                categorias.add(categoria);
+                Categoria c = new Categoria();
+                c.setId(rs.getInt("id_categoria"));
+                c.setNombre(rs.getString("nombre"));
+                c.setActivo(rs.getBoolean("activo"));
+                categorias.add(c);
             }
         }
         return categorias;
@@ -31,19 +32,17 @@ public class CategoriaDAOImpl implements CategoriaDAO {
 
     @Override
     public Categoria load(Integer id) throws SQLException {
-        String sql = "SELECT id_categoria, descripcion FROM Categoria WHERE id_categoria = ?";
-
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql)) {
-
-            pstmt.setInt(1, id);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
+        String sql = "SELECT id_categoria, nombre, activo FROM Categoria WHERE id_categoria = ?";
+        try (Connection cn = DBManager.getInstance().getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    Categoria categoria = new Categoria();
-                    categoria.setId(rs.getInt("id_categoria"));
-                    categoria.setNombre(rs.getString("descripcion"));
-                    return categoria;
+                    Categoria c = new Categoria();
+                    c.setId(rs.getInt("id_categoria"));
+                    c.setNombre(rs.getString("nombre"));
+                    c.setActivo(rs.getBoolean("activo"));
+                    return c;
                 }
             }
         }
@@ -51,51 +50,42 @@ public class CategoriaDAOImpl implements CategoriaDAO {
     }
 
     @Override
-    public Categoria save(Categoria categoria) throws SQLException {
-        String sql = "INSERT INTO Categoria (descripcion) VALUES (?)";
-
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            pstmt.setString(1, categoria.getNombre());
-
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                try (ResultSet keys = pstmt.getGeneratedKeys()) {
-                    if (keys.next()) {
-                        categoria.setId(keys.getInt(1));
-                    }
-                }
+    public Categoria save(Categoria c) throws SQLException {
+        String sql = "INSERT INTO Categoria (nombre, activo) VALUES (?, ?)";
+        try (Connection cn = DBManager.getInstance().getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, c.getNombre());
+            ps.setBoolean(2, c.getActivo());
+            ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) c.setId(keys.getInt(1));
             }
         }
-        return categoria;
+        return c;
     }
 
     @Override
-    public Categoria update(Categoria categoria) throws SQLException {
-        String sql = "UPDATE Categoria SET descripcion = ? WHERE id_categoria = ?";
-
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql)) {
-
-            pstmt.setString(1, categoria.getNombre());
-            pstmt.setInt(2, categoria.getId());
-
-            pstmt.executeUpdate();
+    public Categoria update(Categoria c) throws SQLException {
+        String sql = "UPDATE Categoria SET nombre = ?, activo = ? WHERE id_categoria = ?";
+        try (Connection cn = DBManager.getInstance().getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, c.getNombre());
+            ps.setBoolean(2, c.getActivo());
+            ps.setInt(3, c.getId());
+            ps.executeUpdate();
         }
-        return categoria;
+        return c;
     }
 
     @Override
-    public void remove(Categoria categoria) throws SQLException {
-        // En tu tabla no hay campo activo -> eliminación física
-        String sql = "DELETE FROM Categoria WHERE id_categoria = ?";
-
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql)) {
-
-            pstmt.setInt(1, categoria.getId());
-            pstmt.executeUpdate();
+    public void remove(Categoria c) throws SQLException {
+        c.setActivo(false);
+        String sql = "UPDATE Categoria SET activo = ? WHERE id_categoria = ?";
+        try (Connection cn = DBManager.getInstance().getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setBoolean(1, c.getActivo());
+            ps.setInt(2, c.getId());
+            ps.executeUpdate();
         }
     }
 }

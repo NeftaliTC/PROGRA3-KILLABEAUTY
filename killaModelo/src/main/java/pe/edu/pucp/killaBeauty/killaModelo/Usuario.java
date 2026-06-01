@@ -7,36 +7,37 @@ import java.util.ArrayList;
 public class Usuario {
     private int id;
     private String nombre;
-    private String correoElectronico;
-    private String apellidoMaterno;
     private String apellidoPaterno;
-    private Date fechaDeInscripcion;
+    private String apellidoMaterno;
+    private String correoElectronico;
     private Date fechaNacimiento;
-    private String contrasena; //-> estado
+    private Date fechaDeInscripcion;
+    private String contrasena; //-> activo
     private String telefono;
-    private Boolean estado; // 1=activo - 0=inactivo
-    private List<Direccion> direcciones;
-    private List<Pedido> pedidos;
-    private Carrito carritoActivo;
-    private TipoUsuario tipoUsuario;
+    private Boolean activo; // 1=activo - 0=inactivo
     private int dni;
+    private TipoUsuario tipoUsuario;
 
 
     //Constructores
     public Usuario() {
-        this.pedidos = new ArrayList<>();
-        this.direcciones = new ArrayList<>();
     }
 
-    //Metodos
-    public void registrarse() {}
-    public void iniciarSesion(String correoElectronico, String contrasena) {}
-    public void realizarPedido() {}
-    public void actualizarDatos() {}
-    public void agregarDireccion(Direccion direccionNueva) {}
-    public void agregarPedido(Pedido pedidoNuevo) {}
-    
-    //Getters y setters
+    public Usuario(int id, String nombre, String apellidoPaterno, String apellidoMaterno, String correoElectronico, Date fechaNacimiento, Date fechaDeInscripcion, String contrasena, String telefono, Boolean activo, int dni, TipoUsuario tipoUsuario) {
+        this.id = id;
+        this.nombre = nombre;
+        this.apellidoPaterno = apellidoPaterno;
+        this.apellidoMaterno = apellidoMaterno;
+        this.correoElectronico = correoElectronico;
+        this.fechaNacimiento = fechaNacimiento;
+        this.fechaDeInscripcion = fechaDeInscripcion;
+        this.contrasena = contrasena;
+        this.telefono = telefono;
+        this.activo = activo;
+        this.dni = dni;
+        this.tipoUsuario = tipoUsuario;
+    }
+
     public int getId() {
         return id;
     }
@@ -53,6 +54,22 @@ public class Usuario {
         this.nombre = nombre;
     }
 
+    public String getApellidoPaterno() {
+        return apellidoPaterno;
+    }
+
+    public void setApellidoPaterno(String apellidoPaterno) {
+        this.apellidoPaterno = apellidoPaterno;
+    }
+
+    public String getApellidoMaterno() {
+        return apellidoMaterno;
+    }
+
+    public void setApellidoMaterno(String apellidoMaterno) {
+        this.apellidoMaterno = apellidoMaterno;
+    }
+
     public String getCorreoElectronico() {
         return correoElectronico;
     }
@@ -61,20 +78,20 @@ public class Usuario {
         this.correoElectronico = correoElectronico;
     }
 
-    public Date getFechaDeInscripcion() {
-        return fechaDeInscripcion;
-    }
-
-    public void setFechaDeInscripcion(Date fechaDeInscripcion) {
-        this.fechaDeInscripcion = fechaDeInscripcion;
-    }
-
     public Date getFechaNacimiento() {
         return fechaNacimiento;
     }
 
     public void setFechaNacimiento(Date fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
+    }
+
+    public Date getFechaDeInscripcion() {
+        return fechaDeInscripcion;
+    }
+
+    public void setFechaDeInscripcion(Date fechaDeInscripcion) {
+        this.fechaDeInscripcion = fechaDeInscripcion;
     }
 
     public String getContrasena() {
@@ -93,60 +110,12 @@ public class Usuario {
         this.telefono = telefono;
     }
 
-    public Boolean getEstado() {
-        return estado;
+    public Boolean getActivo() {
+        return activo;
     }
 
-    public void setEstado(Boolean estado) {
-        this.estado = estado;
-    }
-
-    public List<Direccion> getDirecciones() {
-        return direcciones;
-    }
-
-    public void setDirecciones(List<Direccion> direcciones) {
-        this.direcciones = direcciones;
-    }
-
-    public List<Pedido> getPedidos() {
-        return pedidos;
-    }
-
-    public void setPedidos(List<Pedido> pedidos) {
-        this.pedidos = pedidos;
-    }
-
-    public Carrito getCarritoActivo() {
-        return carritoActivo;
-    }
-
-    public void setCarritoActivo(Carrito carritoActivo) {
-        this.carritoActivo = carritoActivo;
-    }
-
-    public String getApellidoMaterno() {
-        return apellidoMaterno;
-    }
-
-    public void setApellidoMaterno(String apellidoMaterno) {
-        this.apellidoMaterno = apellidoMaterno;
-    }
-
-    public String getApellidoPaterno() {
-        return apellidoPaterno;
-    }
-
-    public void setApellidoPaterno(String apellidoPaterno) {
-        this.apellidoPaterno = apellidoPaterno;
-    }
-
-    public TipoUsuario getTipoUsuario() {
-        return tipoUsuario;
-    }
-
-    public void setTipoUsuario(TipoUsuario tipoUsuario) {
-        this.tipoUsuario = tipoUsuario;
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 
     public int getDni() {
@@ -155,5 +124,13 @@ public class Usuario {
 
     public void setDni(int dni) {
         this.dni = dni;
+    }
+
+    public TipoUsuario getTipoUsuario() {
+        return tipoUsuario;
+    }
+
+    public void setTipoUsuario(TipoUsuario tipoUsuario) {
+        this.tipoUsuario = tipoUsuario;
     }
 }

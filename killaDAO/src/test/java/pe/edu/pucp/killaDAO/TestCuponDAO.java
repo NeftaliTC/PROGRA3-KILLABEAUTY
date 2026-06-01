@@ -15,7 +15,7 @@ public class TestCuponDAO {
             Cupon nuevo = new Cupon();
             nuevo.setCodigo("KILLATEST2026");
             nuevo.setDescripcion("Descuento de prueba");
-            nuevo.setMontoMaximo(50.0);
+            nuevo.setMontoMaximoDescuento(50.0);
             nuevo.setPorcentajeDeDescuento(20.0);
             nuevo.setFechaInicio(LocalDate.now());
             nuevo.setFechaFin(LocalDate.now().plusDays(7));

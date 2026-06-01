@@ -1,5 +1,6 @@
 package pe.edu.pucp.killaDAO;
 
+import pe.edu.pucp.killaBeauty.killaModelo.Pais;
 import pe.edu.pucp.killaDAO.Impl.MarcaDAOImpl;
 import pe.edu.pucp.killaBeauty.killaModelo.Marca;
 
@@ -14,7 +15,7 @@ public class TestMarcaDAO {
             // 1) SAVE
             Marca nueva = new Marca();
             nueva.setDescripcion("Marca Test");
-            nueva.setPaisDeOrigen("Peru");
+            nueva.setPais(Pais.CHILE);
             Marca guardada = marcaDAO.save(nueva);
             System.out.println("SAVE OK -> id: " + guardada.getId());
 
@@ -34,7 +35,7 @@ public class TestMarcaDAO {
             List<Marca> marcas = marcaDAO.listAll();
             System.out.println("LIST ALL -> total: " + marcas.size());
             for (Marca m : marcas) {
-                System.out.println(" - " + m.getId() + " | " + m.getDescripcion() + " | " + m.getPaisDeOrigen());
+                System.out.println(" - " + m.getId() + " | " + m.getDescripcion() + " | " + m.getPais());
             }
 
             // 5) REMOVE

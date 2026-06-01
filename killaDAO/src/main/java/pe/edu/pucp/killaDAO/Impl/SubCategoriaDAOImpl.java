@@ -13,7 +13,7 @@ public class SubCategoriaDAOImpl implements SubCategoriaDAO {
     @Override
     public List<Subcategoria> listAll() throws SQLException {
         List<Subcategoria> lista = new ArrayList<>();
-        String sql = "SELECT id_subcategoria, descripcion FROM Subcategoria";
+        String sql = "SELECT id_subcategoria, nombre, activo, id_categoria FROM Subcategoria";
 
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql);
@@ -22,7 +22,9 @@ public class SubCategoriaDAOImpl implements SubCategoriaDAO {
             while (rs.next()) {
                 Subcategoria s = new Subcategoria();
                 s.setId(rs.getInt("id_subcategoria"));
-                s.setNombre(rs.getString("descripcion"));
+                s.setNombre(rs.getString("nombre"));
+                s.setActivo(rs.getBoolean("activo"));
+                s.getCategoria().setId(rs.getInt("id_categoria"));
                 lista.add(s);
             }
         }
@@ -32,18 +34,18 @@ public class SubCategoriaDAOImpl implements SubCategoriaDAO {
     @Override
     public List<Subcategoria> listByCategoriaId(Integer idCategoria) throws SQLException {
         List<Subcategoria> lista = new ArrayList<>();
-        String sql = "SELECT id_subcategoria, descripcion FROM Subcategoria WHERE id_categoria = ?";
+        String sql = "SELECT id_subcategoria, nombre, activo FROM Subcategoria WHERE id_categoria = ?";
 
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
-
             ps.setInt(1, idCategoria);
-
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Subcategoria s = new Subcategoria();
                     s.setId(rs.getInt("id_subcategoria"));
-                    s.setNombre(rs.getString("descripcion"));
+                    s.setNombre(rs.getString("nombre"));
+                    s.setActivo(rs.getBoolean("activo"));
+                    s.getCategoria().setId(idCategoria);
                     lista.add(s);
                 }
             }
@@ -53,18 +55,18 @@ public class SubCategoriaDAOImpl implements SubCategoriaDAO {
 
     @Override
     public Subcategoria load(Integer id) throws SQLException {
-        String sql = "SELECT id_subcategoria, descripcion FROM Subcategoria WHERE id_subcategoria = ?";
+        String sql = "SELECT id_subcategoria, nombre, activo, id_categoria FROM Subcategoria WHERE id_subcategoria = ?";
 
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
-
             ps.setInt(1, id);
-
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     Subcategoria s = new Subcategoria();
                     s.setId(rs.getInt("id_subcategoria"));
-                    s.setNombre(rs.getString("descripcion"));
+                    s.setNombre(rs.getString("nombre"));
+                    s.setActivo(rs.getBoolean("activo"));
+                    s.getCategoria().setId(rs.getInt("id_categoria"));
                     return s;
                 }
             }
@@ -72,63 +74,45 @@ public class SubCategoriaDAOImpl implements SubCategoriaDAO {
         return null;
     }
 
-    // BaseDAO exige este metodo, pero falta idCategoria
     @Override
-    public Subcategoria save(Subcategoria t) throws SQLException {
-        throw new UnsupportedOperationException("Use save(Subcategoria, Integer idCategoria)");
-    }
-
-    @Override
-    public Subcategoria save(Subcategoria subcategoria, Integer idCategoria) throws SQLException {
-        String sql = "INSERT INTO Subcategoria (descripcion, id_categoria) VALUES (?, ?)";
+    public Subcategoria save(Subcategoria s) throws SQLException {
+        String sql = "INSERT INTO Subcategoria (nombre, activo, id_categoria) VALUES (?, ?, ?)";
 
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            ps.setString(1, subcategoria.getNombre());
-            ps.setInt(2, idCategoria);
-
-            int affected = ps.executeUpdate();
-            if (affected > 0) {
-                try (ResultSet keys = ps.getGeneratedKeys()) {
-                    if (keys.next()) {
-                        subcategoria.setId(keys.getInt(1));
-                    }
-                }
+            ps.setString(1, s.getNombre());
+            ps.setBoolean(2, s.getActivo());
+            ps.setInt(3, s.getCategoria().getId());
+            ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) s.setId(keys.getInt(1));
             }
         }
-        return subcategoria;
+        return s;
     }
 
     @Override
-    public Subcategoria update(Subcategoria t) throws SQLException {
-        throw new UnsupportedOperationException("Use update(Subcategoria, Integer idCategoria)");
-    }
-
-    @Override
-    public Subcategoria update(Subcategoria subcategoria, Integer idCategoria) throws SQLException {
-        String sql = "UPDATE Subcategoria SET descripcion = ?, id_categoria = ? WHERE id_subcategoria = ?";
-
+    public Subcategoria update(Subcategoria s) throws SQLException {
+        String sql = "UPDATE Subcategoria SET nombre = ?, activo = ?, id_categoria = ? WHERE id_subcategoria = ?";
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
-
-            ps.setString(1, subcategoria.getNombre());
-            ps.setInt(2, idCategoria);
-            ps.setInt(3, subcategoria.getId());
-
+            ps.setString(1, s.getNombre());
+            ps.setBoolean(2, s.getActivo());
+            ps.setInt(3, s.getCategoria().getId());
+            ps.setInt(4, s.getId());
             ps.executeUpdate();
         }
-        return subcategoria;
+        return s;
     }
 
     @Override
-    public void remove(Subcategoria subcategoria) throws SQLException {
-        String sql = "DELETE FROM Subcategoria WHERE id_subcategoria = ?";
-
+    public void remove(Subcategoria s) throws SQLException {
+        s.setActivo(false);
+        String sql = "UPDATE Subcategoria SET activo = ? WHERE id_subcategoria = ?";
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
-
-            ps.setInt(1, subcategoria.getId());
+            ps.setBoolean(1, s.getActivo());
+            ps.setInt(2, s.getId());
             ps.executeUpdate();
         }
     }

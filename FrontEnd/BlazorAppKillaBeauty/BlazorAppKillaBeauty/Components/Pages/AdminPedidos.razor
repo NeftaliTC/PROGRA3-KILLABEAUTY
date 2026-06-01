@@ -1,0 +1,353 @@
+@page "/admin/pedidos"
+@rendermode InteractiveServer
+
+<PageTitle>Pedidos Admin - Killa Beauty</PageTitle>
+
+<main class="admin-page">
+    <AdminNavbar />
+
+    <section class="admin-content admin-orders-content">
+
+        <div class="admin-breadcrumb">
+            <span>Administrador</span>
+            <i class="bi bi-chevron-right"></i>
+            <span>Pedidos</span>
+        </div>
+
+        <header class="admin-header admin-orders-header">
+            <div>
+                <h1>Pedidos</h1>
+                <p>Consulta y filtra las compras registradas en la tienda.</p>
+            </div>
+        </header>
+
+        <section class="admin-orders-filters">
+            <div class="admin-orders-search">
+                <i class="bi bi-search"></i>
+                <input type="text"
+                       placeholder="Buscar por pedido, cliente o correo"
+                       @bind="busqueda"
+                       @bind:event="oninput" />
+            </div>
+
+            <div class="admin-orders-filter-row">
+                <div class="admin-date-group">
+                    <span>Fecha inicial</span>
+                    <div class="admin-date-selects">
+                        <select @bind="anioInicio">
+                            <option value="0">Ano</option>
+                            @foreach (var anio in anios)
+                            {
+                                <option value="@anio">@anio</option>
+                            }
+                        </select>
+
+                        <select @bind="mesInicio">
+                            <option value="0">Mes</option>
+                            @foreach (var mes in meses)
+                            {
+                                <option value="@mes.Valor">@mes.Texto</option>
+                            }
+                        </select>
+
+                        <select @bind="diaInicio">
+                            <option value="0">Dia</option>
+                            @foreach (var dia in dias)
+                            {
+                                <option value="@dia">@dia</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="admin-date-group">
+                    <span>Fecha final</span>
+                    <div class="admin-date-selects">
+                        <select @bind="anioFin">
+                            <option value="0">Ano</option>
+                            @foreach (var anio in anios)
+                            {
+                                <option value="@anio">@anio</option>
+                            }
+                        </select>
+
+                        <select @bind="mesFin">
+                            <option value="0">Mes</option>
+                            @foreach (var mes in meses)
+                            {
+                                <option value="@mes.Valor">@mes.Texto</option>
+                            }
+                        </select>
+
+                        <select @bind="diaFin">
+                            <option value="0">Dia</option>
+                            @foreach (var dia in dias)
+                            {
+                                <option value="@dia">@dia</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="admin-status-filter">
+                    <span>Estado de envio</span>
+                    <select @bind="estadoSeleccionado">
+                        <option value="Cualquier estado">Cualquier estado</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="En proceso">En proceso</option>
+                        <option value="Listo para recoger">Listo para recoger</option>
+                        <option value="Enviado">Enviado</option>
+                        <option value="Entregado">Entregado</option>
+                        <option value="Cancelado">Cancelado</option>
+                    </select>
+                </div>
+
+                <button type="button"
+                        class="admin-clear-filters"
+                        @onclick="LimpiarFiltros">
+                    <i class="bi bi-x-circle"></i>
+                    Limpiar filtros
+                </button>
+            </div>
+        </section>
+
+        <section class="admin-table-card admin-orders-table-card">
+            <table class="admin-table admin-orders-table">
+                <thead>
+                    <tr>
+                        <th>Pedido</th>
+                        <th>Cliente</th>
+                        <th>Correo</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Detalle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (PedidosPaginados.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="7">
+                                <div class="admin-empty-orders">
+                                    <i class="bi bi-inbox"></i>
+                                    <span>No se encontraron pedidos con esos filtros.</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var pedido in PedidosPaginados)
+                        {
+                            <tr>
+                                <td>@pedido.Id</td>
+                                <td>@pedido.Cliente</td>
+                                <td>@pedido.Correo</td>
+                                <td>@pedido.Fecha.ToString("dd/MM/yyyy")</td>
+                                <td>S/ @pedido.Total.ToString("F2")</td>
+                                <td>
+                                    <span class="admin-status @pedido.ClaseEstado">
+                                        @pedido.EstadoEnvio
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="/admin/pedidos/detalle/@pedido.Id"
+                                       class="admin-detail-button">
+                                        <i class="bi bi-eye"></i>
+                                        Ver
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </section>
+
+        <footer class="admin-pagination">
+            <span>
+                Pagina @paginaActual de @TotalPaginas
+            </span>
+
+            <div class="admin-pagination-buttons">
+                <button type="button"
+                        disabled="@(paginaActual == 1)"
+                        @onclick="PaginaAnterior">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+
+                @for (var pagina = 1; pagina <= TotalPaginas; pagina++)
+                {
+                    var numeroPagina = pagina;
+
+                    <button type="button"
+                            class="@(paginaActual == numeroPagina ? "active" : "")"
+                            @onclick="() => CambiarPagina(numeroPagina)">
+                        @numeroPagina
+                    </button>
+                }
+
+                <button type="button"
+                        disabled="@(paginaActual == TotalPaginas)"
+                        @onclick="PaginaSiguiente">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </footer>
+
+    </section>
+</main>
+
+@code {
+    private string busqueda = "";
+    private string estadoSeleccionado = "Cualquier estado";
+
+    private int anioInicio;
+    private int mesInicio;
+    private int diaInicio;
+    private int anioFin;
+    private int mesFin;
+    private int diaFin;
+
+    private int paginaActual = 1;
+    private const int PedidosPorPagina = 5;
+
+    private List<int> anios = new() { 2026, 2025, 2024 };
+
+    private List<MesFiltro> meses = new()
+    {
+        new MesFiltro(1, "Enero"),
+        new MesFiltro(2, "Febrero"),
+        new MesFiltro(3, "Marzo"),
+        new MesFiltro(4, "Abril"),
+        new MesFiltro(5, "Mayo"),
+        new MesFiltro(6, "Junio"),
+        new MesFiltro(7, "Julio"),
+        new MesFiltro(8, "Agosto"),
+        new MesFiltro(9, "Septiembre"),
+        new MesFiltro(10, "Octubre"),
+        new MesFiltro(11, "Noviembre"),
+        new MesFiltro(12, "Diciembre")
+    };
+
+    private List<int> dias = Enumerable.Range(1, 31).ToList();
+
+    private List<PedidoAdmin> pedidos = new()
+    {
+        new PedidoAdmin("KIL-202610081", "Cliente", "cliente@correo.com", new DateTime(2026, 5, 30), 159.80m, "En proceso", "warning"),
+        new PedidoAdmin("KIL-202605002", "Maria Lopez", "maria.lopez@correo.com", new DateTime(2026, 5, 25), 178.20m, "Entregado", "active"),
+        new PedidoAdmin("KIL-202604115", "Ana Torres", "ana.torres@correo.com", new DateTime(2026, 5, 10), 120.00m, "Listo para recoger", "info"),
+        new PedidoAdmin("KIL-202604086", "Luis Perez", "luis.perez@correo.com", new DateTime(2026, 4, 28), 89.90m, "Enviado", "info"),
+        new PedidoAdmin("KIL-202604033", "Camila Rios", "camila.rios@correo.com", new DateTime(2026, 4, 18), 245.70m, "Pendiente", "warning"),
+        new PedidoAdmin("KIL-202603021", "Sofia Castro", "sofia.castro@correo.com", new DateTime(2026, 3, 9), 52.90m, "Cancelado", "danger"),
+        new PedidoAdmin("KIL-202602014", "Valeria Diaz", "valeria.diaz@correo.com", new DateTime(2026, 2, 14), 302.40m, "Entregado", "active")
+    };
+
+    private List<PedidoAdmin> PedidosFiltrados =>
+        pedidos
+            .Where(CoincideBusqueda)
+            .Where(CoincideEstado)
+            .Where(CoincideFechaInicio)
+            .Where(CoincideFechaFin)
+            .OrderByDescending(p => p.Fecha)
+            .ToList();
+
+    private List<PedidoAdmin> PedidosPaginados =>
+        PedidosFiltrados
+            .Skip((paginaActual - 1) * PedidosPorPagina)
+            .Take(PedidosPorPagina)
+            .ToList();
+
+    private int TotalPaginas =>
+        Math.Max(1, (int)Math.Ceiling(PedidosFiltrados.Count / (double)PedidosPorPagina));
+
+    private bool CoincideBusqueda(PedidoAdmin pedido)
+    {
+        if (string.IsNullOrWhiteSpace(busqueda))
+        {
+            return true;
+        }
+
+        return pedido.Id.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
+               pedido.Cliente.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
+               pedido.Correo.Contains(busqueda, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool CoincideEstado(PedidoAdmin pedido)
+    {
+        return estadoSeleccionado == "Cualquier estado" ||
+               pedido.EstadoEnvio == estadoSeleccionado;
+    }
+
+    private bool CoincideFechaInicio(PedidoAdmin pedido)
+    {
+        var fechaInicio = CrearFecha(anioInicio, mesInicio, diaInicio);
+
+        return fechaInicio is null || pedido.Fecha.Date >= fechaInicio.Value.Date;
+    }
+
+    private bool CoincideFechaFin(PedidoAdmin pedido)
+    {
+        var fechaFin = CrearFecha(anioFin, mesFin, diaFin);
+
+        return fechaFin is null || pedido.Fecha.Date <= fechaFin.Value.Date;
+    }
+
+    private static DateTime? CrearFecha(int anio, int mes, int dia)
+    {
+        if (anio == 0 || mes == 0 || dia == 0)
+        {
+            return null;
+        }
+
+        var ultimoDia = DateTime.DaysInMonth(anio, mes);
+
+        return new DateTime(anio, mes, Math.Min(dia, ultimoDia));
+    }
+
+    private void LimpiarFiltros()
+    {
+        busqueda = "";
+        estadoSeleccionado = "Cualquier estado";
+        anioInicio = 0;
+        mesInicio = 0;
+        diaInicio = 0;
+        anioFin = 0;
+        mesFin = 0;
+        diaFin = 0;
+        paginaActual = 1;
+    }
+
+    private void CambiarPagina(int pagina)
+    {
+        paginaActual = pagina;
+    }
+
+    private void PaginaAnterior()
+    {
+        if (paginaActual > 1)
+        {
+            paginaActual--;
+        }
+    }
+
+    private void PaginaSiguiente()
+    {
+        if (paginaActual < TotalPaginas)
+        {
+            paginaActual++;
+        }
+    }
+
+    private record MesFiltro(int Valor, string Texto);
+
+    private record PedidoAdmin(
+        string Id,
+        string Cliente,
+        string Correo,
+        DateTime Fecha,
+        decimal Total,
+        string EstadoEnvio,
+        string ClaseEstado);
+}
