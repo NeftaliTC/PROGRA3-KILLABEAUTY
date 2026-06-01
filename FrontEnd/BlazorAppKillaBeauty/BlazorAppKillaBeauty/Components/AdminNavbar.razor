@@ -1,0 +1,34 @@
+<nav class="admin-navbar">
+    <NavLink href="/admin/productos"
+             class="admin-brand"
+             Match="NavLinkMatch.Prefix">
+        <img src="Images/Logo.png" alt="Killa Beauty" />
+        <span>Admin</span>
+    </NavLink>
+
+    <div class="admin-nav-links">
+        @foreach (var item in menu)
+        {
+            <NavLink href="@item.Url"
+                     class="admin-nav-button"
+                     Match="NavLinkMatch.All">
+                <i class="@item.Icono"></i>
+                <span>@item.Texto</span>
+            </NavLink>
+        }
+    </div>
+</nav>
+
+@code {
+    private List<MenuAdmin> menu = new()
+    {
+        new MenuAdmin("Productos", "/admin/productos", "bi bi-box-seam"),
+        new MenuAdmin("Categorias", "/admin/categorias", "bi bi-grid"),
+        new MenuAdmin("Marcas", "/admin/marcas", "bi bi-award"),
+        new MenuAdmin("Cupones", "/admin/cupones", "bi bi-ticket-perforated"),
+        new MenuAdmin("Pedidos", "/admin/pedidos", "bi bi-receipt"),
+        new MenuAdmin("Reportes", "/admin/reportes", "bi bi-bar-chart")
+    };
+
+    private record MenuAdmin(string Texto, string Url, string Icono);
+}
