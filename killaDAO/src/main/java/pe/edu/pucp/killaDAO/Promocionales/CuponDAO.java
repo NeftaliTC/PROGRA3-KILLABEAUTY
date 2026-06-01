@@ -1,6 +1,6 @@
-package pe.edu.pucp.killaDAO;
+package pe.edu.pucp.killaDAO.Promocionales;
 
-import pe.edu.pucp.killaBeauty.killaModelo.Cupon;
+import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Cupon;
 import pe.edu.pucp.killaDAO.Base.BaseDAO;
 
 import java.sql.SQLException;
