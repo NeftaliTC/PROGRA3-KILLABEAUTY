@@ -67,7 +67,7 @@ public class TestDetallePedidoDAO {
             // Direccion
             try (PreparedStatement ps = cn.prepareStatement("""
                     INSERT INTO Direccion
-                    (Departamento, Provincia, Distrito, Direccion_exacta, Referencia, id_usuario)
+                    (departamento, provincia, distrito, direccion_detalle, referencia, id_usuario)
                     VALUES (?, ?, ?, ?, ?, ?)
                     """, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, "Lima");
@@ -142,7 +142,7 @@ public class TestDetallePedidoDAO {
 
             // Save detalle
             Producto productoRef = new Producto();
-            productoRef.setIdProducto(idProducto);
+            productoRef.setId(idProducto);
 
             DetallePedido nuevo = new DetallePedido();
             nuevo.setCantidad(2);
