@@ -11,6 +11,7 @@ public class Usuario {
     private String apellidoMaterno;
     private String correoElectronico;
     private Date fechaNacimiento;
+    private String genero;
     private Date fechaDeInscripcion;
     private String contrasena; //-> activo
     private String telefono;
@@ -84,6 +85,14 @@ public class Usuario {
 
     public void setFechaNacimiento(Date fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
+    }
+
+    public String getGenero() {
+        return genero;
+    }
+
+    public void setGenero(String genero) {
+        this.genero = genero;
     }
 
     public Date getFechaDeInscripcion() {
