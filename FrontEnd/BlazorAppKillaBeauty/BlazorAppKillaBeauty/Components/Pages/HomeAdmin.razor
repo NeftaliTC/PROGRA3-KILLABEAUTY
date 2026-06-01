@@ -1,0 +1,320 @@
+@page "/admin"
+@page "/admin/{Seccion}"
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+
+<PageTitle>Panel Administrador - Killa Beauty</PageTitle>
+
+<main class="admin-page">
+
+    <nav class="admin-navbar">
+        <NavLink href="/admin/productos"
+                 class="admin-brand"
+                 Match="NavLinkMatch.Prefix">
+            <img src="Images/Logo.png" alt="Killa Beauty" />
+            <span>Admin</span>
+        </NavLink>
+
+        <div class="admin-nav-links">
+            @foreach (var item in menu)
+            {
+                <NavLink href="@item.Url"
+                         class="admin-nav-button"
+                         Match="@GetNavMatch(item.Key)">
+                    <i class="@item.Icono"></i>
+                    <span>@item.Texto</span>
+                </NavLink>
+            }
+        </div>
+    </nav>
+
+    <section class="admin-content">
+        <header class="admin-header">
+            <div>
+                <span class="admin-eyebrow">Panel administrativo</span>
+                <h1>@TituloActual</h1>
+                <p>@DescripcionActual</p>
+            </div>
+
+            <button type="button" class="admin-primary-action">
+                <i class="bi bi-plus-lg"></i>
+                @TextoBotonActual
+            </button>
+        </header>
+
+        @switch (SeccionActual)
+        {
+            case "categorias":
+                <section class="admin-grid-list">
+                    @foreach (var categoria in categorias)
+                    {
+                        <article class="admin-item-card">
+                            <div class="admin-item-icon">
+                                <i class="@categoria.Icono"></i>
+                            </div>
+                            <div>
+                                <h2>@categoria.Nombre</h2>
+                                <p>@categoria.Descripcion</p>
+                                <span>@categoria.Productos producto(s)</span>
+                            </div>
+                        </article>
+                    }
+                </section>
+                break;
+
+            case "marcas":
+                <section class="admin-table-card">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Marca</th>
+                                <th>Origen</th>
+                                <th>Productos</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var marca in marcas)
+                            {
+                                <tr>
+                                    <td>@marca.Nombre</td>
+                                    <td>@marca.Origen</td>
+                                    <td>@marca.Productos</td>
+                                    <td><span class="admin-status active">Activa</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </section>
+                break;
+
+            case "cupones":
+                <section class="admin-grid-list">
+                    @foreach (var cupon in cupones)
+                    {
+                        <article class="admin-coupon-card">
+                            <span>@cupon.Codigo</span>
+                            <h2>@cupon.Nombre</h2>
+                            <p>@cupon.Condicion</p>
+                            <div>
+                                <i class="bi bi-calendar-event"></i>
+                                @cupon.Vigencia
+                            </div>
+                        </article>
+                    }
+                </section>
+                break;
+
+            case "pedidos":
+                <section class="admin-table-card">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Pedido</th>
+                                <th>Cliente</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var pedido in pedidos)
+                            {
+                                <tr>
+                                    <td>@pedido.Id</td>
+                                    <td>@pedido.Cliente</td>
+                                    <td>S/ @pedido.Total.ToString("F2")</td>
+                                    <td><span class="admin-status @pedido.ClaseEstado">@pedido.Estado</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </section>
+                break;
+
+            case "reportes":
+                <section class="admin-report-grid">
+                    @foreach (var reporte in reportes)
+                    {
+                        <article class="admin-report-card">
+                            <i class="@reporte.Icono"></i>
+                            <span>@reporte.Etiqueta</span>
+                            <strong>@reporte.Valor</strong>
+                            <p>@reporte.Detalle</p>
+                        </article>
+                    }
+                </section>
+                break;
+
+            default:
+                <section class="admin-table-card">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Categoria</th>
+                                <th>Stock</th>
+                                <th>Precio</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var producto in productos)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="admin-product-cell">
+                                            <img src="@producto.Imagen" alt="@producto.Nombre" />
+                                            <span>@producto.Nombre</span>
+                                        </div>
+                                    </td>
+                                    <td>@producto.Categoria</td>
+                                    <td>@producto.Stock</td>
+                                    <td>S/ @producto.Precio.ToString("F2")</td>
+                                    <td>
+                                        <span class="admin-status @(producto.Stock > 10 ? "active" : "warning")">
+                                            @(producto.Stock > 10 ? "Disponible" : "Stock bajo")
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </section>
+                break;
+        }
+    </section>
+
+</main>
+
+@code {
+    [Parameter]
+    public string? Seccion { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (string.IsNullOrWhiteSpace(Seccion))
+        {
+            Navigation.NavigateTo("/admin/productos", replace: true);
+        }
+    }
+
+    private string SeccionActual =>
+        NormalizarSeccion(Seccion);
+
+    private string TituloActual => SeccionActual switch
+    {
+        "categorias" => "Categorias",
+        "marcas" => "Marcas",
+        "cupones" => "Cupones",
+        "pedidos" => "Pedidos",
+        "reportes" => "Reportes",
+        _ => "Productos"
+    };
+
+    private string DescripcionActual => SeccionActual switch
+    {
+        "categorias" => "Administra las familias principales del catalogo.",
+        "marcas" => "Revisa las marcas disponibles en la tienda.",
+        "cupones" => "Controla promociones, descuentos y vigencias.",
+        "pedidos" => "Da seguimiento a las compras de tus clientes.",
+        "reportes" => "Consulta indicadores clave del e-commerce.",
+        _ => "Gestiona stock, precios y estado de los productos."
+    };
+
+    private string TextoBotonActual => SeccionActual switch
+    {
+        "categorias" => "Nueva categoria",
+        "marcas" => "Nueva marca",
+        "cupones" => "Nuevo cupon",
+        "pedidos" => "Exportar pedidos",
+        "reportes" => "Descargar reporte",
+        _ => "Nuevo producto"
+    };
+
+    private List<MenuAdmin> menu = new()
+    {
+        new MenuAdmin("productos", "Productos", "/admin/productos", "bi bi-box-seam"),
+        new MenuAdmin("categorias", "Categorias", "/admin/categorias", "bi bi-grid"),
+        new MenuAdmin("marcas", "Marcas", "/admin/marcas", "bi bi-award"),
+        new MenuAdmin("cupones", "Cupones", "/admin/cupones", "bi bi-ticket-perforated"),
+        new MenuAdmin("pedidos", "Pedidos", "/admin/pedidos", "bi bi-receipt"),
+        new MenuAdmin("reportes", "Reportes", "/admin/reportes", "bi bi-bar-chart")
+    };
+
+    private List<ProductoAdmin> productos = new()
+    {
+        new ProductoAdmin("Serum Vitamina C Gold Kiwi", "Skincare", 28, 89.90m, "Images/Serum.jpg"),
+        new ProductoAdmin("Crema Hidratante Facial CeraVe", "Skincare", 18, 69.90m, "Images/Cerave.jpg"),
+        new ProductoAdmin("Labial Matte Ink Mood PERIPERA", "Maquillaje", 8, 45.90m, "Images/LabialPeripera.jpg"),
+        new ProductoAdmin("Mascara Essence Prince False Lash Effect", "Maquillaje", 14, 52.90m, "Images/Mascara.jpg"),
+        new ProductoAdmin("L03 Professional Protein Treatment LORINIQUE", "Cabello", 6, 42.50m, "Images/LoriniqueCabello.jpg")
+    };
+
+    private List<CategoriaAdmin> categorias = new()
+    {
+        new CategoriaAdmin("Skincare", "Limpieza, hidratacion y tratamientos faciales.", 18, "bi bi-droplet"),
+        new CategoriaAdmin("Maquillaje", "Labiales, mascaras, bases y accesorios.", 24, "bi bi-palette"),
+        new CategoriaAdmin("Cabello", "Tratamientos, mascarillas y cuidado capilar.", 12, "bi bi-stars"),
+        new CategoriaAdmin("Fragancias", "Perfumes, colonias y brumas corporales.", 9, "bi bi-flower1")
+    };
+
+    private List<MarcaAdmin> marcas = new()
+    {
+        new MarcaAdmin("CeraVe", "Estados Unidos", 8),
+        new MarcaAdmin("PERIPERA", "Corea del Sur", 12),
+        new MarcaAdmin("Essence", "Alemania", 10),
+        new MarcaAdmin("LORINIQUE", "Brasil", 6)
+    };
+
+    private List<CuponAdmin> cupones = new()
+    {
+        new CuponAdmin("MAMA20", "20% OFF Dia de la Madre", "Compra minima S/ 100", "Vence 12 de Mayo"),
+        new CuponAdmin("BIENVENIDO2026", "S/ 15 OFF primera compra", "Compra minima S/ 75", "Vence 31 de Diciembre"),
+        new CuponAdmin("CYBERWOW30", "30% OFF CyberWOW", "Compra minima S/ 250", "Vence 14 de Octubre")
+    };
+
+    private List<PedidoAdmin> pedidos = new()
+    {
+        new PedidoAdmin("KIL-202610081", "Cliente", 159.80m, "En proceso", "warning"),
+        new PedidoAdmin("KIL-202605002", "Maria Lopez", 178.20m, "Entregado", "active"),
+        new PedidoAdmin("KIL-202604115", "Ana Torres", 120.00m, "Listo para recoger", "info")
+    };
+
+    private List<ReporteAdmin> reportes = new()
+    {
+        new ReporteAdmin("Ventas del mes", "S/ 8,420.50", "12% mas que el mes anterior", "bi bi-cash-stack"),
+        new ReporteAdmin("Pedidos activos", "36", "8 pendientes de envio", "bi bi-truck"),
+        new ReporteAdmin("Productos bajos", "7", "Requieren reposicion", "bi bi-exclamation-circle"),
+        new ReporteAdmin("Clientes nuevos", "124", "Registrados este mes", "bi bi-people")
+    };
+
+    private NavLinkMatch GetNavMatch(string key)
+    {
+        return key == "productos"
+            ? NavLinkMatch.Prefix
+            : NavLinkMatch.All;
+    }
+
+    private static string NormalizarSeccion(string? seccion)
+    {
+        var valor = seccion?.ToLowerInvariant() ?? "productos";
+
+        return valor switch
+        {
+            "categorias" => "categorias",
+            "marcas" => "marcas",
+            "cupones" => "cupones",
+            "pedidos" => "pedidos",
+            "reportes" => "reportes",
+            _ => "productos"
+        };
+    }
+
+    private record MenuAdmin(string Key, string Texto, string Url, string Icono);
+    private record ProductoAdmin(string Nombre, string Categoria, int Stock, decimal Precio, string Imagen);
+    private record CategoriaAdmin(string Nombre, string Descripcion, int Productos, string Icono);
+    private record MarcaAdmin(string Nombre, string Origen, int Productos);
+    private record CuponAdmin(string Codigo, string Nombre, string Condicion, string Vigencia);
+    private record PedidoAdmin(string Id, string Cliente, decimal Total, string Estado, string ClaseEstado);
+    private record ReporteAdmin(string Etiqueta, string Valor, string Detalle, string Icono);
+}
