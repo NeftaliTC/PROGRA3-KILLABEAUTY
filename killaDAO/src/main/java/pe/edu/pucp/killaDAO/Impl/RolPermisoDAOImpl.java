@@ -13,58 +13,52 @@ import java.util.List;
 public class RolPermisoDAOImpl implements RolPermisoDAO {
 
     @Override
-    public List<RolPermiso> listAll() throws SQLException {
-        List<RolPermiso> lista = new ArrayList<>();
-        String sql = """
-            SELECT rp.id_tipoUsuario, p.id_permiso, p.nombre, p.descripcion
-            FROM Rol_Permiso rp
-            INNER JOIN Permiso p ON p.id_permiso = rp.id_permiso
-        """;
-
-        try (Connection cn = DBManager.getInstance().getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                TipoUsuario tipo = TipoUsuario.fromId(rs.getInt("id_tipoUsuario"));
-
-                Permiso permiso = new Permiso();
-                permiso.setId(rs.getInt("id_permiso"));
-                permiso.setNombre(rs.getString("nombre"));
-                permiso.setDescripcion(rs.getString("descripcion"));
-
-                RolPermiso rp = new RolPermiso(tipo, permiso);
-
-                lista.add(rp);
-            }
-        }
-        return lista;
+    public RolPermiso load(Integer id) throws SQLException {
+        return null;
     }
 
     @Override
-    public List<RolPermiso> listarPorTipoUsuario(Integer idTipoUsuario) throws SQLException {
+    public RolPermiso save(RolPermiso rp) throws SQLException {
+        String sql = "INSERT INTO RolPermiso (tipo_usuario, id_permiso) VALUES (?, ?)";
+        try (PreparedStatement ps = DBManager.getInstance().getConnection().prepareStatement(sql)) {
+            ps.setString(1, rp.getTipoUsuario().name());
+            ps.setInt(2, rp.getPermiso().getId());
+            ps.executeUpdate();
+        }
+        return rp;
+    }
+
+    @Override
+    public RolPermiso update(RolPermiso rp) throws SQLException {
+        // Normalmente no se actualiza un rol_permiso, se elimina y se inserta de nuevo
+        return rp;
+    }
+
+    @Override
+    public void remove(RolPermiso rp) throws SQLException {
+        String sql = "DELETE FROM RolPermiso WHERE tipo_usuario = ? AND id_permiso = ?";
+        try (PreparedStatement ps = DBManager.getInstance().getConnection().prepareStatement(sql)) {
+            ps.setString(1, rp.getTipoUsuario().name());
+            ps.setInt(2, rp.getPermiso().getId());
+            ps.executeUpdate();
+        }
+    }
+
+    @Override
+    public List<RolPermiso> listByTipoUsuario(int idTipoUsuario) throws SQLException {
         List<RolPermiso> lista = new ArrayList<>();
-        String sql = """
-            SELECT rp.id_tipoUsuario, p.id_permiso, p.nombre, p.descripcion
-            FROM Rol_Permiso rp
-            INNER JOIN Permiso p ON p.id_permiso = rp.id_permiso
-            WHERE rp.id_tipoUsuario = ?
-        """;
-
-        try (Connection cn = DBManager.getInstance().getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
-
-            ps.setInt(1, idTipoUsuario);
+        String sql = "SELECT * FROM RolPermiso WHERE tipo_usuario = ?";
+        TipoUsuario tipoUsuarioEnum = TipoUsuario.values()[idTipoUsuario];
+        try (PreparedStatement ps = DBManager.getInstance().getConnection().prepareStatement(sql)) {
+            ps.setString(1, tipoUsuarioEnum.name());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    TipoUsuario tipo = TipoUsuario.fromId(rs.getInt("id_tipoUsuario"));
-
-                    Permiso permiso = new Permiso();
-                    permiso.setId(rs.getInt("id_permiso"));
-                    permiso.setNombre(rs.getString("nombre"));
-                    permiso.setDescripcion(rs.getString("descripcion"));
-
-                    RolPermiso rp = new RolPermiso(tipo, permiso);
+                    RolPermiso rp = new RolPermiso();
+                    TipoUsuario tu = TipoUsuario.valueOf(rs.getString("tipo_usuario"));
+                    Permiso p = new Permiso();
+                    p.setId(rs.getInt("id_permiso"));
+                    rp.setTipoUsuario(tu);
+                    rp.setPermiso(p);
                     lista.add(rp);
                 }
             }
@@ -73,41 +67,21 @@ public class RolPermisoDAOImpl implements RolPermisoDAO {
     }
 
     @Override
-    public RolPermiso load(Integer idPermiso) throws SQLException {
-        throw new UnsupportedOperationException("No se puede buscar por un solo ID en esta tabla. Usar listarPorTipoUsuario");
-    }
-
-    @Override
-    public RolPermiso save(RolPermiso rolPermiso) throws SQLException {
-        String sql = "INSERT INTO Rol_Permiso (id_tipoUsuario, id_permiso) VALUES (?, ?)";
-
-        try (Connection cn = DBManager.getInstance().getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
-
-            ps.setInt(1, rolPermiso.getTipoUsuario().getId());
-            ps.setInt(2, rolPermiso.getPermiso().getId());
-            ps.executeUpdate();
+    public List<RolPermiso> listAll() throws SQLException {
+        List<RolPermiso> lista = new ArrayList<>();
+        String sql = "SELECT * FROM RolPermiso";
+        try (PreparedStatement ps = DBManager.getInstance().getConnection().prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                RolPermiso rp = new RolPermiso();
+                TipoUsuario tu = TipoUsuario.valueOf(rs.getString("tipo_usuario"));
+                Permiso p = new Permiso();
+                p.setId(rs.getInt("id_permiso"));
+                rp.setTipoUsuario(tu);
+                rp.setPermiso(p);
+                lista.add(rp);
+            }
         }
-        return rolPermiso;
-    }
-
-    @Override
-    public RolPermiso update(RolPermiso rolPermiso) throws SQLException {
-        // No hay "id" único. Normalmente en tabla muchos a muchos no se hace update,
-        // se elimina y se vuelve a insertar.
-        throw new UnsupportedOperationException("Tabla puente con PK compuesta: use remove + save");
-    }
-
-    @Override
-    public void remove(RolPermiso rolPermiso) throws SQLException {
-        String sql = "DELETE FROM Rol_Permiso WHERE id_tipoUsuario = ? AND id_permiso = ?";
-
-        try (Connection cn = DBManager.getInstance().getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
-
-            ps.setInt(1, rolPermiso.getTipoUsuario().getId());
-            ps.setInt(2, rolPermiso.getPermiso().getId());
-            ps.executeUpdate();
-        }
+        return lista;
     }
 }

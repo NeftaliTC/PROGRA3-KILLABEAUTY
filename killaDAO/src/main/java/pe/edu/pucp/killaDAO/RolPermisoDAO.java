@@ -6,6 +6,6 @@ import pe.edu.pucp.killaDAO.Base.BaseDAO;
 import java.sql.SQLException;
 import java.util.List;
 public interface RolPermisoDAO extends BaseDAO<RolPermiso,Integer> {
+    List<RolPermiso> listByTipoUsuario(int idTipoUsuario) throws SQLException;
     List<RolPermiso> listAll() throws SQLException;
-    List<RolPermiso> listarPorTipoUsuario(Integer idTipoUsuario) throws SQLException;
 }
