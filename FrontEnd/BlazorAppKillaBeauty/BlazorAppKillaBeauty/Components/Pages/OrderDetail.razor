@@ -99,7 +99,7 @@
                                     }
                                 </div>
                                 <div class="product-actions-column">
-                                    <a href="/review/@OrderId" class="btn-review-outline">
+                                    <a href="/review/@OrderId/@item.Nombre" class="btn-review-outline">
                                         <i class="bi bi-star"></i> Reseñar
                                     </a>
                                     <div class="subtotal-label">
@@ -279,7 +279,7 @@
     }
 
     // Datos de prueba
-    private List<PedidoDetalle> ObtenerCatalogoDetallesMock() => new()
+    public static List<PedidoDetalle> ObtenerCatalogoDetallesMock() => new()
     {
         new PedidoDetalle {
             Id = "KIL-202610081",
