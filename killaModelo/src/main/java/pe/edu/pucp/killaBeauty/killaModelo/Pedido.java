@@ -19,23 +19,27 @@ public class Pedido {
     private List<DetallePedido> detalles;
 
     public Pedido() {
-        this.detalles = new ArrayList<>();
-        this.fechaPedido = LocalDate.now();
     }
 
-    public EstadoPedido getEstadoPedido() {
-        return estadoPedido;
-    }
-
-    public void setEstadoPedido(EstadoPedido estadoPedido) {
+    public Pedido(int id, LocalDate fechaPedido, EstadoPedido estadoPedido, String metodoPago, double subtotal, double igv, double total, Usuario cliente, Direccion direccionEnvio, Cupon cupon, List<DetallePedido> detalles) {
+        this.id = id;
+        this.fechaPedido = fechaPedido;
         this.estadoPedido = estadoPedido;
+        this.metodoPago = metodoPago;
+        this.subtotal = subtotal;
+        this.igv = igv;
+        this.total = total;
+        this.cliente = cliente;
+        this.direccionEnvio = direccionEnvio;
+        this.cupon = cupon;
+        this.detalles = detalles;
     }
 
-    public int getIdPedido() {
+    public int getId() {
         return id;
     }
 
-    public void setIdPedido(int id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -45,6 +49,14 @@ public class Pedido {
 
     public void setFechaPedido(LocalDate fechaPedido) {
         this.fechaPedido = fechaPedido;
+    }
+
+    public EstadoPedido getEstadoPedido() {
+        return estadoPedido;
+    }
+
+    public void setEstadoPedido(EstadoPedido estadoPedido) {
+        this.estadoPedido = estadoPedido;
     }
 
     public String getMetodoPago() {
@@ -108,31 +120,6 @@ public class Pedido {
     }
 
     public void setDetalles(List<DetallePedido> detalles) {
-        this.detalles = (detalles != null) ? detalles : new ArrayList<>();
+        this.detalles = detalles;
     }
-
-    public void agregarDetalle(DetallePedido detalle) {
-        if (detalle != null) this.detalles.add(detalle);
-    }
-
-    public boolean quitarDetalle(DetallePedido detalle) {
-        return detalle != null && this.detalles.remove(detalle);
-    }
-
-    public void recalcularTotales() {
-        this.subtotal = 0.0;
-
-        for (DetallePedido d : detalles) {
-            if (d != null) this.subtotal += d.calcularTotalConDescuento();
-        }
-
-        if (cupon != null && cupon.esVigente(LocalDate.now())) {
-            this.subtotal = this.subtotal * (1 - cupon.getPorcentajeDescuento() / 100.0);
-        }
-
-        this.igv = this.subtotal * 0.18;
-        this.total = this.subtotal + this.igv;
-    }
-
-
 }

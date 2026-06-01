@@ -23,7 +23,7 @@ public class CuponDAOImpl implements CuponDAO {
                 cupon.setIdCupon(rs.getInt("id_cupon"));
                 cupon.setCodigo(rs.getString("codigo"));
                 cupon.setDescripcion(rs.getString("descripcion"));
-                cupon.setMontoMaximo(rs.getDouble("monto_maximo"));
+                cupon.setMontoMaximoDescuento(rs.getDouble("monto_maximo"));
                 cupon.setPorcentajeDeDescuento(rs.getDouble("porcentaje_descuento"));
 
                 // CONVERSIÓN DE SQL Date A LocalDate
@@ -52,7 +52,7 @@ public class CuponDAOImpl implements CuponDAO {
                     cupon.setIdCupon(rs.getInt("id_cupon"));
                     cupon.setCodigo(rs.getString("codigo"));
                     cupon.setDescripcion(rs.getString("descripcion"));
-                    cupon.setMontoMaximo(rs.getDouble("monto_maximo"));
+                    cupon.setMontoMaximoDescuento(rs.getDouble("monto_maximo"));
                     cupon.setPorcentajeDeDescuento(rs.getDouble("porcentaje_descuento"));
 
                     // CONVERSIÓN DE SQL Date A LocalDate
@@ -78,7 +78,7 @@ public class CuponDAOImpl implements CuponDAO {
 
             pstmt.setString(1, cupon.getCodigo());
             pstmt.setString(2, cupon.getDescripcion());
-            pstmt.setDouble(3, cupon.getMontoMaximo());
+            pstmt.setDouble(3, cupon.getMontoMaximoDescuento());
             pstmt.setDouble(4, cupon.getPorcentajeDeDescuento());
 
             // CONVERSIÓN DE LocalDate A SQL Date
@@ -108,7 +108,7 @@ public class CuponDAOImpl implements CuponDAO {
 
             pstmt.setString(1, cupon.getCodigo());
             pstmt.setString(2, cupon.getDescripcion());
-            pstmt.setDouble(3, cupon.getMontoMaximo());
+            pstmt.setDouble(3, cupon.getMontoMaximoDescuento());
             pstmt.setDouble(4, cupon.getPorcentajeDeDescuento());
 
             // CONVERSIÓN DE LocalDate A SQL Date

@@ -4,49 +4,43 @@ import java.time.LocalDate;
 public class Cupon {
 
     private int id;
-    private String codigo;
     private String descripcion;
-    private double porcentaje;
+    private String codigo;
+    private double valorDescuento;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
-    private boolean activo;
-    private double montoMaximo;
+    private Boolean activo;
     private double montoMinimoCompra;
+    private double montoMaximoDescuento;
+    private int maxUsosGenerales;
 
-    // Constructores
-    public Cupon() {}
+    private TipoDescuento tipoDescuento;
+    private Campana campana;
 
-    public Cupon(int idCupon, String codigo, double porcentajeDeDescuento, LocalDate fechaInicio, LocalDate fechaFin, boolean activo) {
-        this.id = idCupon;
+    public Cupon() {
+    }
+
+    public Cupon(int id, String descripcion, String codigo, double valorDescuento, LocalDate fechaInicio, LocalDate fechaFin, Boolean activo, double montoMinimoCompra, double montoMaximoDescuento, int maxUsosGenerales, TipoDescuento tipoDescuento, Campana campana) {
+        this.id = id;
+        this.descripcion = descripcion;
         this.codigo = codigo;
-        this.porcentaje = porcentajeDeDescuento;
+        this.valorDescuento = valorDescuento;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
         this.activo = activo;
+        this.montoMinimoCompra = montoMinimoCompra;
+        this.montoMaximoDescuento = montoMaximoDescuento;
+        this.maxUsosGenerales = maxUsosGenerales;
+        this.tipoDescuento = tipoDescuento;
+        this.campana = campana;
     }
 
-    // Métodos
-    public boolean esVigente(LocalDate fecha) {
-        return false;
-    }
-
-    public void validarVigencia() {}
-
-    // Getters y setters
-    public int getIdCupon() {
+    public int getId() {
         return id;
     }
 
-    public void setIdCupon(int idCupon) {
-        this.id = idCupon;
-    }
-
-    public String getCodigo() {
-        return codigo;
-    }
-
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getDescripcion() {
@@ -57,16 +51,20 @@ public class Cupon {
         this.descripcion = descripcion;
     }
 
-    public double getPorcentajeDescuento() {
-        return porcentaje;
+    public String getCodigo() {
+        return codigo;
     }
 
-    public double getPorcentajeDeDescuento() {
-        return porcentaje;
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
     }
 
-    public void setPorcentajeDeDescuento(double porcentajeDeDescuento) {
-        this.porcentaje = porcentajeDeDescuento;
+    public double getValorDescuento() {
+        return valorDescuento;
+    }
+
+    public void setValorDescuento(double valorDescuento) {
+        this.valorDescuento = valorDescuento;
     }
 
     public LocalDate getFechaInicio() {
@@ -85,19 +83,51 @@ public class Cupon {
         this.fechaFin = fechaFin;
     }
 
-    public boolean isActivo() {
+    public Boolean getActivo() {
         return activo;
     }
 
-    public void setActivo(boolean activo) {
+    public void setActivo(Boolean activo) {
         this.activo = activo;
     }
 
-    public double getMontoMaximo() { return montoMaximo; }
+    public double getMontoMinimoCompra() {
+        return montoMinimoCompra;
+    }
 
-    public void setMontoMaximo(double montoMaximo) { this.montoMaximo = montoMaximo; }
+    public void setMontoMinimoCompra(double montoMinimoCompra) {
+        this.montoMinimoCompra = montoMinimoCompra;
+    }
 
-    public double getMontoMinimoCompra() { return montoMinimoCompra; }
+    public double getMontoMaximoDescuento() {
+        return montoMaximoDescuento;
+    }
 
-    public void setMontoMinimoCompra(double montoMinimoCompra) { this.montoMinimoCompra = montoMinimoCompra; }
+    public void setMontoMaximoDescuento(double montoMaximoDescuento) {
+        this.montoMaximoDescuento = montoMaximoDescuento;
+    }
+
+    public int getMaxUsosGenerales() {
+        return maxUsosGenerales;
+    }
+
+    public void setMaxUsosGenerales(int maxUsosGenerales) {
+        this.maxUsosGenerales = maxUsosGenerales;
+    }
+
+    public TipoDescuento getTipoDescuento() {
+        return tipoDescuento;
+    }
+
+    public void setTipoDescuento(TipoDescuento tipoDescuento) {
+        this.tipoDescuento = tipoDescuento;
+    }
+
+    public Campana getCampana() {
+        return campana;
+    }
+
+    public void setCampana(Campana campana) {
+        this.campana = campana;
+    }
 }
