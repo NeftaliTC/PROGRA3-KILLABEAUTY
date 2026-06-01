@@ -19,7 +19,7 @@ public class TestResenaDAO {
 
             // Usamos Composición (sacamos el ID de los objetos)
             nueva.getCliente().setId(1);  // Debe existir en tabla Usuario
-            nueva.getProducto().setIdProducto(1); // Debe existir en tabla Producto
+            nueva.getProducto().setId(1); // Debe existir en tabla Producto
 
             Resena guardada = dao.save(nueva);
             System.out.println("SAVE OK -> id: " + guardada.getIdResena());

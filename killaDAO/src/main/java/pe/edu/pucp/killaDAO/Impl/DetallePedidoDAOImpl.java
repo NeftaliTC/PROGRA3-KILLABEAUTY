@@ -85,7 +85,7 @@ public class DetallePedidoDAOImpl implements DetallePedidoDAO {
 
     @Override
     public DetallePedido save(DetallePedido detalle, Integer idPedido) throws SQLException {
-        if (detalle.getProducto() == null || detalle.getProducto().getIdProducto() <= 0) {
+        if (detalle.getProducto() == null || detalle.getProducto().getId() <= 0) {
             throw new SQLException("Producto inválido en DetallePedido.save");
         }
 
@@ -104,7 +104,7 @@ public class DetallePedidoDAOImpl implements DetallePedidoDAO {
             ps.setDouble(2, detalle.getPrecioAplicado());
             ps.setDouble(3, subtotal);
             ps.setInt(4, idPedido);
-            ps.setInt(5, detalle.getProducto().getIdProducto());
+            ps.setInt(5, detalle.getProducto().getId());
 
             int affected = ps.executeUpdate();
             if (affected > 0) {
@@ -124,7 +124,7 @@ public class DetallePedidoDAOImpl implements DetallePedidoDAO {
 
     @Override
     public DetallePedido update(DetallePedido detalle, Integer idPedido) throws SQLException {
-        if (detalle.getProducto() == null || detalle.getProducto().getIdProducto() <= 0) {
+        if (detalle.getProducto() == null || detalle.getProducto().getId() <= 0) {
             throw new SQLException("Producto inválido en DetallePedido.update");
         }
 
@@ -143,7 +143,7 @@ public class DetallePedidoDAOImpl implements DetallePedidoDAO {
             ps.setDouble(2, detalle.getPrecioAplicado());
             ps.setDouble(3, subtotal);
             ps.setInt(4, idPedido);
-            ps.setInt(5, detalle.getProducto().getIdProducto());
+            ps.setInt(5, detalle.getProducto().getId());
             ps.setInt(6, detalle.getIdDetallePedido());
 
             ps.executeUpdate();
@@ -171,7 +171,7 @@ public class DetallePedidoDAOImpl implements DetallePedidoDAO {
         d.setPrecioAplicado(rs.getDouble("precio_unitario_aplicado"));
 
         Producto p = new Producto();
-        p.setIdProducto(rs.getInt("id_producto"));
+        p.setId(rs.getInt("id_producto"));
         d.setProducto(p);
 
         return d;

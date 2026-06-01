@@ -1,6 +1,5 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
 
-
 // CORREGIDA
 public enum TipoUsuario {
     ADMINISTRADOR(1, "Administrador"),

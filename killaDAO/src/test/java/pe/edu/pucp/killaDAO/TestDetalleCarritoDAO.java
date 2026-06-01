@@ -13,7 +13,7 @@ public class TestDetalleCarritoDAO {
             // 1) SAVE
             DetalleCarrito nuevo = new DetalleCarrito();
             nuevo.setCantidad(3);
-            nuevo.getProducto().setIdProducto(1); //Producto existe
+            nuevo.getProducto().setId(1); //Producto existe
             nuevo.setIdCarrito(1); //Carrito existe
 
             DetalleCarrito guardado = dao.save(nuevo);

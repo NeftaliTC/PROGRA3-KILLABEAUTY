@@ -69,5 +69,4 @@ public class DetallePedido {
         return subtotal;
     }
 
-
 }
