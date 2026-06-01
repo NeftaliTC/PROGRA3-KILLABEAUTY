@@ -1,0 +1,71 @@
+@page "/admin/productos"
+@rendermode InteractiveServer
+
+<PageTitle>Productos Admin - Killa Beauty</PageTitle>
+
+<main class="admin-page">
+    <AdminNavbar />
+
+    <section class="admin-content">
+        <header class="admin-header">
+            <div>
+                <span class="admin-eyebrow">Panel administrativo</span>
+                <h1>Productos</h1>
+                <p>Gestiona stock, precios y estado de los productos.</p>
+            </div>
+
+            <button type="button" class="admin-primary-action">
+                <i class="bi bi-plus-lg"></i>
+                Nuevo producto
+            </button>
+        </header>
+
+        <section class="admin-table-card">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Categoria</th>
+                        <th>Stock</th>
+                        <th>Precio</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var producto in productos)
+                    {
+                        <tr>
+                            <td>
+                                <div class="admin-product-cell">
+                                    <img src="@producto.Imagen" alt="@producto.Nombre" />
+                                    <span>@producto.Nombre</span>
+                                </div>
+                            </td>
+                            <td>@producto.Categoria</td>
+                            <td>@producto.Stock</td>
+                            <td>S/ @producto.Precio.ToString("F2")</td>
+                            <td>
+                                <span class="admin-status @(producto.Stock > 10 ? "active" : "warning")">
+                                    @(producto.Stock > 10 ? "Disponible" : "Stock bajo")
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </section>
+    </section>
+</main>
+
+@code {
+    private List<ProductoAdmin> productos = new()
+    {
+        new ProductoAdmin("Serum Vitamina C Gold Kiwi", "Skincare", 28, 89.90m, "Images/Serum.jpg"),
+        new ProductoAdmin("Crema Hidratante Facial CeraVe", "Skincare", 18, 69.90m, "Images/Cerave.jpg"),
+        new ProductoAdmin("Labial Matte Ink Mood PERIPERA", "Maquillaje", 8, 45.90m, "Images/LabialPeripera.jpg"),
+        new ProductoAdmin("Mascara Essence Prince False Lash Effect", "Maquillaje", 14, 52.90m, "Images/Mascara.jpg"),
+        new ProductoAdmin("L03 Professional Protein Treatment LORINIQUE", "Cabello", 6, 42.50m, "Images/LoriniqueCabello.jpg")
+    };
+
+    private record ProductoAdmin(string Nombre, string Categoria, int Stock, decimal Precio, string Imagen);
+}

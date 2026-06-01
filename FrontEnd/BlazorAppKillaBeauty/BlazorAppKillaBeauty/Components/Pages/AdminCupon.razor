@@ -1,0 +1,49 @@
+@page "/admin/cupones"
+@rendermode InteractiveServer
+
+<PageTitle>Cupones Admin - Killa Beauty</PageTitle>
+
+<main class="admin-page">
+    <AdminNavbar />
+
+    <section class="admin-content">
+        <header class="admin-header">
+            <div>
+                <span class="admin-eyebrow">Panel administrativo</span>
+                <h1>Cupones</h1>
+                <p>Controla promociones, descuentos y vigencias.</p>
+            </div>
+
+            <button type="button" class="admin-primary-action">
+                <i class="bi bi-plus-lg"></i>
+                Nuevo cupon
+            </button>
+        </header>
+
+        <section class="admin-grid-list">
+            @foreach (var cupon in cupones)
+            {
+                <article class="admin-coupon-card">
+                    <span>@cupon.Codigo</span>
+                    <h2>@cupon.Nombre</h2>
+                    <p>@cupon.Condicion</p>
+                    <div>
+                        <i class="bi bi-calendar-event"></i>
+                        @cupon.Vigencia
+                    </div>
+                </article>
+            }
+        </section>
+    </section>
+</main>
+
+@code {
+    private List<CuponAdmin> cupones = new()
+    {
+        new CuponAdmin("MAMA20", "20% OFF Dia de la Madre", "Compra minima S/ 100", "Vence 12 de Mayo"),
+        new CuponAdmin("BIENVENIDO2026", "S/ 15 OFF primera compra", "Compra minima S/ 75", "Vence 31 de Diciembre"),
+        new CuponAdmin("CYBERWOW30", "30% OFF CyberWOW", "Compra minima S/ 250", "Vence 14 de Octubre")
+    };
+
+    private record CuponAdmin(string Codigo, string Nombre, string Condicion, string Vigencia);
+}

@@ -1,0 +1,47 @@
+@page "/admin/reportes"
+@rendermode InteractiveServer
+
+<PageTitle>Reportes Admin - Killa Beauty</PageTitle>
+
+<main class="admin-page">
+    <AdminNavbar />
+
+    <section class="admin-content">
+        <header class="admin-header">
+            <div>
+                <span class="admin-eyebrow">Panel administrativo</span>
+                <h1>Reportes</h1>
+                <p>Consulta indicadores clave del e-commerce.</p>
+            </div>
+
+            <button type="button" class="admin-primary-action">
+                <i class="bi bi-download"></i>
+                Descargar reporte
+            </button>
+        </header>
+
+        <section class="admin-report-grid">
+            @foreach (var reporte in reportes)
+            {
+                <article class="admin-report-card">
+                    <i class="@reporte.Icono"></i>
+                    <span>@reporte.Etiqueta</span>
+                    <strong>@reporte.Valor</strong>
+                    <p>@reporte.Detalle</p>
+                </article>
+            }
+        </section>
+    </section>
+</main>
+
+@code {
+    private List<ReporteAdmin> reportes = new()
+    {
+        new ReporteAdmin("Ventas del mes", "S/ 8,420.50", "12% mas que el mes anterior", "bi bi-cash-stack"),
+        new ReporteAdmin("Pedidos activos", "36", "8 pendientes de envio", "bi bi-truck"),
+        new ReporteAdmin("Productos bajos", "7", "Requieren reposicion", "bi bi-exclamation-circle"),
+        new ReporteAdmin("Clientes nuevos", "124", "Registrados este mes", "bi bi-people")
+    };
+
+    private record ReporteAdmin(string Etiqueta, string Valor, string Detalle, string Icono);
+}

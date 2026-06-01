@@ -1,0 +1,51 @@
+@page "/admin/categorias"
+@rendermode InteractiveServer
+
+<PageTitle>Categorias Admin - Killa Beauty</PageTitle>
+
+<main class="admin-page">
+    <AdminNavbar />
+
+    <section class="admin-content">
+        <header class="admin-header">
+            <div>
+                <span class="admin-eyebrow">Panel administrativo</span>
+                <h1>Categorias</h1>
+                <p>Administra las familias principales del catalogo.</p>
+            </div>
+
+            <button type="button" class="admin-primary-action">
+                <i class="bi bi-plus-lg"></i>
+                Nueva categoria
+            </button>
+        </header>
+
+        <section class="admin-grid-list">
+            @foreach (var categoria in categorias)
+            {
+                <article class="admin-item-card">
+                    <div class="admin-item-icon">
+                        <i class="@categoria.Icono"></i>
+                    </div>
+                    <div>
+                        <h2>@categoria.Nombre</h2>
+                        <p>@categoria.Descripcion</p>
+                        <span>@categoria.Productos producto(s)</span>
+                    </div>
+                </article>
+            }
+        </section>
+    </section>
+</main>
+
+@code {
+    private List<CategoriaAdmin> categorias = new()
+    {
+        new CategoriaAdmin("Skincare", "Limpieza, hidratacion y tratamientos faciales.", 18, "bi bi-droplet"),
+        new CategoriaAdmin("Maquillaje", "Labiales, mascaras, bases y accesorios.", 24, "bi bi-palette"),
+        new CategoriaAdmin("Cabello", "Tratamientos, mascarillas y cuidado capilar.", 12, "bi bi-stars"),
+        new CategoriaAdmin("Fragancias", "Perfumes, colonias y brumas corporales.", 9, "bi bi-flower1")
+    };
+
+    private record CategoriaAdmin(string Nombre, string Descripcion, int Productos, string Icono);
+}
