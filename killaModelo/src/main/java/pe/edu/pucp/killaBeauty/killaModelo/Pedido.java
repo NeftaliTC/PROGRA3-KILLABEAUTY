@@ -1,5 +1,7 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
 
+import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Cupon;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
