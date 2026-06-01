@@ -5,38 +5,325 @@
 
 <Navbar CantidadCarrito="@CartService.CantidadTotal" />
 <div class="order-detail-container">
-    <div class="breadcrumb">
-        <a href="/orders"><i class="bi bi-arrow-left"></i> Volver a mis pedidos</a>
+    <div class="breadcrumb-nav">
+        <a href="/orders" class="btn-back">
+            <i class="bi bi-arrow-left"></i> Volver a mis pedidos
+        </a>
     </div>
 
-    <div class="header-section">
-        <h1>Pedido #@OrderId</h1>
-        <span class="status-pill">En Proceso</span>
-    </div>
-
-    <div class="detail-grid">
-        <div class="products-card">
-            <h3>Productos</h3>
-            @foreach (var item in new string[] { "Producto 1", "Producto 2" })
-            {
-                <div class="product-item">
-                    <div class="product-info">
-                        <span class="product-name">@item</span>
-                    </div>
-                    <a href="/review/@OrderId" class="btn-review">Reseñar</a>
-                </div>
-            }
+    @if (pedidoActual == null)
+    {
+        <div class="loading-state">
+            <p>Buscando la información del pedido #@OrderId...</p>
         </div>
-
-        <div class="summary-card">
-            <h3>Resumen</h3>
-            <div class="total-row">
-                <span>Total</span>
-                <span class="total-amount">S/ 230.00</span>
+    }
+    else
+    {
+        @* Encabezado principal del Pedido *@
+        <div class="order-header-main">
+            <div class="header-titles">
+                <h1>Pedido @pedidoActual.Id</h1>
+                <p class="order-date">Realizado el @pedidoActual.Fecha</p>
             </div>
-            <button class="btn-download-invoice">Descargar factura</button>
+            <span class="status-badge-detail @pedidoActual.ClaseEstado">
+                @(pedidoActual.Estado == "PAGADO" ? "Confirmado" :
+                  pedidoActual.Estado == "EN_PREPARACION" ? "En preparación" :
+                  pedidoActual.Estado == "ENVIADO" ? "En camino" : "Entregado")
+            </span>
         </div>
-    </div>
+
+        @* Grilla de dos columnas *@
+        <div class="order-detail-grid">
+            
+            @* COLUMNA IZQUIERDA: Seguimiento y Productos *@
+            <div class="detail-main-column">
+                
+                @* Tarjeta 1: Seguimiento del pedido *@
+                <div class="detail-card tracking-card">
+                    <h2>Seguimiento del pedido</h2>
+                    <div class="tracking-bar-container">
+                        <div class="tracking-line"></div>
+                        <div class="tracking-steps">
+                            <div class="step @(GetTrackingStepClass(pedidoActual.Estado, 1))">
+                                <span class="step-dot"></span>
+                                <span class="step-label">Pedido confirmado</span>
+                            </div>
+                            <div class="step @(GetTrackingStepClass(pedidoActual.Estado, 2))">
+                                <span class="step-dot"></span>
+                                <span class="step-label">En preparación</span>
+                            </div>
+                            <div class="step @(GetTrackingStepClass(pedidoActual.Estado, 3))">
+                                <span class="step-dot"></span>
+                                <span class="step-label">En camino</span>
+                            </div>
+                            <div class="step @(GetTrackingStepClass(pedidoActual.Estado, 4))">
+                                <span class="step-dot"></span>
+                                <span class="step-label">Entregado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* Tarjeta 2: Productos del pedido *@
+                <div class="detail-card products-card">
+                    <h2>Productos del pedido</h2>
+                    <div class="products-list">
+                        @foreach (var item in pedidoActual.Productos)
+                        {
+                            <div class="product-row-item">
+                                <img src="@item.Imagen" alt="@item.Nombre" class="product-thumbnail" />
+                                <div class="product-main-details">
+                                    <span class="product-title">@item.Nombre</span>
+                                    <span class="product-brand">@item.Marca</span>
+                                    <span class="product-qty-badge">@item.Cantidad unidad@(item.Cantidad > 1 ? "es" : "")</span>
+    
+                                    <div class="price-container">
+                                        @if (item.PrecioUnitario > item.PrecioUnitarioDesc)
+                                        {
+                                            @* Precio original tachado *@
+                                            <span class="product-unit-price" style="text-decoration: line-through; color: #888; margin-right: 8px;">
+                                                S/ @item.PrecioUnitario.ToString("F2")
+                                            </span>
+                                        }
+                                        @* Precio con descuento (o normal) *@
+                                        <span class="product-unit-price" style="font-weight: bold; color: #d63384;">
+                                            S/ @item.PrecioUnitarioDesc.ToString("F2")
+                                        </span>
+                                    </div>
+
+                                    @if (item.AhorroVolumen > 0)
+                                    {
+                                        <span class="savings-tag" style="color: #28a745; font-size: 0.85em;">
+                                            <i class="bi bi-tags"></i> Ahorraste: S/ @item.AhorroVolumen.ToString("F2")
+                                        </span>
+                                    }
+                                </div>
+                                <div class="product-actions-column">
+                                    <a href="/review/@OrderId" class="btn-review-outline">
+                                        <i class="bi bi-star"></i> Reseñar
+                                    </a>
+                                    <div class="subtotal-label">
+                                        Subtotal: S/ @((item.PrecioUnitario * item.Cantidad).ToString("F2"))
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    
+                    @if (pedidoActual.Productos.Any(p => p.AhorroVolumen > 0))
+                    {
+                        <div class="alert-savings-banner">
+                            <i class="bi bi-ticket-perk"></i> ¡Ahorraste S/ @pedidoActual.Productos.Sum(p => p.AhorroVolumen).ToString("F2") en este pedido por precios por volumen!
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @* COLUMNA DERECHA: Resumen, Entrega, Pago y Comprobante *@
+            <div class="detail-sidebar-column">
+                
+                @* Tarjeta 3: Resumen del Pedido *@
+                <div class="detail-card summary-card">
+                    <h2>Resumen del Pedido</h2>
+                    <div class="summary-rows">
+                        <div class="summary-line">
+                            <span>Subtotal</span>
+                            <span>S/ @pedidoActual.Subtotal.ToString("F2")</span>
+                        </div>
+                        <div class="summary-line">
+                            <span>Envío</span>
+                            <span>S/ @pedidoActual.Envio.ToString("F2")</span>
+                        </div>
+                        @if (pedidoActual.DescuentoCupon > 0)
+                        {
+                            <div class="summary-line coupon-line">
+                                <span><i class="bi bi-tag-fill"></i> Cupón de dscto</span>
+                                <span>- S/ @pedidoActual.DescuentoCupon.ToString("F2")</span>
+                            </div>
+                        }
+                        <hr class="summary-divider" />
+                        <div class="summary-line total-line">
+                            <span>Total pagado</span>
+                            <span class="final-price">S/ @pedidoActual.Total.ToString("F2")</span>
+                        </div>
+                    </div>
+                </div>
+
+                @* Tarjeta 4: Comprobante de Pago - Nueva sección *@
+                <div class="detail-card invoice-card">
+                    <h2>Comprobante Electrónico</h2>
+                    <div class="invoice-details-box">
+                        <div class="invoice-meta">
+                            <p class="invoice-type"><strong>Tipo:</strong> @pedidoActual.TipoComprobante</p>
+                            @if (pedidoActual.TipoComprobante == "Factura")
+                            {
+                                <p><strong>RUC:</strong> @pedidoActual.DocumentoIdentidad</p>
+                                <p><strong>Razón Social:</strong> @pedidoActual.RazonSocial</p>
+                            }
+                            else
+                            {
+                                <p><strong>DNI:</strong> @pedidoActual.DocumentoIdentidad</p>
+                            }
+                        </div>
+                        <button class="btn-download-invoice-solid">
+                            <i class="bi bi-download"></i> Descargar @pedidoActual.TipoComprobante
+                        </button>
+                    </div>
+                </div>
+
+                @* Tarjeta 5: Método de entrega *@
+                <div class="detail-card shipping-card">
+                    <h2>Método de entrega</h2>
+                    <div class="info-icon-block">
+                        <i class="bi bi-box-seam icon-pink"></i>
+                        <div class="block-text">
+                            <h3>Envío a domicilio</h3>
+                            <p class="courier-highlight">Operado por Olva Courier</p>
+                            <p>@pedidoActual.DireccionLinea1</p>
+                            <p>@pedidoActual.DireccionLinea2</p>
+                            @if (!string.IsNullOrEmpty(pedidoActual.Referencia))
+                            {
+                                <p class="reference-text">Ref: @pedidoActual.Referencia</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                @* Tarjeta 6: Medio de pago *@
+                <div class="detail-card payment-card">
+                    <h2>Medio de pago</h2>
+                    <div class="info-icon-block">
+                        <i class="bi bi-credit-card-2-front icon-pink"></i>
+                        <div class="block-text">
+                            <h3>@pedidoActual.MetodoPago</h3>
+                            <p>@pedidoActual.DetalleMetodoPago</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    }
 </div>
 
-@code { [Parameter] public string OrderId { get; set; } }
+@code {
+    [Parameter] public string? OrderId { get; set; }
+    private PedidoDetalle? pedidoActual;
+
+    protected override void OnInitialized()
+    {
+        pedidoActual = ObtenerCatalogoDetallesMock().FirstOrDefault(p => p.Id == OrderId);
+    }
+
+    private string GetTrackingStepClass(string estadoBackend, int stepNumber)
+    {
+        int currentStepWeight = estadoBackend switch
+        {
+            "PAGADO" => 1,
+            "EN_PREPARACION" => 2,
+            "ENVIADO" => 3,
+            "ENTREGADO" => 4,
+            _ => 0
+        };
+
+        if (currentStepWeight == stepNumber) return "active";
+        if (currentStepWeight > stepNumber) return "completed";
+        return "";
+    }
+
+    public class PedidoDetalle
+    {
+        public string? Id { get; set; }
+        public string? Fecha { get; set; }
+        public string? Estado { get; set; } // Lee directamente los enums: PAGADO, EN_PREPARACION, ENVIADO, ENTREGADO
+        public string? ClaseEstado { get; set; }
+        public decimal Subtotal { get; set; }
+        public decimal Envio { get; set; }
+        public decimal DescuentoCupon { get; set; }
+        public decimal Total => (Subtotal + Envio) - DescuentoCupon;
+        public int TotalArticulos => Productos.Sum(p => p.Cantidad);
+        
+        public string? TipoComprobante { get; set; } // "Boleta" o "Factura"
+        public string? DocumentoIdentidad { get; set; }
+        public string? RazonSocial { get; set; }
+        public string? DireccionLinea1 { get; set; }
+        public string? DireccionLinea2 { get; set; }
+        public string? Referencia { get; set; }
+
+        public string? MetodoPago { get; set; }
+        public string? DetalleMetodoPago { get; set; }
+
+        public List<ProductoDetalle> Productos { get; set; } = new();
+    }
+
+    public class ProductoDetalle
+    {
+        public string? Nombre { get; set; }
+        public string? Marca { get; set; }
+        public string? Imagen { get; set; }
+        public int Cantidad { get; set; }
+        public decimal PrecioUnitarioDesc {get; set; }
+        public decimal PrecioUnitario { get; set; }
+        public decimal AhorroVolumen { get; set; }
+
+        public ProductoDetalle(string nombre, string marca, string imagen, int cantidad, decimal precioUnitDesc, decimal precioUnitOrig)
+        {
+            Nombre = nombre;
+            Marca = marca;
+            Imagen = imagen;
+            Cantidad = cantidad;
+            PrecioUnitarioDesc = precioUnitDesc;
+            PrecioUnitario = precioUnitOrig;
+            AhorroVolumen = (precioUnitOrig - precioUnitDesc) * cantidad;
+        }
+    }
+
+    // Datos de prueba
+    private List<PedidoDetalle> ObtenerCatalogoDetallesMock() => new()
+    {
+        new PedidoDetalle {
+            Id = "KIL-202610081",
+            Fecha = "01 de junio del 2026",
+            Estado = "EN_PREPARACION",
+            ClaseEstado = "status-orange",
+            Subtotal = 449.30m, Envio = 10.00m, DescuentoCupon = 0.00m,
+            TipoComprobante = "Boleta", DocumentoIdentidad = "72145896",
+            DireccionLinea1 = "Av. Arequipa 1234", DireccionLinea2 = "Miraflores, Lima",
+            Referencia = "Frente al parque Kennedy",
+            MetodoPago = "Tarjeta de crédito", DetalleMetodoPago = "Visa ****0789",
+            Productos = new List<ProductoDetalle> {
+                new("Sérum Vitamina C", "Essence", "Images/Serum.jpg", 1, 89.90m, 89.90m),
+                new("Crema Hidratante CeraVe", "CeraVe", "Images/Cerave.jpg", 6, 59.90m, 69.90m)
+            }
+        },
+        new PedidoDetalle {
+            Id = "KIL-202605002",
+            Fecha = "25 de mayo del 2026",
+            Estado = "ENVIADO",
+            ClaseEstado = "status-purple",
+            Subtotal = 78.20m, Envio = 10.00m, DescuentoCupon = 15.00m,
+            TipoComprobante = "Factura", DocumentoIdentidad = "20601234567", RazonSocial = "Killa Beauty S.A.C.",
+            DireccionLinea1 = "Calle Las Orquídeas 456", DireccionLinea2 = "San Isidro, Lima",
+            Referencia = "A dos cuadras de la estación",
+            MetodoPago = "Yape", DetalleMetodoPago = "9******81",
+            Productos = new List<ProductoDetalle> {
+                new("Labial Peripera Ink", "Peripera", "Images/LabialPeripera.jpg", 1, 40.00m, 40.00m),
+                new("Máscara de pestañas", "Maybelline", "Images/Mascara.jpg", 1, 38.20m, 38.20m)
+            }
+        },
+        new PedidoDetalle {
+            Id = "KIL-202626589",
+            Fecha = "05 de mayo del 2026",
+            Estado = "ENTREGADO",
+            ClaseEstado = "status-green",
+            Subtotal = 120.00m, Envio = 12.00m, DescuentoCupon = 0.00m,
+            TipoComprobante = "Boleta", DocumentoIdentidad = "45127896",
+            DireccionLinea1 = "Av. Javier Prado 2500", DireccionLinea2 = "San Borja, Lima",
+            Referencia = "Cerca a la Rambla",
+            MetodoPago = "Tarjeta de crédito", DetalleMetodoPago = "Mastercard ****4412",
+            Productos = new List<ProductoDetalle> {
+                new("Sérum Vitamina C", "Essence", "Images/Serum.jpg", 2, 60.00m, 60.00m)
+            }
+        }
+    };
+}

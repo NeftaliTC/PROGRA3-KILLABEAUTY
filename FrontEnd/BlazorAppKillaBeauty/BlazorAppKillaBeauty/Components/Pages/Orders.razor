@@ -27,15 +27,22 @@
                 <div class="order-card">
                     <div class="card-header">
                         <span class="date">@p.Fecha</span>
-                        <span class="status-badge @GetStatusClass(p.Estado)">@p.Estado</span>
+                        <span class="status-badge @p.ClaseEstado">@p.Estado</span>
                     </div>
                     
                     <h3>Pedido @p.Id</h3>
                     
                     <div class="product-preview">
-                        @foreach (var img in p.ImagenesProductos)
+                        @* Mostramos máximo 3 imágenes *@
+                        @foreach (var prod in p.Productos.Take(3))
                         {
-                            <img src="@img" alt="Producto" class="thumb" />
+                            <img src="@prod.Imagen" alt="Producto" class="thumb" />
+                        }
+    
+                        @* Si hay más de 3, mostramos el contador +N *@
+                        @if (p.Productos.Count > 3)
+                        {
+                            <div class="more-items">+@(p.Productos.Count - 3)</div>
                         }
                     </div>
 
@@ -54,18 +61,13 @@
 </div>
 
 @code {
-    private List<Pedido> pedidos = new()
-    {
-        new Pedido("KIL-202610081", "30 Mayo, 2026", "En proceso", "status-orange", new List<string> { "Images/Serum.jpg", "Images/Cerave.jpg" }, 2, 159.80m),
-        new Pedido("KIL-202605002", "25 Mayo, 2026", "Entregado", "status-green", new List<string> { "Images/LabialPeripera.jpg", "Images/Mascara.jpg", "Images/LoriniqueCabello.jpg" }, 3, 178.20m),
-        new Pedido("KIL-202604115", "10 Mayo, 2026", "Listo para recoger", "status-purple", new List<string> { "Images/Fragancia.png" }, 1, 120.00m)
-    };
 
     private string GetStatusClass(string activo) => activo switch
     {
         "Entregado" => "status-green",
-        "Listo para recoger" => "status-purple",
-        "En proceso" => "status-orange",
+        "En camino" => "status-purple",
+        "En preparación" => "status-orange",
+        "Pedido confirmado" => "status-yellow",
         _ => "status-default"
     };
     
@@ -74,21 +76,54 @@
         public string Id { get; set; }
         public string Fecha { get; set; }
         public string Estado { get; set; }
-        public string ClaseEstado { get; set; } // <--- AGREGADO
-        public List<string> ImagenesProductos { get; set; }
+        public string ClaseEstado { get; set; }
         public int TotalArticulos { get; set; }
+        public List<Producto> Productos { get; set; } = new();
         public decimal TotalPrecio { get; set; }
-
-        public Pedido(string id, string fecha, string activo, string claseEstado,
-                      List<string> imagenes, int totalArticulos, decimal totalPrecio)
-        {
-            Id = id;
-            Fecha = fecha;
-            Estado = activo;
-            ClaseEstado = claseEstado; // <--- AGREGADO
-            ImagenesProductos = imagenes;
-            TotalArticulos = totalArticulos;
-            TotalPrecio = totalPrecio;
-        }
     }
+
+    public class Producto
+    {
+        public string Imagen { get; set; }
+    }
+    
+    private List<Pedido> pedidos = new()
+    {
+        new Pedido {
+            Id = "KIL-202610081",
+            Fecha = "01 de junio del 2026",
+            Estado = "En preparación",
+            ClaseEstado = "status-orange",
+            TotalArticulos = 7, // 1 Sérum + 6 Cremas
+            TotalPrecio = 459.30m, // (89.90 + (59.90*6)) - 60.00 ahorro
+            Productos = new List<Producto> {
+                new(){Imagen="Images/Serum.jpg"},
+                new(){Imagen="Images/Cerave.jpg"}
+            }
+        },
+        new Pedido {
+            Id = "KIL-202605002",
+            Fecha = "25 de mayo del 2026",
+            Estado = "En camino",
+            ClaseEstado = "status-purple",
+            TotalArticulos = 2,
+            TotalPrecio = 73.20m, // (40.00 + 38.20) - 15.00 de descuento
+            Productos = new List<Producto> {
+                new(){Imagen="Images/LabialPeripera.jpg"},
+                new(){Imagen="Images/Mascara.jpg"}
+            }
+        },
+        new Pedido {
+            Id = "KIL-202626589",
+            Fecha = "05 de mayo del 2026",
+            Estado = "Entregado",
+            ClaseEstado = "status-green",
+            TotalArticulos = 2,
+            TotalPrecio = 132.00m,
+            Productos = new List<Producto> {
+                new(){Imagen="Images/Serum.jpg"}
+            }
+        }
+        
+    };
 }

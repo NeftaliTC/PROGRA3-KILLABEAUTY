@@ -1,8 +1,10 @@
 ﻿@inherits LayoutComponentBase
 @layout MainLayout
 @inject AuthService AuthService
+@using BlazorAppKillaBeauty.Services
+@inject CartService CartService
 
-<Navbar CantidadCarrito="0" />
+<Navbar CantidadCarrito="@CartService.CantidadTotal" />
 
 <div class="page-background-wrapper">
     <div class="account-main-container">
@@ -12,7 +14,7 @@
             <div class="account-sidebar-card">
                 <div class="profile-avatar-zone">
                     <div class="avatar-circle">C</div>
-                    <h2 class="avatar-name">@AuthService.NombreUsuarioCuenta</h2>
+                    <h2 class="avatar-name">@AuthService.NombreUsuario</h2>
                     <span class="avatar-email">cliente@ejemplo.com</span>
                 </div>
                 
@@ -27,12 +29,12 @@
 </div>
 
 @code {
+    [Inject] NavigationManager Navigation { get; set; }
     protected override void OnInitialized()
     {
-        // Esto llena el servicio con datos de prueba si están vacíos
-        if (string.IsNullOrEmpty(AuthService.NombreUsuario))
+        if (!AuthService.EstaLogueado)
         {
-            AuthService.LoginCliente("cliente");
+            Navigation.NavigateTo("/login");
         }
     }
 }

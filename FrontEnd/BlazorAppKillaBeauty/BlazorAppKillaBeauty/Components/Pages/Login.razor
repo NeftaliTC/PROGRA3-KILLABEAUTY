@@ -85,7 +85,7 @@
         {
             AuthService.LoginCliente("Cliente");
 
-            Navigation.NavigateTo("/");
+            Navigation.NavigateTo("/", forceLoad: true);
             return;
         }
 

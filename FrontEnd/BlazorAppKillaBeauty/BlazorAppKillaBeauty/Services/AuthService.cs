@@ -3,7 +3,6 @@
     public bool EstaLogueado { get; private set; }
     public string NombreUsuario { get; private set; } = "";
     public string Rol { get; private set; } = "";
-    public string NombreUsuarioCuenta => NombreUsuario;
 
     public void LoginCliente(string nombre)
     {
