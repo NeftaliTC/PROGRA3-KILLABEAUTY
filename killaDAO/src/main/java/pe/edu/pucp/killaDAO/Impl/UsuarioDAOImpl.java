@@ -5,6 +5,7 @@ package pe.edu.pucp.killaDAO.Impl;
 import java.sql.*;
 
 import pe.edu.pucp.dbManager.DBManager;
+import pe.edu.pucp.dbManager.TransactionContext;
 import pe.edu.pucp.killaBeauty.killaModelo.Usuario;
 import pe.edu.pucp.killaDAO.UsuarioDAO;
 
@@ -14,59 +15,17 @@ import java.util.List;
 public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
-    public List<Usuario> listAll() throws SQLException {
-        List<Usuario> list=new ArrayList<>();
-        String sql = "SELECT id_usuario, nombre, apellido_materno, apellido_paterno, " +
-                "correo_electronico, fecha_de_inscripcion, contrasena, telefono, activo, id_tipoUsuario " +
-                "FROM Usuario " +
-                "WHERE activo = TRUE";
-        try(Connection connection=DBManager.getInstance().getConnection();
-            Statement stm=connection.createStatement(); ResultSet rs=stm.executeQuery(sql)) {
-            while(rs.next()){
-                Usuario usuario=new Usuario();
-                usuario.setId(rs.getInt(1));
-                usuario.setNombre(rs.getString(2));
-                usuario.setApellidoMaterno(rs.getString(3));
-                usuario.setApellidoPaterno(rs.getString(4));
-                usuario.setCorreoElectronico(rs.getString(5));
-                usuario.setFechaDeInscripcion(rs.getDate(6));
-                usuario.setContrasena(rs.getString(7));
-                usuario.setTelefono(rs.getString(8));
-                usuario.setActivo(rs.getBoolean(9));
-                list.add(usuario);
-
-
-            }
-            return list;
-        }
-
-    }
-
-    @Override
     public Usuario load(Integer id) throws SQLException {
-
-        String sql = "SELECT id_usuario, nombre, apellido_materno, apellido_paterno, " +
-                "correo_electronico, fecha_de_inscripcion, contrasena, telefono, activo " +
-                "FROM Usuario " +
-                "WHERE id_usuario = ?";
-        try(Connection connection=DBManager.getInstance().getConnection();
-            PreparedStatement pstmt=connection.prepareStatement(sql)) {
-            pstmt.setInt(1,id);
-            try(ResultSet rs=pstmt.executeQuery()) {
-                if (rs.next()) {
-                    Usuario usuario = new Usuario();
-                    usuario.setId(rs.getInt(1));
-                    usuario.setNombre(rs.getString(2));
-                    usuario.setApellidoMaterno(rs.getString(3));
-                    usuario.setApellidoPaterno(rs.getString(4));
-                    usuario.setCorreoElectronico(rs.getString(5));
-                    usuario.setFechaDeInscripcion(rs.getDate(6));
-                    usuario.setContrasena(rs.getString(7));
-                    usuario.setTelefono(rs.getString(8));
-                    usuario.setActivo(rs.getBoolean(9));
-
-                    return usuario;
-
+        String sql = "SELECT * FROM Usuario WHERE id_usuario = ?";
+        try (PreparedStatement ps = DBManager.getInstance().getConnection().prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try(ResultSet rs = ps.executeQuery()) {
+                if(rs.next()) {
+                    Usuario u = new Usuario();
+                    u.setId(rs.getInt("id_usuario"));
+                    u.setCorreoElectronico(rs.getString("correo_electronico"));
+                    u.setActivo(rs.getBoolean("activo"));
+                    return u;
                 }
             }
         }
@@ -74,71 +33,82 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     }
 
     @Override
-    public Usuario save(Usuario usuario) throws SQLException {
-        usuario.setActivo(true);
-        String sql="INSERT INTO Usuario " +
-                "(nombre, apellido_materno, apellido_paterno, correo_electronico, contrasena, telefono, activo) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection connection=DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
-            pstmt.setString(1, usuario.getNombre());
-            pstmt.setString(2, usuario.getApellidoMaterno());
-            pstmt.setString(3, usuario.getApellidoPaterno());
-            pstmt.setString(4, usuario.getCorreoElectronico());
-            pstmt.setString(5, usuario.getContrasena());
-            pstmt.setString(6, usuario.getTelefono());
-            pstmt.setBoolean(7, usuario.getActivo());
-
-
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        int newId = generatedKeys.getInt(1);
-                        usuario.setId(newId);
-                    }
-                }
+    public Usuario save(Usuario u) throws SQLException {
+        String sql = "INSERT INTO Usuario (nombre, correo_electronico, contraseña, activo) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement ps = TransactionContext.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, u.getNombre());
+            ps.setString(2, u.getCorreoElectronico());
+            ps.setString(3, u.getContrasena());
+            ps.setBoolean(4, u.getActivo());
+            ps.executeUpdate();
+            try(ResultSet keys = ps.getGeneratedKeys()) {
+                if(keys.next()) u.setId(keys.getInt(1));
             }
         }
-
-        return usuario;
-
+        return u;
     }
 
     @Override
-    public Usuario update(Usuario usuario) throws SQLException {
-        String sql = "UPDATE Usuario SET nombre = ?, apellido_materno = ?, apellido_paterno = ?, " +
-                "correo_electronico = ?, contrasena = ?, telefono = ?, activo = ?" +
-                "WHERE id_usuario = ?";
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, usuario.getNombre());
-            pstmt.setString(2, usuario.getApellidoMaterno());
-            pstmt.setString(3, usuario.getApellidoPaterno());
-            pstmt.setString(4, usuario.getCorreoElectronico());
-            pstmt.setString(5, usuario.getContrasena());
-            pstmt.setString(6, usuario.getTelefono());
-            pstmt.setBoolean(7, usuario.getActivo());
-
-            pstmt.executeUpdate();
-            return usuario;
-        } catch (SQLException e){
-            throw new RuntimeException(e);
+    public Usuario update(Usuario u) throws SQLException {
+        String sql = "UPDATE Usuario SET nombre = ?, correo_electronico = ?, contraseña = ?, activo = ? WHERE id_usuario = ?";
+        try (PreparedStatement ps = TransactionContext.getConnection().prepareStatement(sql)) {
+            ps.setString(1, u.getNombre());
+            ps.setString(2, u.getCorreoElectronico());
+            ps.setString(3, u.getContrasena());
+            ps.setBoolean(4, u.getActivo());
+            ps.setInt(5, u.getId());
+            ps.executeUpdate();
         }
-
-        }
+        return u;
+    }
 
     @Override
-    public void remove(Usuario usuario) throws SQLException {
-        usuario.setActivo(false);
+    public void remove(Usuario u) throws SQLException {
+        u.setActivo(false);
         String sql = "UPDATE Usuario SET activo = ? WHERE id_usuario = ?";
-
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql)) {
-
-            pstmt.setBoolean(1, usuario.getActivo());
-            pstmt.setInt(2, usuario.getId());
-            pstmt.executeUpdate();
+        try (PreparedStatement ps = TransactionContext.getConnection().prepareStatement(sql)) {
+            ps.setBoolean(1, u.getActivo());
+            ps.setInt(2, u.getId());
+            ps.executeUpdate();
         }
+    }
+
+    @Override
+    public List<Usuario> listByTipoUsuario(int idTipoUsuario) throws SQLException {
+        List<Usuario> lista = new ArrayList<>();
+        String sql = "SELECT * FROM Usuario WHERE id_tipoUsuario = ?";
+        try (PreparedStatement ps = DBManager.getInstance().getConnection().prepareStatement(sql)) {
+            ps.setInt(1, idTipoUsuario);
+            try(ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    Usuario u = new Usuario();
+                    u.setId(rs.getInt("id_usuario"));
+                    u.setNombre(rs.getString("nombre"));
+                    u.setCorreoElectronico(rs.getString("correo_electronico"));
+                    u.setActivo(rs.getBoolean("activo"));
+                    lista.add(u);
+                }
+            }
+        }
+        return lista;
+    }
+
+    @Override
+    public Usuario loadByEmail(String email) throws SQLException {
+        String sql = "SELECT * FROM Usuario WHERE correo_electronico = ?";
+        try (PreparedStatement ps = DBManager.getInstance().getConnection().prepareStatement(sql)) {
+            ps.setString(1, email);
+            try(ResultSet rs = ps.executeQuery()) {
+                if(rs.next()) {
+                    Usuario u = new Usuario();
+                    u.setId(rs.getInt("id_usuario"));
+                    u.setNombre(rs.getString("nombre"));
+                    u.setCorreoElectronico(rs.getString("correo_electronico"));
+                    u.setActivo(rs.getBoolean("activo"));
+                    return u;
+                }
+            }
+        }
+        return null;
     }
 }

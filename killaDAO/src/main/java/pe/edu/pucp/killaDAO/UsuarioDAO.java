@@ -6,5 +6,6 @@ import pe.edu.pucp.killaDAO.Base.BaseDAO;
 import java.sql.SQLException;
 import java.util.List;
 public interface UsuarioDAO extends BaseDAO<Usuario,Integer> {
-    List<Usuario> listAll() throws SQLException;
+    Usuario loadByEmail(String email) throws SQLException;
+    List<Usuario> listByTipoUsuario(int idTipoUsuario) throws SQLException;
 }
