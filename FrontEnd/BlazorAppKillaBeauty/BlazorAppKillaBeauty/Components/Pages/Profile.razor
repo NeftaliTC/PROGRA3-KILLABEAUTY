@@ -7,17 +7,17 @@
 <div class="profile-form-grid">
     <div class="form-input-group">
         <label>Nombres</label>
-        <input type="text" value="@profile.Nombres" @oninput="OnNombresInput" />
+        <input type="text" @bind="profile.Nombres" @bind:event="oninput" @bind:after="ValidateForm" />
     </div>
     
     <div class="form-input-group">
         <label>Apellido Paterno</label>
-        <input type="text" value="@profile.ApellidoPaterno" @oninput="OnPaternoInput" />
+        <input type="text" @bind="profile.ApellidoPaterno" @bind:event="oninput" @bind:after="ValidateForm" />
     </div>
     
     <div class="form-input-group">
         <label>Apellido Materno</label>
-        <input type="text" value="@profile.ApellidoMaterno" @oninput="OnMaternoInput" />
+        <input type="text" @bind="profile.ApellidoMaterno" @bind:event="oninput" @bind:after="ValidateForm" />
     </div>
     
     <div class="form-input-group">
@@ -26,18 +26,8 @@
     </div>
     
     <div class="form-input-group">
-        <label>Tipo de documento</label>
-        <select class="custom-select-field" value="@profile.TipoDocumento" disabled>
-            <option value="DNI">DNI</option>
-            <option value="RUC">RUC</option>
-            <option value="Pasaporte">Pasaporte</option>
-            <option value="Carné de Extranjería">Carné de Extranjería</option>
-        </select>
-    </div>
-    
-    <div class="form-input-group">
-        <label>Número de documento</label>
-        <input type="text" value="@profile.NumeroDocumento" disabled />
+        <label>Número de documento (DNI)</label>
+        <input type="text" value="@profile.Dni" disabled />
     </div>
     
     <div class="form-input-group @(hasFechaError ? "has-error" : "")">
@@ -50,14 +40,14 @@
 
         @if (hasFechaError)
         {
-            <span class="error-hint-text">⚠️ @(profile.FechaNacimiento == null ? "Fecha inexistente" : "Debes ser mayor de 18 años")</span>
+            <span class="error-hint-text">⚠️ Debes ser mayor de 18 años</span>
         }
     </div>
 
     <div class="form-input-group">
         <label>Género</label>
         <div class="select-wrapper">
-            <select class="custom-select-field" value="@profile.Genero" @onchange="OnGeneroChange">
+            <select class="custom-select-field" @bind="profile.Genero" @bind:after="ValidateForm">
                 <option value="Selecciona">Selecciona</option>
                 <option value="Masculino">Masculino</option>
                 <option value="Femenino">Femenino</option>
@@ -72,23 +62,34 @@
                value="@profile.Celular"
                @oninput="OnCelularInput"
                maxlength="9"
-               inputmode="numeric" />
+               inputmode="numeric"
+               placeholder="9XXXXXXXX" />
         @if (hasCelularError)
         {
             <span class="error-hint-text">⚠️ Introduce un celular válido (9 dígitos)</span>
         }
     </div>
     
-    <div class="form-input-group empty-space-block"></div>
+    
 </div>
 
 <div class="form-actions-area">
     <button class="killa-save-button @(canSave ? "state-active" : "state-disabled")"
-            disabled="@(!canSave)"
-            @onclick="ProcessFormSave">
-        Guardar cambios
+            disabled="@(!canSave)" @onclick="ProcessFormSave">
+        @(isSaving ? "Guardando..." : "Guardar cambios")
     </button>
 </div>
+
+@if (showSuccessModal)
+{
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="modal-title-text">¡Éxito!</h3>
+            <p class="modal-body-text">Tus cambios se han guardado correctamente.</p>
+            <button @onclick="() => showSuccessModal = false" class="killa-save-button state-active modal-accept-btn">Aceptar</button>
+        </div>
+    </div>
+}
 
 @code {
     private class UserProfileData
@@ -97,8 +98,7 @@
         public string ApellidoPaterno { get; set; } = "";
         public string ApellidoMaterno { get; set; } = "";
         public string Correo { get; set; } = "";
-        public string TipoDocumento { get; set; } = "DNI";
-        public string NumeroDocumento { get; set; } = "";
+        public string Dni { get; set; } = "";
         public DateTime? FechaNacimiento { get; set; }
         public string Genero { get; set; } = "Selecciona";
         public string Celular { get; set; } = "";
@@ -106,14 +106,11 @@
 
     private UserProfileData profile = new();
     private UserProfileData originalSnapshot = new();
-
-    private int selDay = 15;
-    private int selMonth = 4;
-    private int selYear = 2004;
-
     private bool hasFechaError = false;
     private bool hasCelularError = false;
     private bool canSave = false;
+    private bool showSuccessModal = false;
+    private bool isSaving = false;
 
     protected override void OnInitialized()
     {
@@ -123,17 +120,11 @@
             ApellidoPaterno = "Diaz",
             ApellidoMaterno = "Moscoso",
             Correo = "cliente@example.com",
-            TipoDocumento = "DNI",
-            NumeroDocumento = "72817267",
+            Dni = "72817267",
             FechaNacimiento = new DateTime(2004, 04, 15),
             Genero = "Femenino",
             Celular = "964245541"
         };
-
-        selDay = profile.FechaNacimiento.Value.Day;
-        selMonth = profile.FechaNacimiento.Value.Month;
-        selYear = profile.FechaNacimiento.Value.Year;
-
         TakeDataSnapshot();
         ValidateForm();
     }
@@ -146,8 +137,7 @@
             ApellidoPaterno = profile.ApellidoPaterno,
             ApellidoMaterno = profile.ApellidoMaterno,
             Correo = profile.Correo,
-            TipoDocumento = profile.TipoDocumento,
-            NumeroDocumento = profile.NumeroDocumento,
+            Dni = profile.Dni,
             FechaNacimiento = profile.FechaNacimiento,
             Genero = profile.Genero,
             Celular = profile.Celular
@@ -172,30 +162,6 @@
         StateHasChanged();
     }
 
-    private void OnNombresInput(ChangeEventArgs e) {
-        profile.Nombres = e.Value?.ToString() ?? "";
-        ValidateForm();
-    }
-    private void OnPaternoInput(ChangeEventArgs e) {
-        profile.ApellidoPaterno = e.Value?.ToString() ?? "";
-        ValidateForm();
-    }
-    private void OnMaternoInput(ChangeEventArgs e) {
-        profile.ApellidoMaterno = e.Value?.ToString() ?? "";
-        ValidateForm();
-    }
-    private void OnGeneroChange(ChangeEventArgs e) {
-        profile.Genero = e.Value?.ToString() ?? "Selecciona";
-        ValidateForm();
-    }
-
-    private void OnCelularInput(ChangeEventArgs e)
-    {
-        string rawValue = e.Value?.ToString() ?? "";
-        profile.Celular = new string(rawValue.Where(char.IsDigit).ToArray());
-        ValidateForm();
-    }
-
     private void OnDateChange(ChangeEventArgs e)
     {
         if (DateTime.TryParse(e.Value?.ToString(), out DateTime nuevaFecha))
@@ -208,20 +174,28 @@
 
             hasFechaError = (edad < 18);
         }
-        else
-        {
-            profile.FechaNacimiento = null;
-            hasFechaError = true;
-        }
         ValidateForm();
     }
 
-    private void ProcessFormSave()
+    private void OnCelularInput(ChangeEventArgs e)
+    {
+        string rawValue = e.Value?.ToString() ?? "";
+        // Filtra para que solo queden números
+        profile.Celular = new string(rawValue.Where(char.IsDigit).Take(9).ToArray());
+        ValidateForm();
+    }
+
+    private async Task ProcessFormSave()
     {
         if (canSave)
         {
+            isSaving = true;
+            await Task.Delay(1000); // Simulamos el guardado
+            isSaving = false;
+            
             TakeDataSnapshot();
             ValidateForm();
+            showSuccessModal = true; // Mostramos el modal
         }
     }
 }
