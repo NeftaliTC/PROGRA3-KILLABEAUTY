@@ -24,8 +24,8 @@ public class TestCuponDAO {
             nuevo.setValorDescuento(20.0);
             nuevo.setMontoMaximoDescuento(50.0);
             nuevo.setMontoMinimoCompra(100.0);
-            nuevo.setMaxUsosGenerales(100); // Obligatorio según nuestro modelo
-            nuevo.setCampana(null); // Sin campaña asociada por ahora para evitar error de Llave Foránea
+            nuevo.setMaxUsosGenerales(100);
+            nuevo.setCampana(null);
 
             nuevo.setFechaInicio(LocalDate.now());
             nuevo.setFechaFin(LocalDate.now().plusDays(7));
@@ -41,7 +41,7 @@ public class TestCuponDAO {
 
             // 3) UPDATE - Actualización
             if (cargado != null) {
-                cargado.setValorDescuento(25.0); // Subimos el descuento
+                cargado.setValorDescuento(25.0);
                 cargado.setDescripcion("Descuento ACTUALIZADO");
                 cuponDAO.update(cargado);
 
@@ -61,7 +61,7 @@ public class TestCuponDAO {
             if (cargado != null) {
                 cuponDAO.remove(cargado);
                 Cupon eliminado = cuponDAO.load(cargado.getIdCupon());
-                //Cupon aun existe pero ya no funciona (no vigente)
+
                 System.out.println("REMOVE OK -> " + (eliminado != null && !eliminado.isActivo() ? "inactivo" : "aun activo"));
             }
         } catch (SQLException e) {
