@@ -5,6 +5,7 @@
 
 <h2>Gestión de productos</h2>
 
+<!-- Tarjetas estadísticas -->
 <div class="stats-cards" style="display:flex; gap:1rem; margin-bottom:1rem;">
     <div class="card" style="background-color:#E6E6FA; padding:1rem; border-radius:10px;">
         <h3>148</h3>
@@ -24,11 +25,13 @@
     </div>
 </div>
 
+<!-- Acciones y filtros -->
 <div class="actions-header" style="display:flex; justify-content:space-between; margin-bottom:1rem;">
     <button class="btn btn-pink" @onclick="NuevoProducto" style="background-color:#F7C6D1; border:none; border-radius:5px; padding:0.5rem 1rem;">+ Nuevo producto</button>
     <input type="text" placeholder="Buscar productos, marcas..." @bind="FiltroBusqueda" class="form-control" style="width:40%;" />
 </div>
 
+<!-- Tabla de productos -->
 <table class="table table-hover table-bordered" style="border-radius:10px;">
     <thead class="thead-light">
         <tr>
@@ -68,6 +71,7 @@
     </tbody>
 </table>
 
+<!-- Paginación -->
 <div class="pagination mt-3">
     <span>Mostrando 1-4 de 148 productos</span>
     <nav>
