@@ -1,0 +1,276 @@
+﻿@page "/admin/productos/nuevo"
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+
+<PageTitle>Registrar nuevo producto - Killa Beauty</PageTitle>
+
+<main class="admin-page">
+    <AdminNavbar />
+
+    <section class="admin-content admin-product-form-content">
+
+        <div class="admin-breadcrumb">
+            <span>Inicio</span>
+            <i class="bi bi-chevron-right"></i>
+            <span>Productos</span>
+            <i class="bi bi-chevron-right"></i>
+            <span>Nuevo producto</span>
+        </div>
+
+        <header class="admin-product-form-header">
+            <div>
+                <h1>Registrar nuevo producto</h1>
+            </div>
+
+            <div class="admin-product-form-header-actions">
+                <button type="button" class="btn-form-cancel" @onclick="Cancelar">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-form-save" @onclick="Guardar">
+                    Guardar producto
+                </button>
+            </div>
+        </header>
+
+        @if (!string.IsNullOrWhiteSpace(mensajeError))
+        {
+            <div class="admin-products-alert">
+                <span><i class="bi bi-exclamation-circle-fill"></i> @mensajeError</span>
+                <button type="button" @onclick="() => mensajeError = null">X</button>
+            </div>
+        }
+
+        <section class="admin-product-form-card">
+            <div class="admin-form-section-title">
+                <i class="bi bi-tag"></i>
+                <h2>Identificación</h2>
+            </div>
+
+            <div class="admin-form-grid-2">
+                <div class="admin-form-field">
+                    <label>Código del producto</label>
+                    <div class="admin-form-field-readonly">
+                        <input disabled value="@codigoGenerado" />
+                        <small>El sistema genera el código único al guardar.</small>
+                    </div>
+                </div>
+
+                <div class="admin-form-field">
+                    <label>Nombre del producto <span class="required">*</span></label>
+                    <input type="text"
+                           placeholder="Ej: Sérum vitamina C 30ml"
+                           @bind="nombre" />
+                </div>
+            </div>
+        </section>
+
+        <section class="admin-product-form-card">
+            <div class="admin-form-section-title">
+                <i class="bi bi-bookmark"></i>
+                <h2>Clasificación</h2>
+            </div>
+
+            <div class="admin-form-grid-3">
+                <div class="admin-form-field">
+                    <label>Categoría <span class="required">*</span></label>
+                    <select @bind="categoria">
+                        <option value="">Seleccionar categoría</option>
+                        @foreach (var c in categorias)
+                        {
+                            <option value="@c">@c</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="admin-form-field">
+                    <label>Subcategoría <span class="required">*</span></label>
+                    <select @bind="subcategoria" disabled="@(string.IsNullOrWhiteSpace(categoria))">
+                        <option value="">Seleccionar subcategoría</option>
+                        @foreach (var s in SubcategoriasFiltradas)
+                        {
+                            <option value="@s">@s</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="admin-form-field">
+                    <label>Marca <span class="required">*</span></label>
+                    <select @bind="marca">
+                        <option value="">Seleccionar marca</option>
+                        @foreach (var m in marcas)
+                        {
+                            <option value="@m">@m</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="admin-product-form-card">
+            <div class="admin-form-section-title">
+                <i class="bi bi-cash-coin"></i>
+                <h2>Precio y stock</h2>
+            </div>
+
+            <div class="admin-form-grid-2">
+                <div class="admin-form-field">
+                    <label>Precio base (S/.) <span class="required">*</span></label>
+                    <input type="number" step="0.01" placeholder="0.00" @bind="precioBase" />
+                </div>
+
+                <div class="admin-form-field">
+                    <label>Stock inicial <span class="required">*</span></label>
+                    <input type="number" placeholder="0" @bind="stockInicial" />
+                </div>
+            </div>
+        </section>
+
+        <section class="admin-product-form-card">
+            <div class="admin-form-section-title">
+                <i class="bi bi-eye"></i>
+                <h2>Opciones de visibilidad</h2>
+            </div>
+
+            <div class="admin-form-toggles">
+                <div class="toggle-row">
+                    <span>Disponible en catálogo</span>
+                    <label class="switch">
+                        <input type="checkbox" @bind="disponible" />
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-row">
+                    <span>En promoción</span>
+                    <label class="switch">
+                        <input type="checkbox" @bind="enPromocion" />
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <div class="admin-product-form-hint">
+            Las escalas de precio (precio por unidad, media docena, cajón) se configuran después de guardar el producto, desde la pantalla de escalas.
+        </div>
+
+        <footer class="admin-product-form-footer">
+            <button type="button" class="btn-form-cancel" @onclick="Cancelar">
+                Cancelar
+            </button>
+            <button type="button" class="btn-form-save" @onclick="Guardar">
+                Guardar producto
+            </button>
+        </footer>
+
+        @if (mostrarExito)
+        {
+            <div class="admin-modal-overlay">
+                <div class="admin-modal-card">
+                    <div class="admin-modal-icon" style="color:#1f7a3d;">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                    <h2>Producto registrado</h2>
+                    <p class="admin-modal-text">
+                        Se guardó el producto <strong>@nombre</strong> (simulado).
+                    </p>
+
+                    <div class="admin-modal-actions">
+                        <button class="admin-modal-btn-confirm" style="background:#1f7a3d;" @onclick="VolverAProductos">
+                            Volver a productos
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </section>
+</main>
+
+@code {
+    private string? mensajeError;
+    private bool mostrarExito = false;
+
+    // mock “codigo generado”
+    private string codigoGenerado = "KB-149 (generado automáticamente)";
+
+    // form fields
+    private string nombre = "";
+    private string categoria = "";
+    private string subcategoria = "";
+    private string marca = "";
+    private decimal precioBase = 0;
+    private int stockInicial = 0;
+    private bool disponible = true;
+    private bool enPromocion = false;
+
+    // mock selects
+    private List<string> categorias = new() { "Skincare", "Maquillaje", "Cabello" };
+
+    private Dictionary<string, List<string>> subcategoriasPorCategoria = new()
+    {
+        ["Skincare"] = new() { "Limpieza", "Hidratación", "Protección solar" },
+        ["Maquillaje"] = new() { "Base", "Labios", "Ojos" },
+        ["Cabello"] = new() { "Shampoo", "Mascarillas", "Tratamientos" }
+    };
+
+    private List<string> marcas = new() { "The Ordinary", "Maybelline", "Pantene", "NYX", "CeraVe" };
+
+    private List<string> SubcategoriasFiltradas =>
+        string.IsNullOrWhiteSpace(categoria) ? new List<string>() :
+        (subcategoriasPorCategoria.TryGetValue(categoria, out var list) ? list : new List<string>());
+
+    private void Cancelar()
+    {
+        Navigation.NavigateTo("/admin/productos");
+    }
+
+    private void Guardar()
+    {
+        // Validaciones front (solo interacción)
+        if (string.IsNullOrWhiteSpace(nombre))
+        {
+            mensajeError = "El nombre del producto es obligatorio.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(categoria))
+        {
+            mensajeError = "Selecciona una categoría.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(subcategoria))
+        {
+            mensajeError = "Selecciona una subcategoría.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(marca))
+        {
+            mensajeError = "Selecciona una marca.";
+            return;
+        }
+
+        if (precioBase <= 0)
+        {
+            mensajeError = "El precio base debe ser mayor a 0.";
+            return;
+        }
+
+        if (stockInicial < 0)
+        {
+            mensajeError = "El stock inicial no puede ser negativo.";
+            return;
+        }
+
+        mensajeError = null;
+        mostrarExito = true;
+    }
+
+    private void VolverAProductos()
+    {
+        mostrarExito = false;
+        Navigation.NavigateTo("/admin/productos");
+    }
+}

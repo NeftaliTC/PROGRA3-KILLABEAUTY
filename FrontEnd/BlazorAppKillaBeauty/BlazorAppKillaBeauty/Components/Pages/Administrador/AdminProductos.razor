@@ -1,5 +1,6 @@
 @page "/admin/productos"
 @rendermode InteractiveServer
+@inject NavigationManager Navigation
 
 <PageTitle>Productos Admin - Killa Beauty</PageTitle>
 
@@ -46,7 +47,7 @@
                 <p>Consulta, filtra y gestiona los productos disponibles en la tienda.</p>
             </div>
 
-            <button class="admin-primary-action" type="button" @onclick="AbrirCrear">
+            <button class="admin-primary-action" type="button" @onclick="IrANuevoProducto">
                 <i class="bi bi-plus-circle"></i>
                 Nuevo producto
             </button>
@@ -628,5 +629,10 @@
         if (p.Stock == 0) return "pill-danger";
         if (p.Stock < 10) return "pill-warning";
         return "pill-success";
+    }
+
+    private void IrANuevoProducto()
+    {
+        Navigation.NavigateTo("/admin/productos/nuevo");
     }
 }
