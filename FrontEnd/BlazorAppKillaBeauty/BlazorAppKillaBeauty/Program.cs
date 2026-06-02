@@ -10,8 +10,11 @@ builder.Services.AddRazorComponents()
 // SERVICE
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<CartService>();
+<<<<<<< HEAD
 builder.Services.AddSingleton<AddressService>();
 builder.Services.AddSingleton<CouponService>();
+=======
+>>>>>>> master
 builder.Services.AddSingleton<ProductoService>();
 var app = builder.Build();
 
