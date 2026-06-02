@@ -3,16 +3,114 @@
 
 <PageTitle>Productos Admin - Killa Beauty</PageTitle>
 
-<main class="admin-page">
-    <AdminNavbar />
+<h2>Gestión de productos</h2>
 
-    <section class="admin-content">
-        <header class="admin-header">
-            <div>
-                <span class="admin-eyebrow">Panel administrativo</span>
-                <h1>Productos</h1>
-                <p>Modulo pendiente de implementacion.</p>
-            </div>
-        </header>
-    </section>
-</main>
+<div class="stats-cards" style="display:flex; gap:1rem; margin-bottom:1rem;">
+    <div class="card" style="background-color:#E6E6FA; padding:1rem; border-radius:10px;">
+        <h3>148</h3>
+        <p>activos en catálogo</p>
+    </div>
+    <div class="card" style="background-color:#FFD6D6; padding:1rem; border-radius:10px;">
+        <h3>7</h3>
+        <p>requieren reposición</p>
+    </div>
+    <div class="card" style="background-color:#D6F5D6; padding:1rem; border-radius:10px;">
+        <h3>23</h3>
+        <p>con promoción activa</p>
+    </div>
+    <div class="card" style="background-color:#FFE6D6; padding:1rem; border-radius:10px;">
+        <h3>12</h3>
+        <p>menos de 10 unidades</p>
+    </div>
+</div>
+
+<div class="actions-header" style="display:flex; justify-content:space-between; margin-bottom:1rem;">
+    <button class="btn btn-pink" @onclick="NuevoProducto" style="background-color:#F7C6D1; border:none; border-radius:5px; padding:0.5rem 1rem;">+ Nuevo producto</button>
+    <input type="text" placeholder="Buscar productos, marcas..." @bind="FiltroBusqueda" class="form-control" style="width:40%;" />
+</div>
+
+<table class="table table-hover table-bordered" style="border-radius:10px;">
+    <thead class="thead-light">
+        <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Marca</th>
+            <th>Precio base</th>
+            <th>Stock</th>
+            <th>Estado</th>
+            <th>Promo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in ProductosFiltrados)
+        {
+            <tr>
+                <td>@p.Codigo</td>
+                <td>@p.Nombre</td>
+                <td>@p.Categoria</td>
+                <td>@p.Marca</td>
+                <td>s/. @p.PrecioBase</td>
+                <td>@p.Stock und.</td>
+                <td>@p.Estado</td>
+                <td>@(p.Promocion ? "Sí" : "--")</td>
+                <td>
+                    <button class="btn btn-info btn-sm" style="background-color:#FADADD; border:none;" @onclick="() => VerProducto(p)">Ver</button>
+                    <button class="btn btn-warning btn-sm" style="background-color:#F7C6D1; border:none;" @onclick="() => EditarProducto(p)">Editar</button>
+                    @if (p.Estado == "De baja")
+                    {
+                        <button class="btn btn-success btn-sm" style="background-color:#D6F5D6; border:none;" @onclick="() => ReactivarProducto(p)">Reactivar</button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="pagination mt-3">
+    <span>Mostrando 1-4 de 148 productos</span>
+    <nav>
+        <ul style="display:flex; gap:0.5rem; list-style:none; padding:0;">
+            <li><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li>...</li>
+            <li><a href="#">37</a></li>
+        </ul>
+    </nav>
+</div>
+
+@code {
+    private string FiltroBusqueda = "";
+    private List<Producto> Productos = new List<Producto>
+    {
+        new Producto{Codigo="KB-001", Nombre="Sérum vitamina C 30ml", Categoria="Skincare", Marca="The Ordinary", PrecioBase=45, Stock=38, Estado="Disponible", Promocion=true},
+        new Producto{Codigo="KB-002", Nombre="Base fluida larga duración", Categoria="Maquillaje", Marca="Maybelline", PrecioBase=62, Stock=0, Estado="Sin stock", Promocion=false},
+        new Producto{Codigo="KB-003", Nombre="Mascarilla capilar nutritiva", Categoria="Cabello", Marca="Pantene", PrecioBase=28, Stock=7, Estado="De baja", Promocion=false},
+        new Producto{Codigo="KB-004", Nombre="Delineador líquido negro", Categoria="Maquillaje", Marca="NYX", PrecioBase=35, Stock=21, Estado="Disponible", Promocion=true}
+    };
+
+    private IEnumerable<Producto> ProductosFiltrados => Productos
+        .Where(p => string.IsNullOrWhiteSpace(FiltroBusqueda) || p.Nombre.Contains(FiltroBusqueda, StringComparison.OrdinalIgnoreCase));
+
+    private void NuevoProducto() => NavigationManager.NavigateTo("/admin/productos/nuevo");
+    private void VerProducto(Producto p) => NavigationManager.NavigateTo($"/admin/productos/{p.Codigo}");
+    private void EditarProducto(Producto p) => NavigationManager.NavigateTo($"/admin/productos/editar/{p.Codigo}");
+    private void ReactivarProducto(Producto p) => p.Estado = "Disponible";
+
+    // Clase placeholder para UI
+    public class Producto
+    {
+        public string Codigo { get; set; }
+        public string Nombre { get; set; }
+        public string Categoria { get; set; }
+        public string Subcategoria { get; set; }
+        public string Marca { get; set; }
+        public decimal PrecioBase { get; set; }
+        public int Stock { get; set; }
+        public string Estado { get; set; }
+        public bool Promocion { get; set; }
+    }
+
+    [Inject] NavigationManager NavigationManager { get; set; }
+}
