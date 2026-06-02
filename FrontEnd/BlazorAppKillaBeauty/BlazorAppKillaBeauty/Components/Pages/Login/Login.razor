@@ -66,6 +66,9 @@
 
     private string mensajeError = "";
 
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    private string? ReturnUrl { get; set; }
+
     private void IniciarSesion()
     {
         mensajeError = "";
@@ -85,7 +88,7 @@
         {
             AuthService.LoginCliente("Cliente");
 
-            Navigation.NavigateTo("/", forceLoad: true);
+            Navigation.NavigateTo(ReturnUrl ?? "/", forceLoad: true);
             return;
         }
 

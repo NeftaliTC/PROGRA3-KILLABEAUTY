@@ -1,6 +1,8 @@
 ﻿@page "/cart"
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
+@inject AuthService AuthService
+@inject NavigationManager Navigation
 @inject CartService CartService
 
 <Navbar CantidadCarrito="@CantidadCarrito" />
@@ -46,11 +48,20 @@
                         <div class="cart-item-info">
                             <h3>@producto.Nombre</h3>
 
-                            <span class="cart-tag">
-                                @producto.TipoCompra
-                            </span>
+                            <div class="discount-line">
+                                <span class="cart-tag">
+                                    @producto.TipoCompra
+                                </span>
 
-                            <p>
+                                @if (producto.PrecioUnitario < producto.PrecioOriginal)
+                                {
+                                    <span class="saving-text">
+                                        ↝ Ahorro: S/ @((producto.PrecioOriginal - producto.PrecioUnitario).ToString("0.00"))
+                                    </span>
+                                }
+                            </div>
+
+                            <p class="unit-price">
                                 Precio unitario:
                                 S/ @producto.PrecioUnitario.ToString("0.00")
 
@@ -58,6 +69,10 @@
                                 {
                                     <span class="old-price">
                                         S/ @producto.PrecioOriginal.ToString("0.00")
+                                    </span>
+
+                                    <span class="off-text">
+                                        (@producto.PorcentajeDescuento% OFF)
                                     </span>
                                 }
                             </p>
@@ -100,10 +115,13 @@
                     <strong>S/ @CartService.Total.ToString("0.00")</strong>
                 </div>
 
-                <div class="summary-row discount">
-                    <span>Descuento por volumen</span>
-                    <strong>S/ @CartService.DescuentoTotal.ToString("0.00")</strong>
-                </div>
+                @if (CartService.DescuentoTotal > 0)
+                {
+                    <div class="summary-row discount">
+                        <span>Descuento por volumen</span>
+                        <strong>S/ @CartService.DescuentoTotal.ToString("0.00")</strong>
+                    </div>
+                }
 
                 <hr />
 
@@ -112,9 +130,20 @@
                     <strong>S/ @CartService.Total.ToString("0.00")</strong>
                 </div>
 
-                <button class="pay-button">
-                    Proceder al pago
-                </button>
+                @if (AuthService.EstaLogueado)
+                {
+                    <button class="pay-button"
+                            @onclick="ProcederPago">
+                        Proceder al pago
+                    </button>
+                }
+                else
+                {
+                    <button class="pay-button"
+                            @onclick="IrLogin">
+                        Iniciar sesión para continuar
+                    </button>
+                }
 
                 <NavLink href="/" class="continue-link">
                     Continuar comprando
@@ -133,4 +162,16 @@
         CartService.Productos;
 
     private decimal Total => CartService.Total;
+
+    private string mensajeError = "";
+
+    private void ProcederPago()
+    {
+        Navigation.NavigateTo("/checkout");
+    }
+
+    private void IrLogin()
+    {
+        Navigation.NavigateTo("/login?returnUrl=/cart");
+    }
 }

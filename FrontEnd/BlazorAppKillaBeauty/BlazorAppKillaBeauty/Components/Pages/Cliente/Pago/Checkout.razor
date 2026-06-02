@@ -1,0 +1,649 @@
+﻿@page "/checkout"
+@rendermode InteractiveServer
+@using BlazorAppKillaBeauty.Services
+@inject CartService CartService
+@inject AddressService AddressService
+@inject CouponService CouponService
+
+<Navbar CantidadCarrito="@CartService.CantidadTotal" />
+
+<section class="checkout-page">
+
+    <div class="checkout-left">
+
+        <h1>Finalizar Compra</h1>
+
+        <div class="checkout-card">
+            <h2>
+                <i class="bi bi-truck"></i>
+                Método de entrega
+            </h2>
+
+            <div class="delivery-options">
+
+                <button class="delivery-option @(metodoEntrega == "DELIVERY" ? "selected" : "")"
+                        @onclick='() => SeleccionarEntrega("DELIVERY")'>
+                    <i class="bi bi-truck"></i>
+                    <strong>Delivery</strong>
+                    <span>Según distrito</span>
+                </button>
+
+                <button class="delivery-option @(metodoEntrega == "RECOJO" ? "selected" : "")"
+                        @onclick='() => SeleccionarEntrega("RECOJO")'>
+                    <i class="bi bi-bag"></i>
+                    <strong>Recojo en tienda</strong>
+                    <span>Gratis</span>
+                </button>
+
+            </div>
+
+            @if (!string.IsNullOrEmpty(errorEntrega))
+            {
+                <p class="checkout-error">@errorEntrega</p>
+            }
+        </div>
+
+        @if (metodoEntrega == "DELIVERY")
+        {
+            <div class="checkout-card">
+
+                <div class="card-title-row">
+                    <h2>
+                        <i class="bi bi-geo-alt"></i>
+                        Dirección de Entrega
+                    </h2>
+
+                    <button class="btn-new-address"
+                            @onclick="AbrirModalDireccion">
+                        + Nueva Dirección
+                    </button>
+                </div>
+
+                @foreach (var direccion in AddressService.UserAddresses)
+                {
+                    <div class="address-option @(direccionSeleccionada?.Id == direccion.Id ? "selected" : "")"
+                         @onclick="() => SeleccionarDireccion(direccion)">
+
+                        <h3>
+                            @direccion.Alias
+
+                            @if (direccion.IsDefault)
+                            {
+                                <span class="default-badge">
+                                    ★ Predeterminada
+                                </span>
+                            }
+                        </h3>
+
+                        <p>
+                            @direccion.DireccionDetalle<br />
+                            @direccion.Distrito, @direccion.Provincia<br />
+                            @direccion.Referencia
+                        </p>
+
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(errorDireccionEntrega))
+                {
+                    <p class="checkout-error">@errorDireccionEntrega</p>
+                }
+
+            </div>
+        }
+
+        <div class="checkout-card">
+            <h2>
+                <i class="bi bi-tag"></i>
+                Cupón de Descuento
+            </h2>
+
+            <div class="coupon-row">
+                <input placeholder="Ingresa tu código de cupón"
+                       @bind="cupon" />
+
+                <button class="coupon-button"
+                        disabled="@string.IsNullOrWhiteSpace(cupon)"
+                        @onclick="AplicarCupon">
+                    Aplicar
+                </button>
+            </div>
+
+            @if (cuponAplicado != null)
+            {
+                <p class="coupon-discount">
+                    @cuponAplicado.Titulo
+                </p>
+
+                <div class="coupon-success">
+                    ✓ Cupón <strong>@cuponAplicado.Codigo</strong> aplicado correctamente
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(errorCupon))
+            {
+                <div class="coupon-error">
+                    @errorCupon
+                </div>
+            }
+        </div>
+
+        <div class="checkout-card">
+            <h2>
+                <i class="bi bi-file-earmark-text"></i>
+                Tipo de Comprobante
+            </h2>
+
+            <div class="voucher-options">
+
+                <button type="button"
+                        class="voucher-option @(tipoComprobante == "BOLETA" ? "selected" : "")"
+                        @onclick='() => SeleccionarComprobante("BOLETA")'>
+                    <i class="bi bi-file-earmark-text"></i>
+                    <strong>Boleta</strong>
+                    <span>Para personas naturales</span>
+                </button>
+
+                <button type="button"
+                        class="voucher-option @(tipoComprobante == "FACTURA" ? "selected" : "")"
+                        @onclick='() => SeleccionarComprobante("FACTURA")'>
+                    <i class="bi bi-receipt"></i>
+                    <strong>Factura</strong>
+                    <span>Para empresas</span>
+                </button>
+
+            </div>
+
+            @if (tipoComprobante == "BOLETA")
+            {
+                <div class="checkout-field">
+                    <label>DNI</label>
+                    <input placeholder="Ingresa tu DNI"
+                           maxlength="8"
+                           @bind="dni" />
+                </div>
+            }
+
+            @if (tipoComprobante == "FACTURA")
+            {
+                <div class="checkout-field">
+                    <label>RUC</label>
+                    <input placeholder="Ingresa el RUC de tu empresa"
+                           maxlength="11"
+                           @bind="ruc" />
+                </div>
+
+                <div class="checkout-field">
+                    <label>Razón Social</label>
+                    <input placeholder="Nombre o razón social de la empresa"
+                           @bind="razonSocial" />
+                </div>
+
+                <div class="checkout-field">
+                    <label>Dirección Fiscal</label>
+                    <input placeholder="Dirección registrada en SUNAT"
+                           @bind="direccionFiscal" />
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(errorComprobante))
+            {
+                <p class="checkout-error">@errorComprobante</p>
+            }
+        </div>
+
+        <div class="checkout-card">
+            <h2>
+                <i class="bi bi-credit-card"></i>
+                Método de pago
+            </h2>
+
+            <div class="payment-options">
+
+                <button type="button"
+                        class="payment-option-btn @(metodoPago == "TARJETA" ? "selected" : "")"
+                        @onclick='() => SeleccionarPago("TARJETA")'>
+                    <span class="payment-radio @(metodoPago == "TARJETA" ? "active" : "")"></span>
+                    <i class="bi bi-credit-card"></i>
+                    Tarjeta de Crédito/Débito
+                </button>
+
+                <button type="button"
+                        class="payment-option-btn @(metodoPago == "YAPE_PLIN" ? "selected" : "")"
+                        @onclick='() => SeleccionarPago("YAPE_PLIN")'>
+                    <span class="payment-radio @(metodoPago == "YAPE_PLIN" ? "active" : "")"></span>
+                    <i class="bi bi-phone"></i>
+                    Yape / Plin
+                </button>
+
+            </div>
+
+            @if (metodoPago == "TARJETA")
+            {
+                <div class="payment-extra">
+                    <p class="payment-provider">Datos de la Tarjeta</p>
+
+                    <div class="checkout-field">
+                        <label>Número de Tarjeta</label>
+                        <input placeholder="1234 5678 9012 3456" maxlength="19" @bind="numeroTarjeta" />
+                    </div>
+
+                    <div class="checkout-field">
+                        <label>Nombre en la Tarjeta</label>
+                        <input placeholder="NOMBRE APELLIDO" @bind="nombreTarjeta" />
+                    </div>
+
+                    <div class="payment-grid">
+                        <div class="checkout-field">
+                            <label>Fecha de Vencimiento</label>
+                            <input placeholder="MM/AA" maxlength="5" @bind="vencimientoTarjeta" />
+                        </div>
+                        <div class="checkout-field">
+                            <label>CVV</label>
+                            <input placeholder="123" maxlength="4" @bind="cvvTarjeta" />
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (metodoPago == "YAPE_PLIN")
+            {
+                <div class="payment-extra">
+                    <p class="payment-provider">Pago con Yape/Plin</p>
+
+                    <div class="qr-box">
+                        <img src="Images/qr-yape-plin.png" alt="QR Yape/Plin" />
+                    </div>
+
+                    <p class="payment-note">
+                        Escanea el QR y confirma tu operación.
+                    </p>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(errorPago))
+            {
+                <p class="checkout-error">@errorPago</p>
+            }
+        </div>
+
+    </div>
+
+    <div class="checkout-summary">
+        <h2>Resumen del Pedido</h2>
+
+        @foreach (var producto in CartService.Productos)
+        {
+            <div class="summary-product">
+                <span>@($"{producto.Nombre} x{producto.Cantidad}")</span>
+                <strong>S/ @producto.Subtotal.ToString("0.00")</strong>
+            </div>
+        }
+
+        <hr />
+
+        <div class="summary-row">
+            <span>Subtotal</span>
+            <strong>S/ @CartService.Total.ToString("0.00")</strong>
+        </div>
+
+        @if (CartService.DescuentoTotal > 0)
+        {
+            <div class="summary-row discount">
+                <span>Descuento por volumen</span>
+                <strong>S/ @CartService.DescuentoTotal.ToString("0.00")</strong>
+            </div>
+        }
+
+        @if (descuentoCupon > 0)
+        {
+            <div class="summary-row discount">
+                <span>
+                    <i class="bi bi-tag"></i>
+                    Cupón de descuento
+                </span>
+                <strong>-S/ @descuentoCupon.ToString("0.00")</strong>
+            </div>
+        }
+
+        @if (metodoEntrega == "DELIVERY")
+        {
+            <div class="summary-row">
+                <span>Envío</span>
+                @if (direccionSeleccionada is null)
+                {
+                    <strong>-</strong>
+                }
+                else
+                {
+                    <strong>S/ @costoEnvio.ToString("0.00")</strong>
+                }
+            </div>
+        }
+        else if (metodoEntrega == "RECOJO")
+        {
+            <div class="summary-row">
+                <span>Envío</span>
+                <strong>Gratis</strong>
+            </div>
+        }
+
+        <hr />
+
+        <div class="summary-total">
+            <span>Total a pagar</span>
+            <strong>S/ @TotalFinal.ToString("0.00")</strong>
+        </div>
+
+        <button class="confirm-button" @onclick="ConfirmarPedido">
+            Confirmar pedido
+        </button>
+    </div>
+
+</section>
+
+@if (mostrarModalDireccion)
+{
+    <div class="modal-overlay">
+
+        <div class="address-modal">
+
+            <h2>Nueva Dirección</h2>
+
+            <div class="modal-grid">
+                <div class="form-group">
+                    <label>Alias</label>
+                    <input @bind="nuevaDireccion.Alias" placeholder="Casa / Oficina" />
+                </div>
+
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input @bind="nuevaDireccion.Telefono" maxlength="9" placeholder="987654321" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Dirección</label>
+                <input @bind="nuevaDireccion.DireccionDetalle" placeholder="Calle, número, departamento" />
+            </div>
+
+            <div class="modal-grid">
+                <div class="form-group">
+                    <label>Departamento</label>
+                    <input value="Lima" disabled />
+                </div>
+
+                <div class="form-group">
+                    <label>Provincia</label>
+                    <input value="Lima Metropolitana" disabled />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Distrito</label>
+                <select @bind="nuevaDireccion.Distrito">
+                    <option value="">Seleccione...</option>
+                    @foreach (var d in DistritosLima)
+                    {
+                        <option value="@d">@d</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Referencia</label>
+                <input @bind="nuevaDireccion.Referencia" placeholder="Frente a..., al lado de..." />
+            </div>
+
+            @if (!string.IsNullOrEmpty(errorDireccion))
+            {
+                <p class="address-error">@errorDireccion</p>
+            }
+
+            <div class="modal-actions">
+                <button class="btn-cancel" @onclick="CerrarModalDireccion">Cancelar</button>
+                <button class="btn-save" @onclick="GuardarNuevaDireccion">Usar esta Dirección</button>
+            </div>
+
+        </div>
+
+    </div>
+}
+
+@code {
+    private string metodoEntrega = "";
+    private string metodoPago = "";
+    private Address? direccionSeleccionada;
+    private decimal costoEnvio = 0;
+
+    private string errorEntrega = "";
+    private string errorDireccionEntrega = "";
+    private string errorPago = "";
+
+    protected override void OnInitialized()
+    {
+        direccionSeleccionada = AddressService.ObtenerPredeterminada();
+    }
+
+    private void SeleccionarEntrega(string metodo)
+    {
+        metodoEntrega = metodo;
+        errorEntrega = "";
+
+        if (metodo == "RECOJO")
+        {
+            costoEnvio = 0;
+        }
+
+        if (metodo == "DELIVERY")
+        {
+            direccionSeleccionada ??= AddressService.ObtenerPredeterminada();
+
+            if (direccionSeleccionada != null)
+            {
+                costoEnvio = AddressService.CalcularEnvio(direccionSeleccionada);
+            }
+        }
+    }
+
+    private void SeleccionarDireccion(Address direccion)
+    {
+        direccionSeleccionada = direccion;
+        errorDireccionEntrega = "";
+        costoEnvio = AddressService.CalcularEnvio(direccion);
+    }
+
+    private void SeleccionarPago(string metodo)
+    {
+        metodoPago = metodo;
+        errorPago = "";
+    }
+
+    private string cupon = "";
+    private Cupon? cuponAplicado;
+    private decimal descuentoCupon = 0;
+    private string errorCupon = "";
+
+    private void AplicarCupon()
+    {
+        errorCupon = "";
+
+        var encontrado = CouponService.BuscarCupon(cupon);
+
+        if (encontrado == null)
+        {
+            errorCupon = "Cupón no válido.";
+            return;
+        }
+
+        descuentoCupon = CouponService.CalcularDescuento(encontrado, CartService.Total);
+
+        if (descuentoCupon <= 0)
+        {
+            errorCupon = $"Compra mínima S/ {encontrado.MontoMinimoCompra}";
+            return;
+        }
+
+        cuponAplicado = encontrado;
+    }
+
+    private bool mostrarModalDireccion = false;
+    private string errorDireccion = "";
+    private Address nuevaDireccion = new();
+
+    private List<string> DistritosLima = new()
+    {
+        "Ancón", "Ate", "Barranco", "Breña", "Carabayllo",
+        "Cercado de Lima", "Chaclacayo", "Chorrillos",
+        "Cieneguilla", "Comas", "El Agustino",
+        "Independencia", "Jesús María", "La Molina",
+        "La Victoria", "Lince", "Los Olivos",
+        "Miraflores", "San Isidro", "San Borja",
+        "Santiago de Surco", "Surquillo",
+        "Villa El Salvador", "Villa María del Triunfo"
+    };
+
+    private void AbrirModalDireccion()
+    {
+        errorDireccion = "";
+        nuevaDireccion = new Address { Departamento = "Lima", Provincia = "Lima Metropolitana" };
+        mostrarModalDireccion = true;
+    }
+
+    private void CerrarModalDireccion()
+    {
+        mostrarModalDireccion = false;
+    }
+
+    private void GuardarNuevaDireccion()
+    {
+        errorDireccion = "";
+
+        if (string.IsNullOrWhiteSpace(nuevaDireccion.Alias) ||
+            string.IsNullOrWhiteSpace(nuevaDireccion.Telefono) ||
+            string.IsNullOrWhiteSpace(nuevaDireccion.DireccionDetalle) ||
+            string.IsNullOrWhiteSpace(nuevaDireccion.Distrito) ||
+            string.IsNullOrWhiteSpace(nuevaDireccion.Referencia))
+        {
+            errorDireccion = "Complete todos los campos obligatorios.";
+            return;
+        }
+
+        if (nuevaDireccion.Telefono.Length != 9 ||
+            !nuevaDireccion.Telefono.All(char.IsDigit) ||
+            !nuevaDireccion.Telefono.StartsWith("9"))
+        {
+            errorDireccion = "Ingrese un celular válido.";
+            return;
+        }
+
+        nuevaDireccion.Id = AddressService.UserAddresses.Count + 1;
+        nuevaDireccion.IsDefault = false;
+        AddressService.UserAddresses.Add(nuevaDireccion);
+        direccionSeleccionada = nuevaDireccion;
+        costoEnvio = AddressService.CalcularEnvio(nuevaDireccion);
+        mostrarModalDireccion = false;
+    }
+
+    private string tipoComprobante = "BOLETA";
+    private string dni = "";
+    private string ruc = "";
+    private string razonSocial = "";
+    private string direccionFiscal = "";
+    private string errorComprobante = "";
+
+    private string numeroTarjeta = "";
+    private string nombreTarjeta = "";
+    private string vencimientoTarjeta = "";
+    private string cvvTarjeta = "";
+
+    private void SeleccionarComprobante(string tipo)
+    {
+        tipoComprobante = tipo;
+        errorComprobante = "";
+    }
+
+    private bool ValidarTodo()
+    {
+        var valido = true;
+
+        errorEntrega = "";
+        errorDireccionEntrega = "";
+        errorPago = "";
+        errorComprobante = "";
+
+        if (string.IsNullOrEmpty(metodoEntrega))
+        {
+            errorEntrega = "Selecciona un método de entrega.";
+            valido = false;
+        }
+
+        if (metodoEntrega == "DELIVERY" && direccionSeleccionada is null)
+        {
+            errorDireccionEntrega = "Selecciona una dirección de entrega.";
+            valido = false;
+        }
+
+        if (string.IsNullOrEmpty(metodoPago))
+        {
+            errorPago = "Selecciona un método de pago.";
+            valido = false;
+        }
+
+        if (metodoPago == "TARJETA")
+        {
+            if (string.IsNullOrWhiteSpace(numeroTarjeta) ||
+                string.IsNullOrWhiteSpace(nombreTarjeta) ||
+                string.IsNullOrWhiteSpace(vencimientoTarjeta) ||
+                string.IsNullOrWhiteSpace(cvvTarjeta))
+            {
+                errorPago = "Completa todos los datos de la tarjeta.";
+                valido = false;
+            }
+        }
+
+        if (tipoComprobante == "BOLETA")
+        {
+            if (dni.Length != 8 || !dni.All(char.IsDigit))
+            {
+                errorComprobante = "Ingrese un DNI válido de 8 dígitos.";
+                valido = false;
+            }
+        }
+
+        if (tipoComprobante == "FACTURA")
+        {
+            if (ruc.Length != 11 || !ruc.All(char.IsDigit))
+            {
+                errorComprobante = "Ingrese un RUC válido de 11 dígitos.";
+                valido = false;
+            }
+            else if (!(ruc.StartsWith("10") || ruc.StartsWith("20")))
+            {
+                errorComprobante = "El RUC debe iniciar con 10 o 20.";
+                valido = false;
+            }
+            else if (string.IsNullOrWhiteSpace(razonSocial) || string.IsNullOrWhiteSpace(direccionFiscal))
+            {
+                errorComprobante = "Complete los datos de facturación.";
+                valido = false;
+            }
+        }
+
+        return valido;
+    }
+
+    [Inject]
+    private NavigationManager Navigation { get; set; } = default!;
+
+    private void ConfirmarPedido()
+    {
+        if (!ValidarTodo())
+            return;
+
+        CartService.VaciarCarrito();
+        Navigation.NavigateTo("/order-confirmed");
+    }
+
+    private decimal TotalFinal =>
+        CartService.Total + costoEnvio - descuentoCupon;
+}
