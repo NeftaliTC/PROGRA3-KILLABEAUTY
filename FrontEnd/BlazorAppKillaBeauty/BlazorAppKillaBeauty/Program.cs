@@ -12,6 +12,7 @@ builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<CartService>();
 builder.Services.AddScoped<AddressService>();
 builder.Services.AddScoped<CouponService>();
+builder.Services.AddSingleton<ProductoService>();
 
 var app = builder.Build();
 
