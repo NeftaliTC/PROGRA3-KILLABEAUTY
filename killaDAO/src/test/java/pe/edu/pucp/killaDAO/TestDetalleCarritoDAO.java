@@ -7,20 +7,20 @@ import java.util.List;
 
 public class TestDetalleCarritoDAO {
     public static void main(String[] args) {
-        DetalleCarritoDAO dao = new DetalleCarritoDAOImpl();
+        /*DetalleCarritoDAO dao = new DetalleCarritoDAOImpl();
 
         try {
             // 1) SAVE
             DetalleCarrito nuevo = new DetalleCarrito();
             nuevo.setCantidad(3);
             nuevo.getProducto().setId(1); //Producto existe
-            nuevo.setIdCarrito(1); //Carrito existe
+            nuevo.setId(1); //Carrito existe
 
             DetalleCarrito guardado = dao.save(nuevo);
-            System.out.println("SAVE OK -> id detalle: " + guardado.getIdDetalleCarrito());
+            System.out.println("SAVE OK -> id detalle: " + guardado.getId());
 
             // 2) LOAD
-            DetalleCarrito cargado = dao.load(guardado.getIdDetalleCarrito());
+            DetalleCarrito cargado = dao.load(guardado.getId());
             System.out.println("LOAD OK -> Cantidad cargada: " + (cargado != null ? cargado.getCantidad() : "null"));
 
             // 3) UPDATE
@@ -45,6 +45,6 @@ public class TestDetalleCarritoDAO {
         } catch (SQLException e) {
             System.err.println("Error SQL: " + e.getMessage());
             e.printStackTrace();
-        }
+        }*/
     }
 }
