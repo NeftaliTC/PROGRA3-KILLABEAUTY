@@ -1,6 +1,7 @@
 package pe.edu.pucp.killaDAO.Impl;
 
 import pe.edu.pucp.dbManager.DBManager;
+import pe.edu.pucp.dbManager.TransactionContext;
 import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Cupon;
 import pe.edu.pucp.killaBeauty.killaModelo.Direccion;
 import pe.edu.pucp.killaBeauty.killaModelo.Pedido;
@@ -201,5 +202,17 @@ public class PedidoDAOImpl implements PedidoDAO {
         }
 
         return p;
+    }
+
+    @Override
+    public void updateEstado(Integer idPedido, Integer idNuevoEstado) throws SQLException {
+        String sql = "UPDATE Pedido SET id_estado_pedido = ? WHERE id_pedido = ?";
+        Connection con = TransactionContext.getConnection();
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idNuevoEstado);
+            ps.setInt(2, idPedido);
+            ps.executeUpdate();
+        }
     }
 }

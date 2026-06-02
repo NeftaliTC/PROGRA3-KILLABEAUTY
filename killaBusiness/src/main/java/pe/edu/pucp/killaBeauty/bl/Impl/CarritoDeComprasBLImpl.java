@@ -1,4 +1,4 @@
-package pe.edu.pucp.killaBeauty.bl.impl;
+package pe.edu.pucp.killaBeauty.bl.Impl;
 
 import pe.edu.pucp.dbManager.TransactionContext;
 import pe.edu.pucp.killaBeauty.bl.CarritoDeComprasBL;

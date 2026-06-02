@@ -1,4 +1,4 @@
-package pe.edu.pucp.killaBeauty.bl.impl;
+package pe.edu.pucp.killaBeauty.bl.Impl;
 
 import pe.edu.pucp.killaBeauty.bl.CategoriaBL;
 import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;

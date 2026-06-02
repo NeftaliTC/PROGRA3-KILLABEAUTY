@@ -12,7 +12,7 @@ public class CourierDAOImpl implements CourierDAO {
     @Override
     public List<Courier> listAll() throws SQLException {
         List<Courier> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Courier"; // Trae todos para que el admin pueda gestionarlos
+        String sql = "SELECT id_courier, nombre, ruc, telefono, activo, correo FROM Courier"; // Trae todos para que el admin pueda gestionarlos
         try (Connection con = DBManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -98,5 +98,7 @@ public class CourierDAOImpl implements CourierDAO {
     }
 
     @Override
-    public void remove(Courier courier) throws SQLException {}
+    public void remove(Courier courier) throws SQLException {
+        throw new UnsupportedOperationException("La eliminación no está permitida en este sistema.");
+    }
 }
