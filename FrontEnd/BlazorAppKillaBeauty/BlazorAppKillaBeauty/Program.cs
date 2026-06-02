@@ -11,7 +11,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<CartService>();
 builder.Services.AddScoped<CuponService>();
-
+builder.Services.AddScoped<CampanaService>();
 
 
 
