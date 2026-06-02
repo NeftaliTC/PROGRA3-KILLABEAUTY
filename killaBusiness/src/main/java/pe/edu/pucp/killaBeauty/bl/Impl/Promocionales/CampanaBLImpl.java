@@ -1,4 +1,4 @@
-package pe.edu.pucp.killaBeauty.bl.impl.Promocionales;
+package pe.edu.pucp.killaBeauty.bl.Impl.Promocionales;
 
 import pe.edu.pucp.dbManager.TransactionContext;
 import pe.edu.pucp.killaBeauty.bl.Promocionales.CampanaBL;
