@@ -152,6 +152,16 @@ body {
     .category-card p {
         color: gray;
     }
+.category-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+    .category-link:hover {
+        text-decoration: none;
+        color: inherit;
+    }
 
 /* DISTRIBUIDOR */
 

@@ -10,7 +10,7 @@ builder.Services.AddRazorComponents()
 // SERVICE
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<CartService>();
-
+builder.Services.AddSingleton<ProductoService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

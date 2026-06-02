@@ -1,0 +1,542 @@
+﻿@page "/catalogo"
+@page "/catalogo/{CategoriaUrl}"
+@page "/catalogo/{CategoriaUrl}/{SubcategoriaUrl}"
+@rendermode InteractiveServer
+
+@using BlazorAppKillaBeauty.Services
+@using Microsoft.AspNetCore.Components
+
+@inject ProductoService ProductoService
+@inject CartService CartService
+@inject NavigationManager Navigation
+
+<Navbar CantidadCarrito="@CartService.CantidadTotal" />
+
+<section class="catalog-page">
+
+    
+
+        <div class="catalog-breadcrumb">
+
+            <NavLink href="/" class="breadcrumb-link">
+                Home
+            </NavLink>
+
+            <span class="breadcrumb-separator">&gt;</span>
+
+            <NavLink href="/catalogo" class="breadcrumb-link">
+                Catálogo
+            </NavLink>
+
+            @if (categoriaSeleccionada != "Todas")
+            {
+                <span class="breadcrumb-separator">&gt;</span>
+
+                <NavLink href="@($"/catalogo/{ConvertirParaUrl(categoriaSeleccionada)}")"
+                         class="breadcrumb-link">
+                    @categoriaSeleccionada
+                </NavLink>
+            }
+
+            @if (!string.IsNullOrEmpty(subcategoriaSeleccionada))
+            {
+                <span class="breadcrumb-separator">&gt;</span>
+
+                <NavLink href="@($"/catalogo/{ConvertirParaUrl(categoriaSeleccionada)}/{ConvertirParaUrl(subcategoriaSeleccionada)}")"
+                         class="breadcrumb-current">
+                    @subcategoriaSeleccionada
+                </NavLink>
+            }
+
+        </div>
+
+   
+
+    <div class="catalog-layout">
+
+        <aside class="filters-card filters-card-large">
+            <h2>Filtros</h2>
+
+            <h4>CATEGORÍAS</h4>
+
+            <button class="filter-option @(categoriaSeleccionada == "Todas" ? "active" : "")"
+                    @onclick='() => SeleccionarCategoria("Todas")'>
+                Todas las categorías
+            </button>
+
+            <button class="filter-option filter-category-row @(categoriaSeleccionada == "Skincare" ? "active-text" : "")"
+                    @onclick="ToggleSkincare">
+                <span>Skincare</span>
+
+                @if (mostrarSkincare)
+                {
+                    <i class="bi bi-chevron-up"></i>
+                }
+                else
+                {
+                    <i class="bi bi-chevron-down"></i>
+                }
+            </button>
+
+            @if (mostrarSkincare)
+            {
+                <button class="filter-suboption @(subcategoriaSeleccionada == "Limpiadores faciales" ? "active-subcategory" : "")"
+                        @onclick='() => SeleccionarSubcategoria("Skincare", "Limpiadores faciales")'>
+                    Limpiadores faciales
+                </button>
+
+                <button class="filter-suboption @(subcategoriaSeleccionada == "Serums" ? "active-subcategory" : "")"
+                        @onclick='() => SeleccionarSubcategoria("Skincare", "Serums")'>
+                    Serums
+                </button>
+
+                <button class="filter-suboption @(subcategoriaSeleccionada == "Crema Hidratante" ? "active-subcategory" : "")"
+                        @onclick='() => SeleccionarSubcategoria("Skincare", "Crema Hidratante")'>
+                    Crema Hidratante
+                </button>
+            }
+
+            <button class="filter-option filter-category-row @(categoriaSeleccionada == "Makeup" ? "active-text" : "")"
+                    @onclick="ToggleMakeup">
+                <span>Makeup</span>
+
+                @if (mostrarMakeup)
+                {
+                    <i class="bi bi-chevron-up"></i>
+                }
+                else
+                {
+                    <i class="bi bi-chevron-down"></i>
+                }
+            </button>
+
+            @if (mostrarMakeup)
+            {
+                <button class="filter-suboption @(subcategoriaSeleccionada == "Bases" ? "active-subcategory" : "")"
+                        @onclick='() => SeleccionarSubcategoria("Makeup", "Bases")'>
+                    Bases
+                </button>
+
+                <button class="filter-suboption @(subcategoriaSeleccionada == "Labiales" ? "active-subcategory" : "")"
+                        @onclick='() => SeleccionarSubcategoria("Makeup", "Labiales")'>
+                    Labiales
+                </button>
+
+                <button class="filter-suboption @(subcategoriaSeleccionada == "Máscaras" ? "active-subcategory" : "")"
+                        @onclick='() => SeleccionarSubcategoria("Makeup", "Máscaras")'>
+                    Máscaras
+                </button>
+
+                <button class="filter-suboption @(subcategoriaSeleccionada == "Correctores" ? "active-subcategory" : "")"
+                        @onclick='() => SeleccionarSubcategoria("Makeup", "Correctores")'>
+                    Correctores
+                </button>
+            }
+
+            <button class="filter-option filter-category-row @(categoriaSeleccionada == "Cuidado del cabello" ? "active-text" : "")"
+                    @onclick="ToggleCabello">
+                <span>Cuidado del cabello</span>
+
+                @if (mostrarCabello)
+                {
+                    <i class="bi bi-chevron-up"></i>
+                }
+                else
+                {
+                    <i class="bi bi-chevron-down"></i>
+                }
+            </button>
+
+            @if (mostrarCabello)
+            {
+                <button class="filter-suboption @(subcategoriaSeleccionada == "Shampoo" ? "active-subcategory" : "")"
+                        @onclick='() => SeleccionarSubcategoria("Cuidado del cabello", "Shampoo")'>
+                    Shampoo
+                </button>
+
+                <button class="filter-suboption @(subcategoriaSeleccionada == "Acondicionador" ? "active-subcategory" : "")"
+                        @onclick='() => SeleccionarSubcategoria("Cuidado del cabello", "Acondicionador")'>
+                    Acondicionador
+                </button>
+
+                <button class="filter-suboption @(subcategoriaSeleccionada == "Tratamientos" ? "active-subcategory" : "")"
+                        @onclick='() => SeleccionarSubcategoria("Cuidado del cabello", "Tratamientos")'>
+                    Tratamientos
+                </button>
+
+                <button class="filter-suboption @(subcategoriaSeleccionada == "Cremas de peinar" ? "active-subcategory" : "")"
+                        @onclick='() => SeleccionarSubcategoria("Cuidado del cabello", "Cremas de peinar")'>
+                    Cremas de peinar
+                </button>
+            }
+
+            <button class="filter-option filter-category-row @(categoriaSeleccionada == "Fragancias" ? "active-text" : "")"
+                    @onclick="ToggleFragancias">
+                <span>Fragancias</span>
+
+                @if (mostrarFragancias)
+                {
+                    <i class="bi bi-chevron-up"></i>
+                }
+                else
+                {
+                    <i class="bi bi-chevron-down"></i>
+                }
+            </button>
+
+            @if (mostrarFragancias)
+            {
+                <button class="filter-suboption @(subcategoriaSeleccionada == "Perfumes" ? "active-subcategory" : "")"
+                        @onclick='() => SeleccionarSubcategoria("Fragancias", "Perfumes")'>
+                    Perfumes
+                </button>
+            }
+
+            <h4>TOP MARCAS</h4>
+
+            <label class="filter-row">
+                <input type="checkbox" @bind="soloCerave" @bind:after="ResetearPagina" />
+                CeraVe
+            </label>
+
+            <label class="filter-row">
+                <input type="checkbox" @bind="soloOrdinary" @bind:after="ResetearPagina" />
+                The Ordinary
+            </label>
+
+            <label class="filter-row">
+                <input type="checkbox" @bind="soloLaRoche" @bind:after="ResetearPagina" />
+                La Roche-Posay
+            </label>
+
+            <label class="filter-row">
+                <input type="checkbox" @bind="soloGarnier" @bind:after="ResetearPagina" />
+                Garnier
+            </label>
+
+            <h4>PRECIO</h4>
+
+            <div class="single-price-range">
+                <input class="price-slider"
+                       type="range"
+                       min="0"
+                       max="500"
+                       @bind="precioMaximo"
+                       @bind:after="ResetearPagina" />
+            </div>
+
+            <div class="price-range">
+                <span>S/ 0</span>
+                <span>S/ @precioMaximo</span>
+            </div>
+
+        </aside>
+
+        <div class="catalog-content">
+
+            <div class="catalog-products">
+
+                @foreach (var producto in ProductosPaginados)
+                {
+                    <div class="catalog-product-card">
+
+                        <div class="catalog-product-image-area">
+                            <img class="catalog-product-img"
+                                 src="@producto.Imagen"
+                                 alt="@producto.Nombre" />
+                        </div>
+
+                        <div class="catalog-product-info">
+
+                            <p class="catalog-brand">
+                                @producto.Marca
+                            </p>
+
+                            <h3 class="catalog-product-title">
+                                @producto.Nombre
+                            </h3>
+
+                            <p class="catalog-price">
+                                @MostrarPrecio(producto)
+                            </p>
+
+                            <button class="catalog-add-btn"
+                                    @onclick="() => AgregarCarrito(producto)">
+                                <i class="bi bi-bag"></i>
+                                Añadir
+                            </button>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+            @if (TotalPaginas > 1)
+            {
+                <div class="catalog-pagination">
+
+                    <span class="pagination-label">Páginas:</span>
+
+                    <button class="pagination-arrow"
+                            disabled="@(paginaActual == 1)"
+                            @onclick="PaginaAnterior">
+                        &lt;
+                    </button>
+
+                    @foreach (var numeroPagina in PaginasVisibles)
+                    {
+                        if (numeroPagina == -1)
+                        {
+                            <span class="pagination-dots">...</span>
+                        }
+                        else
+                        {
+                            <button class="pagination-number @(paginaActual == numeroPagina ? "active" : "")"
+                                    @onclick="() => CambiarPagina(numeroPagina)">
+                                @numeroPagina
+                            </button>
+                        }
+                    }
+
+                    <button class="pagination-arrow"
+                            disabled="@(paginaActual == TotalPaginas)"
+                            @onclick="PaginaSiguiente">
+                        &gt;
+                    </button>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</section>
+
+@code {
+    [Parameter]
+    public string? CategoriaUrl { get; set; }
+
+    [Parameter]
+    public string? SubcategoriaUrl { get; set; }
+
+    private int paginaActual = 1;
+    private int productosPorPagina = 12;
+
+    private List<Producto> productos = new();
+
+    private bool mostrarSkincare = true;
+    private bool mostrarMakeup = false;
+    private bool mostrarCabello = false;
+    private bool mostrarFragancias = false;
+
+    private string categoriaSeleccionada = "Todas";
+    private string subcategoriaSeleccionada = "";
+
+    private decimal precioMaximo = 500;
+
+    private bool soloCerave;
+    private bool soloOrdinary;
+    private bool soloLaRoche;
+    private bool soloGarnier;
+
+    protected override void OnParametersSet()
+    {
+        productos = ProductoService.ObtenerTodos().ToList();
+
+        if (!string.IsNullOrEmpty(CategoriaUrl))
+        {
+            categoriaSeleccionada = ConvertirDesdeUrl(CategoriaUrl);
+        }
+        else
+        {
+            categoriaSeleccionada = "Todas";
+        }
+
+        if (!string.IsNullOrEmpty(SubcategoriaUrl))
+        {
+            subcategoriaSeleccionada = ConvertirDesdeUrl(SubcategoriaUrl);
+        }
+        else
+        {
+            subcategoriaSeleccionada = "";
+        }
+
+        AbrirCategoriaActual();
+        paginaActual = 1;
+    }
+
+    private IEnumerable<Producto> ProductosFiltrados =>
+        productos.Where(p =>
+            FiltroCategoria(p)
+            && FiltroSubcategoria(p)
+            && FiltroPrecio(p)
+            && FiltroMarca(p)
+        );
+
+    private IEnumerable<Producto> ProductosPaginados =>
+        ProductosFiltrados
+            .Skip((paginaActual - 1) * productosPorPagina)
+            .Take(productosPorPagina);
+
+    private int TotalPaginas =>
+        (int)Math.Ceiling(ProductosFiltrados.Count() / (double)productosPorPagina);
+
+    private IEnumerable<int> PaginasVisibles
+    {
+        get
+        {
+            if (TotalPaginas <= 5)
+            {
+                return Enumerable.Range(1, TotalPaginas);
+            }
+
+            if (paginaActual <= 3)
+            {
+                return new List<int> { 1, 2, 3, -1, TotalPaginas };
+            }
+
+            if (paginaActual >= TotalPaginas - 2)
+            {
+                return new List<int> { 1, -1, TotalPaginas - 2, TotalPaginas - 1, TotalPaginas };
+            }
+
+            return new List<int> { 1, -1, paginaActual, -1, TotalPaginas };
+        }
+    }
+
+    private bool FiltroCategoria(Producto producto)
+    {
+        return categoriaSeleccionada == "Todas"
+            || producto.Categoria == categoriaSeleccionada;
+    }
+
+    private bool FiltroSubcategoria(Producto producto)
+    {
+        return string.IsNullOrEmpty(subcategoriaSeleccionada)
+            || producto.Subcategoria == subcategoriaSeleccionada;
+    }
+
+    private bool FiltroPrecio(Producto producto)
+    {
+        return producto.PrecioMinimo <= precioMaximo;
+    }
+
+    private bool FiltroMarca(Producto producto)
+    {
+        if (!soloCerave && !soloOrdinary && !soloLaRoche && !soloGarnier)
+        {
+            return true;
+        }
+
+        return (soloCerave && producto.Marca == "CeraVe")
+            || (soloOrdinary && producto.Marca == "The Ordinary")
+            || (soloLaRoche && producto.Marca == "La Roche-Posay")
+            || (soloGarnier && producto.Marca == "Garnier");
+    }
+
+    private void SeleccionarCategoria(string categoria)
+    {
+        if (categoria == "Todas")
+        {
+            Navigation.NavigateTo("/catalogo");
+            return;
+        }
+
+        Navigation.NavigateTo($"/catalogo/{ConvertirParaUrl(categoria)}");
+    }
+
+    private void SeleccionarSubcategoria(string categoria, string subcategoria)
+    {
+        Navigation.NavigateTo($"/catalogo/{ConvertirParaUrl(categoria)}/{ConvertirParaUrl(subcategoria)}");
+    }
+
+    private void ToggleSkincare()
+    {
+        mostrarSkincare = !mostrarSkincare;
+        SeleccionarCategoria("Skincare");
+    }
+
+    private void ToggleMakeup()
+    {
+        mostrarMakeup = !mostrarMakeup;
+        SeleccionarCategoria("Makeup");
+    }
+
+    private void ToggleCabello()
+    {
+        mostrarCabello = !mostrarCabello;
+        SeleccionarCategoria("Cuidado del cabello");
+    }
+
+    private void ToggleFragancias()
+    {
+        mostrarFragancias = !mostrarFragancias;
+        SeleccionarCategoria("Fragancias");
+    }
+
+    private void AbrirCategoriaActual()
+    {
+        mostrarSkincare = categoriaSeleccionada == "Skincare" || categoriaSeleccionada == "Todas";
+        mostrarMakeup = categoriaSeleccionada == "Makeup";
+        mostrarCabello = categoriaSeleccionada == "Cuidado del cabello";
+        mostrarFragancias = categoriaSeleccionada == "Fragancias";
+    }
+
+    private string MostrarPrecio(Producto producto)
+    {
+        if (producto.PrecioMinimo == producto.PrecioMaximo)
+        {
+            return $"S/ {producto.PrecioMinimo:0.00}";
+        }
+
+        return $"S/ {producto.PrecioMinimo:0.00} - {producto.PrecioMaximo:0.00}";
+    }
+
+    private void AgregarCarrito(Producto producto)
+    {
+        CartService.AgregarProducto(
+            producto.Nombre,
+            producto.PrecioMinimo,
+            producto.Imagen
+        );
+    }
+
+    private void CambiarPagina(int numeroPagina)
+    {
+        paginaActual = numeroPagina;
+    }
+
+    private void PaginaAnterior()
+    {
+        if (paginaActual > 1)
+        {
+            paginaActual--;
+        }
+    }
+
+    private void PaginaSiguiente()
+    {
+        if (paginaActual < TotalPaginas)
+        {
+            paginaActual++;
+        }
+    }
+
+    private void ResetearPagina()
+    {
+        paginaActual = 1;
+    }
+
+    private string ConvertirParaUrl(string texto)
+    {
+        return texto.Replace(" ", "-");
+    }
+
+    private string ConvertirDesdeUrl(string texto)
+    {
+        return texto.Replace("-", " ");
+    }
+}
