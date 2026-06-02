@@ -3,118 +3,630 @@
 
 <PageTitle>Productos Admin - Killa Beauty</PageTitle>
 
-<h2>Gestión de productos</h2>
+<main class="admin-page">
+    <AdminNavbar />
 
-<!-- Tarjetas estadísticas -->
-<div class="stats-cards" style="display:flex; gap:1rem; margin-bottom:1rem;">
-    <div class="card" style="background-color:#E6E6FA; padding:1rem; border-radius:10px;">
-        <h3>148</h3>
-        <p>activos en catálogo</p>
-    </div>
-    <div class="card" style="background-color:#FFD6D6; padding:1rem; border-radius:10px;">
-        <h3>7</h3>
-        <p>requieren reposición</p>
-    </div>
-    <div class="card" style="background-color:#D6F5D6; padding:1rem; border-radius:10px;">
-        <h3>23</h3>
-        <p>con promoción activa</p>
-    </div>
-    <div class="card" style="background-color:#FFE6D6; padding:1rem; border-radius:10px;">
-        <h3>12</h3>
-        <p>menos de 10 unidades</p>
-    </div>
-</div>
+    <section class="admin-content admin-products-content">
 
-<!-- Acciones y filtros -->
-<div class="actions-header" style="display:flex; justify-content:space-between; margin-bottom:1rem;">
-    <button class="btn btn-pink" @onclick="NuevoProducto" style="background-color:#F7C6D1; border:none; border-radius:5px; padding:0.5rem 1rem;">+ Nuevo producto</button>
-    <input type="text" placeholder="Buscar productos, marcas..." @bind="FiltroBusqueda" class="form-control" style="width:40%;" />
-</div>
+        <section class="admin-products-kpis">
+            <article class="admin-products-kpi-card kpi-neutral">
+                <span>Total productos</span>
+                <strong>@TotalProductos</strong>
+                <p>activos en catálogo</p>
+            </article>
 
-<!-- Tabla de productos -->
-<table class="table table-hover table-bordered" style="border-radius:10px;">
-    <thead class="thead-light">
-        <tr>
-            <th>Código</th>
-            <th>Nombre</th>
-            <th>Categoría</th>
-            <th>Marca</th>
-            <th>Precio base</th>
-            <th>Stock</th>
-            <th>Estado</th>
-            <th>Promo</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var p in ProductosFiltrados)
+            <article class="admin-products-kpi-card kpi-danger">
+                <span>Sin stock</span>
+                <strong>@SinStock</strong>
+                <p>requieren reposición</p>
+            </article>
+
+            <article class="admin-products-kpi-card kpi-success">
+                <span>En promoción</span>
+                <strong>@EnPromo</strong>
+                <p>con promoción activa</p>
+            </article>
+
+            <article class="admin-products-kpi-card kpi-warning">
+                <span>Stock crítico</span>
+                <strong>@StockCritico</strong>
+                <p>menos de 10 unidades</p>
+            </article>
+        </section>
+
+        <div class="admin-breadcrumb">
+            <span>Inicio</span>
+            <i class="bi bi-chevron-right"></i>
+            <span>Productos</span>
+        </div>
+
+        <header class="admin-header admin-products-header">
+            <div>
+                <h1>Gestión de productos</h1>
+                <p>Consulta, filtra y gestiona los productos disponibles en la tienda.</p>
+            </div>
+
+            <button class="admin-primary-action" type="button" @onclick="AbrirCrear">
+                <i class="bi bi-plus-circle"></i>
+                Nuevo producto
+            </button>
+        </header>
+
+        @if (!string.IsNullOrWhiteSpace(mensajeError))
         {
-            <tr>
-                <td>@p.Codigo</td>
-                <td>@p.Nombre</td>
-                <td>@p.Categoria</td>
-                <td>@p.Marca</td>
-                <td>s/. @p.PrecioBase</td>
-                <td>@p.Stock und.</td>
-                <td>@p.Estado</td>
-                <td>@(p.Promocion ? "Sí" : "--")</td>
-                <td>
-                    <button class="btn btn-info btn-sm" style="background-color:#FADADD; border:none;" @onclick="() => VerProducto(p)">Ver</button>
-                    <button class="btn btn-warning btn-sm" style="background-color:#F7C6D1; border:none;" @onclick="() => EditarProducto(p)">Editar</button>
-                    @if (p.Estado == "De baja")
-                    {
-                        <button class="btn btn-success btn-sm" style="background-color:#D6F5D6; border:none;" @onclick="() => ReactivarProducto(p)">Reactivar</button>
-                    }
-                </td>
-            </tr>
+            <div class="admin-products-alert">
+                <span><i class="bi bi-exclamation-circle-fill"></i> @mensajeError</span>
+                <button type="button" @onclick="() => mensajeError = null">X</button>
+            </div>
         }
-    </tbody>
-</table>
 
-<!-- Paginación -->
-<div class="pagination mt-3">
-    <span>Mostrando 1-4 de 148 productos</span>
-    <nav>
-        <ul style="display:flex; gap:0.5rem; list-style:none; padding:0;">
-            <li><a href="#">1</a></li>
-            <li><a href="#">2</a></li>
-            <li>...</li>
-            <li><a href="#">37</a></li>
-        </ul>
-    </nav>
-</div>
+        <section class="admin-orders-filters admin-products-filters">
+            <div class="admin-orders-search">
+                <i class="bi bi-search"></i>
+                <input type="text"
+                       placeholder="Buscar productos, marcas..."
+                       @bind="busqueda"
+                       @bind:event="oninput" />
+            </div>
+
+            <div class="admin-products-filter-row">
+                <div class="admin-status-filter">
+                    <span>Categoría</span>
+                    <select @bind="categoriaSeleccionada">
+                        <option value="Todas las categorías">Todas las categorías</option>
+                        @foreach (var c in CategoriasDisponibles)
+                        {
+                            <option value="@c">@c</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="admin-status-filter">
+                    <span>Marca</span>
+                    <select @bind="marcaSeleccionada">
+                        <option value="Todas las marcas">Todas las marcas</option>
+                        @foreach (var m in MarcasDisponibles)
+                        {
+                            <option value="@m">@m</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="admin-status-filter">
+                    <span>Estado</span>
+                    <select @bind="estadoSeleccionado">
+                        <option value="Todos los estados">Todos los estados</option>
+                        <option value="Disponible">Disponible</option>
+                        <option value="Sin stock">Sin stock</option>
+                        <option value="De baja">De baja</option>
+                    </select>
+                </div>
+
+                <button type="button" class="admin-clear-filters" @onclick="LimpiarFiltros">
+                    Limpiar filtros
+                </button>
+            </div>
+        </section>
+
+        <section class="admin-table-card admin-products-table-card">
+            <table class="admin-table admin-products-table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Marca</th>
+                        <th>Precio base</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                        <th>Promo</th>
+                        <th style="text-align:right;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ProductosPaginados.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="9">
+                                <div class="admin-empty-orders">
+                                    <i class="bi bi-inbox"></i>
+                                    <span>No se encontraron productos con esos filtros.</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var p in ProductosPaginados)
+                        {
+                            <tr style="@(p.Activo ? "" : "opacity: 0.82;")">
+                                <td>@p.Codigo</td>
+                                <td class="admin-products-name">@p.Nombre</td>
+                                <td>@p.Categoria</td>
+                                <td>@p.Marca</td>
+                                <td>S/. @p.PrecioBase.ToString("F2")</td>
+                                <td>
+                                    <span class="admin-products-pill @GetStockClass(p)">
+                                        @p.Stock unid.
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="admin-products-pill @GetEstadoClass(p)">
+                                        @GetEstadoTexto(p)
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (p.EnPromocion)
+                                    {
+                                        <span class="admin-products-pill pill-promo">Sí</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="admin-products-dash">—</span>
+                                    }
+                                </td>
+                                <td style="text-align:right;">
+                                    <div class="admin-products-actions">
+                                        <button type="button" class="admin-products-btn" @onclick="() => AbrirVer(p)">
+                                            <i class="bi bi-eye"></i> Ver
+                                        </button>
+
+                                        <button type="button" class="admin-products-btn" @onclick="() => AbrirEditar(p)">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </button>
+
+                                        @if (!p.Activo)
+                                        {
+                                            <button type="button" class="admin-products-btn btn-reactivar" @onclick="() => AbrirReactivar(p)">
+                                                <i class="bi bi-arrow-counterclockwise"></i> Reactivar
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </section>
+
+        <footer class="admin-pagination admin-products-pagination">
+            <span>
+                Mostrando @RangoMostrado de @ProductosFiltrados.Count productos
+            </span>
+
+            <div class="admin-pagination-buttons">
+                <button type="button" disabled="@(paginaActual == 1)" @onclick="PaginaAnterior">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+
+                @for (var pagina = 1; pagina <= TotalPaginas; pagina++)
+                {
+                    var numeroPagina = pagina;
+                    <button type="button"
+                            class="@(paginaActual == numeroPagina ? "active" : "")"
+                            @onclick="() => CambiarPagina(numeroPagina)">
+                        @numeroPagina
+                    </button>
+                }
+
+                <button type="button" disabled="@(paginaActual == TotalPaginas)" @onclick="PaginaSiguiente">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </footer>
+
+    </section>
+</main>
+
+@if (mostrarModal && productoSeleccionado != null)
+{
+    <div class="admin-modal-overlay">
+        <div class="admin-modal-card admin-products-modal-card">
+            <header class="admin-products-modal-header">
+                <h2>@TituloModal</h2>
+                <button type="button" class="admin-products-modal-close" @onclick="CerrarModal">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </header>
+
+            @if (modoModal == ModoModal.Ver)
+            {
+                <div class="admin-products-modal-body">
+                    <div><strong>Código:</strong> @productoSeleccionado.Codigo</div>
+                    <div><strong>Nombre:</strong> @productoSeleccionado.Nombre</div>
+                    <div><strong>Categoría:</strong> @productoSeleccionado.Categoria</div>
+                    <div><strong>Marca:</strong> @productoSeleccionado.Marca</div>
+                    <div><strong>Precio:</strong> S/. @productoSeleccionado.PrecioBase.ToString("F2")</div>
+                    <div><strong>Stock:</strong> @productoSeleccionado.Stock unid.</div>
+                    <div><strong>Estado:</strong> @GetEstadoTexto(productoSeleccionado)</div>
+                    <div><strong>Promo:</strong> @(productoSeleccionado.EnPromocion ? "Sí" : "No")</div>
+                </div>
+
+                <div class="admin-modal-actions" style="justify-content:flex-end; margin-top: 22px;">
+                    <button class="admin-modal-btn-cancel" @onclick="CerrarModal">Cerrar</button>
+                </div>
+            }
+            else if (modoModal == ModoModal.Crear || modoModal == ModoModal.Editar)
+            {
+                <EditForm Model="modeloFormulario" OnValidSubmit="GuardarProducto">
+                    <div class="admin-form-group">
+                        <label>Código</label>
+                        <input type="text" @bind-value="modeloFormulario.Codigo" required />
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Nombre</label>
+                        <input type="text" @bind-value="modeloFormulario.Nombre" required />
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Categoría</label>
+                        <input type="text" @bind-value="modeloFormulario.Categoria" required />
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Marca</label>
+                        <input type="text" @bind-value="modeloFormulario.Marca" required />
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Precio base</label>
+                        <input type="number" step="0.01" @bind-value="modeloFormulario.PrecioBase" required />
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Stock</label>
+                        <input type="number" @bind-value="modeloFormulario.Stock" required />
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>En promoción</label>
+                        <select @bind="modeloFormulario.EnPromocion">
+                            <option value="false">No</option>
+                            <option value="true">Sí</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Activo</label>
+                        <select @bind="modeloFormulario.Activo">
+                            <option value="true">Activo</option>
+                            <option value="false">De baja</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-modal-actions" style="justify-content:flex-end; margin-top: 22px;">
+                        <button type="button" class="admin-modal-btn-cancel" @onclick="CerrarModal">Cancelar</button>
+                        <button type="submit" class="admin-primary-action" style="box-shadow:none;">
+                            <i class="bi bi-download"></i> Guardar
+                        </button>
+                    </div>
+                </EditForm>
+            }
+            else if (modoModal == ModoModal.Reactivar)
+            {
+                <p class="admin-modal-text" style="text-align:left;">
+                    ¿Deseas reactivar el producto <strong>@productoSeleccionado.Nombre</strong>?
+                </p>
+
+                <div class="admin-modal-actions" style="justify-content:flex-end;">
+                    <button class="admin-modal-btn-cancel" @onclick="CerrarModal">Cancelar</button>
+                    <button class="admin-modal-btn-confirm admin-products-btn-confirm-success" @onclick="ConfirmarReactivacion">
+                        Reactivar
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+}
 
 @code {
-    private string FiltroBusqueda = "";
-    private List<Producto> Productos = new List<Producto>
+    private string? mensajeError;
+
+    // IMPORTANTE: propiedades con setter para resetear paginación sin @oninput/@onchange
+    private string _busqueda = "";
+    private string busqueda
     {
-        new Producto{Codigo="KB-001", Nombre="Sérum vitamina C 30ml", Categoria="Skincare", Marca="The Ordinary", PrecioBase=45, Stock=38, Estado="Disponible", Promocion=true},
-        new Producto{Codigo="KB-002", Nombre="Base fluida larga duración", Categoria="Maquillaje", Marca="Maybelline", PrecioBase=62, Stock=0, Estado="Sin stock", Promocion=false},
-        new Producto{Codigo="KB-003", Nombre="Mascarilla capilar nutritiva", Categoria="Cabello", Marca="Pantene", PrecioBase=28, Stock=7, Estado="De baja", Promocion=false},
-        new Producto{Codigo="KB-004", Nombre="Delineador líquido negro", Categoria="Maquillaje", Marca="NYX", PrecioBase=35, Stock=21, Estado="Disponible", Promocion=true}
-    };
-
-    private IEnumerable<Producto> ProductosFiltrados => Productos
-        .Where(p => string.IsNullOrWhiteSpace(FiltroBusqueda) || p.Nombre.Contains(FiltroBusqueda, StringComparison.OrdinalIgnoreCase));
-
-    private void NuevoProducto() => NavigationManager.NavigateTo("/admin/productos/nuevo");
-    private void VerProducto(Producto p) => NavigationManager.NavigateTo($"/admin/productos/{p.Codigo}");
-    private void EditarProducto(Producto p) => NavigationManager.NavigateTo($"/admin/productos/editar/{p.Codigo}");
-    private void ReactivarProducto(Producto p) => p.Estado = "Disponible";
-
-    // Clase placeholder para UI
-    public class Producto
-    {
-        public string Codigo { get; set; }
-        public string Nombre { get; set; }
-        public string Categoria { get; set; }
-        public string Subcategoria { get; set; }
-        public string Marca { get; set; }
-        public decimal PrecioBase { get; set; }
-        public int Stock { get; set; }
-        public string Estado { get; set; }
-        public bool Promocion { get; set; }
+        get => _busqueda;
+        set { _busqueda = value; paginaActual = 1; }
     }
 
-    [Inject] NavigationManager NavigationManager { get; set; }
+    private string _categoriaSeleccionada = "Todas las categorías";
+    private string categoriaSeleccionada
+    {
+        get => _categoriaSeleccionada;
+        set { _categoriaSeleccionada = value; paginaActual = 1; }
+    }
+
+    private string _marcaSeleccionada = "Todas las marcas";
+    private string marcaSeleccionada
+    {
+        get => _marcaSeleccionada;
+        set { _marcaSeleccionada = value; paginaActual = 1; }
+    }
+
+    private string _estadoSeleccionado = "Todos los estados";
+    private string estadoSeleccionado
+    {
+        get => _estadoSeleccionado;
+        set { _estadoSeleccionado = value; paginaActual = 1; }
+    }
+
+    private int paginaActual = 1;
+    private const int ProductosPorPagina = 6;
+
+    private bool mostrarModal = false;
+    private ProductoAdmin? productoSeleccionado;
+    private ProductoAdmin modeloFormulario = new();
+    private ModoModal modoModal = ModoModal.Ver;
+
+    private enum ModoModal { Ver, Crear, Editar, Reactivar }
+
+    private List<ProductoAdmin> productos = new()
+    {
+        new ProductoAdmin { Codigo = "KB-001", Nombre = "Sérum vitamina C 30 ml", Categoria = "Skincare", Marca = "The Ordinary", PrecioBase = 45.00m, Stock = 38, EnPromocion = true,  Activo = true  },
+        new ProductoAdmin { Codigo = "KB-002", Nombre = "Base fluida larga duración", Categoria = "Maquillaje", Marca = "Maybelline",  PrecioBase = 62.00m, Stock = 0,  EnPromocion = false, Activo = true  },
+        new ProductoAdmin { Codigo = "KB-003", Nombre = "Mascarilla capilar nutritiva", Categoria = "Cabello",    Marca = "Pantene",     PrecioBase = 28.00m, Stock = 7,  EnPromocion = false, Activo = false },
+        new ProductoAdmin { Codigo = "KB-004", Nombre = "Delineador líquido negro", Categoria = "Maquillaje", Marca = "NYX",          PrecioBase = 35.00m, Stock = 21, EnPromocion = true,  Activo = true  },
+        new ProductoAdmin { Codigo = "KB-005", Nombre = "Crema hidratante diaria", Categoria = "Skincare", Marca = "CeraVe", PrecioBase = 59.90m, Stock = 9, EnPromocion = false, Activo = true },
+        new ProductoAdmin { Codigo = "KB-006", Nombre = "Protector solar SPF50", Categoria = "Skincare", Marca = "La Roche-Posay", PrecioBase = 79.00m, Stock = 12, EnPromocion = true, Activo = true },
+        new ProductoAdmin { Codigo = "KB-007", Nombre = "Shampoo anti-frizz", Categoria = "Cabello", Marca = "Tresemmé", PrecioBase = 22.50m, Stock = 3, EnPromocion = false, Activo = true },
+        new ProductoAdmin { Codigo = "KB-008", Nombre = "Labial mate", Categoria = "Maquillaje", Marca = "MAC", PrecioBase = 89.00m, Stock = 15, EnPromocion = true, Activo = true }
+    };
+
+    private class ProductoAdmin
+    {
+        public string Codigo { get; set; } = "";
+        public string Nombre { get; set; } = "";
+        public string Categoria { get; set; } = "";
+        public string Marca { get; set; } = "";
+        public decimal PrecioBase { get; set; }
+        public int Stock { get; set; }
+        public bool EnPromocion { get; set; }
+        public bool Activo { get; set; }
+    }
+
+    // KPIs
+    private int TotalProductos => productos.Count(p => p.Activo);
+    private int SinStock => productos.Count(p => p.Activo && p.Stock == 0);
+    private int EnPromo => productos.Count(p => p.Activo && p.EnPromocion);
+    private int StockCritico => productos.Count(p => p.Activo && p.Stock > 0 && p.Stock < 10);
+
+    private List<string> CategoriasDisponibles =>
+        productos.Select(p => p.Categoria).Distinct().OrderBy(x => x).ToList();
+
+    private List<string> MarcasDisponibles =>
+        productos.Select(p => p.Marca).Distinct().OrderBy(x => x).ToList();
+
+    private List<ProductoAdmin> ProductosFiltrados =>
+        productos
+            .Where(CoincideBusqueda)
+            .Where(CoincideCategoria)
+            .Where(CoincideMarca)
+            .Where(CoincideEstado)
+            .OrderBy(p => p.Codigo)
+            .ToList();
+
+    private List<ProductoAdmin> ProductosPaginados =>
+        ProductosFiltrados
+            .Skip((paginaActual - 1) * ProductosPorPagina)
+            .Take(ProductosPorPagina)
+            .ToList();
+
+    private int TotalPaginas =>
+        Math.Max(1, (int)Math.Ceiling(ProductosFiltrados.Count / (double)ProductosPorPagina));
+
+    private string RangoMostrado
+    {
+        get
+        {
+            if (ProductosFiltrados.Count == 0) return "0-0";
+            var inicio = ((paginaActual - 1) * ProductosPorPagina) + 1;
+            var fin = Math.Min(paginaActual * ProductosPorPagina, ProductosFiltrados.Count);
+            return $"{inicio}-{fin}";
+        }
+    }
+
+    private bool CoincideBusqueda(ProductoAdmin p)
+    {
+        if (string.IsNullOrWhiteSpace(busqueda)) return true;
+
+        return p.Codigo.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
+               p.Nombre.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
+               p.Marca.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
+               p.Categoria.Contains(busqueda, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool CoincideCategoria(ProductoAdmin p) =>
+        categoriaSeleccionada == "Todas las categorías" || p.Categoria == categoriaSeleccionada;
+
+    private bool CoincideMarca(ProductoAdmin p) =>
+        marcaSeleccionada == "Todas las marcas" || p.Marca == marcaSeleccionada;
+
+    private bool CoincideEstado(ProductoAdmin p)
+    {
+        if (estadoSeleccionado == "Todos los estados") return true;
+
+        return estadoSeleccionado switch
+        {
+            "Disponible" => p.Activo && p.Stock > 0,
+            "Sin stock" => p.Activo && p.Stock == 0,
+            "De baja" => !p.Activo,
+            _ => true
+        };
+    }
+
+    private void LimpiarFiltros()
+    {
+        busqueda = "";
+        categoriaSeleccionada = "Todas las categorías";
+        marcaSeleccionada = "Todas las marcas";
+        estadoSeleccionado = "Todos los estados";
+        paginaActual = 1;
+    }
+
+    private void CambiarPagina(int pagina) => paginaActual = pagina;
+
+    private void PaginaAnterior()
+    {
+        if (paginaActual > 1) paginaActual--;
+    }
+
+    private void PaginaSiguiente()
+    {
+        if (paginaActual < TotalPaginas) paginaActual++;
+    }
+
+    private void AbrirCrear()
+    {
+        mensajeError = null;
+        modoModal = ModoModal.Crear;
+        productoSeleccionado = new ProductoAdmin();
+        modeloFormulario = new ProductoAdmin { Activo = true, Stock = 10, EnPromocion = false };
+        mostrarModal = true;
+    }
+
+    private void AbrirVer(ProductoAdmin p)
+    {
+        mensajeError = null;
+        modoModal = ModoModal.Ver;
+        productoSeleccionado = p;
+        mostrarModal = true;
+    }
+
+    private void AbrirEditar(ProductoAdmin p)
+    {
+        mensajeError = null;
+        modoModal = ModoModal.Editar;
+        productoSeleccionado = p;
+        modeloFormulario = new ProductoAdmin
+        {
+            Codigo = p.Codigo,
+            Nombre = p.Nombre,
+            Categoria = p.Categoria,
+            Marca = p.Marca,
+            PrecioBase = p.PrecioBase,
+            Stock = p.Stock,
+            EnPromocion = p.EnPromocion,
+            Activo = p.Activo
+        };
+        mostrarModal = true;
+    }
+
+    private void AbrirReactivar(ProductoAdmin p)
+    {
+        mensajeError = null;
+        modoModal = ModoModal.Reactivar;
+        productoSeleccionado = p;
+        mostrarModal = true;
+    }
+
+    private string TituloModal => modoModal switch
+    {
+        ModoModal.Crear => "Nuevo producto",
+        ModoModal.Editar => "Editar producto",
+        ModoModal.Reactivar => "Reactivar producto",
+        _ => "Detalle del producto"
+    };
+
+    private void CerrarModal()
+    {
+        mostrarModal = false;
+        productoSeleccionado = null;
+    }
+
+    private void GuardarProducto()
+    {
+        if (string.IsNullOrWhiteSpace(modeloFormulario.Codigo) ||
+            string.IsNullOrWhiteSpace(modeloFormulario.Nombre) ||
+            string.IsNullOrWhiteSpace(modeloFormulario.Categoria) ||
+            string.IsNullOrWhiteSpace(modeloFormulario.Marca))
+        {
+            mensajeError = "Completa todos los campos obligatorios.";
+            return;
+        }
+
+        if (modeloFormulario.PrecioBase <= 0)
+        {
+            mensajeError = "El precio base debe ser mayor a 0.";
+            return;
+        }
+
+        if (modeloFormulario.Stock < 0)
+        {
+            mensajeError = "El stock no puede ser negativo.";
+            return;
+        }
+
+        if (modoModal == ModoModal.Crear)
+        {
+            if (productos.Any(x => x.Codigo.Equals(modeloFormulario.Codigo, StringComparison.OrdinalIgnoreCase)))
+            {
+                mensajeError = "Ya existe un producto con ese código.";
+                return;
+            }
+
+            productos.Add(new ProductoAdmin
+            {
+                Codigo = modeloFormulario.Codigo.Trim(),
+                Nombre = modeloFormulario.Nombre.Trim(),
+                Categoria = modeloFormulario.Categoria.Trim(),
+                Marca = modeloFormulario.Marca.Trim(),
+                PrecioBase = modeloFormulario.PrecioBase,
+                Stock = modeloFormulario.Stock,
+                EnPromocion = modeloFormulario.EnPromocion,
+                Activo = modeloFormulario.Activo
+            });
+        }
+        else if (modoModal == ModoModal.Editar && productoSeleccionado != null)
+        {
+            if (!productoSeleccionado.Codigo.Equals(modeloFormulario.Codigo, StringComparison.OrdinalIgnoreCase) &&
+                productos.Any(x => x.Codigo.Equals(modeloFormulario.Codigo, StringComparison.OrdinalIgnoreCase)))
+            {
+                mensajeError = "Ya existe un producto con ese código.";
+                return;
+            }
+
+            productoSeleccionado.Codigo = modeloFormulario.Codigo.Trim();
+            productoSeleccionado.Nombre = modeloFormulario.Nombre.Trim();
+            productoSeleccionado.Categoria = modeloFormulario.Categoria.Trim();
+            productoSeleccionado.Marca = modeloFormulario.Marca.Trim();
+            productoSeleccionado.PrecioBase = modeloFormulario.PrecioBase;
+            productoSeleccionado.Stock = modeloFormulario.Stock;
+            productoSeleccionado.EnPromocion = modeloFormulario.EnPromocion;
+            productoSeleccionado.Activo = modeloFormulario.Activo;
+        }
+
+        mensajeError = null;
+        paginaActual = 1;
+        CerrarModal();
+    }
+
+    private void ConfirmarReactivacion()
+    {
+        if (productoSeleccionado != null) productoSeleccionado.Activo = true;
+        CerrarModal();
+    }
+
+    private string GetEstadoTexto(ProductoAdmin p)
+    {
+        if (!p.Activo) return "De baja";
+        if (p.Stock == 0) return "Sin stock";
+        return "Disponible";
+    }
+
+    private string GetEstadoClass(ProductoAdmin p)
+    {
+        if (!p.Activo) return "pill-danger";
+        if (p.Stock == 0) return "pill-danger";
+        return "pill-success";
+    }
+
+    private string GetStockClass(ProductoAdmin p)
+    {
+        if (p.Stock == 0) return "pill-danger";
+        if (p.Stock < 10) return "pill-warning";
+        return "pill-success";
+    }
 }
