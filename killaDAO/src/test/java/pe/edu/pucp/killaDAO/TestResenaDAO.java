@@ -7,7 +7,7 @@ import java.util.List;
 
 public class TestResenaDAO {
     public static void main(String[] args) {
-        ResenaDAO dao = new ResenaDAOImpl();
+        /*ResenaDAO dao = new ResenaDAOImpl();
 
         try {
             // 1) SAVE
@@ -53,6 +53,6 @@ public class TestResenaDAO {
         } catch (SQLException e) {
             System.err.println("Error SQL: " + e.getMessage());
             e.printStackTrace();
-        }
+        }*/
     }
 }
