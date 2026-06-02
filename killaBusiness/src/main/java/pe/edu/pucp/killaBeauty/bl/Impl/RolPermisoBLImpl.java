@@ -1,4 +1,4 @@
-package pe.edu.pucp.killaBeauty.bl.Impl;
+package pe.edu.pucp.killaBeauty.bl.impl;
 
 import pe.edu.pucp.killaBeauty.bl.RolPermisoBL;
 import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
@@ -6,37 +6,36 @@ import pe.edu.pucp.killaBeauty.killaModelo.RolPermiso;
 import pe.edu.pucp.killaDAO.RolPermisoDAO;
 import pe.edu.pucp.killaDAO.Impl.RolPermisoDAOImpl;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class RolPermisoBLImpl implements RolPermisoBL {
-
     private RolPermisoDAO rolPermisoDAO = new RolPermisoDAOImpl();
 
     @Override
-    public RolPermiso create(RolPermiso rp) throws BusinessLogicException {
+    public RolPermiso create(RolPermiso rolPermiso) throws BusinessLogicException {
         try {
-            return rolPermisoDAO.save(rp);
-        } catch (Exception ex) {
-            throw new BusinessLogicException("Error al asignar el permiso al rol: " + ex.getMessage());
+            return rolPermisoDAO.save(rolPermiso);
+        } catch(SQLException e) {
+            throw new BusinessLogicException(e);
         }
     }
 
     @Override
-    public void remove(RolPermiso rp) throws BusinessLogicException {
+    public void remove(RolPermiso rolPermiso) throws BusinessLogicException {
         try {
-            rolPermisoDAO.remove(rp);
-        } catch (Exception ex) {
-            throw new BusinessLogicException("Error al retirar el permiso del rol: " + ex.getMessage());
+            rolPermisoDAO.remove(rolPermiso);
+        } catch(SQLException e) {
+            throw new BusinessLogicException(e);
         }
     }
 
     @Override
-    public RolPermiso load(Integer id) throws BusinessLogicException {
+    public List<RolPermiso> listByTipoUsuario(int tipoUsuario) throws BusinessLogicException {
         try {
-            // Esto simplemente pasará el error de "Operación no soportada" que se configuro en el DAO
-            return rolPermisoDAO.load(id);
-        } catch (Exception ex) {
-            throw new BusinessLogicException("Error al cargar el permiso: " + ex.getMessage());
+            return rolPermisoDAO.listByTipoUsuario(tipoUsuario);
+        } catch(SQLException e) {
+            throw new BusinessLogicException(e);
         }
     }
 
@@ -44,17 +43,8 @@ public class RolPermisoBLImpl implements RolPermisoBL {
     public List<RolPermiso> listAll() throws BusinessLogicException {
         try {
             return rolPermisoDAO.listAll();
-        } catch (Exception ex) {
-            throw new BusinessLogicException("Error al listar todos los permisos: " + ex.getMessage());
-        }
-    }
-
-    @Override
-    public List<RolPermiso> listarPorTipoUsuario(Integer idTipoUsuario) throws BusinessLogicException {
-        try {
-            return rolPermisoDAO.listarPorTipoUsuario(idTipoUsuario);
-        } catch (Exception ex) {
-            throw new BusinessLogicException("Error al listar los permisos del tipo de usuario: " + ex.getMessage());
+        } catch(SQLException e) {
+            throw new BusinessLogicException(e);
         }
     }
 }

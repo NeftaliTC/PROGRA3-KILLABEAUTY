@@ -6,9 +6,9 @@ import pe.edu.pucp.killaBeauty.killaModelo.Permiso;
 import java.util.List;
 
 public interface PermisoBL {
-    Permiso create(Permiso p) throws BusinessLogicException;
-    Permiso update(Permiso p) throws BusinessLogicException;
-    void remove(Permiso p) throws BusinessLogicException;
-    Permiso load(Integer id) throws BusinessLogicException;
+    Permiso create(Permiso permiso) throws BusinessLogicException;
+    Permiso update(Permiso permiso) throws BusinessLogicException;
+    void remove(Permiso permiso) throws BusinessLogicException;
     List<Permiso> listAll() throws BusinessLogicException;
+    List<Permiso> listByNombre(String nombre) throws BusinessLogicException;
 }

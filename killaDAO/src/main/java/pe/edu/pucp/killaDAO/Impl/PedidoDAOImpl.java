@@ -1,7 +1,7 @@
 package pe.edu.pucp.killaDAO.Impl;
 
 import pe.edu.pucp.dbManager.DBManager;
-import pe.edu.pucp.killaBeauty.killaModelo.Cupon;
+import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Cupon;
 import pe.edu.pucp.killaBeauty.killaModelo.Direccion;
 import pe.edu.pucp.killaBeauty.killaModelo.Pedido;
 import pe.edu.pucp.killaBeauty.killaModelo.EstadoPedido;
@@ -78,7 +78,7 @@ public class PedidoDAOImpl implements PedidoDAO {
             ps.setDouble(2, pedido.getSubtotal());
 
             if (pedido.getCupon() != null) {
-                ps.setInt(3, pedido.getCupon().getId());
+                ps.setInt(3, pedido.getCupon().getIdCupon());
             } else {
                 ps.setNull(3, Types.INTEGER);
             }
@@ -129,7 +129,7 @@ public class PedidoDAOImpl implements PedidoDAO {
             ps.setDouble(2, pedido.getSubtotal());
 
             if (pedido.getCupon() != null) {
-                ps.setInt(3, pedido.getCupon().getId());
+                ps.setInt(3, pedido.getCupon().getIdCupon());
             } else {
                 ps.setNull(3, Types.INTEGER);
             }
@@ -194,7 +194,7 @@ public class PedidoDAOImpl implements PedidoDAO {
         int idCupon = rs.getInt("id_cupon");
         if (!rs.wasNull()) {
             Cupon c = new Cupon();
-            c.setId(idCupon);
+            c.setIdCupon(idCupon);
             p.setCupon(c);
         } else {
             p.setCupon(null);

@@ -1,6 +1,7 @@
 package pe.edu.pucp.killaDAO.Impl.Promocionales;
 
 import pe.edu.pucp.dbManager.DBManager;
+import pe.edu.pucp.dbManager.TransactionContext;
 import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Cupon;
 import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.TipoDescuento;
 import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Campana;
@@ -20,7 +21,7 @@ public class CuponDAOImpl implements CuponDAO {
                 "activo, monto_maximo_descuento, monto_minimo_compra, tipo_descuento, " +
                 "max_usos_generales, id_campana FROM Cupon";
 
-        try (Connection connection = DBManager.getInstance().getConnection();
+        try (Connection connection = TransactionContext.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
@@ -65,7 +66,7 @@ public class CuponDAOImpl implements CuponDAO {
                 "tipo_descuento, max_usos_generales, id_campana " +
                 "FROM Cupon WHERE id_cupon = ?";
 
-        try (Connection connection = DBManager.getInstance().getConnection();
+        try (Connection connection = TransactionContext.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -111,7 +112,7 @@ public class CuponDAOImpl implements CuponDAO {
         String sql = "INSERT INTO Cupon (codigo, descripcion, valor_descuento, fecha_inicio, fecha_fin, " +
                 "activo, monto_maximo_descuento, monto_minimo_compra, tipo_descuento, " +
                 "max_usos_generales, id_campana) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection connection = DBManager.getInstance().getConnection();
+        try (Connection connection = TransactionContext.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, cupon.getCodigo());
@@ -152,7 +153,7 @@ public class CuponDAOImpl implements CuponDAO {
                 "fecha_inicio = ?, fecha_fin = ?, activo = ?, monto_maximo_descuento = ?, " +
                 "monto_minimo_compra = ?, tipo_descuento = ?, max_usos_generales = ?, " +
                 "id_campana = ? WHERE id_cupon = ?";
-        try (Connection connection = DBManager.getInstance().getConnection();
+        try (Connection connection = TransactionContext.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
             pstmt.setString(1, cupon.getCodigo());
@@ -188,7 +189,7 @@ public class CuponDAOImpl implements CuponDAO {
         // logica
         String sql = "UPDATE Cupon SET activo = 0 WHERE id_cupon = ?";
 
-        try (Connection connection = DBManager.getInstance().getConnection();
+        try (Connection connection = TransactionContext.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
             pstmt.setInt(1, cupon.getIdCupon());

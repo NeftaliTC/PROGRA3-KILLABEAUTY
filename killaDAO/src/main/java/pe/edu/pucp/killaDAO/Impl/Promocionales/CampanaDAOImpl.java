@@ -1,4 +1,5 @@
 package pe.edu.pucp.killaDAO.Impl.Promocionales;
+import pe.edu.pucp.dbManager.TransactionContext;
 import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Campana;
 import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Cupon;
 import pe.edu.pucp.killaDAO.Promocionales.CampanaDAO;
@@ -17,7 +18,7 @@ public class CampanaDAOImpl implements CampanaDAO {
         List<Campana> list = new ArrayList<>();
         String sql = "SELECT id_campana, nombre, descripcion, activo FROM campana";
         //buscas conexion
-        try(Connection connection = DBManager.getInstance().getConnection();
+        try(Connection connection = TransactionContext.getConnection();
             PreparedStatement pstmt = connection.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery()){
             while (rs.next()) {
@@ -35,7 +36,7 @@ public class CampanaDAOImpl implements CampanaDAO {
     @Override
     public Campana load(Integer id) throws SQLException {
         String sql = "SELECT id_campana, nombre, descripcion, activo FROM campana WHERE id_campana = ?";
-        try (Connection connection = DBManager.getInstance().getConnection();
+        try (Connection connection = TransactionContext.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
@@ -55,8 +56,8 @@ public class CampanaDAOImpl implements CampanaDAO {
 
     @Override
     public Campana save(Campana campana) throws SQLException {
-        String sql = "INSERT INTO Campana (nombre, descripcion, activo) VALUES (?, ?, ?, ?)";
-        try (Connection connection = DBManager.getInstance().getConnection();
+        String sql = "INSERT INTO Campana (nombre, descripcion, activo) VALUES (?, ?, ?)";
+        try (Connection connection = TransactionContext.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, campana.getNombre());
@@ -78,7 +79,7 @@ public class CampanaDAOImpl implements CampanaDAO {
     @Override
     public Campana update(Campana campana) throws SQLException {
         String sql = "UPDATE Campana SET nombre = ?, descripcion = ?, activo = ? WHERE id_campana = ?";
-        try (Connection connection = DBManager.getInstance().getConnection();
+        try (Connection connection = TransactionContext.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
             pstmt.setString(1, campana.getNombre());
@@ -97,7 +98,7 @@ public class CampanaDAOImpl implements CampanaDAO {
         // logical removal
         campana.setActivo(false);
         String sql = "update campana set activo = ? where id_campana = ?";
-        try (Connection connection = DBManager.getInstance().getConnection();
+        try (Connection connection = TransactionContext.getConnection();
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
             pstmt.setBoolean(1, campana.isActivo());
