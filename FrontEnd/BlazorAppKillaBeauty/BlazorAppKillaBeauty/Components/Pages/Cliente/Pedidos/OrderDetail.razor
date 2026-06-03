@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
 @inject CartService CartService
+@inject NavigationManager Navigation
 
 <Navbar CantidadCarrito="@CartService.CantidadTotal" />
 <div class="order-detail-container">
@@ -99,9 +100,11 @@
                                     }
                                 </div>
                                 <div class="product-actions-column">
-                                    <a href="/review/@OrderId/@item.Nombre" class="btn-review-outline">
+                                    <button type="button"
+                                            class="btn-review-outline"
+                                            @onclick="() => IrAReview(pedidoActual.Id, item.Nombre)">
                                         <i class="bi bi-star"></i> Reseñar
-                                    </a>
+                                    </button>
                                     <div class="subtotal-label">
                                         Subtotal: S/ @((item.PrecioUnitarioDesc * item.Cantidad).ToString("F2"))
                                     </div>
@@ -277,6 +280,22 @@
             AhorroVolumen = (precioUnitOrig - precioUnitDesc) * cantidad;
         }
     }
+    private void IrAReview(string? orderId, string? itemNombre)
+    {
+        if (string.IsNullOrWhiteSpace(orderId) || string.IsNullOrWhiteSpace(itemNombre))
+            return;
+
+        var nombreUrl = ConvertirParaUrl(itemNombre);
+        Navigation.NavigateTo($"/review/{orderId}/{nombreUrl}");
+    }
+
+    private string ConvertirParaUrl(string texto)
+    {
+        return texto
+            .Trim()
+            .Replace(" ", "-")
+            .Replace("/", "-");
+    }
 
     // Datos de prueba
     public static List<PedidoDetalle> ObtenerCatalogoDetallesMock() => new()
@@ -292,8 +311,8 @@
             Referencia = "Frente al parque Kennedy",
             MetodoPago = "Tarjeta de crédito", DetalleMetodoPago = "Visa ****0789",
             Productos = new List<ProductoDetalle> {
-                new("Sérum Vitamina C", "Essence", "Images/Serum.jpg", 1, 89.90m, 89.90m),
-                new("Crema Hidratante CeraVe", "CeraVe", "Images/Cerave.jpg", 6, 59.90m, 69.90m)
+                new("Sérum Vitamina C Gold Kiwi", "Essence", "Images/Serum.jpg", 1, 89.90m, 89.90m),
+                new("Crema Hidratante Facial CeraVe", "CeraVe", "Images/Cerave.jpg", 6, 59.90m, 69.90m)
             }
         },
         new PedidoDetalle {
@@ -307,8 +326,8 @@
             Referencia = "A dos cuadras de la estación",
             MetodoPago = "Yape", DetalleMetodoPago = "9******81",
             Productos = new List<ProductoDetalle> {
-                new("Labial Peripera Ink", "Peripera", "Images/LabialPeripera.jpg", 1, 40.00m, 40.00m),
-                new("Máscara de pestañas", "Maybelline", "Images/Mascara.jpg", 1, 38.20m, 38.20m)
+                new("Labial Matte Ink Mood PERIPERA", "Peripera", "Images/LabialPeripera.jpg", 1, 40.00m, 40.00m),
+                new("Máscara Essence Prince False Lash Effect", "Maybelline", "Images/Mascara.jpg", 1, 38.20m, 38.20m)
             }
         },
         new PedidoDetalle {
@@ -322,7 +341,7 @@
             Referencia = "Cerca a la Rambla",
             MetodoPago = "Tarjeta de crédito", DetalleMetodoPago = "Mastercard ****4412",
             Productos = new List<ProductoDetalle> {
-                new("Sérum Vitamina C", "Essence", "Images/Serum.jpg", 2, 60.00m, 60.00m)
+                new("Sérum Vitamina C Gold Kiwi", "Essence", "Images/Serum.jpg", 2, 60.00m, 60.00m)
             }
         }
     };
