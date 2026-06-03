@@ -9,7 +9,7 @@
     <section class="admin-content admin-orders-content">
 
         <div class="admin-breadcrumb">
-            <span>Administrador</span>
+            <span>Inicio</span>
             <i class="bi bi-chevron-right"></i>
             <span>Pedidos</span>
         </div>
@@ -94,8 +94,8 @@
                     <select @bind="estadoSeleccionado">
                         <option value="Cualquier estado">Cualquier estado</option>
                         <option value="Pendiente">Pendiente</option>
-                        <option value="En proceso">En proceso</option>
-                        <option value="Listo para recoger">Listo para recoger</option>
+                        <option value="Pagado">Pagado</option>
+                        <option value="En preparación">En preparación</option>
                         <option value="Enviado">Enviado</option>
                         <option value="Entregado">Entregado</option>
                         <option value="Cancelado">Cancelado</option>
@@ -120,7 +120,7 @@
                         <th>Correo</th>
                         <th>Fecha</th>
                         <th>Total</th>
-                        <th>Estado</th>
+                        <th>Estado de envio</th>
                         <th>Detalle</th>
                     </tr>
                 </thead>
@@ -235,9 +235,9 @@
 
     private List<PedidoAdmin> pedidos = new()
     {
-        new PedidoAdmin("KIL-202610081", "Cliente", "cliente@correo.com", new DateTime(2026, 5, 30), 159.80m, "En proceso", "warning"),
+        new PedidoAdmin("KIL-202610081", "Cliente", "cliente@correo.com", new DateTime(2026, 5, 30), 159.80m, "En preparación", "warning"),
         new PedidoAdmin("KIL-202605002", "Maria Lopez", "maria.lopez@correo.com", new DateTime(2026, 5, 25), 178.20m, "Entregado", "active"),
-        new PedidoAdmin("KIL-202604115", "Ana Torres", "ana.torres@correo.com", new DateTime(2026, 5, 10), 120.00m, "Listo para recoger", "info"),
+        new PedidoAdmin("KIL-202604115", "Ana Torres", "ana.torres@correo.com", new DateTime(2026, 5, 10), 120.00m, "Pagado", "info"),
         new PedidoAdmin("KIL-202604086", "Luis Perez", "luis.perez@correo.com", new DateTime(2026, 4, 28), 89.90m, "Enviado", "info"),
         new PedidoAdmin("KIL-202604033", "Camila Rios", "camila.rios@correo.com", new DateTime(2026, 4, 18), 245.70m, "Pendiente", "warning"),
         new PedidoAdmin("KIL-202603021", "Sofia Castro", "sofia.castro@correo.com", new DateTime(2026, 3, 9), 52.90m, "Cancelado", "danger"),

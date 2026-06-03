@@ -121,5 +121,18 @@
                 PrecioUnitario = PrecioOriginal;
             }
         }
+
+        public int PorcentajeDescuento
+        {
+            get
+            {
+                if (PrecioOriginal == 0)
+                    return 0;
+
+                return (int)Math.Round(
+                    ((PrecioOriginal - PrecioUnitario) / PrecioOriginal) * 100
+                );
+            }
+        }
     }
 }

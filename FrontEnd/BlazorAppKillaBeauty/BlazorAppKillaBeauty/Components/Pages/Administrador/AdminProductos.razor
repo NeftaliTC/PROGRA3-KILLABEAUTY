@@ -168,7 +168,7 @@
                                 </td>
                                 <td style="text-align:right;">
                                     <div class="admin-products-actions">
-                                        <button type="button" class="admin-products-btn" @onclick="() => AbrirVer(p)">
+                                        <button type="button" class="admin-products-btn" @onclick="() => IrADetalleProducto(p.Codigo)">
                                             <i class="bi bi-eye"></i> Ver
                                         </button>
 
@@ -488,12 +488,9 @@
         mostrarModal = true;
     }
 
-    private void AbrirVer(ProductoAdmin p)
+    private void IrADetalleProducto(string codigo)
     {
-        mensajeError = null;
-        modoModal = ModoModal.Ver;
-        productoSeleccionado = p;
-        mostrarModal = true;
+        Navigation.NavigateTo($"/admin/productos/{codigo}");
     }
 
     private void AbrirEditar(ProductoAdmin p)

@@ -1,8 +1,9 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
-@inject CartService CartService
 @inject NavigationManager Navigation
+@inject CartService CartService
+
 
 <PageTitle>KILLA Beauty – Belleza que Inspira</PageTitle>
 
@@ -21,13 +22,13 @@
         </p>
         
         <div class="hero-buttons">
-            
-                <button class="btn-primary"
-                        @onclick='() => Navigation.NavigateTo("/catalogo")'>
-                    Explorar Catálogo
-                </button>
+            <button class="btn-primary"
+                    @onclick='() => Navigation.NavigateTo("/catalogo")'>
+                Explorar Catálogo
+            </button>
 
-            <button class="btn-secondary">
+            <button class="btn-secondary"
+                    @onclick='() => Navigation.NavigateTo("/register")'>
                 Registrarse Ahora
             </button>
         </div>
