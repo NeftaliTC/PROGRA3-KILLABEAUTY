@@ -7,7 +7,7 @@ namespace BlazorAppKillaBeauty.Services
             
      private List<Producto> productos = new(){
         new Producto(
-        "Serum Skin Garnier Vitamina Express Aclara 15ml",
+        "Sérum Vitamina C Gold Kiwi",
         65.00m,
         80.00m,
         "Images/Serum.jpg",

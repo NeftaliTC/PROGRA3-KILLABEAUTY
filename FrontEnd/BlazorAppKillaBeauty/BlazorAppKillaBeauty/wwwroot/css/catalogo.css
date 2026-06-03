@@ -4,6 +4,9 @@
     padding: 38px 45px 70px;
     overflow-x: hidden;
 }
+.catalog-product-card {
+    cursor: pointer;
+}
 
 .catalog-breadcrumb {
     font-size: 16px;

@@ -1,0 +1,550 @@
+﻿@page "/usuario-producto"
+@page "/usuario-producto/{NombreProducto}"
+@rendermode InteractiveServer
+
+@using BlazorAppKillaBeauty.Services
+@inject ProductoService ProductoService
+@inject CartService CartService
+@inject NavigationManager Navigation
+
+<Navbar CantidadCarrito="@CartService.CantidadTotal" />
+
+@if (producto == null)
+{
+    <section class="usuario-producto-page">
+        <div class="producto-no-encontrado">
+            <h2>Producto no encontrado</h2>
+            <button @onclick="@(() => Navigation.NavigateTo("/catalogo"))">
+                Volver al catálogo
+            </button>
+        </div>
+    </section>
+}
+else
+{
+    <section class="usuario-producto-page">
+
+        <div class="producto-breadcrumb">
+            <NavLink href="/" class="producto-breadcrumb-link">Home</NavLink>
+            <span>&gt;</span>
+
+            <NavLink href="/catalogo" class="producto-breadcrumb-link">Catálogo</NavLink>
+            <span>&gt;</span>
+
+            <span>@producto.Categoria</span>
+            <span>&gt;</span>
+
+            <span>@producto.Subcategoria</span>
+            <span>&gt;</span>
+
+            <span class="producto-breadcrumb-current">@producto.Nombre</span>
+        </div>
+
+        <div class="producto-detalle-layout">
+
+            <aside class="producto-miniaturas">
+                @foreach (var imagen in ImagenesProducto)
+                {
+                    <button class="producto-miniatura @(imagenSeleccionada == imagen ? "activa" : "")"
+                            @onclick="@(() => CambiarImagen(imagen))">
+                        <img src="@imagen" alt="@producto.Nombre" />
+                    </button>
+                }
+
+                <button class="miniatura-flecha">
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+            </aside>
+
+            <section class="producto-imagen-principal-card">
+                <button class="producto-flecha izquierda @(EstaEnPrimeraImagen ? "deshabilitada" : "")"
+                        disabled="@EstaEnPrimeraImagen"
+                        @onclick="ImagenAnterior">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+
+                <img src="@imagenSeleccionada" alt="@producto.Nombre" class="producto-imagen-principal" />
+
+                <button class="producto-flecha derecha @(EstaEnUltimaImagen ? "deshabilitada" : "")"
+                        disabled="@EstaEnUltimaImagen"
+                        @onclick="ImagenSiguiente">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </section>
+
+            <section class="producto-info-card">
+
+                <h1>@producto.Nombre</h1>
+
+                <p class="producto-nombre-completo">
+                    @producto.Marca
+                </p>
+
+                <div class="producto-precio-linea">
+                    <span class="producto-precio-actual">
+                        S/ @PrecioTotal.ToString("0.00")
+                    </span>
+
+                    @if (TieneDescuento)
+                    {
+                        <span class="producto-precio-anterior">
+                            S/ @PrecioTotalSinDescuento.ToString("0.00")
+                        </span>
+
+                        <span class="producto-descuento">
+                            -@PorcentajeDescuento.ToString("0.0")%
+                        </span>
+                    }
+                </div>
+
+                <p class="producto-ayuda-precios">
+                    Variación de precios dependiendo de cantidad de compra
+                </p>
+
+                <div class="producto-escalas">
+                    <button class="producto-escala @(cantidad >= 1 && cantidad <= 5 ? "activa" : "")"
+                            @onclick="@(() => cantidad = 1)">
+                        <span>1 - 5 Unidades</span>
+                        <strong>S/ 80.00</strong>
+                        <small>por unidad</small>
+                    </button>
+
+                    <button class="producto-escala @(cantidad >= 6 && cantidad <= 23 ? "activa" : "")"
+                            @onclick="@(() => cantidad = 6)">
+                        <span>6 - 23 Unidades</span>
+                        <strong>S/ 70.00</strong>
+                        <small>por unidad</small>
+                    </button>
+
+                    <button class="producto-escala @(cantidad >= 24 ? "activa" : "")"
+                            @onclick="@(() => cantidad = 24)">
+                        <span>24+ Unidades</span>
+                        <strong>S/ 65.00</strong>
+                        <small>por unidad</small>
+                    </button>
+                </div>
+
+                <div class="producto-compra-row">
+
+                    <div class="producto-cantidad">
+                        <button @onclick="DisminuirCantidad">
+                            <i class="bi bi-dash"></i>
+                        </button>
+
+                        <span>@cantidad</span>
+
+                        <button @onclick="AumentarCantidad">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+
+                    <button class="producto-btn-carrito" @onclick="AgregarAlCarrito">
+                        AÑADIR AL CARRITO
+                    </button>
+
+                </div>
+
+                <div class="producto-meta">
+                    <p><strong>Categoría:</strong> @producto.Categoria</p>
+                    <p><strong>SubCategoría:</strong> @producto.Subcategoria</p>
+                    
+                </div>
+
+            </section>
+
+        </div>
+
+        <section class="producto-resenas-section">
+
+            <div class="producto-tabs">
+                <button class="tab-activa">
+                    Reseñas (@Resenas.Count)
+                </button>
+            </div>
+
+            @if (!TieneResenas)
+            {
+                <div class="producto-sin-resenas">
+                    <h3>Este producto todavía no tiene reseñas</h3>
+                    <p>Cuando los clientes compren y comenten, aparecerán aquí.</p>
+                </div>
+            }
+            else
+            {
+                <div class="producto-resumen-resenas">
+
+                    <div class="producto-promedio">
+                        <strong>@PromedioResenas.ToString("0.0")</strong>
+
+                        <div class="producto-estrellas">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="bi @(i <= Math.Round(PromedioResenas) ? "bi-star-fill" : "bi-star")"></i>
+                            }
+                        </div>
+
+                        <p>@Resenas.Count reseñas verificadas</p>
+                    </div>
+
+                    <div class="producto-barras">
+                        @for (int estrella = 5; estrella >= 1; estrella--)
+                        {
+                            var cantidadEstrella = Resenas.Count(r => r.Calificacion == estrella);
+                            var porcentaje = Resenas.Count == 0 ? 0 : cantidadEstrella * 100 / Resenas.Count;
+
+                            <div class="barra-row">
+                                <span>@estrella ★</span>
+                                <div class="barra-fondo">
+                                    <div class="barra-relleno" style="width:@porcentaje%"></div>
+                                </div>
+                                <span>@cantidadEstrella</span>
+                            </div>
+                        }
+                    </div>
+
+                </div>
+
+                <div class="producto-filtros-resenas">
+                    <h3>Filtrar:</h3>
+
+                    <select @bind="filtroCalificacion">
+                        <option value="0">Todas las calificaciones</option>
+                        <option value="5">5 estrellas</option>
+                        <option value="4">4 estrellas</option>
+                        <option value="3">3 estrellas</option>
+                        <option value="2">2 estrellas</option>
+                        <option value="1">1 estrella</option>
+                    </select>
+
+                    <select @bind="ordenResena">
+                        <option value="recientes">Más recientes primero</option>
+                        <option value="antiguas">Más antiguas primero</option>
+                    </select>
+                </div>
+
+                <div class="producto-lista-resenas">
+                    @foreach (var resena in ResenasFiltradas)
+                    {
+                        <article class="producto-resena-card">
+
+                            <div class="resena-avatar">
+                                @resena.Iniciales
+                            </div>
+
+                            <div class="resena-contenido">
+                                <h4>@resena.Cliente</h4>
+                                <p class="resena-fecha">
+                                    @resena.Fecha · Pedido #@resena.Pedido
+                                </p>
+
+                                <h5>@resena.Titulo</h5>
+
+                                <p class="resena-comentario">
+                                    @resena.Comentario
+                                </p>
+                            </div>
+
+                            <div class="resena-estrellas">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="bi @(i <= resena.Calificacion ? "bi-star-fill" : "bi-star")"></i>
+                                }
+                            </div>
+
+                        </article>
+                    }
+                </div>
+            }
+
+        </section>
+
+    </section>
+}
+
+@code {
+    [Parameter]
+    public string? NombreProducto { get; set; }
+
+    private Producto? producto;
+    private string imagenSeleccionada = "";
+    private int cantidad = 7;
+
+    private int filtroCalificacion = 0;
+    private string ordenResena = "recientes";
+
+    protected override void OnInitialized()
+    {
+        var productos = ProductoService.ObtenerTodos();
+
+        if (string.IsNullOrWhiteSpace(NombreProducto))
+        {
+            producto = productos.FirstOrDefault();
+        }
+        else
+        {
+            producto = productos.FirstOrDefault(p =>
+                ConvertirParaUrl(p.Nombre).Equals(NombreProducto, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (producto == null)
+        {
+            return;
+        }
+
+        imagenSeleccionada = ImagenesProducto.FirstOrDefault() ?? producto.Imagen;
+    }
+
+    private bool EsProductoConDetalleHardcodeado =>
+        producto != null &&
+        producto.Nombre.Contains("Sérum Vitamina C Gold Kiwi", StringComparison.OrdinalIgnoreCase);
+
+    
+
+    private List<string> ImagenesProducto
+    {
+        get
+        {
+            if (producto == null)
+            {
+                return new List<string>();
+            }
+
+            if (EsProductoConDetalleHardcodeado)
+            {
+                return new List<string>
+                {
+                    producto.Imagen,
+                    "Images/Logo.png",
+                    "Images/Transporte.png"
+                };
+            }
+
+            return new List<string>
+            {
+                producto.Imagen
+            };
+        }
+    }
+
+    private decimal PrecioUnitarioActual
+    {
+        get
+        {
+            if (cantidad >= 24)
+            {
+                return 65.00m;
+            }
+
+            if (cantidad >= 6)
+            {
+                return 70.00m;
+            }
+
+            return 80.00m;
+        }
+    }
+
+    private decimal PrecioBase => 80.00m;
+
+    private decimal PrecioTotal => PrecioUnitarioActual * cantidad;
+
+    private decimal PrecioTotalSinDescuento => PrecioBase * cantidad;
+
+    private bool TieneDescuento => PrecioTotalSinDescuento > PrecioTotal;
+
+    private decimal PorcentajeDescuento =>
+        PrecioTotalSinDescuento == 0
+            ? 0
+            : ((PrecioTotalSinDescuento - PrecioTotal) / PrecioTotalSinDescuento) * 100;
+
+    private bool TieneResenas => Resenas.Any();
+
+    private double PromedioResenas =>
+        TieneResenas
+            ? Resenas.Average(r => r.Calificacion)
+            : 0;
+
+    private List<ResenaVista> Resenas
+    {
+        get
+        {
+            if (!EsProductoConDetalleHardcodeado)
+            {
+                return new List<ResenaVista>();
+            }
+
+            return new List<ResenaVista>
+            {
+                new ResenaVista
+                {
+                    Cliente = "Maria Lopez",
+                    Iniciales = "ML",
+                    Calificacion = 5,
+                    Fecha = "10 mayo 2026",
+                    Pedido = "PED-2241",
+                    Titulo = "Excelente producto, lo recomiendo",
+                    Comentario = "Me encantó el sérum. Lo uso desde hace 3 semanas y ya noto diferencia en el tono de mi piel. Llegó bien empacado y rápido."
+                },
+                new ResenaVista
+                {
+                    Cliente = "Carla Gutierrez",
+                    Iniciales = "CG",
+                    Calificacion = 4,
+                    Fecha = "08 mayo 2026",
+                    Pedido = "PED-2198",
+                    Titulo = "Bueno pero tarda en hacer efecto",
+                    Comentario = "El producto es bueno, pero los resultados no son inmediatos. Igual lo seguiría usando."
+                },
+                new ResenaVista
+                {
+                    Cliente = "Ana Torres",
+                    Iniciales = "AT",
+                    Calificacion = 5,
+                    Fecha = "03 mayo 2026",
+                    Pedido = "PED-2102",
+                    Titulo = "Muy buen sérum",
+                    Comentario = "Tiene buena textura, no deja sensación pesada y combina bien con mi rutina de skincare."
+                },
+                new ResenaVista
+                {
+                    Cliente = "Lucia Ramos",
+                    Iniciales = "LR",
+                    Calificacion = 3,
+                    Fecha = "29 abril 2026",
+                    Pedido = "PED-2055",
+                    Titulo = "Regular",
+                    Comentario = "El producto llegó bien, pero esperaba ver resultados más rápidos."
+                },
+                new ResenaVista
+                {
+                    Cliente = "Valeria Diaz",
+                    Iniciales = "VD",
+                    Calificacion = 5,
+                    Fecha = "21 abril 2026",
+                    Pedido = "PED-1988",
+                    Titulo = "Me encantó",
+                    Comentario = "Lo volvería a comprar. Me gustó bastante para mi rutina diaria."
+                }
+            };
+        }
+    }
+
+    private IEnumerable<ResenaVista> ResenasFiltradas
+    {
+        get
+        {
+            var query = Resenas.AsEnumerable();
+
+            if (filtroCalificacion > 0)
+            {
+                query = query.Where(r => r.Calificacion == filtroCalificacion);
+            }
+
+            if (ordenResena == "antiguas")
+            {
+                query = query.Reverse();
+            }
+
+            return query;
+        }
+    }
+
+    private void CambiarImagen(string imagen)
+    {
+        imagenSeleccionada = imagen;
+    }
+
+    private int IndiceImagenActual
+    {
+        get
+        {
+            var imagenes = ImagenesProducto;
+
+            if (!imagenes.Any())
+            {
+                return 0;
+            }
+
+            var index = imagenes.IndexOf(imagenSeleccionada);
+
+            return index < 0 ? 0 : index;
+        }
+    }
+
+    private bool EstaEnPrimeraImagen =>
+        IndiceImagenActual == 0;
+
+    private bool EstaEnUltimaImagen =>
+        ImagenesProducto.Any() &&
+        IndiceImagenActual == ImagenesProducto.Count - 1;
+
+    private void ImagenAnterior()
+    {
+        var imagenes = ImagenesProducto;
+
+        if (!imagenes.Any() || EstaEnPrimeraImagen)
+        {
+            return;
+        }
+
+        imagenSeleccionada = imagenes[IndiceImagenActual - 1];
+    }
+
+    private void ImagenSiguiente()
+    {
+        var imagenes = ImagenesProducto;
+
+        if (!imagenes.Any() || EstaEnUltimaImagen)
+        {
+            return;
+        }
+
+        imagenSeleccionada = imagenes[IndiceImagenActual + 1];
+    }
+
+    private void AumentarCantidad()
+    {
+        cantidad++;
+    }
+
+    private void DisminuirCantidad()
+    {
+        if (cantidad > 1)
+        {
+            cantidad--;
+        }
+    }
+
+    private void AgregarAlCarrito()
+    {
+        if (producto == null)
+        {
+            return;
+        }
+
+        CartService.AgregarProducto(
+            producto.Nombre,
+            PrecioUnitarioActual,
+            producto.Imagen
+        );
+    }
+
+    private string ConvertirParaUrl(string texto)
+    {
+        return texto
+            .Trim()
+            .Replace(" ", "-")
+            .Replace("/", "-");
+    }
+
+    private class ResenaVista
+    {
+        public string Cliente { get; set; } = "";
+        public string Iniciales { get; set; } = "";
+        public int Calificacion { get; set; }
+        public string Fecha { get; set; } = "";
+        public string Pedido { get; set; } = "";
+        public string Titulo { get; set; } = "";
+        public string Comentario { get; set; } = "";
+    }
+}
