@@ -238,8 +238,8 @@
 
                 @foreach (var producto in ProductosPaginados)
                 {
-                    <div class="catalog-product-card">
-
+                    <div class="catalog-product-card"
+                        @onclick="@(() => IrADetalleProducto(producto))">
                         <div class="catalog-product-image-area">
                             <img class="catalog-product-img"
                                  src="@producto.Imagen"
@@ -261,6 +261,7 @@
                             </p>
 
                             <button class="catalog-add-btn"
+                                    @onclick:stopPropagation="true"
                                     @onclick="() => AgregarCarrito(producto)">
                                 <i class="bi bi-bag"></i>
                                 Añadir
@@ -502,6 +503,10 @@
             producto.PrecioMinimo,
             producto.Imagen
         );
+    }
+    private void IrADetalleProducto(Producto producto)
+    {
+        Navigation.NavigateTo($"/usuario-producto/{ConvertirParaUrl(producto.Nombre)}");
     }
 
     private void CambiarPagina(int numeroPagina)

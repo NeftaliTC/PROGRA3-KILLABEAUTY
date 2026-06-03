@@ -4,6 +4,7 @@
 @inject NavigationManager Navigation
 @inject CartService CartService
 
+
 <PageTitle>KILLA Beauty – Belleza que Inspira</PageTitle>
 
 <Navbar CantidadCarrito="@CartService.CantidadTotal" />
@@ -19,7 +20,7 @@
             Los mejores productos de skincare,
             maquillaje y cuidado capilar
         </p>
-
+        
         <div class="hero-buttons">
             <button class="btn-primary"
                     @onclick='() => Navigation.NavigateTo("/catalogo")'>
@@ -150,7 +151,7 @@
             var producto = productos[i];
             var index = i;
 
-            <div class="product-card">
+            <div class="product-card" @onclick="@(() => IrADetalleProducto(producto.Nombre))">
 
                 <div class="product-image">
 
@@ -178,8 +179,8 @@
 
                         <button type="button"
                                 class="cart-btn @(productosAnimados.Contains(index) ? "cart-added" : "")"
+                                @onclick:stopPropagation="true"
                                 @onclick="() => AgregarCarrito(index)">
-
                             @if (productosAnimados.Contains(index))
                             {
                                 <i class="bi bi-check-lg"></i>
@@ -224,9 +225,10 @@
 @code {
     private int cantidadCarrito = 0;
 
+
     private List<Producto> productos = new()
     {
-        new Producto("Sérum Vitamina C Gold Kiwi", "89.90", "Images/Serum.jpg"),
+        new Producto("Sérum Vitamina C Gold Kiwi", "65.00", "Images/Serum.jpg"),
         new Producto("Crema Hidratante Facial CeraVe", "69.90", "Images/Cerave.jpg"),
         new Producto("Labial Matte Ink Mood PERIPERA", "45.90", "Images/LabialPeripera.jpg"),
         new Producto("Máscara Essence Prince False Lash Effect", "52.90", "Images/Mascara.jpg"),
@@ -264,5 +266,17 @@
             Precio = precio;
             Imagen = imagen;
         }
+    }
+    private void IrADetalleProducto(string nombreProducto)
+    {
+        Navigation.NavigateTo($"/usuario-producto/{ConvertirParaUrl(nombreProducto)}");
+    }
+
+    private string ConvertirParaUrl(string texto)
+    {
+        return texto
+            .Trim()
+            .Replace(" ", "-")
+            .Replace("/", "-");
     }
 }

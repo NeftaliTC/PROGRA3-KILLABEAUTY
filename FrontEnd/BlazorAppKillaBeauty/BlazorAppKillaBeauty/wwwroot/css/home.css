@@ -11,6 +11,23 @@ body {
 }
 
 /* ESTILOS GENERALES */
+.btn-primary {
+    background: var(--white);
+    border: none;
+    padding: 15px 28px;
+    border-radius: 40px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--white);
+    color: var(--white);
+    padding: 15px 28px;
+    border-radius: 40px;
+    cursor: pointer;
+}
 
 .section-title {
     font-size: 34px;
@@ -157,6 +174,7 @@ body {
     color: inherit;
     display: block;
 }
+
 
     .category-link:hover {
         text-decoration: none;
