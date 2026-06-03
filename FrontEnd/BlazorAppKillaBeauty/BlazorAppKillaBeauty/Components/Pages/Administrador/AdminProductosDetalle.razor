@@ -28,7 +28,7 @@
                     Volver
                 </button>
 
-                <button type="button" class="btn-detail-outline" @onclick="Editar">
+                <button type="button" class="btn-detail-outline" @onclick="AbrirEditarProducto">
                     <i class="bi bi-pencil-square"></i>
                     Editar
                 </button>
@@ -271,6 +271,118 @@
     </div>
 }
 
+@if (mostrarModalEditar)
+{
+    <div class="admin-modal-overlay">
+        <div class="admin-modal-card admin-product-edit-modal">
+            <header class="admin-product-edit-header">
+                <h2>
+                    <i class="bi bi-pencil-square"></i>
+                    Editar producto
+                </h2>
+
+                <button type="button" class="admin-product-edit-close" @onclick="CerrarEditarProducto">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </header>
+
+            @if (!string.IsNullOrWhiteSpace(mensajeErrorEditar))
+            {
+                <div class="admin-product-edit-error">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                    <span>@mensajeErrorEditar</span>
+                </div>
+            }
+
+            <EditForm Model="formEditar" OnValidSubmit="GuardarEdicionProducto">
+                <div class="admin-product-edit-grid">
+                    <div class="admin-product-edit-field">
+                        <label>Código</label>
+                        <input disabled value="@producto.Codigo" />
+                        <small>No se puede editar el código en esta entrega.</small>
+                    </div>
+
+                    <div class="admin-product-edit-field">
+                        <label>Nombre <span class="req">*</span></label>
+                        <input type="text" placeholder="Ej: Sérum vitamina C 30ml" @bind-value="formEditar.Nombre" />
+                    </div>
+
+                    <div class="admin-product-edit-field">
+                        <label>Categoría <span class="req">*</span></label>
+                        <select @bind="formEditar.Categoria">
+                            <option value="">Seleccionar</option>
+                            @foreach (var c in categorias)
+                            {
+                                <option value="@c">@c</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="admin-product-edit-field">
+                        <label>Subcategoría <span class="req">*</span></label>
+                        <select @bind="formEditar.Subcategoria" disabled="@(string.IsNullOrWhiteSpace(formEditar.Categoria))">
+                            <option value="">Seleccionar</option>
+                            @foreach (var s in SubcategoriasFiltradas)
+                            {
+                                <option value="@s">@s</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="admin-product-edit-field">
+                        <label>Marca <span class="req">*</span></label>
+                        <select @bind="formEditar.Marca">
+                            <option value="">Seleccionar</option>
+                            @foreach (var m in marcas)
+                            {
+                                <option value="@m">@m</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="admin-product-edit-field">
+                        <label>Precio base (S/.) <span class="req">*</span></label>
+                        <input type="number" step="0.01" placeholder="0.00" @bind-value="formEditar.PrecioBase" />
+                    </div>
+
+                    <div class="admin-product-edit-field">
+                        <label>Stock <span class="req">*</span></label>
+                        <input type="number" placeholder="0" @bind-value="formEditar.Stock" />
+                    </div>
+
+                    <div class="admin-product-edit-switches">
+                        <div class="switch-row">
+                            <span>Disponible</span>
+                            <label class="switch">
+                                <input type="checkbox" @bind="formEditar.Disponible" />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="switch-row">
+                            <span>En promoción</span>
+                            <label class="switch">
+                                <input type="checkbox" @bind="formEditar.EnPromocion" />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <footer class="admin-product-edit-actions">
+                    <button type="button" class="admin-modal-btn-cancel" @onclick="CerrarEditarProducto">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="admin-product-edit-save">
+                        <i class="bi bi-download"></i>
+                        Guardar cambios
+                    </button>
+                </footer>
+            </EditForm>
+        </div>
+    </div>
+}
+
 @code {
     [Parameter] public string Codigo { get; set; } = "";
 
@@ -341,8 +453,7 @@
     }
 
     private void Volver() => Navigation.NavigateTo("/admin/productos");
-    private void Editar() => Navigation.NavigateTo($"/admin/productos/{Codigo}/editar"); // placeholder
-    private void IrAEscalas() => tabActual = "escalas";
+    private void IrAEscalas() => Navigation.NavigateTo($"/admin/productos/{Codigo}/escalas");
 
     private void AbrirDarDeBaja() => mostrarModalBaja = true;
     private void CerrarDarDeBaja() => mostrarModalBaja = false;
@@ -431,4 +542,115 @@
         DateTime Fecha,
         string CodigoPedido
     );
+
+    // Modal editar
+    private bool mostrarModalEditar = false;
+    private string? mensajeErrorEditar;
+    private ProductoEditForm formEditar = new();
+
+    // data mock para selects (estilo igual al registrar)
+    private List<string> categorias = new() { "Skincare", "Maquillaje", "Cabello" };
+
+    private Dictionary<string, List<string>> subcategoriasPorCategoria = new()
+    {
+        ["Skincare"] = new() { "Limpieza", "Hidratación", "Protección solar", "Serums" },
+        ["Maquillaje"] = new() { "Base", "Labios", "Ojos" },
+        ["Cabello"] = new() { "Shampoo", "Mascarillas", "Tratamientos" }
+    };
+
+    private List<string> marcas = new() { "The Ordinary", "Maybelline", "Pantene", "NYX", "CeraVe", "MAC" };
+
+    private List<string> SubcategoriasFiltradas =>
+        string.IsNullOrWhiteSpace(formEditar.Categoria) ? new List<string>() :
+        (subcategoriasPorCategoria.TryGetValue(formEditar.Categoria, out var list) ? list : new List<string>());
+
+    private void AbrirEditarProducto()
+    {
+        mensajeErrorEditar = null;
+
+        // Precargar el form con el detalle actual
+        formEditar = new ProductoEditForm
+        {
+            Nombre = producto.Nombre,
+            Categoria = producto.Categoria,
+            Subcategoria = producto.Subcategoria,
+            Marca = producto.Marca,
+            PrecioBase = producto.PrecioBase,
+            Stock = producto.Stock,
+            Disponible = producto.Disponible,
+            EnPromocion = producto.EnPromocion
+        };
+
+        mostrarModalEditar = true;
+    }
+
+    private void CerrarEditarProducto()
+    {
+        mostrarModalEditar = false;
+    }
+
+    private void GuardarEdicionProducto()
+    {
+        // Validaciones front
+        if (string.IsNullOrWhiteSpace(formEditar.Nombre))
+        {
+            mensajeErrorEditar = "El nombre es obligatorio.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(formEditar.Categoria))
+        {
+            mensajeErrorEditar = "Selecciona una categoría.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(formEditar.Subcategoria))
+        {
+            mensajeErrorEditar = "Selecciona una subcategoría.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(formEditar.Marca))
+        {
+            mensajeErrorEditar = "Selecciona una marca.";
+            return;
+        }
+
+        if (formEditar.PrecioBase <= 0)
+        {
+            mensajeErrorEditar = "El precio base debe ser mayor a 0.";
+            return;
+        }
+
+        if (formEditar.Stock < 0)
+        {
+            mensajeErrorEditar = "El stock no puede ser negativo.";
+            return;
+        }
+
+        // Aplicar cambios al mock actual
+        producto.Nombre = formEditar.Nombre.Trim();
+        producto.Categoria = formEditar.Categoria;
+        producto.Subcategoria = formEditar.Subcategoria;
+        producto.Marca = formEditar.Marca;
+        producto.PrecioBase = formEditar.PrecioBase;
+        producto.Stock = formEditar.Stock;
+        producto.Disponible = formEditar.Disponible;
+        producto.EnPromocion = formEditar.EnPromocion;
+
+        mensajeErrorEditar = null;
+        mostrarModalEditar = false;
+    }
+
+    private class ProductoEditForm
+    {
+        public string Nombre { get; set; } = "";
+        public string Categoria { get; set; } = "";
+        public string Subcategoria { get; set; } = "";
+        public string Marca { get; set; } = "";
+        public decimal PrecioBase { get; set; }
+        public int Stock { get; set; }
+        public bool Disponible { get; set; }
+        public bool EnPromocion { get; set; }
+    }
 }
