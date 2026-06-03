@@ -102,6 +102,16 @@
             return;
         }
 
+        // LOGIN SUPERADMIN
+        if (usuario == "superadmin" &&
+            password == "super123")
+        {
+            AuthService.LoginSuperAdmin("Killa Beauty");
+
+            Navigation.NavigateTo("/admin/productos");
+            return;
+        }
+
         // ERROR
         mensajeError ="Usuario o contraseña incorrectos.";
     }

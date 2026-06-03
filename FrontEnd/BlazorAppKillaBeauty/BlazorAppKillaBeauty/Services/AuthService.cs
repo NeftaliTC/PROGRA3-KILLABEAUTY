@@ -18,6 +18,13 @@
         Rol = "Administrador";
     }
 
+    public void LoginSuperAdmin(string nombre)
+    {
+        EstaLogueado = true;
+        NombreUsuario = nombre;
+        Rol = "SuperAdmin";
+    }
+
     public void Logout()
     {
         EstaLogueado = false;
