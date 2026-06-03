@@ -1,9 +1,9 @@
-﻿@page "/checkout"
+﻿    @page "/checkout"
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
 @inject CartService CartService
 @inject AddressService AddressService
-@inject CouponService CouponService
+@inject CuponService cuponService
 
 <Navbar CantidadCarrito="@CartService.CantidadTotal" />
 
@@ -112,7 +112,7 @@
             @if (cuponAplicado != null)
             {
                 <p class="coupon-discount">
-                    @cuponAplicado.Titulo
+                    @cuponAplicado.Codigo
                 </p>
 
                 <div class="coupon-success">
@@ -467,7 +467,7 @@
     {
         errorCupon = "";
 
-        var encontrado = CouponService.BuscarCupon(cupon);
+        var encontrado = cuponService.BuscarCupon(cupon);
 
         if (encontrado == null)
         {
@@ -475,7 +475,7 @@
             return;
         }
 
-        descuentoCupon = CouponService.CalcularDescuento(encontrado, CartService.Total);
+        descuentoCupon = cuponService.CalcularDescuento(encontrado, CartService.Total);
 
         if (descuentoCupon <= 0)
         {

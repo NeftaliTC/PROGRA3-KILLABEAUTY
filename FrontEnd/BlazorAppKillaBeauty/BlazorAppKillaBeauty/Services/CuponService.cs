@@ -97,6 +97,24 @@
             });
         }
 
+        public Cupon? BuscarCupon(string codigo)
+        {
+            return cupones.FirstOrDefault(c =>
+                c.Codigo.Equals(codigo.Trim(), StringComparison.OrdinalIgnoreCase));
+        }
+
+        public decimal CalcularDescuento(Cupon cupon, decimal subtotal)
+        {
+            if (subtotal < cupon.MontoMinimoCompra)
+                return 0;
+
+            decimal descuento = cupon.TipoDescuento == "PORCENTAJE"
+                ? subtotal * (cupon.ValorDescuento / 100)
+                : cupon.ValorDescuento;
+
+            //return Math.Min(descuento, cupon.MontoMaximoDescuento);
+            return Math.Min(descuento, cupon.MontoMaximoDescuento ?? decimal.MaxValue);
+        }
 
         public IReadOnlyList<Cupon> ObtenerTodos()
         {
@@ -142,13 +160,13 @@
         public int Id { get; set; }
         public string Codigo { get; set; } = "";
         public string Descripcion { get; set; } = "";
-        public double ValorDescuento { get; set; }
+        public decimal ValorDescuento { get; set; }
         public string TipoDescuento { get; set; } = "seleccione";
         public DateTime? FechaInicio { get; set; } = DateTime.Now;
         public DateTime? FechaFin { get; set; } = DateTime.Now.AddDays(7);
         public bool Activo { get; set; } = true;
-        public double? MontoMaximoDescuento { get; set; }
-        public double? MontoMinimoCompra { get; set; }
+        public decimal? MontoMaximoDescuento { get; set; }
+        public decimal? MontoMinimoCompra { get; set; }
         public int? MaxUsosGenerales { get; set; }
 
 

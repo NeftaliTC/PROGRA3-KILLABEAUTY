@@ -17,7 +17,6 @@ builder.Services.AddScoped<MarcaService>();
 
 
 builder.Services.AddSingleton<AddressService>();
-builder.Services.AddSingleton<CouponService>();
 builder.Services.AddSingleton<ProductoService>();
 var app = builder.Build();
 
