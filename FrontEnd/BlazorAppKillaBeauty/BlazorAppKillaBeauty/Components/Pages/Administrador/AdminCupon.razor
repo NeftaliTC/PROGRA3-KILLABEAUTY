@@ -27,7 +27,7 @@
                 <h1>Gestión de Cupones</h1>
                 <p>Consulta y filtra las compras registradas en la tienda.</p>
             </div>
-            <button class="btn-add-marca" @onclick='() => NavManager.NavigateTo("/admin/marcas/nuevo")'>
+            <button class="btn-add-marca" @onclick="AbrirModalNuevo">
                 + Nuevo Cupon
             </button>
         </header>
@@ -147,12 +147,12 @@
 
 @if (showModal)
 {
-    <div class="modal fade show" style="display:block;" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content modal-kb">
 
-                <div class="modal-header">
-                    <h5 class="modal-kb-title">@(EsEdicion ? "Modificar cupón" : "Nuevo cupón")</h5>
+<div class="admin-modal-overlay"> 
+        <div class="admin-modal-card" style="text-align: left; max-width: 700px; width: 90%;">
+          
+                <div class="modal-header" style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                <h5 class="modal-kb-title" style="margin: 0; font-size: 1.4rem;">@(EsEdicion ? "Modificar cupón" : "Nuevo cupón")</h5>
                 </div>
 
                 <div class="modal-body p-4">
@@ -261,7 +261,7 @@
                     </EditForm>
                 </div>
             </div>
-        </div>
+        
     </div>
 }
 
@@ -269,110 +269,110 @@
 
 @if (showModalDetalle && cuponDetalle != null)
 {
-    <div class="modal fade show d-block modal-backdrop-kb" tabindex="-1" @onclick="CerrarDetalle">
-        <div class="modal-dialog modal-dialog-centered" @onclick:stopPropagation="true">
-            <div class="modal-content modal-kb">
-
-                <div class="modal-header">
-                    <div>
-                        <h5 class="modal-kb-title">Detalle del cupón</h5>
-                        <span class="text-muted" style="font-size:0.82rem;">ID: @cuponDetalle.Id.ToString("D5")</span>
-                    </div>
-                    <div class="ms-auto d-flex align-items-center gap-2">
-                        @switch (ObtenerEstado(cuponDetalle))
-                        {
-                            case "Disponible":
-                                <span class="badge-disponible">Disponible</span>
-                                break;
-                            case "Inactivo":
-
-                                <span class="badge-inactivo">Inactivo</span>
-                                break;
-                            default:
-
-                                <span class="badge-vencido">Vencido</span>
-                                break;
-                        }
-                        <button type="button" class="btn-close" @onclick="CerrarDetalle"></button>
-                    </div>
+    <div class="admin-modal-overlay" @onclick="CerrarDetalle">
+        <div class="admin-modal-card" style="text-align: left; max-width: 600px; padding: 32px;" @onclick:stopPropagation="true">
+            
+            <div class="modal-header" style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h5 class="modal-kb-title" style="margin: 0; font-size: 1.4rem;">Detalle del cupón</h5>
+                    <span class="text-muted" style="font-size:0.82rem;">ID: @cuponDetalle?.Id.ToString("D5")</span>
                 </div>
-
-                <div class="modal-body p-4">
-
-                    <div class="mb-4">
-                        <span class="detalle-codigo-badge">@cuponDetalle.Codigo</span>
-                    </div>
-
-                    <div class="row g-3 mb-3">
-                        <div class="col-6">
-                            <div class="detalle-data-card">
-                                <div class="detalle-data-label">Descuento</div>
-                                <div class="detalle-data-value accent">
-                                    @(cuponDetalle.TipoDescuento == "Porcentaje" ? $"{cuponDetalle.ValorDescuento}%" : $"S/ {cuponDetalle.ValorDescuento}")
-                                </div>
-                                <div class="detalle-data-sub">@cuponDetalle.TipoDescuento</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="detalle-data-card">
-                                <div class="detalle-data-label">Monto mínimo</div>
-                                <div class="detalle-data-value">
-                                    @(cuponDetalle.MontoMinimoCompra.HasValue ? $"S/ {cuponDetalle.MontoMinimoCompra}" : "Sin mínimo")
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="detalle-data-card">
-                                <div class="detalle-data-label">Máx. descuento</div>
-                                <div class="detalle-data-value">
-                                    @(cuponDetalle.MontoMaximoDescuento.HasValue ? $"S/ {cuponDetalle.MontoMaximoDescuento}" : "Sin límite")
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="detalle-data-card">
-                                <div class="detalle-data-label">Usos</div>
-                                <div class="detalle-data-value">
-                                    @cuponDetalle.UsosActuales / @(cuponDetalle.MaxUsosGenerales.HasValue ? cuponDetalle.MaxUsosGenerales.ToString() : "∞")
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="detalle-data-card">
-                                <div class="detalle-data-label">Fecha inicio</div>
-                                <div class="detalle-data-value">@(cuponDetalle.FechaInicio?.ToString("dd/MM/yyyy") ?? "-")</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="detalle-data-card">
-                                <div class="detalle-data-label">Fecha expiración</div>
-                                <div class="detalle-data-value">@(cuponDetalle.FechaFin?.ToString("dd/MM/yyyy") ?? "-")</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    @if (!string.IsNullOrEmpty(cuponDetalle.CampanaNombre))
+                <div class="d-flex align-items-center gap-2">
+                    @switch (ObtenerEstado(cuponDetalle))
                     {
-                        <div class="detalle-campana-wrap mb-3">
-                            <i class="bi bi-tag"></i> @cuponDetalle.CampanaNombre
-                        </div>
+                        case "Disponible":
+                            <span class="badge-disponible">Disponible</span>
+                            break;
+                        case "Inactivo":
+                            <span class="badge-inactivo">Inactivo</span>
+                            break;
+                        default:
+                            <span class="badge-vencido">Vencido</span>
+                            break;
                     }
-
-                    @if (!string.IsNullOrWhiteSpace(cuponDetalle.Descripcion))
-                    {
-                        <div class="detalle-legales-wrap mb-3">@cuponDetalle.Descripcion</div>
-                    }
-
-                    <div class="d-flex justify-content-end gap-2 mt-2">
-                        <button class="btn-modal-cancelar" @onclick="CerrarDetalle">Cerrar</button>
-                        <button class="btn-modal-submit"
-                                @onclick='() => { CerrarDetalle(); NavManager.NavigateTo($"/admin/cupones/editar/{cuponDetalle.Id}"); }'>
-                            <i class="bi bi-pencil"></i> Editar
-                        </button>
-                    </div>
-
+                    <button type="button" @onclick="CerrarDetalle" style="background: transparent; border: none; font-size: 1.2rem; color: var(--gray); cursor: pointer;">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
                 </div>
             </div>
+
+            <div class="mb-4 text-center">
+                <span class="detalle-codigo-badge" style="font-size: 1.2rem; font-weight: bold; padding: 8px 16px; border-radius: 8px; background: #fdf5f7; color: #a12828; border: 1px dashed #a12828;">
+                    @cuponDetalle?.Codigo
+                </span>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <div class="detalle-data-card" style="background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
+                        <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Descuento</div>
+                        <div class="detalle-data-value accent" style="color: #a12828; font-weight: bold; font-size: 1.1rem; margin: 4px 0;">
+                            @(cuponDetalle?.TipoDescuento == "Porcentaje" ? $"{cuponDetalle?.ValorDescuento}%" : $"S/ {cuponDetalle?.ValorDescuento}")
+                        </div>
+                        <div class="detalle-data-sub" style="font-size: 0.75rem; color: #999;">@cuponDetalle?.TipoDescuento</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="detalle-data-card" style="background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
+                        <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Monto mínimo</div>
+                        <div class="detalle-data-value" style="font-weight: bold; font-size: 1.1rem; margin-top: 4px;">
+                            @(cuponDetalle?.MontoMinimoCompra.HasValue == true ? $"S/ {cuponDetalle?.MontoMinimoCompra}" : "Sin mínimo")
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="detalle-data-card" style="background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
+                        <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Máx. descuento</div>
+                        <div class="detalle-data-value" style="font-weight: bold; font-size: 1.1rem; margin-top: 4px;">
+                            @(cuponDetalle?.MontoMaximoDescuento.HasValue == true ? $"S/ {cuponDetalle?.MontoMaximoDescuento}" : "Sin límite")
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="detalle-data-card" style="background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
+                        <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Usos</div>
+                        <div class="detalle-data-value" style="font-weight: bold; font-size: 1.1rem; margin-top: 4px;">
+                            @cuponDetalle?.UsosActuales / @(cuponDetalle?.MaxUsosGenerales.HasValue == true ? cuponDetalle?.MaxUsosGenerales.ToString() : "∞")
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="detalle-data-card" style="background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
+                        <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Fecha inicio</div>
+                        <div class="detalle-data-value" style="font-weight: bold; font-size: 1.1rem; margin-top: 4px;">@(cuponDetalle?.FechaInicio?.ToString("dd/MM/yyyy") ?? "-")</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="detalle-data-card" style="background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
+                        <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Fecha expiración</div>
+                        <div class="detalle-data-value" style="font-weight: bold; font-size: 1.1rem; margin-top: 4px;">@(cuponDetalle?.FechaFin?.ToString("dd/MM/yyyy") ?? "-")</div>
+                    </div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(cuponDetalle?.CampanaNombre))
+            {
+                <div class="detalle-campana-wrap mb-3" style="background: #eef2fa; padding: 10px; border-radius: 6px; color: #3b5998; font-size: 0.9rem;">
+                    <i class="bi bi-tag"></i> @cuponDetalle?.CampanaNombre
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(cuponDetalle?.Descripcion))
+            {
+                <div class="detalle-legales-wrap mb-4" style="font-size: 0.85rem; color: #666; background: #f9f9f9; padding: 12px; border-left: 3px solid #ccc;">
+                    @cuponDetalle?.Descripcion
+                </div>
+            }
+
+            <div class="admin-modal-actions" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px;">
+                <button type="button" class="admin-modal-btn-cancel" @onclick="CerrarDetalle">Cerrar</button>
+                
+                <button type="button" class="admin-modal-btn-confirm"
+                        @onclick='() => { var id = cuponDetalle?.Id; CerrarDetalle(); if(id.HasValue) NavManager.NavigateTo($"/admin/cupones/editar/{id.Value}"); }'>
+                    <i class="bi bi-pencil"></i> Editar
+                </button>
+            </div>
+
         </div>
     </div>
 }
@@ -450,6 +450,14 @@
             showModal = false;
         }
     }
+    private void AbrirModalNuevo()
+    {
+        cuponActual = new Cupon();
+        idCampanaSeleccionada = 0;
+        opcionUsos = "Mantener";
+        EsEdicion = false;
+        showModal = true;
+    }
 
     private void RefrescarTabla()
     {
@@ -520,7 +528,9 @@
             cuponActual.UsosActuales = 0;
 
         CuponService.Guardar(cuponActual);
-        NavManager.NavigateTo("/admin/cupones");
+        // NavManager.NavigateTo("/admin/cupones");
+        showModal = false; 
+        RefrescarTabla();
     }
 
     private void EliminarCupon(int id)

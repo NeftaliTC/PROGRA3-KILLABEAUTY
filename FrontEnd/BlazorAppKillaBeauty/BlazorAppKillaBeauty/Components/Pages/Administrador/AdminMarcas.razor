@@ -150,9 +150,16 @@
 
 @if (showModalForm)
 {
-    <div class="modal fade show d-block modal-overlay" tabindex="-1">
+@*     <div class="modal fade show d-block modal-overlay" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content modal-content-kb">
+            <div class="modal-content modal-content-kb"> *@
+
+
+
+     <div class="admin-modal-overlay"> 
+        <div class="admin-modal-card"> <!-- Usamos tu clase probada -->
+            
+            <div class="modal-content-kb">
 
                 <h3 class="modal-title-kb">@(EsEdicion ? "Editar Marca" : "Registrar Nueva Marca")</h3>
 
