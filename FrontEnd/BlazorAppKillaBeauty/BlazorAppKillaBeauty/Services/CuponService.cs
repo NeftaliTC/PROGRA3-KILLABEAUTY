@@ -27,6 +27,74 @@
                 Activo = false,
                 FechaFin = new DateTime(2025, 5, 10)
             });
+            cupones.Add(new Cupon
+            {
+                Id = 2,
+                Codigo = "MAMA50",
+                ValorDescuento = 50,
+                TipoDescuento = "Monto Fijo",
+                FechaInicio = new DateTime(2026, 06, 02),
+                FechaFin = new DateTime(2026, 06, 30),
+                Activo = true,
+                MontoMinimoCompra = 200,
+                MaxUsosGenerales = 50,
+                UsosActuales = 45,
+                Descripcion = "Promoción mes de la madre"
+            });
+
+            cupones.Add(new Cupon
+            {
+                Id = 3,
+                Codigo = "ENVIOFREE",
+                ValorDescuento = 10,
+                TipoDescuento = "Monto Fijo",
+                FechaInicio = new DateTime(2026, 05, 01),
+                FechaFin = new DateTime(2026, 05, 31),
+                Activo = false,
+                MontoMinimoCompra = 150,
+                MaxUsosGenerales = 200,
+                UsosActuales = 200,
+                Descripcion = "Cupón vencido de envío"
+            });
+
+            cupones.Add(new Cupon
+            {
+                Id = 4,
+                Codigo = "SUMMER26",
+                ValorDescuento = 15,
+                TipoDescuento = "Porcentaje",
+                FechaInicio = new DateTime(2026, 07, 01),
+                FechaFin = new DateTime(2026, 09, 20),
+                Activo = true,
+                MontoMinimoCompra = 80,
+                MaxUsosGenerales = 500,
+                UsosActuales = 0,
+                Descripcion = "Descuento de temporada de verano"
+            });
+
+            cupones.Add(new Cupon
+            {
+                Id = 5,
+                Codigo = "FLASH100",
+                ValorDescuento = 100,
+                TipoDescuento = "Monto Fijo",
+                FechaInicio = new DateTime(2026, 06, 01),
+                FechaFin = new DateTime(2026, 06, 05),
+                Activo = true,
+                MontoMinimoCompra = 400,
+                MaxUsosGenerales = 20,
+                UsosActuales = 5,
+                Descripcion = "Oferta relámpago"
+            });
+            cupones.Add(new Cupon
+            {
+                Id = 10, Codigo = "BELLEZA2026", ValorDescuento = 15, TipoDescuento = "Porcentaje", FechaInicio = DateTime.Now.AddDays(-15), FechaFin = DateTime.Now.AddDays(90), Activo = true, MontoMinimoCompra = 90, Descripcion = "Aniversario Killa" 
+
+            });
+            cupones.Add(new Cupon
+            {
+                Id = 11, Codigo = "DESCUENTON", ValorDescuento = 100, TipoDescuento = "Monto Fijo", FechaInicio = DateTime.Now.AddDays(-5), FechaFin = DateTime.Now.AddDays(10), Activo = true, MontoMinimoCompra = 500, Descripcion = "Mega ahorro" 
+            });
         }
 
 
@@ -79,8 +147,14 @@
         public DateTime? FechaInicio { get; set; } = DateTime.Now;
         public DateTime? FechaFin { get; set; } = DateTime.Now.AddDays(7);
         public bool Activo { get; set; } = true;
-        public double MontoMaximoDescuento { get; set; }
-        public double MontoMinimoCompra { get; set; }
-        public int MaxUsosGenerales { get; set; }
+        public double? MontoMaximoDescuento { get; set; }
+        public double? MontoMinimoCompra { get; set; }
+        public int? MaxUsosGenerales { get; set; }
+
+
+        public int UsosActuales { get; set; } = 0;
+
+        public int? CampanaId { get; set; }
+        public string CampanaNombre { get; set; } = "";
     }
 }
