@@ -61,6 +61,14 @@
         new MenuAdmin("Reportes", "/admin/reportes", "bi bi-bar-chart")
     };
 
+    protected override void OnInitialized()
+    {
+        if (AuthService.EstaLogueado && AuthService.Rol == "SuperAdmin")
+        {
+            menu.Add(new MenuAdmin("Empleados", "/admin/empleados", "bi bi-people-fill"));
+        }
+    }
+
     private record MenuAdmin(string Texto, string Url, string Icono);
 
     private void AbrirAviso()
