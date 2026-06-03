@@ -1,18 +1,531 @@
 @page "/admin/cupones"
+@page "/admin/cupones/{Accion}"
+@page "/admin/cupones/{Accion}/{IdParam:int}"
 @rendermode InteractiveServer
+@using BlazorAppKillaBeauty.Services
+@inject CuponService CuponService
+@inject CampanaService CampanaService
+@inject NavigationManager NavManager
 
 <PageTitle>Cupones Admin - Killa Beauty</PageTitle>
+
+<link rel="stylesheet" href="css/admin-cupones.css" />
 
 <main class="admin-page">
     <AdminNavbar />
 
-    <section class="admin-content">
-        <header class="admin-header">
+    <section class="admin-content admin-orders-content">
+        <div class="admin-breadcrumb">
+            <span>Administrador</span>
+            <i class="bi bi-chevron-right"></i>
+            <span>Cupones</span>
+        </div>
+
+
+        <header class="admin-header admin-orders-header d-flex justify-content-between align-items-center">
             <div>
-                <span class="admin-eyebrow">Panel administrativo</span>
-                <h1>Cupones</h1>
-                <p>Modulo pendiente de implementacion.</p>
+                <h1>Gestión de Cupones</h1>
+                <p>Consulta y filtra las compras registradas en la tienda.</p>
             </div>
+            <button class="btn-add-marca" @onclick='() => NavManager.NavigateTo("/admin/marcas/nuevo")'>
+                + Nuevo Cupon
+            </button>
         </header>
+
+
+
+        <section class="admin-orders-filters">
+            <div class="admin-orders-search">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Buscar por código..."
+                       @bind="filtroCodigo" @bind:event="oninput" @bind:after="AplicarFiltros" />
+            </div>
+
+            <div class="admin-orders-filter-row cupones-filter-grid">
+
+                <div class="admin-status-filter">
+                    <span>Estado</span>
+                    <select @bind="filtroEstado" @bind:after="AplicarFiltros">
+                        <option value="">Todos</option>
+                        <option value="Disponible">Disponible</option>
+                        <option value="Vencido">Vencido</option>
+                        <option value="Inactivo">Inactivo</option>
+                    </select>
+                </div>
+
+                <div class="admin-status-filter">
+                    <span>Vigente desde</span>
+                    <input type="date" @bind="filtroDesde" @bind:after="AplicarFiltros" />
+                </div>
+
+                <div class="admin-status-filter">
+                    <span>Vigente hasta</span>
+                    <input type="date" @bind="filtroHasta" @bind:after="AplicarFiltros" />
+                </div>
+
+                <div class="d-flex align-items-end">
+                    <button class="btn-limpiar-filtros" @onclick="LimpiarFiltros">
+                        <i class="bi bi-x-circle"></i> Limpiar filtros
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+
+        <section class="admin-table-card admin-orders-table-card">
+            <table class="admin-table admin-orders-table">
+                <thead>
+                    <tr>
+                        <th style="padding-left: 2rem !important;">ID</th>
+                        <th>CÓDIGO</th>
+                        <th>DESCUENTO</th>
+                        <th>FECHA INICIO</th>
+                        <th>FECHA EXPIRACIÓN</th>
+                        <th class="text-center">ESTADO</th>
+                        <th class="text-end" style="padding-right: 2rem !important;">ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+      
+                    @foreach (var c in cuponesPaginados)
+                    {
+                        <tr>
+                            <td style="padding-left: 2rem !important; color: #777;">@c.Id.ToString("D5")</td>
+                            <td class="td-codigo">@c.Codigo</td>
+                            <td style="font-weight: 700;">@(c.TipoDescuento == "Porcentaje" ? $"{c.ValorDescuento}%" : $"S/ {c.ValorDescuento}")</td>
+                            <td>@(c.FechaInicio?.ToString("dd/MM/yyyy") ?? "-")</td>
+                            <td>@(c.FechaFin?.ToString("dd/MM/yyyy") ?? "-")</td>
+                            <td class="text-center">
+                                @if (ObtenerEstado(c) == "Disponible")
+                                {
+                                    <span class="badge-disponible">Disponible</span>
+                                }
+                                else if (ObtenerEstado(c) == "Inactivo")
+                                {
+
+                                    <span class="badge-inactivo">Inactivo</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge-vencido">Vencido</span>
+                                }
+                            </td>
+                            <td class="text-end" style="padding-right: 2rem !important;">
+                                <button class="btn-accion" title="Ver" @onclick="() => VerDetalle(c)"><i class="bi bi-eye"></i></button>
+                                <button class="btn-accion" title="Editar" @onclick='() => NavManager.NavigateTo($"/admin/cupones/editar/{c.Id}")'><i class="bi bi-pencil"></i></button>
+                                <button class="btn-accion btn-borrar" title="Eliminar" @onclick="() => EliminarCupon(c.Id)"><i class="bi bi-trash"></i></button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </section>
+
+    
+        @if (totalPaginas > 1)
+        {
+            <footer class="admin-pagination">
+                <span style="font-weight: 600; color: #777;">
+                    Mostrando @(((paginaActual - 1) * itemsPorPagina) + 1)–@(Math.Min(paginaActual * itemsPorPagina, cuponesFiltrados.Count)) de @cuponesFiltrados.Count resultados
+                </span>
+                <div class="admin-pagination-buttons d-flex gap-2">
+                    <button class="btn btn-light rounded-circle" style="width:35px; height:35px; border: 1px solid #ddd;" disabled="@(paginaActual == 1)" @onclick="() => CambiarPagina(paginaActual - 1)">‹</button>
+                    @for (int p = 1; p <= totalPaginas; p++)
+                    {
+                        int pg = p;
+                        <button class="btn rounded-circle fw-bold" style="width:35px; height:35px; @(paginaActual == pg ? "background-color: #f5a3b7; color: white; border:none;" : "background-color: transparent; color: #555; border: 1px solid #ddd;")" @onclick="() => CambiarPagina(pg)">@pg</button>
+                    }
+                    <button class="btn btn-light rounded-circle" style="width:35px; height:35px; border: 1px solid #ddd;" disabled="@(paginaActual == totalPaginas)" @onclick="() => CambiarPagina(paginaActual + 1)">›</button>
+                </div>
+            </footer>
+        }
+
     </section>
 </main>
+
+@if (showModal)
+{
+    <div class="modal fade show" style="display:block;" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content modal-kb">
+
+                <div class="modal-header">
+                    <h5 class="modal-kb-title">@(EsEdicion ? "Modificar cupón" : "Nuevo cupón")</h5>
+                </div>
+
+                <div class="modal-body p-4">
+                    <EditForm Model="cuponActual" OnValidSubmit="GuardarCambios">
+
+                        <div class="row mb-3">
+                            <div class="col-md-5">
+                                <label class="form-label-kb">Código de cupón</label>
+                                <InputText @bind-Value="cuponActual.Codigo"
+                                           class="@(EsEdicion ? "form-control-kb disabled-field" : "form-control-kb")"
+                                           disabled="@EsEdicion" placeholder="NUEVOCUPON" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label-kb">Estado</label>
+                                <InputSelect @bind-Value="cuponActual.Activo" class="form-select-kb">
+                                    <option value="true">Activo</option>
+                                    <option value="false">Inactivo</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label-kb">Monto mínimo de compra</label>
+                                <InputNumber @bind-Value="cuponActual.MontoMinimoCompra" class="form-control-kb" placeholder="0.00" />
+                            </div>
+                        </div>
+
+                        @if (EsEdicion)
+                        {
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label-kb">Usos actuales</label>
+                                    <input type="text" class="form-control-kb disabled-field" disabled value="@cuponActual.UsosActuales" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label-kb">Gestión de usos</label>
+                                    <select class="form-select-kb" @bind="opcionUsos">
+                                        <option value="Mantener">Mantener</option>
+                                        <option value="Reiniciar">Reiniciar</option>
+                                    </select>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label-kb">Monto máximo de descuento</label>
+                                <InputNumber @bind-Value="cuponActual.MontoMaximoDescuento" class="form-control-kb" placeholder="0.00" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label-kb">Límite de uso general</label>
+                                <InputNumber @bind-Value="cuponActual.MaxUsosGenerales" class="form-control-kb" placeholder="0" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label-kb">Tipo de descuento</label>
+                                <InputSelect @bind-Value="cuponActual.TipoDescuento" class="form-select-kb">
+                                    <option value="seleccione">Seleccione</option>
+                                    <option value="Porcentaje">Porcentaje</option>
+                                    <option value="Monto Fijo">Monto Fijo</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label-kb">Valor de descuento</label>
+                                <InputNumber @bind-Value="cuponActual.ValorDescuento" class="form-control-kb" placeholder="0" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label-kb">Fecha de inicio</label>
+                                <InputDate @bind-Value="cuponActual.FechaInicio" class="form-control-kb" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label-kb">Fecha de expiración</label>
+                                <InputDate @bind-Value="cuponActual.FechaFin" class="form-control-kb" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label-kb">Campaña asociada</label>
+                                <InputSelect @bind-Value="idCampanaSeleccionada" class="form-select-kb">
+                                    <option value="0">Ninguna</option>
+                                    @foreach (var campana in campanasDisponibles)
+                                    {
+                                        <option value="@campana.Id">@campana.Nombre</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label-kb">Descripción / Legales</label>
+                            <InputTextArea @bind-Value="cuponActual.Descripcion" class="form-textarea-kb w-100" rows="2"
+                                           placeholder="Términos y condiciones del cupón..." />
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn-modal-cancelar"
+                                    @onclick='() => NavManager.NavigateTo("/admin/cupones")'>
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn-modal-submit">
+                                @(EsEdicion ? "Guardar cambios" : "Agregar cupón")
+                            </button>
+                        </div>
+
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@if (showModalDetalle && cuponDetalle != null)
+{
+    <div class="modal fade show d-block modal-backdrop-kb" tabindex="-1" @onclick="CerrarDetalle">
+        <div class="modal-dialog modal-dialog-centered" @onclick:stopPropagation="true">
+            <div class="modal-content modal-kb">
+
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-kb-title">Detalle del cupón</h5>
+                        <span class="text-muted" style="font-size:0.82rem;">ID: @cuponDetalle.Id.ToString("D5")</span>
+                    </div>
+                    <div class="ms-auto d-flex align-items-center gap-2">
+                        @switch (ObtenerEstado(cuponDetalle))
+                        {
+                            case "Disponible":
+                                <span class="badge-disponible">Disponible</span>
+                                break;
+                            case "Inactivo":
+
+                                <span class="badge-inactivo">Inactivo</span>
+                                break;
+                            default:
+
+                                <span class="badge-vencido">Vencido</span>
+                                break;
+                        }
+                        <button type="button" class="btn-close" @onclick="CerrarDetalle"></button>
+                    </div>
+                </div>
+
+                <div class="modal-body p-4">
+
+                    <div class="mb-4">
+                        <span class="detalle-codigo-badge">@cuponDetalle.Codigo</span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <div class="detalle-data-card">
+                                <div class="detalle-data-label">Descuento</div>
+                                <div class="detalle-data-value accent">
+                                    @(cuponDetalle.TipoDescuento == "Porcentaje" ? $"{cuponDetalle.ValorDescuento}%" : $"S/ {cuponDetalle.ValorDescuento}")
+                                </div>
+                                <div class="detalle-data-sub">@cuponDetalle.TipoDescuento</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detalle-data-card">
+                                <div class="detalle-data-label">Monto mínimo</div>
+                                <div class="detalle-data-value">
+                                    @(cuponDetalle.MontoMinimoCompra.HasValue ? $"S/ {cuponDetalle.MontoMinimoCompra}" : "Sin mínimo")
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detalle-data-card">
+                                <div class="detalle-data-label">Máx. descuento</div>
+                                <div class="detalle-data-value">
+                                    @(cuponDetalle.MontoMaximoDescuento.HasValue ? $"S/ {cuponDetalle.MontoMaximoDescuento}" : "Sin límite")
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detalle-data-card">
+                                <div class="detalle-data-label">Usos</div>
+                                <div class="detalle-data-value">
+                                    @cuponDetalle.UsosActuales / @(cuponDetalle.MaxUsosGenerales.HasValue ? cuponDetalle.MaxUsosGenerales.ToString() : "∞")
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detalle-data-card">
+                                <div class="detalle-data-label">Fecha inicio</div>
+                                <div class="detalle-data-value">@(cuponDetalle.FechaInicio?.ToString("dd/MM/yyyy") ?? "-")</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="detalle-data-card">
+                                <div class="detalle-data-label">Fecha expiración</div>
+                                <div class="detalle-data-value">@(cuponDetalle.FechaFin?.ToString("dd/MM/yyyy") ?? "-")</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(cuponDetalle.CampanaNombre))
+                    {
+                        <div class="detalle-campana-wrap mb-3">
+                            <i class="bi bi-tag"></i> @cuponDetalle.CampanaNombre
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(cuponDetalle.Descripcion))
+                    {
+                        <div class="detalle-legales-wrap mb-3">@cuponDetalle.Descripcion</div>
+                    }
+
+                    <div class="d-flex justify-content-end gap-2 mt-2">
+                        <button class="btn-modal-cancelar" @onclick="CerrarDetalle">Cerrar</button>
+                        <button class="btn-modal-submit"
+                                @onclick='() => { CerrarDetalle(); NavManager.NavigateTo($"/admin/cupones/editar/{cuponDetalle.Id}"); }'>
+                            <i class="bi bi-pencil"></i> Editar
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    [Parameter] public string Accion { get; set; }
+    [Parameter] public int? IdParam { get; set; }
+
+    private IReadOnlyList<Cupon> cupones = new List<Cupon>();
+    private IReadOnlyList<Campana> campanasDisponibles = new List<Campana>();
+
+    private Cupon cuponActual = new Cupon();
+    private bool showModal = false;
+    private bool EsEdicion = false;
+    private int idCampanaSeleccionada = 0;
+    private string opcionUsos = "Mantener";
+
+    private bool showModalDetalle = false;
+    private Cupon cuponDetalle = null;
+
+    private string filtroCodigo = "";
+    private string filtroEstado = "";
+    private DateTime? filtroDesde = null;
+    private DateTime? filtroHasta = null;
+
+    private int paginaActual = 1;
+    private int itemsPorPagina = 6;
+
+    private List<Cupon> cuponesFiltrados = new();
+    private IEnumerable<Cupon> cuponesPaginados => cuponesFiltrados.Skip((paginaActual - 1) * itemsPorPagina).Take(itemsPorPagina);
+    private int totalPaginas => (int)Math.Ceiling((double)cuponesFiltrados.Count / itemsPorPagina);
+
+    protected override void OnInitialized()
+    {
+        RefrescarTabla();
+        campanasDisponibles = CampanaService.ObtenerActivas();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Accion == "nuevo")
+        {
+            cuponActual = new Cupon();
+            idCampanaSeleccionada = 0;
+            opcionUsos = "Mantener";
+            EsEdicion = false;
+            showModal = true;
+        }
+        else if (Accion == "editar" && IdParam.HasValue)
+        {
+            var bd = CuponService.ObtenerPorId(IdParam.Value);
+            cuponActual = new Cupon
+            {
+                Id = bd.Id,
+                Codigo = bd.Codigo,
+                ValorDescuento = bd.ValorDescuento,
+                TipoDescuento = bd.TipoDescuento,
+                FechaInicio = bd.FechaInicio,
+                FechaFin = bd.FechaFin,
+                Activo = bd.Activo,
+                MontoMaximoDescuento = bd.MontoMaximoDescuento,
+                MontoMinimoCompra = bd.MontoMinimoCompra,
+                MaxUsosGenerales = bd.MaxUsosGenerales,
+                UsosActuales = bd.UsosActuales,
+                Descripcion = bd.Descripcion
+            };
+            idCampanaSeleccionada = bd.CampanaId ?? 0;
+            opcionUsos = "Mantener";
+            EsEdicion = true;
+            showModal = true;
+        }
+        else
+        {
+            showModal = false;
+        }
+    }
+
+    private void RefrescarTabla()
+    {
+        cupones = CuponService.ObtenerTodos();
+        AplicarFiltros();
+    }
+
+    private void AplicarFiltros()
+    {
+        var q = cupones.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(filtroCodigo))
+            q = q.Where(c => c.Codigo.Contains(filtroCodigo.Trim(), StringComparison.OrdinalIgnoreCase));
+
+        if (!string.IsNullOrWhiteSpace(filtroEstado))
+            q = q.Where(c => ObtenerEstado(c) == filtroEstado);
+
+        if (filtroDesde.HasValue)
+            q = q.Where(c => c.FechaInicio >= filtroDesde || c.FechaFin >= filtroDesde);
+
+        if (filtroHasta.HasValue)
+            q = q.Where(c => c.FechaFin <= filtroHasta);
+
+        cuponesFiltrados = q.ToList();
+        paginaActual = 1;
+    }
+
+    private void LimpiarFiltros()
+    {
+        filtroCodigo = "";
+        filtroEstado = "";
+        filtroDesde = null;
+        filtroHasta = null;
+        AplicarFiltros();
+    }
+
+    private void CambiarPagina(int pagina) => paginaActual = pagina;
+
+    private string ObtenerEstado(Cupon c)
+    {
+        if (!c.Activo) return "Inactivo";
+        if (c.FechaFin.HasValue && c.FechaFin.Value < DateTime.Today) return "Vencido";
+        return "Disponible";
+    }
+
+    private void VerDetalle(Cupon c)
+    {
+        cuponDetalle = c;
+        if (c.CampanaId.HasValue && c.CampanaId > 0)
+        {
+            var camp = campanasDisponibles.FirstOrDefault(x => x.Id == c.CampanaId);
+            if (camp != null) cuponDetalle.CampanaNombre = camp.Nombre;
+        }
+        showModalDetalle = true;
+    }
+
+    private void CerrarDetalle()
+    {
+        showModalDetalle = false;
+        cuponDetalle = null;
+    }
+
+    private void GuardarCambios()
+    {
+        cuponActual.CampanaId = idCampanaSeleccionada == 0 ? null : idCampanaSeleccionada;
+
+        if (EsEdicion && opcionUsos == "Reiniciar")
+            cuponActual.UsosActuales = 0;
+
+        CuponService.Guardar(cuponActual);
+        NavManager.NavigateTo("/admin/cupones");
+    }
+
+    private void EliminarCupon(int id)
+    {
+        CuponService.EliminarLogico(id);
+        RefrescarTabla();
+    }
+}
