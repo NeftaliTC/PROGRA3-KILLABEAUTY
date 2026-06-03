@@ -404,3 +404,33 @@
     padding: 50px;
     color: #666;
 }
+
+
+/* NUMERO DE SEGUIMIENTO - TRACKING*/
+.tracking-container {
+    background-color: #fdf2f8;
+    border-left: 4px solid #e83e8c;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    width: 270px;
+}
+
+.tracking-label {
+    font-size: 0.85em;
+    color: #666;
+    font-weight: 600;
+}
+
+.tracking-number {
+    display: block;
+    font-size: 1.1em;
+    color: #e83e8c;
+    margin-top: 2px;
+}
+
+.tracking-link {
+    font-size: 0.8em;
+    color: #0d6efd;
+    text-decoration: underline;
+}

@@ -1,3 +1,7 @@
+@inject IJSRuntime JS
+@inject NavigationManager NavManager
+@inject AuthService AuthService
+
 <nav class="admin-navbar">
     <NavLink href="/admin/productos"
              class="admin-brand"
@@ -17,9 +21,36 @@
             </NavLink>
         }
     </div>
+    <div class="admin-nav-right">
+        <button class="btn-logout" @onclick="AbrirAviso">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Salir</span>
+        </button>
+    </div>
 </nav>
 
+@if (mostrarAviso)
+{
+    <div class="killa-modal-overlay">
+        <div class="killa-modal-box">
+            <div class="killa-modal-icon">
+                <i class="bi bi-exclamation-circle-fill"></i>
+            </div>
+            
+            <h3>¿Cerrar Sesión?</h3>
+            <p>¿Estás seguro de que deseas salir del panel de administración de Killa Beauty?</p>
+            
+            <div class="killa-modal-buttons">
+                <button class="btn-killa-cancel" @onclick="CerrarAviso">Cancelar</button>
+                <button class="btn-killa-confirm" @onclick="ConfirmarCierre">Sí, salir</button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
+    private bool mostrarAviso = false;
+
     private List<MenuAdmin> menu = new()
     {
         new MenuAdmin("Productos", "/admin/productos", "bi bi-box-seam"),
@@ -32,4 +63,21 @@
     };
 
     private record MenuAdmin(string Texto, string Url, string Icono);
+
+    private void AbrirAviso()
+    {
+        mostrarAviso = true;
+    }
+
+    private void CerrarAviso()
+    {
+        mostrarAviso = false;
+    }
+
+    private void ConfirmarCierre()
+    {
+        mostrarAviso = false;
+        AuthService.Logout();
+        NavManager.NavigateTo("/", true);
+    }
 }

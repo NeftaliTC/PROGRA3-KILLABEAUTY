@@ -179,6 +179,16 @@
                         <div class="block-text">
                             <h3>Envío a domicilio</h3>
                             <p class="courier-highlight">Operado por Olva Courier</p>
+                            @if (!string.IsNullOrEmpty(pedidoActual.NumeroSeguimiento))
+                            {
+                                <div class="tracking-container">
+                                    <span class="tracking-label">N° de Seguimiento:</span>
+                                    <strong class="tracking-number">@pedidoActual.NumeroSeguimiento</strong>
+                                    <a href="https://www.olvacourier.com/" target="_blank" class="tracking-link">
+                                        Rastrear en la web del courier
+                                    </a>
+                                </div>
+                            }
                             <p>@pedidoActual.DireccionLinea1</p>
                             <p>@pedidoActual.DireccionLinea2</p>
                             @if (!string.IsNullOrEmpty(pedidoActual.Referencia))
@@ -239,6 +249,7 @@
         public string? ClaseEstado { get; set; }
         public decimal Subtotal { get; set; }
         public decimal Envio { get; set; }
+        public string? NumeroSeguimiento { get; set; }
         public decimal DescuentoCupon { get; set; }
         public decimal Total => (Subtotal + Envio) - DescuentoCupon;
         public int TotalArticulos => Productos.Sum(p => p.Cantidad);
@@ -286,7 +297,7 @@
             Fecha = "01 de junio del 2026",
             Estado = "EN_PREPARACION",
             ClaseEstado = "status-orange",
-            Subtotal = 449.30m, Envio = 10.00m, DescuentoCupon = 0.00m,
+            Subtotal = 449.30m, NumeroSeguimiento="00217262" , Envio = 10.00m, DescuentoCupon = 0.00m,
             TipoComprobante = "Boleta", DocumentoIdentidad = "72145896",
             DireccionLinea1 = "Av. Arequipa 1234", DireccionLinea2 = "Miraflores, Lima",
             Referencia = "Frente al parque Kennedy",
@@ -301,7 +312,7 @@
             Fecha = "25 de mayo del 2026",
             Estado = "ENVIADO",
             ClaseEstado = "status-purple",
-            Subtotal = 78.20m, Envio = 10.00m, DescuentoCupon = 15.00m,
+            Subtotal = 78.20m, NumeroSeguimiento="00264788", Envio = 10.00m, DescuentoCupon = 15.00m,
             TipoComprobante = "Factura", DocumentoIdentidad = "20601234567", RazonSocial = "Killa Beauty S.A.C.",
             DireccionLinea1 = "Calle Las Orquídeas 456", DireccionLinea2 = "San Isidro, Lima",
             Referencia = "A dos cuadras de la estación",
@@ -316,7 +327,7 @@
             Fecha = "05 de mayo del 2026",
             Estado = "ENTREGADO",
             ClaseEstado = "status-green",
-            Subtotal = 120.00m, Envio = 12.00m, DescuentoCupon = 0.00m,
+            Subtotal = 120.00m, NumeroSeguimiento="00365271", Envio = 12.00m, DescuentoCupon = 0.00m,
             TipoComprobante = "Boleta", DocumentoIdentidad = "45127896",
             DireccionLinea1 = "Av. Javier Prado 2500", DireccionLinea2 = "San Borja, Lima",
             Referencia = "Cerca a la Rambla",
