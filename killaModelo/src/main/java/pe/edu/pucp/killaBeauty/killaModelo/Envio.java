@@ -10,11 +10,11 @@ public class Envio {
     private EstadoEnvio estadoEnvio;
     private Pedido pedido;
     private Courier courier;
-    private int numeroSeguimiento;
+    private String numeroSeguimiento;
 
     public Envio() {}
 
-    public Envio(int id, String descripcion, double costoEnvio, Date fechaEnvio, EstadoEnvio estadoEnvio, Pedido pedido, Courier courier, int numeroSeguimiento) {
+    public Envio(int id, String descripcion, double costoEnvio, Date fechaEnvio, EstadoEnvio estadoEnvio, Pedido pedido, Courier courier, String numeroSeguimiento) {
         this.id = id;
         this.descripcion = descripcion;
         this.costoEnvio = costoEnvio;
@@ -81,11 +81,11 @@ public class Envio {
         this.courier = courier;
     }
 
-    public int getNumeroSeguimiento() {
+    public String getNumeroSeguimiento() {
         return numeroSeguimiento;
     }
 
-    public void setNumeroSeguimiento(int numeroSeguimiento) {
+    public void setNumeroSeguimiento(String numeroSeguimiento) {
         this.numeroSeguimiento = numeroSeguimiento;
     }
 }

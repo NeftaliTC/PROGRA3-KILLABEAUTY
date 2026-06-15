@@ -2,15 +2,13 @@ package pe.edu.pucp.killaBeauty.killaModelo;
 
 import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Cupon;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Pedido {
     private int id;
-    private LocalDate fechaPedido;
+    private Date fechaPedido;
     private EstadoPedido estadoPedido;
-    private String metodoPago;
     private double subtotal;
     private double igv;
     private double total;
@@ -23,11 +21,10 @@ public class Pedido {
     public Pedido() {
     }
 
-    public Pedido(int id, LocalDate fechaPedido, EstadoPedido estadoPedido, String metodoPago, double subtotal, double igv, double total, Usuario cliente, Direccion direccionEnvio, Cupon cupon, List<DetallePedido> detalles) {
+    public Pedido(int id, Date fechaPedido, EstadoPedido estadoPedido, double subtotal, double igv, double total, Usuario cliente, Direccion direccionEnvio, Cupon cupon, List<DetallePedido> detalles) {
         this.id = id;
         this.fechaPedido = fechaPedido;
         this.estadoPedido = estadoPedido;
-        this.metodoPago = metodoPago;
         this.subtotal = subtotal;
         this.igv = igv;
         this.total = total;
@@ -45,11 +42,11 @@ public class Pedido {
         this.id = id;
     }
 
-    public LocalDate getFechaPedido() {
+    public Date getFechaPedido() {
         return fechaPedido;
     }
 
-    public void setFechaPedido(LocalDate fechaPedido) {
+    public void setFechaPedido(Date fechaPedido) {
         this.fechaPedido = fechaPedido;
     }
 
@@ -59,14 +56,6 @@ public class Pedido {
 
     public void setEstadoPedido(EstadoPedido estadoPedido) {
         this.estadoPedido = estadoPedido;
-    }
-
-    public String getMetodoPago() {
-        return metodoPago;
-    }
-
-    public void setMetodoPago(String metodoPago) {
-        this.metodoPago = metodoPago;
     }
 
     public double getSubtotal() {

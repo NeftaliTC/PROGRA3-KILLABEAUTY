@@ -1,8 +1,7 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
 
 import java.util.Date;
-import java.util.List;
-import java.util.ArrayList;
+
 // REVISADA
 public class Usuario {
     private int id;
@@ -16,7 +15,8 @@ public class Usuario {
     private String contrasena; //-> activo
     private String telefono;
     private Boolean activo; // 1=activo - 0=inactivo
-    private int dni;
+    private String dni;
+    private Date ultimoAcceso;
     private TipoUsuario tipoUsuario;
 
 
@@ -24,7 +24,7 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(int id, String nombre, String apellidoPaterno, String apellidoMaterno, String correoElectronico, Date fechaNacimiento, Date fechaDeInscripcion, String contrasena, String telefono, Boolean activo, int dni, TipoUsuario tipoUsuario) {
+    public Usuario(int id, String nombre, String apellidoPaterno, String apellidoMaterno, String correoElectronico, Date fechaNacimiento, Date fechaDeInscripcion, String contrasena, String telefono, Boolean activo, String dni, TipoUsuario tipoUsuario) {
         this.id = id;
         this.nombre = nombre;
         this.apellidoPaterno = apellidoPaterno;
@@ -127,12 +127,20 @@ public class Usuario {
         this.activo = activo;
     }
 
-    public int getDni() {
+    public String getDni() {
         return dni;
     }
 
-    public void setDni(int dni) {
+    public void setDni(String dni) {
         this.dni = dni;
+    }
+
+    public Date getUltimoAcceso() {
+        return ultimoAcceso;
+    }
+
+    public void setUltimoAcceso(Date ultimoAcceso) {
+        this.ultimoAcceso = ultimoAcceso;
     }
 
     public TipoUsuario getTipoUsuario() {

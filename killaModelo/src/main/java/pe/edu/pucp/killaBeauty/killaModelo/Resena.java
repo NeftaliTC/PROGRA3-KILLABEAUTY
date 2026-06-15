@@ -1,5 +1,6 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
 import java.time.LocalDate;
+import java.util.Date;
 
 public class Resena {
     private int id;
@@ -7,17 +8,13 @@ public class Resena {
     private String comentario;
     private int calificacion;
     private boolean verificado;
-    private LocalDate fechaPublicacion;
+    private Date fechaPublicacion;
     private Boolean activo;
 
     private Usuario cliente;
     private Producto producto;
 
-    public Resena() {
-        this.fechaPublicacion = LocalDate.now();
-        this.cliente = new Usuario();
-        this.producto = new Producto();
-    }
+
 
     public int getIdResena() {
         return id;
@@ -55,11 +52,11 @@ public class Resena {
         this.verificado = verificado;
     }
 
-    public LocalDate getFechaPublicacion() {
+    public Date getFechaPublicacion() {
         return fechaPublicacion;
     }
 
-    public void setFechaPublicacion(LocalDate fechaPublicacion) {
+    public void setFechaPublicacion(Date fechaPublicacion) {
         this.fechaPublicacion = fechaPublicacion;
     }
 
