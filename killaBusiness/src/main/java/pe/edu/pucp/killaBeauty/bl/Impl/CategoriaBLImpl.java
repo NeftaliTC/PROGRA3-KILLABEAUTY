@@ -15,7 +15,7 @@ public class CategoriaBLImpl implements CategoriaBL {
     @Override
     public Categoria create(Categoria c) throws BusinessLogicException {
         try {
-            if(c.getNombre() == null || c.getNombre().isEmpty())
+            if(c.getDescripcion() == null || c.getDescripcion().isEmpty())
                 throw new BusinessLogicException("El nombre de la categoría no puede estar vacío");
             return categoriaDAO.save(c);
         } catch (SQLException e) {

@@ -26,7 +26,7 @@ public class TestDetallePedidoDAO {
 
             // TipoUsuario
             try (PreparedStatement ps = cn.prepareStatement(
-                    "SELECT id_tipoUsuario FROM TipoUsuario WHERE nombre = ? LIMIT 1")) {
+                    "SELECT id_tipoUsuario FROM TipoUsuario WHERE descripcion = ? LIMIT 1")) {
                 ps.setString(1, "Cliente");
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) idTipoUsuario = rs.getInt(1);
@@ -34,7 +34,7 @@ public class TestDetallePedidoDAO {
             }
             if (idTipoUsuario == null) {
                 try (PreparedStatement ps = cn.prepareStatement(
-                        "INSERT INTO TipoUsuario(nombre) VALUES(?)",
+                        "INSERT INTO TipoUsuario(descripcion) VALUES(?)",
                         Statement.RETURN_GENERATED_KEYS)) {
                     ps.setString(1, "Cliente");
                     ps.executeUpdate();
@@ -47,7 +47,7 @@ public class TestDetallePedidoDAO {
             // Usuario
             try (PreparedStatement ps = cn.prepareStatement("""
                     INSERT INTO Usuario
-                    (nombre, apellido_paterno, apellido_materno, correo_electronico, contrasena, telefono, activo, id_tipoUsuario, fecha_de_inscripcion)
+                    (descripcion, apellido_paterno, apellido_materno, correo_electronico, contrasena, telefono, activo, id_tipoUsuario, fecha_de_inscripcion)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
                     """, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, "UserDetTest");
@@ -107,7 +107,7 @@ public class TestDetallePedidoDAO {
 
             // Producto
             try (PreparedStatement ps = cn.prepareStatement("""
-                    INSERT INTO Producto(nombre, precio_base, stock, disponible, promocion, id_marca, id_categoria)
+                    INSERT INTO Producto(descripcion, precio_base, stock, disponible, promocion, id_marca, id_categoria)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
                     """, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, "ProductoDetTest");

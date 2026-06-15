@@ -15,7 +15,7 @@ public class SubcategoriaBLImpl implements SubcategoriaBL {
     @Override
     public Subcategoria create(Subcategoria s) throws BusinessLogicException {
         try {
-            if(s.getNombre() == null || s.getNombre().isEmpty())
+            if(s.getDescripcion() == null || s.getDescripcion().isEmpty())
                 throw new BusinessLogicException("El nombre de la subcategoría no puede estar vacío");
             if(s.getCategoria() == null)
                 throw new BusinessLogicException("La subcategoría debe pertenecer a una categoría");

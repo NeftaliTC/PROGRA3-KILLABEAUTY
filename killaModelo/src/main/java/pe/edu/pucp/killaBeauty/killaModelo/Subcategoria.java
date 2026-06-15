@@ -2,15 +2,15 @@ package pe.edu.pucp.killaBeauty.killaModelo;
 
 public class Subcategoria {
     private int id;
-    private String nombre;
+    private String descripcion;
     private Boolean activo;
     private Categoria categoria;
 
     public Subcategoria() {}
 
-    public Subcategoria(int id, String nombre, Boolean activo, Categoria categoria) {
+    public Subcategoria(int id, String descripcion, Boolean activo, Categoria categoria) {
         this.id = id;
-        this.nombre = nombre;
+        this.descripcion = descripcion;
         this.activo = activo;
         this.categoria = categoria;
     }
@@ -23,12 +23,12 @@ public class Subcategoria {
         this.id = id;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getDescripcion() {
+        return descripcion;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public Boolean getActivo() {

@@ -22,7 +22,7 @@ public class SubCategoriaDAOImpl implements SubCategoriaDAO {
             while (rs.next()) {
                 Subcategoria s = new Subcategoria();
                 s.setId(rs.getInt("id_subcategoria"));
-                s.setNombre(rs.getString("nombre"));
+                s.setDescripcion(rs.getString("nombre"));
                 s.setActivo(rs.getBoolean("activo"));
                 s.getCategoria().setId(rs.getInt("id_categoria"));
                 lista.add(s);
@@ -43,7 +43,7 @@ public class SubCategoriaDAOImpl implements SubCategoriaDAO {
                 while (rs.next()) {
                     Subcategoria s = new Subcategoria();
                     s.setId(rs.getInt("id_subcategoria"));
-                    s.setNombre(rs.getString("nombre"));
+                    s.setDescripcion(rs.getString("nombre"));
                     s.setActivo(rs.getBoolean("activo"));
                     s.getCategoria().setId(idCategoria);
                     lista.add(s);
@@ -64,7 +64,7 @@ public class SubCategoriaDAOImpl implements SubCategoriaDAO {
                 if (rs.next()) {
                     Subcategoria s = new Subcategoria();
                     s.setId(rs.getInt("id_subcategoria"));
-                    s.setNombre(rs.getString("nombre"));
+                    s.setDescripcion(rs.getString("nombre"));
                     s.setActivo(rs.getBoolean("activo"));
                     s.getCategoria().setId(rs.getInt("id_categoria"));
                     return s;
@@ -80,7 +80,7 @@ public class SubCategoriaDAOImpl implements SubCategoriaDAO {
 
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, s.getNombre());
+            ps.setString(1, s.getDescripcion());
             ps.setBoolean(2, s.getActivo());
             ps.setInt(3, s.getCategoria().getId());
             ps.executeUpdate();
@@ -96,7 +96,7 @@ public class SubCategoriaDAOImpl implements SubCategoriaDAO {
         String sql = "UPDATE Subcategoria SET nombre = ?, activo = ?, id_categoria = ? WHERE id_subcategoria = ?";
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
-            ps.setString(1, s.getNombre());
+            ps.setString(1, s.getDescripcion());
             ps.setBoolean(2, s.getActivo());
             ps.setInt(3, s.getCategoria().getId());
             ps.setInt(4, s.getId());

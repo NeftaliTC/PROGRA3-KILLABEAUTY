@@ -22,7 +22,7 @@ public class CategoriaDAOImpl implements CategoriaDAO {
             while (rs.next()) {
                 Categoria c = new Categoria();
                 c.setId(rs.getInt("id_categoria"));
-                c.setNombre(rs.getString("nombre"));
+                c.setDescripcion(rs.getString("nombre"));
                 c.setActivo(rs.getBoolean("activo"));
                 categorias.add(c);
             }
@@ -40,7 +40,7 @@ public class CategoriaDAOImpl implements CategoriaDAO {
                 if (rs.next()) {
                     Categoria c = new Categoria();
                     c.setId(rs.getInt("id_categoria"));
-                    c.setNombre(rs.getString("nombre"));
+                    c.setDescripcion(rs.getString("nombre"));
                     c.setActivo(rs.getBoolean("activo"));
                     return c;
                 }
@@ -54,7 +54,7 @@ public class CategoriaDAOImpl implements CategoriaDAO {
         String sql = "INSERT INTO Categoria (nombre, activo) VALUES (?, ?)";
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, c.getNombre());
+            ps.setString(1, c.getDescripcion());
             ps.setBoolean(2, c.getActivo());
             ps.executeUpdate();
             try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -69,7 +69,7 @@ public class CategoriaDAOImpl implements CategoriaDAO {
         String sql = "UPDATE Categoria SET nombre = ?, activo = ? WHERE id_categoria = ?";
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
-            ps.setString(1, c.getNombre());
+            ps.setString(1, c.getDescripcion());
             ps.setBoolean(2, c.getActivo());
             ps.setInt(3, c.getId());
             ps.executeUpdate();

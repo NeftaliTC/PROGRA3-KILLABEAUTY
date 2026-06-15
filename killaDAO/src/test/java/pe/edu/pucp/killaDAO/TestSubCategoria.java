@@ -20,35 +20,35 @@ public class TestSubCategoria {
         try {
             // 0) Crear categoría padre para asegurar FK válida
             Categoria categoria = new Categoria();
-            categoria.setNombre("Categoria Test FK");
+            categoria.setDescripcion("Categoria Test FK");
             categoriaCreada = categoriaDAO.save(categoria);
             Integer idCategoria = categoriaCreada.getId();
             System.out.println("CATEGORIA SAVE OK -> id: " + idCategoria);
 
             // 1) SAVE Subcategoria
             Subcategoria nueva = new Subcategoria();
-            nueva.setNombre("Subcategoria Test");
+            nueva.setDescripcion("Subcategoria Test");
             subcategoriaCreada = subCategoriaDAO.save(nueva);
             System.out.println("SUBCATEGORIA SAVE OK -> id: " + subcategoriaCreada.getId());
 
             // 2) LOAD
             Subcategoria cargada = subCategoriaDAO.load(subcategoriaCreada.getId());
-            System.out.println("LOAD OK -> " + (cargada != null ? cargada.getNombre() : "null"));
+            System.out.println("LOAD OK -> " + (cargada != null ? cargada.getDescripcion() : "null"));
 
             // 3) UPDATE
             if (cargada != null) {
-                cargada.setNombre("Subcategoria Test Updated");
+                cargada.setDescripcion("Subcategoria Test Updated");
                 subCategoriaDAO.update(cargada);
 
                 Subcategoria actualizada = subCategoriaDAO.load(cargada.getId());
-                System.out.println("UPDATE OK -> " + (actualizada != null ? actualizada.getNombre() : "null"));
+                System.out.println("UPDATE OK -> " + (actualizada != null ? actualizada.getDescripcion() : "null"));
             }
 
             // 4) LIST BY CATEGORIA
             List<Subcategoria> porCategoria = subCategoriaDAO.listByCategoriaId(idCategoria);
             System.out.println("LIST BY CATEGORIA -> total: " + porCategoria.size());
             for (Subcategoria s : porCategoria) {
-                System.out.println(" - " + s.getId() + " | " + s.getNombre());
+                System.out.println(" - " + s.getId() + " | " + s.getDescripcion());
             }
 
             // 5) REMOVE Subcategoria

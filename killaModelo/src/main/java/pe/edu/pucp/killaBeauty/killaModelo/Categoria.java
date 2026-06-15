@@ -1,18 +1,16 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
-import java.util.List;
-import java.util.ArrayList;
 
 public class Categoria {
     private int id;
-    private String nombre;
+    private String descripcion;
 	private Boolean activo;
 
 	public Categoria() {
 	}
 
-	public Categoria(int id, String nombre, Boolean activo) {
+	public Categoria(int id, String descripcion, Boolean activo) {
 		this.id = id;
-		this.nombre = nombre;
+		this.descripcion = descripcion;
 		this.activo = activo;
 	}
 
@@ -24,12 +22,12 @@ public class Categoria {
 		this.id = id;
 	}
 
-	public String getNombre() {
-		return nombre;
+	public String getDescripcion() {
+		return descripcion;
 	}
 
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
 	}
 
 	public Boolean getActivo() {

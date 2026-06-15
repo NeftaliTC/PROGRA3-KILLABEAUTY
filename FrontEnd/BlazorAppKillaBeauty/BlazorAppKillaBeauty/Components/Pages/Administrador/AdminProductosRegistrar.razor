@@ -59,7 +59,7 @@
                     <label>Nombre del producto <span class="required">*</span></label>
                     <input type="text"
                            placeholder="Ej: Sérum vitamina C 30ml"
-                           @bind="nombre" />
+                           @bind="descripcion" />
                 </div>
             </div>
         </section>
@@ -172,7 +172,7 @@
                     </div>
                     <h2>Producto registrado</h2>
                     <p class="admin-modal-text">
-                        Se guardó el producto <strong>@nombre</strong> (simulado).
+                        Se guardó el producto <strong>@descripcion</strong> (simulado).
                     </p>
 
                     <div class="admin-modal-actions">
@@ -195,7 +195,7 @@
     private string codigoGenerado = "KB-149 (generado automáticamente)";
 
     // form fields
-    private string nombre = "";
+    private string descripcion = "";
     private string categoria = "";
     private string subcategoria = "";
     private string marca = "";
@@ -228,9 +228,9 @@
     private void Guardar()
     {
         // Validaciones front (solo interacción)
-        if (string.IsNullOrWhiteSpace(nombre))
+        if (string.IsNullOrWhiteSpace(descripcion))
         {
-            mensajeError = "El nombre del producto es obligatorio.";
+            mensajeError = "El descripcion del producto es obligatorio.";
             return;
         }
 

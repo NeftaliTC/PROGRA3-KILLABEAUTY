@@ -13,28 +13,28 @@ public class TestCategoriaDAO {
         try {
             // 1) SAVE
             Categoria nueva = new Categoria();
-            nueva.setNombre("Categoria Test");
+            nueva.setDescripcion("Categoria Test");
             Categoria guardada = categoriaDAO.save(nueva);
             System.out.println("SAVE OK -> id: " + guardada.getId());
 
             // 2) LOAD
             Categoria cargada = categoriaDAO.load(guardada.getId());
-            System.out.println("LOAD OK -> " + (cargada != null ? cargada.getNombre() : "null"));
+            System.out.println("LOAD OK -> " + (cargada != null ? cargada.getDescripcion() : "null"));
 
             // 3) UPDATE
             if (cargada != null) {
-                cargada.setNombre("Categoria Test Updated");
+                cargada.setDescripcion("Categoria Test Updated");
                 categoriaDAO.update(cargada);
 
                 Categoria actualizada = categoriaDAO.load(cargada.getId());
-                System.out.println("UPDATE OK -> " + (actualizada != null ? actualizada.getNombre() : "null"));
+                System.out.println("UPDATE OK -> " + (actualizada != null ? actualizada.getDescripcion() : "null"));
             }
 
             // 4) LIST ALL
             List<Categoria> lista = categoriaDAO.listAll();
             System.out.println("LIST ALL -> total: " + lista.size());
             for (Categoria c : lista) {
-                System.out.println(" - " + c.getId() + " | " + c.getNombre());
+                System.out.println(" - " + c.getId() + " | " + c.getDescripcion());
             }
 
             // 5) REMOVE
