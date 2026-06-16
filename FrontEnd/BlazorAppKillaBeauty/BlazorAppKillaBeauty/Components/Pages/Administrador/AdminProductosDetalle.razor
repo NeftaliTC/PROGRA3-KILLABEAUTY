@@ -1,4 +1,4 @@
-﻿@page "/admin/productos/{Codigo}"
+﻿@@page "/admin/productos/{Codigo}"
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
 
@@ -509,10 +509,10 @@
         }
     }
 
-    private static string Iniciales(string nombre)
+    private static string Iniciales(string descripcion)
     {
-        if (string.IsNullOrWhiteSpace(nombre)) return "?";
-        var parts = nombre.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (string.IsNullOrWhiteSpace(descripcion)) return "?";
+        var parts = descripcion.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (parts.Length == 1) return parts[0].Substring(0, 1).ToUpper();
         return (parts[0].Substring(0, 1) + parts[^1].Substring(0, 1)).ToUpper();
     }
@@ -594,7 +594,7 @@
         // Validaciones front
         if (string.IsNullOrWhiteSpace(formEditar.Nombre))
         {
-            mensajeErrorEditar = "El nombre es obligatorio.";
+            mensajeErrorEditar = "El descripcion es obligatorio.";
             return;
         }
 

@@ -1518,3 +1518,450 @@ file:/C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/domains/d
 [2026-06-15T18:09:52.840823-05:00] [GF 8.0.3] [INFO] [] [jakarta.enterprise.logging.stdout] [tid: _ThreadID=36 _ThreadName=GlassFish Shutdown Hook] [levelValue: 800] [[
   Completed shutdown of GlassFish runtime]]
 
+[2026-06-15T21:33:37.713450-05:00] [] [INFO] [NCLS-GFLAUNCHER-00005] [jakarta.enterprise.launcher] [tid: _ThreadID=3 _ThreadName=main] [levelValue: 800] [[
+  JVM invocation command line:
+C:\Program Files\Java\jdk-25.0.2\bin\java.exe
+--module-path
+C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\lib\bootstrap
+--add-modules
+ALL-MODULE-PATH
+-DWALL_CLOCK_START=2026-06-16T02:33:37.019209500Z
+-XX:+UnlockDiagnosticVMOptions
+-XX:NewRatio=2
+-Xmx512m
+--add-opens=java.base/java.io=ALL-UNNAMED
+--add-opens=java.base/java.lang=ALL-UNNAMED
+--add-opens=java.base/java.util=ALL-UNNAMED
+--add-opens=java.base/sun.nio.fs=ALL-UNNAMED
+--add-opens=java.base/sun.net.www.protocol.jrt=ALL-UNNAMED
+--add-opens=java.naming/javax.naming.spi=org.glassfish.main.jdke
+--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
+--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED
+--add-exports=java.naming/com.sun.jndi.ldap=ALL-UNNAMED
+--add-exports=java.base/jdk.internal.vm.annotation=ALL-UNNAMED
+--add-opens=java.base/jdk.internal.vm.annotation=ALL-UNNAMED
+--add-exports=java.base/jdk.internal.loader=ALL-UNNAMED
+-javaagent:C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\lib\monitor\flashlight-agent.jar
+-Djava.util.logging.manager=org.glassfish.main.jul.GlassFishLogManager
+-Djava.util.logging.config.block=true
+-Djava.awt.headless=true
+-Djdk.corba.allowOutputStreamSubclass=true
+-Djdk.tls.rejectClientInitiatedRenegotiation=true
+-Djdk.xml.totalEntitySizeLimit=50000000
+-Djavax.xml.accessExternalSchema=all
+-Djava.security.auth.login.config=C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\domains\domain1/config/login.conf
+-Dcom.sun.enterprise.security.httpsOutboundKeyAlias=s1as
+-Djavax.net.ssl.keyStore=C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\domains\domain1/config/keystore.p12
+-Djavax.net.ssl.trustStore=C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\domains\domain1/config/cacerts.p12
+-Djdbc.drivers=org.apache.derby.jdbc.ClientDriver
+-DANTLR_USE_DIRECT_CLASS_LOADING=true
+-Dcom.sun.enterprise.config.config_environment_factory_class=com.sun.enterprise.config.serverbeans.AppserverConfigEnvironmentFactory
+-Dorg.glassfish.additionalOSGiBundlesToStart=org.apache.felix.shell,org.apache.felix.gogo.runtime,org.apache.felix.gogo.shell,org.apache.felix.gogo.command,org.apache.felix.shell.remote,org.apache.felix.fileinstall
+-Dosgi.shell.telnet.port=6666
+-Dosgi.shell.telnet.maxconn=1
+-Dosgi.shell.telnet.ip=127.0.0.1
+-Dgosh.args=--nointeractive
+-Dfelix.fileinstall.dir=C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish/modules/autostart/
+-Dfelix.fileinstall.poll=5000
+-Dfelix.fileinstall.log.level=2
+-Dfelix.fileinstall.bundles.new.start=true
+-Dfelix.fileinstall.bundles.startTransient=true
+-Dfelix.fileinstall.disableConfigSave=false
+-Dorg.glassfish.gmbal.no.multipleUpperBoundsException=true
+-Dcom.ctc.wstx.returnNullForDefaultNamespace=true
+-Djdk.attach.allowAttachSelf=true
+-Dcom.sun.aas.instanceRoot=C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\domains\domain1
+-Dcom.sun.aas.installRoot=C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish
+-Djava.library.path=C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\lib;C:\Program Files\Java\jdk-24\bin;C:\Windows\Sun\Java\bin;C:\Windows\System32;C:\Windows;C:\Windows\System32\wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Windows\System32\OpenSSH;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\MinGW\bin;C:\MinGW\msys\1.0\bin;C:\Program Files\dotnet;C:\Program Files (x86)\Microsoft SQL Server\160\Tools\Binn;C:\Program Files\Microsoft SQL Server\160\Tools\Binn;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn;C:\Program Files\Microsoft SQL Server\160\DTS\Binn;C:\Program Files\NVIDIA Corporation\NVIDIA App\NvDLISR;C:\Windows\Microsoft.NET\Framework\v4.0.30319;C:\Program Files\Microsoft SQL Server\150\Tools\Binn;C:\Users\ANGELINA\OneDrive\Documentos\apache-maven-3.9.11-bin\apache-maven-3.9.11\bin;C:\Program Files\Git\cmd;C:\Program Files\Microsoft SQL Server\170\Tools\Binn;C:\Users\ANGELINA\AppData\Local\Programs\Python\Python314\Scripts;C:\Users\ANGELINA\AppData\Local\Programs\Python\Python314;C:\Users\ANGELINA\AppData\Local\Microsoft\WindowsApps;C:\Users\ANGELINA\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\ANGELINA\.dotnet\tools;C:\Users\ANGELINA\AppData\Local\GitHubDesktop\bin;C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\bin
+com.sun.enterprise.glassfish.bootstrap.GlassFishMain
+-upgrade
+false
+-domaindir
+C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/domains/domain1
+-read-stdin
+true
+-asadmin-args
+--host,,,localhost,,,--port,,,4848,,,--secure=false,,,--terse=false,,,--echo=false,,,--interactive=true,,,start-domain,,,--verbose=false,,,--watchdog=false,,,--debug=false,,,--domaindir,,,C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\domains,,,domain1
+-domainname
+domain1
+-instancename
+server
+-type
+DAS
+-verbose
+false
+-asadmin-modulepath
+C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/lib/bootstrap
+-asadmin-classpath
+C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/appserver-cli.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/admin-cli.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/lib/asadmin/cli-optional.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/lib/asadmin/cluster-cli.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/lib/asadmin/osgi-cli-interactive.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/lib/asadmin/server-mgmt.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/admin-util.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/backup.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/cluster-common.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/cluster-ssh.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/config-api.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/config-types.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/common-util.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/glassfish-api.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/hk2.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/hk2-config-generator.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/internal-api.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/jackson-core.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/jakarta.activation-api.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/jakarta.validation-api.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/jakarta.xml.bind-api.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/jaxb-osgi.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/jettison.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/jsch.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/launcher.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/mimepull.jar
+-debug
+false
+-asadmin-classname
+com.sun.enterprise.admin.cli.AdminMain]]
+
+[2026-06-15T21:33:40.621287-05:00] [GF 8.0.3] [WARNING] [] [org.glassfish.main.jdke.props.SystemProperties] [tid: _ThreadID=3 _ThreadName=main] [levelValue: 900] [[
+  Property com.sun.aas.javaRoot already set to C:\Program Files\Java\jdk-24, overriding with C:\Program Files\Java\jdk-25.0.2]]
+
+[2026-06-15T21:33:40.640400-05:00] [GF 8.0.3] [INFO] [] [jakarta.enterprise.system.core] [tid: _ThreadID=3 _ThreadName=main] [levelValue: 800] [[
+  Loaded server named: server]]
+
+[2026-06-15T21:33:40.748565-05:00] [GF 8.0.3] [INFO] [] [com.sun.enterprise.server.logging.LogManagerService] [tid: _ThreadID=73 _ThreadName=RunLevelControllerThread-1781577220662] [levelValue: 800] [[
+  Using property file: C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\domains\domain1\config\logging.properties]]
+
+[2026-06-15T21:33:40.873056-05:00] [GF 8.0.3] [INFO] [NCLS-LOGGING-00009] [com.sun.enterprise.server.logging.LogManagerService] [tid: _ThreadID=73 _ThreadName=RunLevelControllerThread-1781577220662] [levelValue: 800] [[
+  Running GlassFish Version: Eclipse GlassFish 8.0.3 (commit: 00c8ff1c98b5a1fabfc4c8e922d9bd7398908c77)]]
+
+[2026-06-15T21:33:41.000487-05:00] [GF 8.0.3] [INFO] [NCLS-SECURITY-01115] [jakarta.enterprise.system.core.security] [tid: _ThreadID=72 _ThreadName=RunLevelControllerThread-1781577220661] [levelValue: 800] [[
+  Realm [admin-realm] of classtype [com.sun.enterprise.security.auth.realm.file.FileRealm] successfully created.]]
+
+[2026-06-15T21:33:41.004048-05:00] [GF 8.0.3] [INFO] [NCLS-SECURITY-01115] [jakarta.enterprise.system.core.security] [tid: _ThreadID=72 _ThreadName=RunLevelControllerThread-1781577220661] [levelValue: 800] [[
+  Realm [file] of classtype [com.sun.enterprise.security.auth.realm.file.FileRealm] successfully created.]]
+
+[2026-06-15T21:33:41.010004-05:00] [GF 8.0.3] [INFO] [NCLS-SECURITY-01115] [jakarta.enterprise.system.core.security] [tid: _ThreadID=72 _ThreadName=RunLevelControllerThread-1781577220661] [levelValue: 800] [[
+  Realm [certificate] of classtype [com.sun.enterprise.security.auth.realm.certificate.CertificateRealm] successfully created.]]
+
+[2026-06-15T21:33:41.109684-05:00] [GF 8.0.3] [INFO] [] [org.glassfish.ha.store.spi.BackingStoreFactoryRegistry] [tid: _ThreadID=75 _ThreadName=RunLevelControllerThread-1781577220668] [levelValue: 800] [[
+  Registered org.glassfish.ha.store.adapter.cache.ShoalBackingStoreProxy for persistence-type = replicated in BackingStoreFactoryRegistry]]
+
+[2026-06-15T21:33:41.483495-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00087] [jakarta.enterprise.system.core] [tid: _ThreadID=73 _ThreadName=RunLevelControllerThread-1781577220662] [levelValue: 800] [[
+  Grizzly Framework 5.0.2 started in: 95 ms - bound to [/0.0.0.0:8080]]]
+
+[2026-06-15T21:33:41.529748-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00087] [jakarta.enterprise.system.core] [tid: _ThreadID=73 _ThreadName=RunLevelControllerThread-1781577220662] [levelValue: 800] [[
+  Grizzly Framework 5.0.2 started in: 5 ms - bound to [/0.0.0.0:8181]]]
+
+[2026-06-15T21:33:41.541950-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00087] [jakarta.enterprise.system.core] [tid: _ThreadID=73 _ThreadName=RunLevelControllerThread-1781577220662] [levelValue: 800] [[
+  Grizzly Framework 5.0.2 started in: 5 ms - bound to [/0.0.0.0:4848]]]
+
+[2026-06-15T21:33:41.610691-05:00] [GF 8.0.3] [INFO] [SEC-SVCS-00100] [jakarta.enterprise.security.services] [tid: _ThreadID=73 _ThreadName=RunLevelControllerThread-1781577220662] [levelValue: 800] [[
+  Authorization Service has successfully initialized.]]
+
+[2026-06-15T21:33:41.661410-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00087] [jakarta.enterprise.system.core] [tid: _ThreadID=75 _ThreadName=RunLevelControllerThread-1781577220668] [levelValue: 800] [[
+  Grizzly Framework 5.0.2 started in: 3 ms - bound to [/0.0.0.0:3700]]]
+
+[2026-06-15T21:33:41.662919-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00017] [jakarta.enterprise.system.core] [tid: _ThreadID=3 _ThreadName=main] [levelValue: 800] [[
+  Eclipse GlassFish 8.0.3 (commit: 00c8ff1c98b5a1fabfc4c8e922d9bd7398908c77) startup time: Felix (2,633 ms), startup services (1,008 ms), total (3,641 ms)]]
+
+[2026-06-15T21:33:41.667451-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00018] [jakarta.enterprise.system.core] [tid: _ThreadID=3 _ThreadName=main] [levelValue: 800] [[
+  Total startup time including CLI: 4,647 ms]]
+
+[2026-06-15T21:33:42.056809-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00087] [jakarta.enterprise.system.core] [tid: _ThreadID=73 _ThreadName=RunLevelControllerThread-1781577220662] [levelValue: 800] [[
+  Grizzly Framework 5.0.2 started in: 68 ms - bound to [/0.0.0.0:7676]]]
+
+[2026-06-15T21:33:42.746958-05:00] [GF 8.0.3] [INFO] [NCLS-JMX-00005] [jakarta.enterprise.system.jmx] [tid: _ThreadID=127 _ThreadName=Thread-14] [levelValue: 800] [[
+  JMXStartupService has started JMXConnector on JMXService URL service:jmx:rmi://LAPTOP-5U9U4O5F:8686/jndi/rmi://LAPTOP-5U9U4O5F:8686/jmxrmi]]
+
+[2026-06-15T21:33:44.556097-05:00] [GF 8.0.3] [INFO] [NCLS-SECURITY-01143] [jakarta.enterprise.system.core.security] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  Loading policy provider org.glassfish.exousia.modules.def.DefaultPolicy.]]
+
+[2026-06-15T21:33:44.561601-05:00] [GF 8.0.3] [INFO] [NCLS-SECURITY-01010] [jakarta.enterprise.system.core.security] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  Entering Security Startup Service.]]
+
+[2026-06-15T21:33:44.569622-05:00] [GF 8.0.3] [INFO] [NCLS-SECURITY-01011] [jakarta.enterprise.system.core.security] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  Security Service(s) started successfully.]]
+
+[2026-06-15T21:33:44.813507-05:00] [GF 8.0.3] [INFO] [AS-WEB-GLUE-00198] [jakarta.enterprise.web] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  Created HTTP listener http-listener-1 on host/port 0.0.0.0:8080]]
+
+[2026-06-15T21:33:44.818508-05:00] [GF 8.0.3] [INFO] [AS-WEB-GLUE-00198] [jakarta.enterprise.web] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  Created HTTP listener http-listener-2 on host/port 0.0.0.0:8181]]
+
+[2026-06-15T21:33:44.819502-05:00] [GF 8.0.3] [INFO] [AS-WEB-GLUE-00198] [jakarta.enterprise.web] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  Created HTTP listener admin-listener on host/port 0.0.0.0:4848]]
+
+[2026-06-15T21:33:44.837091-05:00] [GF 8.0.3] [INFO] [AS-WEB-GLUE-00200] [jakarta.enterprise.web] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  Created virtual server server]]
+
+[2026-06-15T21:33:44.839273-05:00] [GF 8.0.3] [INFO] [AS-WEB-GLUE-00200] [jakarta.enterprise.web] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  Created virtual server __asadmin]]
+
+[2026-06-15T21:33:45.108043-05:00] [GF 8.0.3] [INFO] [AS-WEB-CORE-00306] [jakarta.enterprise.web.core] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  Setting JAAS app name glassfish-web]]
+
+[2026-06-15T21:33:45.109039-05:00] [GF 8.0.3] [INFO] [AS-WEB-GLUE-00201] [jakarta.enterprise.web] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  Virtual server server loaded default web module ]]
+
+[2026-06-15T21:33:45.735667-05:00] [GF 8.0.3] [INFO] [] [org.glassfish.web.loader.WebappClassLoader] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  close(), this:
+org.glassfish.web.loader.WebappClassLoader@49b554b8[name=killa-rs-1.0-SNAPSHOT], urls=[
+file:/C:/PUCP/PROGRA3-KILLABEAUTY/Backend/killa-rs/target/killa-rs-1.0-SNAPSHOT/WEB-INF/classes/
+file:/C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/domains/domain1/generated/ejb/killa-rs-1.0-SNAPSHOT/
+][delegate=true, context=killa-rs-1.0-SNAPSHOT, status=RUNNING, antiJARLocking=false, repositories=RepositoryManager[WEB-INF/classes/], notFound.size=26, pathTimestamps.size=0, resourceEntryCache.size=0]]]
+
+[2026-06-15T21:33:45.818785-05:00] [GF 8.0.3] [INFO] [] [org.jboss.weld.Version] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  WELD-000900: 6.0.4 (Final)]]
+
+[2026-06-15T21:33:46.130170-05:00] [GF 8.0.3] [INFO] [] [jakarta.enterprise.inject.spi] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  Enabling Weld for ApplicationInfo[name=killa-rs-1.0-SNAPSHOT]]]
+
+[2026-06-15T21:33:46.816451-05:00] [GF 8.0.3] [INFO] [] [org.jboss.weld.Event] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  WELD-000411: Observer method [BackedAnnotatedMethod] public org.glassfish.jersey.ext.cdi1x.internal.ProcessAllAnnotatedTypes.processAnnotatedType(@Observes ProcessAnnotatedType<?>, BeanManager) receives events for all annotated types. Consider restricting events using @WithAnnotations or a generic type with bounds.]]
+
+[2026-06-15T21:33:47.671544-05:00] [GF 8.0.3] [INFO] [] [org.eclipse.jnosql.jakartapersistence.mapping.spi.JakartaPersistenceExtension] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  Processing Jakarta Persistence extension. Found 0 standard repositories, 0 custom repositories.]]
+
+[2026-06-15T21:33:48.012941-05:00] [GF 8.0.3] [INFO] [] [org.glassfish.soteria.servlet.SamRegistrationInstaller] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  Initializing Soteria 4.0.2 for context '/killa-rs-1.0-SNAPSHOT']]
+
+[2026-06-15T21:33:49.071427-05:00] [GF 8.0.3] [INFO] [AS-WEB-GLUE-00172] [jakarta.enterprise.web] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  Loading application [killa-rs-1.0-SNAPSHOT] at [/killa-rs-1.0-SNAPSHOT]]]
+
+[2026-06-15T21:33:49.205116-05:00] [GF 8.0.3] [INFO] [] [jakarta.enterprise.system.core] [tid: _ThreadID=118 _ThreadName=admin-listener(13)] [levelValue: 800] [[
+  killa-rs-1.0-SNAPSHOT was successfully deployed in 5,903 milliseconds.]]
+
+[2026-06-15T21:47:52.539581-05:00] [GF 8.0.3] [INFO] [] [jakarta.enterprise.inject.spi] [tid: _ThreadID=107 _ThreadName=admin-listener(4)] [levelValue: 800] [[
+  Disabling Weld for ApplicationInfo[name=killa-rs-1.0-SNAPSHOT]]]
+
+[2026-06-15T21:47:52.548106-05:00] [GF 8.0.3] [INFO] [] [org.glassfish.web.loader.WebappClassLoader] [tid: _ThreadID=107 _ThreadName=admin-listener(4)] [levelValue: 800] [[
+  close(), this:
+org.glassfish.web.loader.WebappClassLoader@5ba379ad[name=/killa-rs-1.0-SNAPSHOT], urls=[
+file:/C:/PUCP/PROGRA3-KILLABEAUTY/Backend/killa-rs/target/killa-rs-1.0-SNAPSHOT/WEB-INF/classes/
+file:/C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/domains/domain1/generated/ejb/killa-rs-1.0-SNAPSHOT/
+file:/C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/domains/domain1/generated/killa-rs-1.0-SNAPSHOT/
+][delegate=true, context=/killa-rs-1.0-SNAPSHOT, status=RUNNING, antiJARLocking=false, repositories=RepositoryManager[WEB-INF/classes/], notFound.size=52, pathTimestamps.size=1, resourceEntryCache.size=1]]]
+
+[2026-06-15T21:47:53.303752-05:00] [GF 8.0.3] [INFO] [] [org.glassfish.admin.rest.adapter.RestAdapter] [tid: _ThreadID=117 _ThreadName=admin-listener(12)] [levelValue: 800] [[
+  Listening to REST requests at context: /command/domain.]]
+
+[2026-06-15T21:47:53.382405-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00092] [jakarta.enterprise.system.core] [tid: _ThreadID=241 _ThreadName=Thread-27] [levelValue: 800] [[
+  Server shutdown initiated]]
+
+[2026-06-15T21:47:53.389417-05:00] [GF 8.0.3] [INFO] [] [jakarta.enterprise.logging.stdout] [tid: _ThreadID=241 _ThreadName=Thread-27] [levelValue: 800] [[
+  FileMonitoring shutdown]]
+
+[2026-06-15T21:47:53.398954-05:00] [GF 8.0.3] [INFO] [NCLS-JMX-00002] [jakarta.enterprise.system.jmx] [tid: _ThreadID=241 _ThreadName=Thread-27] [levelValue: 800] [[
+  JMXStartupService: Stopped JMXConnectorServer: null]]
+
+[2026-06-15T21:47:53.398954-05:00] [GF 8.0.3] [INFO] [NCLS-JMX-00001] [jakarta.enterprise.system.jmx] [tid: _ThreadID=241 _ThreadName=Thread-27] [levelValue: 800] [[
+  JMXStartupService and JMXConnectors have been shut down.]]
+
+[2026-06-15T21:47:53.461582-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00013] [jakarta.enterprise.system.core] [tid: _ThreadID=241 _ThreadName=Thread-27] [levelValue: 800] [[
+  Shutdown procedure finished]]
+
+[2026-06-15T21:47:53.462586-05:00] [GF 8.0.3] [INFO] [] [jakarta.enterprise.logging.stdout] [tid: _ThreadID=36 _ThreadName=GlassFish Shutdown Hook] [levelValue: 800] [[
+  Completed shutdown of GlassFish runtime]]
+
+[2026-06-15T21:47:58.573677-05:00] [] [INFO] [NCLS-GFLAUNCHER-00005] [jakarta.enterprise.launcher] [tid: _ThreadID=3 _ThreadName=main] [levelValue: 800] [[
+  JVM invocation command line:
+C:\Program Files\Java\jdk-25.0.2\bin\java.exe
+--module-path
+C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\lib\bootstrap
+--add-modules
+ALL-MODULE-PATH
+-DWALL_CLOCK_START=2026-06-16T02:47:58.075370200Z
+-XX:+UnlockDiagnosticVMOptions
+-XX:NewRatio=2
+-Xmx512m
+--add-opens=java.base/java.io=ALL-UNNAMED
+--add-opens=java.base/java.lang=ALL-UNNAMED
+--add-opens=java.base/java.util=ALL-UNNAMED
+--add-opens=java.base/sun.nio.fs=ALL-UNNAMED
+--add-opens=java.base/sun.net.www.protocol.jrt=ALL-UNNAMED
+--add-opens=java.naming/javax.naming.spi=org.glassfish.main.jdke
+--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
+--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED
+--add-exports=java.naming/com.sun.jndi.ldap=ALL-UNNAMED
+--add-exports=java.base/jdk.internal.vm.annotation=ALL-UNNAMED
+--add-opens=java.base/jdk.internal.vm.annotation=ALL-UNNAMED
+--add-exports=java.base/jdk.internal.loader=ALL-UNNAMED
+-javaagent:C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\lib\monitor\flashlight-agent.jar
+-Djava.util.logging.manager=org.glassfish.main.jul.GlassFishLogManager
+-Djava.util.logging.config.block=true
+-Djava.awt.headless=true
+-Djdk.corba.allowOutputStreamSubclass=true
+-Djdk.tls.rejectClientInitiatedRenegotiation=true
+-Djdk.xml.totalEntitySizeLimit=50000000
+-Djavax.xml.accessExternalSchema=all
+-Djava.security.auth.login.config=C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\domains\domain1/config/login.conf
+-Dcom.sun.enterprise.security.httpsOutboundKeyAlias=s1as
+-Djavax.net.ssl.keyStore=C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\domains\domain1/config/keystore.p12
+-Djavax.net.ssl.trustStore=C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\domains\domain1/config/cacerts.p12
+-Djdbc.drivers=org.apache.derby.jdbc.ClientDriver
+-DANTLR_USE_DIRECT_CLASS_LOADING=true
+-Dcom.sun.enterprise.config.config_environment_factory_class=com.sun.enterprise.config.serverbeans.AppserverConfigEnvironmentFactory
+-Dorg.glassfish.additionalOSGiBundlesToStart=org.apache.felix.shell,org.apache.felix.gogo.runtime,org.apache.felix.gogo.shell,org.apache.felix.gogo.command,org.apache.felix.shell.remote,org.apache.felix.fileinstall
+-Dosgi.shell.telnet.port=6666
+-Dosgi.shell.telnet.maxconn=1
+-Dosgi.shell.telnet.ip=127.0.0.1
+-Dgosh.args=--nointeractive
+-Dfelix.fileinstall.dir=C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish/modules/autostart/
+-Dfelix.fileinstall.poll=5000
+-Dfelix.fileinstall.log.level=2
+-Dfelix.fileinstall.bundles.new.start=true
+-Dfelix.fileinstall.bundles.startTransient=true
+-Dfelix.fileinstall.disableConfigSave=false
+-Dorg.glassfish.gmbal.no.multipleUpperBoundsException=true
+-Dcom.ctc.wstx.returnNullForDefaultNamespace=true
+-Djdk.attach.allowAttachSelf=true
+-Dcom.sun.aas.instanceRoot=C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\domains\domain1
+-Dcom.sun.aas.installRoot=C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish
+-Djava.library.path=C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\lib;C:\Program Files\Java\jdk-24\bin;C:\Windows\Sun\Java\bin;C:\Windows\System32;C:\Windows;C:\Windows\System32\wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Windows\System32\OpenSSH;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\MinGW\bin;C:\MinGW\msys\1.0\bin;C:\Program Files\dotnet;C:\Program Files (x86)\Microsoft SQL Server\160\Tools\Binn;C:\Program Files\Microsoft SQL Server\160\Tools\Binn;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn;C:\Program Files\Microsoft SQL Server\160\DTS\Binn;C:\Program Files\NVIDIA Corporation\NVIDIA App\NvDLISR;C:\Windows\Microsoft.NET\Framework\v4.0.30319;C:\Program Files\Microsoft SQL Server\150\Tools\Binn;C:\Users\ANGELINA\OneDrive\Documentos\apache-maven-3.9.11-bin\apache-maven-3.9.11\bin;C:\Program Files\Git\cmd;C:\Program Files\Microsoft SQL Server\170\Tools\Binn;C:\Users\ANGELINA\AppData\Local\Programs\Python\Python314\Scripts;C:\Users\ANGELINA\AppData\Local\Programs\Python\Python314;C:\Users\ANGELINA\AppData\Local\Microsoft\WindowsApps;C:\Users\ANGELINA\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\ANGELINA\.dotnet\tools;C:\Users\ANGELINA\AppData\Local\GitHubDesktop\bin;C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\bin
+com.sun.enterprise.glassfish.bootstrap.GlassFishMain
+-upgrade
+false
+-domaindir
+C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/domains/domain1
+-read-stdin
+true
+-asadmin-args
+--host,,,localhost,,,--port,,,4848,,,--secure=false,,,--terse=false,,,--echo=false,,,--interactive=true,,,start-domain,,,--verbose=false,,,--watchdog=false,,,--debug=false,,,--domaindir,,,C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\domains,,,domain1
+-domainname
+domain1
+-instancename
+server
+-type
+DAS
+-verbose
+false
+-asadmin-modulepath
+C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/lib/bootstrap
+-asadmin-classpath
+C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/appserver-cli.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/admin-cli.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/lib/asadmin/cli-optional.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/lib/asadmin/cluster-cli.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/lib/asadmin/osgi-cli-interactive.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/lib/asadmin/server-mgmt.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/admin-util.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/backup.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/cluster-common.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/cluster-ssh.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/config-api.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/config-types.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/common-util.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/glassfish-api.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/hk2.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/hk2-config-generator.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/internal-api.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/jackson-core.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/jakarta.activation-api.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/jakarta.validation-api.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/jakarta.xml.bind-api.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/jaxb-osgi.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/jettison.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/jsch.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/launcher.jar;C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/modules/mimepull.jar
+-debug
+false
+-asadmin-classname
+com.sun.enterprise.admin.cli.AdminMain]]
+
+[2026-06-15T21:48:00.495799-05:00] [GF 8.0.3] [WARNING] [] [org.glassfish.main.jdke.props.SystemProperties] [tid: _ThreadID=3 _ThreadName=main] [levelValue: 900] [[
+  Property com.sun.aas.javaRoot already set to C:\Program Files\Java\jdk-24, overriding with C:\Program Files\Java\jdk-25.0.2]]
+
+[2026-06-15T21:48:00.519385-05:00] [GF 8.0.3] [INFO] [] [jakarta.enterprise.system.core] [tid: _ThreadID=3 _ThreadName=main] [levelValue: 800] [[
+  Loaded server named: server]]
+
+[2026-06-15T21:48:00.590706-05:00] [GF 8.0.3] [INFO] [] [com.sun.enterprise.server.logging.LogManagerService] [tid: _ThreadID=73 _ThreadName=RunLevelControllerThread-1781578080541] [levelValue: 800] [[
+  Using property file: C:\PUCP\PROGRA3-KILLABEAUTY\glassfish-8.0.3\glassfish8\glassfish\domains\domain1\config\logging.properties]]
+
+[2026-06-15T21:48:00.663335-05:00] [GF 8.0.3] [INFO] [NCLS-LOGGING-00009] [com.sun.enterprise.server.logging.LogManagerService] [tid: _ThreadID=73 _ThreadName=RunLevelControllerThread-1781578080541] [levelValue: 800] [[
+  Running GlassFish Version: Eclipse GlassFish 8.0.3 (commit: 00c8ff1c98b5a1fabfc4c8e922d9bd7398908c77)]]
+
+[2026-06-15T21:48:00.744181-05:00] [GF 8.0.3] [INFO] [NCLS-SECURITY-01115] [jakarta.enterprise.system.core.security] [tid: _ThreadID=74 _ThreadName=RunLevelControllerThread-1781578080545] [levelValue: 800] [[
+  Realm [admin-realm] of classtype [com.sun.enterprise.security.auth.realm.file.FileRealm] successfully created.]]
+
+[2026-06-15T21:48:00.746224-05:00] [GF 8.0.3] [INFO] [NCLS-SECURITY-01115] [jakarta.enterprise.system.core.security] [tid: _ThreadID=74 _ThreadName=RunLevelControllerThread-1781578080545] [levelValue: 800] [[
+  Realm [file] of classtype [com.sun.enterprise.security.auth.realm.file.FileRealm] successfully created.]]
+
+[2026-06-15T21:48:00.751802-05:00] [GF 8.0.3] [INFO] [NCLS-SECURITY-01115] [jakarta.enterprise.system.core.security] [tid: _ThreadID=74 _ThreadName=RunLevelControllerThread-1781578080545] [levelValue: 800] [[
+  Realm [certificate] of classtype [com.sun.enterprise.security.auth.realm.certificate.CertificateRealm] successfully created.]]
+
+[2026-06-15T21:48:00.809756-05:00] [GF 8.0.3] [INFO] [] [org.glassfish.ha.store.spi.BackingStoreFactoryRegistry] [tid: _ThreadID=73 _ThreadName=RunLevelControllerThread-1781578080541] [levelValue: 800] [[
+  Registered org.glassfish.ha.store.adapter.cache.ShoalBackingStoreProxy for persistence-type = replicated in BackingStoreFactoryRegistry]]
+
+[2026-06-15T21:48:01.086830-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00087] [jakarta.enterprise.system.core] [tid: _ThreadID=74 _ThreadName=RunLevelControllerThread-1781578080545] [levelValue: 800] [[
+  Grizzly Framework 5.0.2 started in: 54 ms - bound to [/0.0.0.0:8080]]]
+
+[2026-06-15T21:48:01.110408-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00087] [jakarta.enterprise.system.core] [tid: _ThreadID=74 _ThreadName=RunLevelControllerThread-1781578080545] [levelValue: 800] [[
+  Grizzly Framework 5.0.2 started in: 4 ms - bound to [/0.0.0.0:8181]]]
+
+[2026-06-15T21:48:01.115930-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00087] [jakarta.enterprise.system.core] [tid: _ThreadID=74 _ThreadName=RunLevelControllerThread-1781578080545] [levelValue: 800] [[
+  Grizzly Framework 5.0.2 started in: 2 ms - bound to [/0.0.0.0:4848]]]
+
+[2026-06-15T21:48:01.160486-05:00] [GF 8.0.3] [INFO] [SEC-SVCS-00100] [jakarta.enterprise.security.services] [tid: _ThreadID=74 _ThreadName=RunLevelControllerThread-1781578080545] [levelValue: 800] [[
+  Authorization Service has successfully initialized.]]
+
+[2026-06-15T21:48:01.188156-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00087] [jakarta.enterprise.system.core] [tid: _ThreadID=72 _ThreadName=RunLevelControllerThread-1781578080539] [levelValue: 800] [[
+  Grizzly Framework 5.0.2 started in: 3 ms - bound to [/0.0.0.0:3700]]]
+
+[2026-06-15T21:48:01.188664-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00017] [jakarta.enterprise.system.core] [tid: _ThreadID=3 _ThreadName=main] [levelValue: 800] [[
+  Eclipse GlassFish 8.0.3 (commit: 00c8ff1c98b5a1fabfc4c8e922d9bd7398908c77) startup time: Felix (1,703 ms), startup services (657 ms), total (2,360 ms)]]
+
+[2026-06-15T21:48:01.190679-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00018] [jakarta.enterprise.system.core] [tid: _ThreadID=3 _ThreadName=main] [levelValue: 800] [[
+  Total startup time including CLI: 3,115 ms]]
+
+[2026-06-15T21:48:01.282733-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00087] [jakarta.enterprise.system.core] [tid: _ThreadID=72 _ThreadName=RunLevelControllerThread-1781578080539] [levelValue: 800] [[
+  Grizzly Framework 5.0.2 started in: 4 ms - bound to [/0.0.0.0:7676]]]
+
+[2026-06-15T21:48:01.413885-05:00] [GF 8.0.3] [INFO] [NCLS-JMX-00005] [jakarta.enterprise.system.jmx] [tid: _ThreadID=125 _ThreadName=Thread-14] [levelValue: 800] [[
+  JMXStartupService has started JMXConnector on JMXService URL service:jmx:rmi://LAPTOP-5U9U4O5F:8686/jndi/rmi://LAPTOP-5U9U4O5F:8686/jmxrmi]]
+
+[2026-06-15T21:48:02.354672-05:00] [GF 8.0.3] [INFO] [NCLS-SECURITY-01143] [jakarta.enterprise.system.core.security] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  Loading policy provider org.glassfish.exousia.modules.def.DefaultPolicy.]]
+
+[2026-06-15T21:48:02.359590-05:00] [GF 8.0.3] [INFO] [NCLS-SECURITY-01010] [jakarta.enterprise.system.core.security] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  Entering Security Startup Service.]]
+
+[2026-06-15T21:48:02.367633-05:00] [GF 8.0.3] [INFO] [NCLS-SECURITY-01011] [jakarta.enterprise.system.core.security] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  Security Service(s) started successfully.]]
+
+[2026-06-15T21:48:02.507101-05:00] [GF 8.0.3] [INFO] [AS-WEB-GLUE-00198] [jakarta.enterprise.web] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  Created HTTP listener http-listener-1 on host/port 0.0.0.0:8080]]
+
+[2026-06-15T21:48:02.509052-05:00] [GF 8.0.3] [INFO] [AS-WEB-GLUE-00198] [jakarta.enterprise.web] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  Created HTTP listener http-listener-2 on host/port 0.0.0.0:8181]]
+
+[2026-06-15T21:48:02.510133-05:00] [GF 8.0.3] [INFO] [AS-WEB-GLUE-00198] [jakarta.enterprise.web] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  Created HTTP listener admin-listener on host/port 0.0.0.0:4848]]
+
+[2026-06-15T21:48:02.519896-05:00] [GF 8.0.3] [INFO] [AS-WEB-GLUE-00200] [jakarta.enterprise.web] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  Created virtual server server]]
+
+[2026-06-15T21:48:02.519896-05:00] [GF 8.0.3] [INFO] [AS-WEB-GLUE-00200] [jakarta.enterprise.web] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  Created virtual server __asadmin]]
+
+[2026-06-15T21:48:02.637351-05:00] [GF 8.0.3] [INFO] [AS-WEB-CORE-00306] [jakarta.enterprise.web.core] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  Setting JAAS app name glassfish-web]]
+
+[2026-06-15T21:48:02.638350-05:00] [GF 8.0.3] [INFO] [AS-WEB-GLUE-00201] [jakarta.enterprise.web] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  Virtual server server loaded default web module ]]
+
+[2026-06-15T21:48:02.956536-05:00] [GF 8.0.3] [INFO] [] [org.glassfish.web.loader.WebappClassLoader] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  close(), this:
+org.glassfish.web.loader.WebappClassLoader@1d8a7bfa[name=killa-rs-1.0-SNAPSHOT], urls=[
+file:/C:/PUCP/PROGRA3-KILLABEAUTY/Backend/killa-rs/target/killa-rs-1.0-SNAPSHOT/WEB-INF/classes/
+file:/C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/domains/domain1/generated/ejb/killa-rs-1.0-SNAPSHOT/
+][delegate=true, context=killa-rs-1.0-SNAPSHOT, status=RUNNING, antiJARLocking=false, repositories=RepositoryManager[WEB-INF/classes/], notFound.size=26, pathTimestamps.size=0, resourceEntryCache.size=0]]]
+
+[2026-06-15T21:48:02.975586-05:00] [GF 8.0.3] [INFO] [] [org.jboss.weld.Version] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  WELD-000900: 6.0.4 (Final)]]
+
+[2026-06-15T21:48:03.126898-05:00] [GF 8.0.3] [INFO] [] [jakarta.enterprise.inject.spi] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  Enabling Weld for ApplicationInfo[name=killa-rs-1.0-SNAPSHOT]]]
+
+[2026-06-15T21:48:03.438359-05:00] [GF 8.0.3] [INFO] [] [org.jboss.weld.Event] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  WELD-000411: Observer method [BackedAnnotatedMethod] public org.glassfish.jersey.ext.cdi1x.internal.ProcessAllAnnotatedTypes.processAnnotatedType(@Observes ProcessAnnotatedType<?>, BeanManager) receives events for all annotated types. Consider restricting events using @WithAnnotations or a generic type with bounds.]]
+
+[2026-06-15T21:48:04.013060-05:00] [GF 8.0.3] [INFO] [] [org.eclipse.jnosql.jakartapersistence.mapping.spi.JakartaPersistenceExtension] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  Processing Jakarta Persistence extension. Found 0 standard repositories, 0 custom repositories.]]
+
+[2026-06-15T21:48:04.347640-05:00] [GF 8.0.3] [INFO] [] [org.eclipse.krazo.servlet.KrazoContainerInitializer] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  Eclipse Krazo version 4.0.2 started]]
+
+[2026-06-15T21:48:04.355177-05:00] [GF 8.0.3] [INFO] [] [org.glassfish.soteria.servlet.SamRegistrationInstaller] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  Initializing Soteria 4.0.2 for context '/killa-rs-1.0-SNAPSHOT']]
+
+[2026-06-15T21:48:04.874027-05:00] [GF 8.0.3] [INFO] [AS-WEB-GLUE-00172] [jakarta.enterprise.web] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  Loading application [killa-rs-1.0-SNAPSHOT] at [/killa-rs-1.0-SNAPSHOT]]]
+
+[2026-06-15T21:48:04.965126-05:00] [GF 8.0.3] [INFO] [] [jakarta.enterprise.system.core] [tid: _ThreadID=111 _ThreadName=admin-listener(6)] [levelValue: 800] [[
+  killa-rs-1.0-SNAPSHOT was successfully deployed in 3,204 milliseconds.]]
+
+[2026-06-15T23:05:55.655092-05:00] [GF 8.0.3] [INFO] [] [jakarta.enterprise.inject.spi] [tid: _ThreadID=106 _ThreadName=admin-listener(3)] [levelValue: 800] [[
+  Disabling Weld for ApplicationInfo[name=killa-rs-1.0-SNAPSHOT]]]
+
+[2026-06-15T23:05:55.732727-05:00] [GF 8.0.3] [INFO] [] [org.glassfish.web.loader.WebappClassLoader] [tid: _ThreadID=106 _ThreadName=admin-listener(3)] [levelValue: 800] [[
+  close(), this:
+org.glassfish.web.loader.WebappClassLoader@49468582[name=/killa-rs-1.0-SNAPSHOT], urls=[
+file:/C:/PUCP/PROGRA3-KILLABEAUTY/Backend/killa-rs/target/killa-rs-1.0-SNAPSHOT/WEB-INF/classes/
+file:/C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/domains/domain1/generated/ejb/killa-rs-1.0-SNAPSHOT/
+file:/C:/PUCP/PROGRA3-KILLABEAUTY/glassfish-8.0.3/glassfish8/glassfish/domains/domain1/generated/killa-rs-1.0-SNAPSHOT/
+][delegate=true, context=/killa-rs-1.0-SNAPSHOT, status=RUNNING, antiJARLocking=false, repositories=RepositoryManager[WEB-INF/classes/], notFound.size=52, pathTimestamps.size=2, resourceEntryCache.size=2]]]
+
+[2026-06-15T23:06:02.633398-05:00] [GF 8.0.3] [INFO] [] [org.glassfish.admin.rest.adapter.RestAdapter] [tid: _ThreadID=108 _ThreadName=admin-listener(5)] [levelValue: 800] [[
+  Listening to REST requests at context: /command/domain.]]
+
+[2026-06-15T23:06:02.758024-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00092] [jakarta.enterprise.system.core] [tid: _ThreadID=250 _ThreadName=Thread-27] [levelValue: 800] [[
+  Server shutdown initiated]]
+
+[2026-06-15T23:06:02.769151-05:00] [GF 8.0.3] [INFO] [] [jakarta.enterprise.logging.stdout] [tid: _ThreadID=250 _ThreadName=Thread-27] [levelValue: 800] [[
+  FileMonitoring shutdown]]
+
+[2026-06-15T23:06:02.783886-05:00] [GF 8.0.3] [INFO] [NCLS-JMX-00002] [jakarta.enterprise.system.jmx] [tid: _ThreadID=250 _ThreadName=Thread-27] [levelValue: 800] [[
+  JMXStartupService: Stopped JMXConnectorServer: null]]
+
+[2026-06-15T23:06:02.785394-05:00] [GF 8.0.3] [INFO] [NCLS-JMX-00001] [jakarta.enterprise.system.jmx] [tid: _ThreadID=250 _ThreadName=Thread-27] [levelValue: 800] [[
+  JMXStartupService and JMXConnectors have been shut down.]]
+
+[2026-06-15T23:06:02.914257-05:00] [GF 8.0.3] [INFO] [NCLS-CORE-00013] [jakarta.enterprise.system.core] [tid: _ThreadID=250 _ThreadName=Thread-27] [levelValue: 800] [[
+  Shutdown procedure finished]]
+
+[2026-06-15T23:06:02.917531-05:00] [GF 8.0.3] [INFO] [] [jakarta.enterprise.logging.stdout] [tid: _ThreadID=36 _ThreadName=GlassFish Shutdown Hook] [levelValue: 800] [[
+  Completed shutdown of GlassFish runtime]]
+

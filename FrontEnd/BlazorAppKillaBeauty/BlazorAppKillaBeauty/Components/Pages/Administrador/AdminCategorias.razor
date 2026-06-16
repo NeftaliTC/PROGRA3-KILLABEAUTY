@@ -39,7 +39,7 @@
             <div class="admin-orders-search">
                 <i class="bi bi-search"></i>
                 <input type="text"
-                       placeholder="Buscar por nombre de categoría o subcategoría..."
+                       placeholder="Buscar por descripcion de categoría o subcategoría..."
                        @bind="filtroBusqueda"
                        @bind:event="oninput"
                        @bind:after="AplicarFiltros" />
@@ -227,7 +227,7 @@
     </section>
 </main>
 
-<!-- 
+<!--
      MODAL: Nueva / Editar CATEGORÍA -->
 @if (mostrarModalCategoria)
 {
@@ -286,7 +286,7 @@
     </div>
 }
 
-<!-- 
+<!--
      MODAL: Nueva / Editar SUBCATEGORÍA-->
 @if (mostrarModalSubcategoria)
 {
@@ -350,7 +350,7 @@
     </div>
 }
 
-<!-- 
+<!--
      MODAL: Confirmar cambio de estado (Categoría) -->
 @if (mostrarModalToggle && categoriaToggle != null)
 {
@@ -414,9 +414,9 @@
 
 @code {
 
-    // 
+    //
     // Modelos mock (equivalen a Categoria y Subcategoria del backend)
-    // 
+    //
 
     private class SubcategoriaMock
     {
@@ -635,13 +635,13 @@
     {
         if (string.IsNullOrWhiteSpace(formCat.Nombre))
         {
-            errorModalCat = "El nombre de la categoría es obligatorio.";
+            errorModalCat = "El descripcion de la categoría es obligatorio.";
             return;
         }
 
         if (!esModoEdicionCat && categorias.Any(c => c.Nombre.Equals(formCat.Nombre.Trim(), StringComparison.OrdinalIgnoreCase)))
         {
-            errorModalCat = "Ya existe una categoría con ese nombre.";
+            errorModalCat = "Ya existe una categoría con ese descripcion.";
             return;
         }
 
@@ -652,7 +652,7 @@
                 c.Nombre.Equals(formCat.Nombre.Trim(), StringComparison.OrdinalIgnoreCase));
             if (existe)
             {
-                errorModalCat = "Ya existe otra categoría con ese nombre.";
+                errorModalCat = "Ya existe otra categoría con ese descripcion.";
                 return;
             }
 
@@ -712,7 +712,7 @@
     {
         if (string.IsNullOrWhiteSpace(formSub.Nombre))
         {
-            errorModalSub = "El nombre de la subcategoría es obligatorio.";
+            errorModalSub = "El descripcion de la subcategoría es obligatorio.";
             return;
         }
 
@@ -722,7 +722,7 @@
             categoriaPadreSeleccionada.Subcategorias.Any(s =>
                 s.Nombre.Equals(formSub.Nombre.Trim(), StringComparison.OrdinalIgnoreCase)))
         {
-            errorModalSub = "Ya existe una subcategoría con ese nombre en esta categoría.";
+            errorModalSub = "Ya existe una subcategoría con ese descripcion en esta categoría.";
             return;
         }
 
@@ -733,7 +733,7 @@
                 s.Nombre.Equals(formSub.Nombre.Trim(), StringComparison.OrdinalIgnoreCase));
             if (existe)
             {
-                errorModalSub = "Ya existe otra subcategoría con ese nombre en esta categoría.";
+                errorModalSub = "Ya existe otra subcategoría con ese descripcion en esta categoría.";
                 return;
             }
 
@@ -801,4 +801,3 @@
         subcategoriaToggle = null;
     }
 }
-

@@ -11,6 +11,7 @@
         <module name="killa-rs" />
         <module name="dbManager" />
         <module name="killaBusiness" />
+        <module name="killa-rs-client" />
       </profile>
     </annotationProcessing>
   </component>

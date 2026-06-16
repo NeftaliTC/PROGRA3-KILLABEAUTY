@@ -20,7 +20,7 @@
             Los mejores productos de skincare,
             maquillaje y cuidado capilar
         </p>
-        
+
         <div class="hero-buttons">
             <button class="btn-primary"
                     @onclick='() => Navigation.NavigateTo("/catalogo")'>
@@ -260,9 +260,9 @@
         public string Precio { get; set; }
         public string Imagen { get; set; }
 
-        public Producto(string nombre, string precio, string imagen)
+        public Producto(string descripcion, string precio, string imagen)
         {
-            Nombre = nombre;
+            Nombre = descripcion;
             Precio = precio;
             Imagen = imagen;
         }

@@ -35,10 +35,10 @@
 
         @* Grilla de dos columnas *@
         <div class="order-detail-grid">
-            
+
             @* COLUMNA IZQUIERDA: Seguimiento y Productos *@
             <div class="detail-main-column">
-                
+
                 @* Tarjeta 1: Seguimiento del pedido *@
                 <div class="detail-card tracking-card">
                     <h2>Seguimiento del pedido</h2>
@@ -77,7 +77,7 @@
                                     <span class="product-title">@item.Nombre</span>
                                     <span class="product-brand">@item.Marca</span>
                                     <span class="product-qty-badge">@item.Cantidad unidad@(item.Cantidad > 1 ? "es" : "")</span>
-    
+
                                     <div class="price-container">
                                         @if (item.PrecioUnitario > item.PrecioUnitarioDesc)
                                         {
@@ -112,7 +112,7 @@
                             </div>
                         }
                     </div>
-                    
+
                     @if (pedidoActual.Productos.Any(p => p.AhorroVolumen > 0))
                     {
                         <div class="alert-savings-banner">
@@ -124,7 +124,7 @@
 
             @* COLUMNA DERECHA: Resumen, Entrega, Pago y Comprobante *@
             <div class="detail-sidebar-column">
-                
+
                 @* Tarjeta 3: Resumen del Pedido *@
                 <div class="detail-card summary-card">
                     <h2>Resumen del Pedido</h2>
@@ -256,7 +256,7 @@
         public decimal DescuentoCupon { get; set; }
         public decimal Total => (Subtotal + Envio) - DescuentoCupon;
         public int TotalArticulos => Productos.Sum(p => p.Cantidad);
-        
+
         public string? TipoComprobante { get; set; } // "Boleta" o "Factura"
         public string? DocumentoIdentidad { get; set; }
         public string? RazonSocial { get; set; }
@@ -276,13 +276,13 @@
         public string? Marca { get; set; }
         public string? Imagen { get; set; }
         public int Cantidad { get; set; }
-        public decimal PrecioUnitarioDesc {get; set; }
+        public decimal PrecioUnitarioDesc { get; set; }
         public decimal PrecioUnitario { get; set; }
         public decimal AhorroVolumen { get; set; }
 
-        public ProductoDetalle(string nombre, string marca, string imagen, int cantidad, decimal precioUnitDesc, decimal precioUnitOrig)
+        public ProductoDetalle(string descripcion, string marca, string imagen, int cantidad, decimal precioUnitDesc, decimal precioUnitOrig)
         {
-            Nombre = nombre;
+            Nombre = descripcion;
             Marca = marca;
             Imagen = imagen;
             Cantidad = cantidad;

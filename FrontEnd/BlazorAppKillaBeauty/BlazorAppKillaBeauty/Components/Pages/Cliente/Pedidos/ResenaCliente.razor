@@ -64,31 +64,31 @@
                 <label>Tu opinión</label>
                 <textarea class="review-textarea  @(mostrarError && string.IsNullOrWhiteSpace(opinion) ? "input-error" : "")"
                           placeholder="Cuéntanos qué te pareció el producto..."
-                              @bind="opinion">
+                          @bind="opinion">
                 </textarea>
-                </div>
-                @if (mostrarError)
-                {
-                    <div class="review-error-message">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        Debe completar todos los campos.
-                    </div>
-                }
-                <div class="review-actions">
-                    <button type="button" class="btn-cancel-review" @onclick="VolverAlPedido">
-                        Cancelar
-                    </button>
-
-                    <button type="button" class="btn-submit-review" @onclick="EnviarResena">
-                        Enviar reseña
-                    </button>
-                </div>
-
             </div>
-        }
+            @if (mostrarError)
+            {
+                <div class="review-error-message">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Debe completar todos los campos.
+                </div>
+            }
+            <div class="review-actions">
+                <button type="button" class="btn-cancel-review" @onclick="VolverAlPedido">
+                    Cancelar
+                </button>
 
-    </div>@if (mostrarModalExito)
-    {
+                <button type="button" class="btn-submit-review" @onclick="EnviarResena">
+                    Enviar reseña
+                </button>
+            </div>
+
+        </div>
+    }
+
+</div>@if (mostrarModalExito)
+{
     <div class="review-modal-overlay">
         <div class="review-success-modal">
 
@@ -179,9 +179,9 @@
         public string? Marca { get; set; }
         public string? Imagen { get; set; }
 
-        public ProductoDetalle(string nombre, string marca, string imagen)
+        public ProductoDetalle(string descripcion, string marca, string imagen)
         {
-            Nombre = nombre;
+            Nombre = descripcion;
             Marca = marca;
             Imagen = imagen;
         }
