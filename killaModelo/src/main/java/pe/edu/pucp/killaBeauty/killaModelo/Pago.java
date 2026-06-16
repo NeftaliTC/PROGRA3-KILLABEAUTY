@@ -8,11 +8,11 @@ public class Pago {
     private Date fechaHoraPago;
     private boolean estado;
     private Pedido pedido;
-    private MetodosDePago metodoPago;
+    private MetodoPago metodoPago;
 
     public Pago() {}
 
-    public Pago(int idPago, double montoPagado, Date fechaHoraPago, boolean estado, Pedido pedido, MetodosDePago metodoPago) {
+    public Pago(int idPago, double montoPagado, Date fechaHoraPago, boolean estado, Pedido pedido, MetodoPago metodoPago) {
         this.idPago = idPago;
         this.montoPagado = montoPagado;
         this.fechaHoraPago = fechaHoraPago;
@@ -61,11 +61,11 @@ public class Pago {
         this.pedido = pedido;
     }
 
-    public MetodosDePago getMetodoPago() {
+    public MetodoPago getMetodoPago() {
         return metodoPago;
     }
 
-    public void setMetodoPago(MetodosDePago metodoPago) {
+    public void setMetodoPago(MetodoPago metodoPago) {
         this.metodoPago = metodoPago;
     }
 }

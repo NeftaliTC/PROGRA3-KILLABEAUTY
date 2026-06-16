@@ -1,6 +1,6 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
 
-public enum MetodosDePago {
+public enum MetodoPago {
     YAPE(1, "YAPE"),
     PLIN(2, "PLIN"),
     TRANSFERENCIA(3, "TRANSFERENCIA"),
@@ -9,7 +9,7 @@ public enum MetodosDePago {
     private final int id;
     private final String nombre;
 
-    MetodosDePago(int id, String nombre) {
+    MetodoPago(int id, String nombre) {
         this.id = id;
         this.nombre = nombre;
     }
@@ -22,8 +22,8 @@ public enum MetodosDePago {
         return nombre;
     }
 
-    public static MetodosDePago fromId(int id) {
-        for (MetodosDePago metodo : MetodosDePago.values()) {
+    public static MetodoPago fromId(int id) {
+        for (MetodoPago metodo : TARJETA.values()) {
             if (metodo.getId() == id) {
                 return metodo;
             }
