@@ -2,15 +2,15 @@ package pe.edu.pucp.killaDAO.Impl;
 
 import pe.edu.pucp.dbManager.DBManager;
 import pe.edu.pucp.dbManager.TransactionContext;
-import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Cupon;
 import pe.edu.pucp.killaBeauty.killaModelo.Direccion;
-import pe.edu.pucp.killaBeauty.killaModelo.Pedido;
 import pe.edu.pucp.killaBeauty.killaModelo.EstadoPedido;
+import pe.edu.pucp.killaBeauty.killaModelo.Pedido;
 import pe.edu.pucp.killaBeauty.killaModelo.Usuario;
+import pe.edu.pucp.killaBeauty.killaModelo.DetallePedido;
+import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Cupon;
 import pe.edu.pucp.killaDAO.PedidoDAO;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,22 +19,17 @@ public class PedidoDAOImpl implements PedidoDAO {
     @Override
     public List<Pedido> listAll() throws SQLException {
         List<Pedido> pedidos = new ArrayList<>();
-
         String sql = """
                 SELECT id_pedido, id_usuario, id_direccion, id_cupon, fecha_pedido,
-                       subtotal, igv, total, estado_pedido
+                       subtotal, igv, total, id_estado_pedido
                 FROM Pedido
                 """;
 
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                pedidos.add(mapRowToPedido(rs));
-            }
+            while (rs.next()) pedidos.add(mapRow(rs));
         }
-
         return pedidos;
     }
 
@@ -42,147 +37,126 @@ public class PedidoDAOImpl implements PedidoDAO {
     public Pedido load(Integer id) throws SQLException {
         String sql = """
                 SELECT id_pedido, id_usuario, id_direccion, id_cupon, fecha_pedido,
-                       subtotal, igv, total, estado_pedido
+                       subtotal, igv, total, id_estado_pedido
                 FROM Pedido
                 WHERE id_pedido = ?
                 """;
 
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
-
             ps.setInt(1, id);
-
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return mapRowToPedido(rs);
+                    Pedido pedido = mapRow(rs);
+                    pedido.setDetalles(new DetallePedidoDAOImpl().listByPedidoId(pedido.getId()));
+                    return pedido;
                 }
             }
         }
-
         return null;
     }
 
     @Override
     public Pedido save(Pedido pedido) throws SQLException {
+        validarPedido(pedido);
         String sql = """
                 INSERT INTO Pedido
-                (fecha_pedido, subtotal, id_cupon, igv, total, id_usuario, id_direccion, estado_pedido)
+                (fecha_pedido, subtotal, igv, total, id_usuario, id_direccion, id_cupon, id_estado_pedido)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """;
+        Connection cn = TransactionContext.getConnection();
 
-        try (Connection cn = DBManager.getInstance().getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            LocalDate fecha = (pedido.getFechaPedido() != null) ? pedido.getFechaPedido() : LocalDate.now();
-            ps.setTimestamp(1, Timestamp.valueOf(fecha.atStartOfDay()));
-
-            ps.setDouble(2, pedido.getSubtotal());
-
-            if (pedido.getCupon() != null) {
-                ps.setInt(3, pedido.getCupon().getIdCupon());
-            } else {
-                ps.setNull(3, Types.INTEGER);
-            }
-
-            ps.setDouble(4, pedido.getIgv());
-            ps.setDouble(5, pedido.getTotal());
-
-            if (pedido.getCliente() == null) {
-                throw new SQLException("Pedido.save: cliente es null");
-            }
-            ps.setInt(6, pedido.getCliente().getId());
-
-            if (pedido.getDireccionEnvio() == null) {
-                throw new SQLException("Pedido.save: direccionEnvio es null");
-            }
-            ps.setInt(7, pedido.getDireccionEnvio().getId());
-
-            ps.setString(8, pedido.getEstadoPedido().name());
-
-            int affected = ps.executeUpdate();
-            if (affected > 0) {
-                try (ResultSet keys = ps.getGeneratedKeys()) {
-                    if (keys.next()) {
-                        pedido.setId(keys.getInt(1));
-                    }
-                }
+        try (PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            setPedidoParams(ps, pedido);
+            ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) pedido.setId(keys.getInt(1));
             }
         }
 
+        if (pedido.getDetalles() != null) {
+            DetallePedidoDAOImpl detalleDAO = new DetallePedidoDAOImpl();
+            for (DetallePedido detalle : pedido.getDetalles()) {
+                detalleDAO.save(detalle, pedido.getId());
+            }
+        }
         return pedido;
     }
 
     @Override
     public Pedido update(Pedido pedido) throws SQLException {
+        validarPedido(pedido);
         String sql = """
                 UPDATE Pedido
-                SET fecha_pedido = ?, subtotal = ?, id_cupon = ?, igv = ?, total = ?,
-                    id_usuario = ?, id_direccion = ?, estado_pedido = ?
+                SET fecha_pedido = ?, subtotal = ?, igv = ?, total = ?, id_usuario = ?,
+                    id_direccion = ?, id_cupon = ?, id_estado_pedido = ?
                 WHERE id_pedido = ?
                 """;
+        Connection cn = TransactionContext.getConnection();
 
-        try (Connection cn = DBManager.getInstance().getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
-
-            LocalDate fecha = (pedido.getFechaPedido() != null) ? pedido.getFechaPedido() : LocalDate.now();
-            ps.setTimestamp(1, Timestamp.valueOf(fecha.atStartOfDay()));
-
-            ps.setDouble(2, pedido.getSubtotal());
-
-            if (pedido.getCupon() != null) {
-                ps.setInt(3, pedido.getCupon().getIdCupon());
-            } else {
-                ps.setNull(3, Types.INTEGER);
-            }
-
-            ps.setDouble(4, pedido.getIgv());
-            ps.setDouble(5, pedido.getTotal());
-
-            if (pedido.getCliente() == null) {
-                throw new SQLException("Pedido.update: cliente es null");
-            }
-            ps.setInt(6, pedido.getCliente().getId());
-
-            if (pedido.getDireccionEnvio() == null) {
-                throw new SQLException("Pedido.update: direccionEnvio es null");
-            }
-            ps.setInt(7, pedido.getDireccionEnvio().getId());
-
-            ps.setString(8, pedido.getEstadoPedido().name());
+        try (PreparedStatement ps = cn.prepareStatement(sql)) {
+            setPedidoParams(ps, pedido);
             ps.setInt(9, pedido.getId());
-
             ps.executeUpdate();
         }
 
+        if (pedido.getDetalles() != null) {
+            try (PreparedStatement ps = cn.prepareStatement("DELETE FROM DetallePedido WHERE id_pedido = ?")) {
+                ps.setInt(1, pedido.getId());
+                ps.executeUpdate();
+            }
+            DetallePedidoDAOImpl detalleDAO = new DetallePedidoDAOImpl();
+            for (DetallePedido detalle : pedido.getDetalles()) {
+                detalleDAO.save(detalle, pedido.getId());
+            }
+        }
         return pedido;
     }
 
     @Override
     public void remove(Pedido pedido) throws SQLException {
-        String sql = "DELETE FROM Pedido WHERE id_pedido = ?";
-
-        try (Connection cn = DBManager.getInstance().getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
-
+        Connection cn = TransactionContext.getConnection();
+        try (PreparedStatement ps = cn.prepareStatement("DELETE FROM DetallePedido WHERE id_pedido = ?")) {
+            ps.setInt(1, pedido.getId());
+            ps.executeUpdate();
+        }
+        try (PreparedStatement ps = cn.prepareStatement("DELETE FROM Pedido WHERE id_pedido = ?")) {
             ps.setInt(1, pedido.getId());
             ps.executeUpdate();
         }
     }
 
-    private Pedido mapRowToPedido(ResultSet rs) throws SQLException {
-        Pedido p = new Pedido();
-
-        p.setId(rs.getInt("id_pedido"));
-
-        Timestamp ts = rs.getTimestamp("fecha_pedido");
-        if (ts != null) {
-            p.setFechaPedido(ts.toLocalDateTime().toLocalDate());
+    @Override
+    public void updateEstado(Integer idPedido, Integer idNuevoEstado) throws SQLException {
+        String sql = "UPDATE Pedido SET id_estado_pedido = ? WHERE id_pedido = ?";
+        try (Connection cn = DBManager.getInstance().getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, idNuevoEstado);
+            ps.setInt(2, idPedido);
+            ps.executeUpdate();
         }
+    }
 
+    private void setPedidoParams(PreparedStatement ps, Pedido pedido) throws SQLException {
+        setTimestamp(ps, 1, pedido.getFechaPedido());
+        ps.setDouble(2, pedido.getSubtotal());
+        ps.setDouble(3, pedido.getIgv());
+        ps.setDouble(4, pedido.getTotal());
+        ps.setInt(5, pedido.getCliente().getId());
+        ps.setInt(6, pedido.getDireccionEnvio().getId());
+        if (pedido.getCupon() != null) ps.setInt(7, pedido.getCupon().getId());
+        else ps.setNull(7, Types.INTEGER);
+        ps.setInt(8, pedido.getEstadoPedido().getId());
+    }
+
+    private Pedido mapRow(ResultSet rs) throws SQLException {
+        Pedido p = new Pedido();
+        p.setId(rs.getInt("id_pedido"));
+        p.setFechaPedido(rs.getTimestamp("fecha_pedido"));
         p.setSubtotal(rs.getDouble("subtotal"));
         p.setIgv(rs.getDouble("igv"));
         p.setTotal(rs.getDouble("total"));
-        p.setEstadoPedido(EstadoPedido.valueOf(rs.getString("estado_pedido")));
+        p.setEstadoPedido(EstadoPedido.fromId(rs.getInt("id_estado_pedido")));
 
         Usuario u = new Usuario();
         u.setId(rs.getInt("id_usuario"));
@@ -195,24 +169,26 @@ public class PedidoDAOImpl implements PedidoDAO {
         int idCupon = rs.getInt("id_cupon");
         if (!rs.wasNull()) {
             Cupon c = new Cupon();
-            c.setIdCupon(idCupon);
+            c.setId(idCupon);
             p.setCupon(c);
-        } else {
-            p.setCupon(null);
         }
-
         return p;
     }
 
-    @Override
-    public void updateEstado(Integer idPedido, Integer idNuevoEstado) throws SQLException {
-        String sql = "UPDATE Pedido SET id_estado_pedido = ? WHERE id_pedido = ?";
-        Connection con = TransactionContext.getConnection();
-
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, idNuevoEstado);
-            ps.setInt(2, idPedido);
-            ps.executeUpdate();
+    private void validarPedido(Pedido pedido) throws SQLException {
+        if (pedido.getCliente() == null || pedido.getCliente().getId() <= 0) {
+            throw new SQLException("Pedido: cliente invalido");
         }
+        if (pedido.getDireccionEnvio() == null || pedido.getDireccionEnvio().getId() <= 0) {
+            throw new SQLException("Pedido: direccion de envio invalida");
+        }
+        if (pedido.getEstadoPedido() == null) {
+            throw new SQLException("Pedido: estado invalido");
+        }
+    }
+
+    private void setTimestamp(PreparedStatement ps, int index, java.util.Date value) throws SQLException {
+        if (value == null) ps.setTimestamp(index, new Timestamp(System.currentTimeMillis()));
+        else ps.setTimestamp(index, new Timestamp(value.getTime()));
     }
 }

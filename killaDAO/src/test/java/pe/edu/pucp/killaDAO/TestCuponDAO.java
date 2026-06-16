@@ -32,10 +32,10 @@ public class TestCuponDAO {
             nuevo.setActivo(true);
 
             Cupon guardado = cuponDAO.save(nuevo);
-            System.out.println("SAVE OK -> id: " + guardado.getIdCupon());
+            System.out.println("SAVE OK -> id: " + guardado.getId());
 
             // 2) LOAD
-            Cupon cargado = cuponDAO.load(guardado.getIdCupon());
+            Cupon cargado = cuponDAO.load(guardado.getId());
             System.out.println("LOAD OK -> Código: " + (cargado != null ? cargado.getCodigo() : "null") +
                     " | Tipo: " + cargado.getTipoDescuento().name());
 
@@ -45,7 +45,7 @@ public class TestCuponDAO {
                 cargado.setDescripcion("Descuento ACTUALIZADO");
                 cuponDAO.update(cargado);
 
-                Cupon actualizado = cuponDAO.load(cargado.getIdCupon());
+                Cupon actualizado = cuponDAO.load(cargado.getId());
                 System.out.println("UPDATE OK -> Nuevo valor descuento: " + actualizado.getValorDescuento());
             }
 
@@ -53,14 +53,14 @@ public class TestCuponDAO {
             List<Cupon> cupones = cuponDAO.listAll();
             System.out.println("LIST ALL -> total: " + cupones.size());
             for (Cupon c : cupones) {
-                System.out.println(" - ID: " + c.getIdCupon() + " | Código: " + c.getCodigo() +
+                System.out.println(" - ID: " + c.getId() + " | Código: " + c.getCodigo() +
                         " | Activo: " + c.isActivo() + " | Usos Max: " + c.getMaxUsosGenerales());
             }
 
             // 5) REMOVE (Borrado lógico)
             if (cargado != null) {
                 cuponDAO.remove(cargado);
-                Cupon eliminado = cuponDAO.load(cargado.getIdCupon());
+                Cupon eliminado = cuponDAO.load(cargado.getId());
 
                 System.out.println("REMOVE OK -> " + (eliminado != null && !eliminado.isActivo() ? "inactivo" : "aun activo"));
             }
