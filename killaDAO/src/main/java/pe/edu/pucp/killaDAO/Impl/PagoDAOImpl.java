@@ -1,7 +1,7 @@
 package pe.edu.pucp.killaDAO.Impl;
 
 import pe.edu.pucp.dbManager.DBManager;
-import pe.edu.pucp.killaBeauty.killaModelo.MetodosDePago;
+import pe.edu.pucp.killaBeauty.killaModelo.MetodoPago;
 import pe.edu.pucp.killaBeauty.killaModelo.Pago;
 import pe.edu.pucp.killaBeauty.killaModelo.Pedido;
 import pe.edu.pucp.killaDAO.PagoDAO;
@@ -98,7 +98,7 @@ public class PagoDAOImpl implements PagoDAO {
         p.setPedido(ped);
 
         int idMetodo = rs.getInt("id_metodo_pago");
-        p.setMetodoPago(MetodosDePago.fromId(idMetodo));
+        p.setMetodoPago(MetodoPago.fromId(idMetodo));
 
         return p;
     }

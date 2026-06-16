@@ -23,7 +23,7 @@ public enum MetodoPago {
     }
 
     public static MetodoPago fromId(int id) {
-        for (MetodoPago metodo : TARJETA.values()) {
+        for (MetodoPago metodo : MetodoPago.values()) {
             if (metodo.getId() == id) {
                 return metodo;
             }

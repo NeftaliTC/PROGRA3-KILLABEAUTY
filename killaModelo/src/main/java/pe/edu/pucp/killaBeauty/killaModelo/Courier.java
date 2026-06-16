@@ -3,7 +3,7 @@ package pe.edu.pucp.killaBeauty.killaModelo;
 public class Courier {
     private int id;
     private String nombre;
-    private String RUC;
+    private String ruc;
     private String telefono;
     private boolean activo;
     private String correo;
@@ -27,12 +27,12 @@ public class Courier {
         this.nombre = nombre;
     }
 
-    public String getRUC() {
-        return RUC;
+    public String getRuc() {
+        return ruc;
     }
 
-    public void setRUC(String RUC) {
-        this.RUC = RUC;
+    public void setRuc(String ruc) {
+        this.ruc = ruc;
     }
 
     public String getTelefono() {

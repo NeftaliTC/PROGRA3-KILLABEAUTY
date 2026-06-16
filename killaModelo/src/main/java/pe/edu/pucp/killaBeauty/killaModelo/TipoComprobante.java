@@ -5,19 +5,19 @@ public enum TipoComprobante {
     FACTURA(2, "Factura Comercial");
 
     private final int id;
-    private final String descripcion;
+    private final String nombre;
 
-    private TipoComprobante(int id, String descripcion) {
+    TipoComprobante(int id, String nombre) {
         this.id = id;
-        this.descripcion = descripcion;
+        this.nombre = nombre;
     }
 
     public int getId() {
         return id;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getnombre() {
+        return nombre;
     }
 
     public static TipoComprobante getById(int id) {

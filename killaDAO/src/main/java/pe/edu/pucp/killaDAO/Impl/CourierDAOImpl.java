@@ -20,8 +20,8 @@ public class CourierDAOImpl implements CourierDAO {
                 Courier c = new Courier();
                 c.setId(rs.getInt("id_courier"));
                 c.setNombre(rs.getString("nombre"));
-                c.setRUC(rs.getInt("ruc"));
-                c.setTelefono(rs.getInt("telefono"));
+                c.setRuc(rs.getString("ruc"));
+                c.setTelefono(rs.getString("telefono"));
                 c.setActivo(rs.getBoolean("activo"));
                 c.setCorreo(rs.getString("correo"));
                 lista.add(c);
@@ -41,8 +41,8 @@ public class CourierDAOImpl implements CourierDAO {
                     Courier c = new Courier();
                     c.setId(rs.getInt("id_courier"));
                     c.setNombre(rs.getString("nombre"));
-                    c.setRUC(rs.getInt("ruc"));
-                    c.setTelefono(rs.getInt("telefono"));
+                    c.setRuc(rs.getString("ruc"));
+                    c.setTelefono(rs.getString("telefono"));
                     c.setActivo(rs.getBoolean("activo"));
                     c.setCorreo(rs.getString("correo"));
                     return c;
@@ -61,8 +61,8 @@ public class CourierDAOImpl implements CourierDAO {
             }
             try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, courier.getNombre());
-                ps.setInt(2, courier.getRUC());
-                ps.setInt(3, courier.getTelefono());
+                ps.setString(2, courier.getRuc());
+                ps.setString(3, courier.getTelefono());
                 ps.setBoolean(4, courier.isActivo());
                 ps.setString(5, courier.getCorreo());
                 ps.executeUpdate();
@@ -86,8 +86,8 @@ public class CourierDAOImpl implements CourierDAO {
 
             try (PreparedStatement ps = con.prepareStatement(sql)) {
                 ps.setString(1, courier.getNombre());
-                ps.setInt(2, courier.getRUC());
-                ps.setInt(3, courier.getTelefono());
+                ps.setString(2, courier.getRuc());
+                ps.setString(3, courier.getTelefono());
                 ps.setBoolean(4, courier.isActivo());
                 ps.setString(5, courier.getCorreo());
                 ps.setInt(6, courier.getId());
