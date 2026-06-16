@@ -1,25 +1,24 @@
 package pe.edu.pucp.killaBeauty.bl.Impl;
 
 import pe.edu.pucp.dbManager.TransactionContext;
-import pe.edu.pucp.killaBeauty.bl.DetalleCarritoBL;
+import pe.edu.pucp.killaBeauty.bl.DetallePedidoBL;
 import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
-import pe.edu.pucp.killaBeauty.killaModelo.DetalleCarrito;
-import pe.edu.pucp.killaDAO.DetalleCarritoDAO;
-import pe.edu.pucp.killaDAO.Impl.DetalleCarritoDAOImpl;
+import pe.edu.pucp.killaBeauty.killaModelo.DetallePedido;
+import pe.edu.pucp.killaDAO.DetallePedidoDAO;
+import pe.edu.pucp.killaDAO.Impl.DetallePedidoDAOImpl;
 
 import java.sql.SQLException;
 import java.util.List;
 
-public class DetalleCarritoBLImpl implements DetalleCarritoBL {
-
-    private DetalleCarritoDAO detalleDAO = new DetalleCarritoDAOImpl();
+public class DetallePedidoBLImpl implements DetallePedidoBL {
+    private DetallePedidoDAO detalleDAO = new DetallePedidoDAOImpl();
 
     @Override
-    public DetalleCarrito create(DetalleCarrito detalle) throws BusinessLogicException {
-        validarDetalle(detalle);
+    public DetallePedido create(DetallePedido detalle, Integer idPedido) throws BusinessLogicException {
+        validarDetalle(detalle, idPedido);
         try {
             TransactionContext.getConnection();
-            DetalleCarrito guardado = detalleDAO.save(detalle);
+            DetallePedido guardado = detalleDAO.save(detalle, idPedido);
             TransactionContext.commit();
             return guardado;
         } catch (SQLException e) {
@@ -31,11 +30,11 @@ public class DetalleCarritoBLImpl implements DetalleCarritoBL {
     }
 
     @Override
-    public DetalleCarrito update(DetalleCarrito detalle) throws BusinessLogicException {
-        validarDetalle(detalle);
+    public DetallePedido update(DetallePedido detalle, Integer idPedido) throws BusinessLogicException {
+        validarDetalle(detalle, idPedido);
         try {
             TransactionContext.getConnection();
-            DetalleCarrito actualizado = detalleDAO.update(detalle);
+            DetallePedido actualizado = detalleDAO.update(detalle, idPedido);
             TransactionContext.commit();
             return actualizado;
         } catch (SQLException e) {
@@ -47,8 +46,8 @@ public class DetalleCarritoBLImpl implements DetalleCarritoBL {
     }
 
     @Override
-    public void remove(DetalleCarrito detalle) throws BusinessLogicException {
-        if (detalle == null || detalle.getId() <= 0) throw new BusinessLogicException("Debe indicar un detalle valido.");
+    public void remove(DetallePedido detalle) throws BusinessLogicException {
+        if (detalle == null || detalle.getIdDetallePedido() <= 0) throw new BusinessLogicException("Debe indicar un detalle valido.");
         try {
             TransactionContext.getConnection();
             detalleDAO.remove(detalle);
@@ -62,7 +61,7 @@ public class DetalleCarritoBLImpl implements DetalleCarritoBL {
     }
 
     @Override
-    public DetalleCarrito load(int id) throws BusinessLogicException {
+    public DetallePedido load(Integer id) throws BusinessLogicException {
         try {
             return detalleDAO.load(id);
         } catch (SQLException e) {
@@ -71,18 +70,28 @@ public class DetalleCarritoBLImpl implements DetalleCarritoBL {
     }
 
     @Override
-    public List<DetalleCarrito> listByCarritoId(int idCarrito) throws BusinessLogicException {
+    public List<DetallePedido> listAll() throws BusinessLogicException {
         try {
-            return detalleDAO.listByCarritoId(idCarrito);
+            return detalleDAO.listAll();
         } catch (SQLException e) {
             throw new BusinessLogicException(e);
         }
     }
 
-    private void validarDetalle(DetalleCarrito detalle) throws BusinessLogicException {
+    @Override
+    public List<DetallePedido> listByPedidoId(Integer idPedido) throws BusinessLogicException {
+        try {
+            return detalleDAO.listByPedidoId(idPedido);
+        } catch (SQLException e) {
+            throw new BusinessLogicException(e);
+        }
+    }
+
+    private void validarDetalle(DetallePedido detalle, Integer idPedido) throws BusinessLogicException {
+        if (idPedido == null || idPedido <= 0) throw new BusinessLogicException("Debe indicar un pedido valido.");
         if (detalle == null) throw new BusinessLogicException("El detalle no puede ser nulo.");
         if (detalle.getProducto() == null || detalle.getProducto().getId() <= 0) throw new BusinessLogicException("El detalle debe tener un producto valido.");
         if (detalle.getCantidad() <= 0) throw new BusinessLogicException("La cantidad debe ser mayor a cero.");
-        if (detalle.getCarritoDeCompras() == null || detalle.getCarritoDeCompras().getId() <= 0) throw new BusinessLogicException("El detalle debe pertenecer a un carrito valido.");
+        if (detalle.getPrecioAplicado() < 0) throw new BusinessLogicException("El precio aplicado no puede ser negativo.");
     }
 }
