@@ -11,7 +11,7 @@ import pe.edu.pucp.killaBeauty.bl.Impl.Promocionales.CuponBLImpl;
 import pe.edu.pucp.killaBeauty.bl.PermisoBL;
 import pe.edu.pucp.killaBeauty.bl.Promocionales.CuponBL;
 
-@Path("/cupones")
+@Path("/permisos")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class PermisoRS {
