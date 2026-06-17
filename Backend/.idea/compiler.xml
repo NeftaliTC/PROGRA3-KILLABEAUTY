@@ -8,11 +8,13 @@
         <outputRelativeToContentRoot value="true" />
         <module name="killaDAO" />
         <module name="killaModelo" />
-        <module name="killa-rs" />
         <module name="dbManager" />
         <module name="killaBusiness" />
-        <module name="killa-rs-client" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="killa-rs" target="25" />
+      <module name="killa-rs-client" target="25" />
+    </bytecodeTargetLevel>
   </component>
 </project>
