@@ -1,4 +1,4 @@
-﻿@page "/admin/productos/nuevo"
+@page "/admin/productos/nuevo"
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
 @inject NavigationManager Navigation
@@ -46,22 +46,22 @@
         <section class="admin-product-form-card">
             <div class="admin-form-section-title">
                 <i class="bi bi-tag"></i>
-                <h2>Identificación</h2>
+                <h2>Identificacion</h2>
             </div>
 
             <div class="admin-form-grid-2">
                 <div class="admin-form-field">
-                    <label>Código del producto</label>
+                    <label>Codigo del producto</label>
                     <div class="admin-form-field-readonly">
                         <input disabled value="@codigoGenerado" />
-                        <small>El sistema genera el código único al guardar.</small>
+                        <small>El sistema genera el codigo unico al guardar.</small>
                     </div>
                 </div>
 
                 <div class="admin-form-field">
                     <label>Nombre del producto <span class="required">*</span></label>
                     <input type="text"
-                           placeholder="Ej: Sérum vitamina C 30ml"
+                           placeholder="Ej: Serum vitamina C 30ml"
                            @bind="descripcion" />
                 </div>
             </div>
@@ -70,14 +70,14 @@
         <section class="admin-product-form-card">
             <div class="admin-form-section-title">
                 <i class="bi bi-bookmark"></i>
-                <h2>Clasificación</h2>
+                <h2>Clasificacion</h2>
             </div>
 
             <div class="admin-form-grid-3">
                 <div class="admin-form-field">
-                    <label>Categoría <span class="required">*</span></label>
+                    <label>Categoria <span class="required">*</span></label>
                     <select @bind="categoriaId">
-                        <option value="0">Seleccionar categoría</option>
+                        <option value="0">Seleccionar categoria</option>
                         @foreach (var c in categorias)
                         {
                             <option value="@c.Id">@c.Descripcion</option>
@@ -86,9 +86,9 @@
                 </div>
 
                 <div class="admin-form-field">
-                    <label>Subcategoría <span class="required">*</span></label>
+                    <label>Subcategoria <span class="required">*</span></label>
                     <select @bind="subcategoriaId" disabled="@(categoriaId == 0)">
-                        <option value="0">Seleccionar subcategoría</option>
+                        <option value="0">Seleccionar subcategoria</option>
                         @foreach (var s in SubcategoriasFiltradas)
                         {
                             <option value="@s.Id">@s.Descripcion</option>
@@ -136,7 +136,7 @@
 
             <div class="admin-form-toggles">
                 <div class="toggle-row">
-                    <span>Disponible en catálogo</span>
+                    <span>Disponible en catalogo</span>
                     <label class="switch">
                         <input type="checkbox" @bind="disponible" />
                         <span class="slider"></span>
@@ -144,7 +144,7 @@
                 </div>
 
                 <div class="toggle-row">
-                    <span>En promoción</span>
+                    <span>En promocion</span>
                     <label class="switch">
                         <input type="checkbox" @bind="enPromocion" />
                         <span class="slider"></span>
@@ -154,7 +154,7 @@
         </section>
 
         <div class="admin-product-form-hint">
-            Las escalas de precio (precio por unidad, media docena, cajón) se configuran después de guardar el producto, desde la pantalla de escalas.
+            Las escalas de precio (precio por unidad, media docena, cajon) se configuran despues de guardar el producto, desde la pantalla de escalas.
         </div>
 
         <footer class="admin-product-form-footer">
@@ -175,7 +175,7 @@
                     </div>
                     <h2>Producto registrado</h2>
                     <p class="admin-modal-text">
-                        Se guardó el producto <strong>@descripcion</strong> en el backend REST.
+                        Se guardo el producto <strong>@descripcion</strong> EXITOSAMENTE.
                     </p>
 
                     <div class="admin-modal-actions">
@@ -194,8 +194,8 @@
     private string? mensajeError;
     private bool mostrarExito = false;
 
-    // mock “codigo generado”
-    private string codigoGenerado = "KB-149 (generado automáticamente)";
+    // codigo generado
+    private string codigoGenerado = "KB-149 (generado automaticamente)";
 
     private string descripcion = "";
     private int categoriaId;
@@ -250,7 +250,7 @@
 
     private async Task Guardar()
     {
-        // Validaciones front (solo interacción)
+        // Validaciones front (solo interaccion)
         if (string.IsNullOrWhiteSpace(descripcion))
         {
             mensajeError = "El descripcion del producto es obligatorio.";
@@ -259,19 +259,31 @@
 
         if (categoriaId == 0)
         {
-            mensajeError = "Selecciona una categoría.";
+            mensajeError = "Selecciona una categoria.";
             return;
         }
 
         if (subcategoriaId == 0)
         {
-            mensajeError = "Selecciona una subcategoría.";
+            mensajeError = "Selecciona una subcategoria.";
             return;
         }
 
         if (marcaId == 0)
         {
             mensajeError = "Selecciona una marca.";
+            return;
+        }
+
+        if (!marcas.Any(m => m.Id == marcaId))
+        {
+            mensajeError = "La marca seleccionada no existe o no esta activa.";
+            return;
+        }
+
+        if (!SubcategoriasFiltradas.Any(s => s.Id == subcategoriaId))
+        {
+            mensajeError = "La subcategoria seleccionada no pertenece a la categoria elegida.";
             return;
         }
 
@@ -306,10 +318,31 @@
         }
         catch (Exception ex)
         {
-            mensajeError = $"No se pudo registrar el producto: {ex.Message}";
+            mensajeError = $"No se pudo registrar el producto: {LimpiarMensajeError(ex.Message)}";
         }
     }
 
+
+    private static string LimpiarMensajeError(string mensaje)
+    {
+        if (string.IsNullOrWhiteSpace(mensaje))
+        {
+            return "Error desconocido.";
+        }
+
+        if (mensaje.Contains("foreign key", StringComparison.OrdinalIgnoreCase) ||
+            mensaje.Contains("fk_p_m", StringComparison.OrdinalIgnoreCase))
+        {
+            return "La marca seleccionada no existe en la base de datos. Recarga la pagina y selecciona una marca activa.";
+        }
+
+        if (mensaje.Contains("fk_p_s", StringComparison.OrdinalIgnoreCase))
+        {
+            return "La subcategoria seleccionada no existe en la base de datos. Recarga la pagina y selecciona una subcategoria activa.";
+        }
+
+        return mensaje;
+    }
     private void VolverAProductos()
     {
         mostrarExito = false;

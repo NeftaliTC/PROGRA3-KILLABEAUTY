@@ -68,14 +68,14 @@ namespace BlazorAppKillaBeauty.Services
 
         public async Task<ProductoApi> CrearAsync(ProductoApi producto)
         {
-            using var response = await http.PostAsJsonAsync("productos", producto, jsonOptions);
+            using var response = await http.PostAsJsonAsync("productos", ProductoRequest.From(producto), jsonOptions);
             await EnsureSuccessAsync(response);
             return await response.Content.ReadFromJsonAsync<ProductoApi>(jsonOptions) ?? producto;
         }
 
         public async Task<ProductoApi> ActualizarAsync(ProductoApi producto)
         {
-            using var response = await http.PutAsJsonAsync($"productos/{producto.Id}", producto, jsonOptions);
+            using var response = await http.PutAsJsonAsync($"productos/{producto.Id}", ProductoRequest.From(producto), jsonOptions);
             await EnsureSuccessAsync(response);
             return await response.Content.ReadFromJsonAsync<ProductoApi>(jsonOptions) ?? producto;
         }
@@ -112,6 +112,57 @@ namespace BlazorAppKillaBeauty.Services
                 string.IsNullOrWhiteSpace(body)
                     ? $"Error REST {(int)response.StatusCode} {response.ReasonPhrase}"
                     : body);
+        }
+        private class ProductoRequest
+        {
+            [JsonPropertyName("id")]
+            public int Id { get; set; }
+
+            [JsonPropertyName("nombre")]
+            public string Nombre { get; set; } = "";
+
+            [JsonPropertyName("precioBase")]
+            public decimal PrecioBase { get; set; }
+
+            [JsonPropertyName("stock")]
+            public int Stock { get; set; }
+
+            [JsonPropertyName("disponible")]
+            public bool Disponible { get; set; }
+
+            [JsonPropertyName("promocion")]
+            public bool Promocion { get; set; }
+
+            [JsonPropertyName("activo")]
+            public bool Activo { get; set; }
+
+            [JsonPropertyName("marca")]
+            public IdRef Marca { get; set; } = new();
+
+            [JsonPropertyName("subcategoria")]
+            public IdRef Subcategoria { get; set; } = new();
+
+            public static ProductoRequest From(ProductoApi producto)
+            {
+                return new ProductoRequest
+                {
+                    Id = producto.Id,
+                    Nombre = producto.Nombre?.Trim() ?? "",
+                    PrecioBase = producto.PrecioBase,
+                    Stock = producto.Stock,
+                    Disponible = producto.Disponible,
+                    Promocion = producto.Promocion,
+                    Activo = producto.Activo,
+                    Marca = new IdRef { Id = producto.Marca?.Id ?? 0 },
+                    Subcategoria = new IdRef { Id = producto.Subcategoria?.Id ?? 0 }
+                };
+            }
+        }
+
+        private class IdRef
+        {
+            [JsonPropertyName("id")]
+            public int Id { get; set; }
         }
     }
 }
