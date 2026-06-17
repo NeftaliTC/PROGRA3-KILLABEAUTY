@@ -33,59 +33,21 @@
             <div class="admin-orders-filter-row">
                 <div class="admin-date-group">
                     <span>Fecha inicial</span>
-                    <div class="admin-date-selects">
-                        <select @bind="anioInicio">
-                            <option value="0">Ano</option>
-                            @foreach (var anio in anios)
-                            {
-                                <option value="@anio">@anio</option>
-                            }
-                        </select>
-
-                        <select @bind="mesInicio">
-                            <option value="0">Mes</option>
-                            @foreach (var mes in meses)
-                            {
-                                <option value="@mes.Valor">@mes.Texto</option>
-                            }
-                        </select>
-
-                        <select @bind="diaInicio">
-                            <option value="0">Dia</option>
-                            @foreach (var dia in dias)
-                            {
-                                <option value="@dia">@dia</option>
-                            }
-                        </select>
+                    <div class="admin-date-picker">
+                        <input type="date"
+                               class="form-control"
+                               max="@FechaInicioMaxima"
+                               @bind="fechaInicio" />
                     </div>
                 </div>
 
                 <div class="admin-date-group">
                     <span>Fecha final</span>
-                    <div class="admin-date-selects">
-                        <select @bind="anioFin">
-                            <option value="0">Ano</option>
-                            @foreach (var anio in anios)
-                            {
-                                <option value="@anio">@anio</option>
-                            }
-                        </select>
-
-                        <select @bind="mesFin">
-                            <option value="0">Mes</option>
-                            @foreach (var mes in meses)
-                            {
-                                <option value="@mes.Valor">@mes.Texto</option>
-                            }
-                        </select>
-
-                        <select @bind="diaFin">
-                            <option value="0">Dia</option>
-                            @foreach (var dia in dias)
-                            {
-                                <option value="@dia">@dia</option>
-                            }
-                        </select>
+                    <div class="admin-date-picker">
+                        <input type="date"
+                               class="form-control"
+                               min="@FechaFinMinima"
+                               @bind="fechaFin" />
                     </div>
                 </div>
 
@@ -121,7 +83,7 @@
                         <th>Fecha</th>
                         <th>Total</th>
                         <th>Estado de envio</th>
-                        <th>Detalle</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -152,11 +114,20 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="/admin/pedidos/detalle/@pedido.Id"
-                                       class="admin-detail-button">
-                                        <i class="bi bi-eye"></i>
-                                        Ver
-                                    </a>
+                                    <div class="admin-order-actions">
+                                        <a href="/admin/pedidos/detalle/@pedido.Id"
+                                           class="admin-detail-button">
+                                            <i class="bi bi-eye"></i>
+                                            Ver
+                                        </a>
+
+                                        <button type="button"
+                                                class="admin-cancel-order-button"
+                                                @onclick="() => AbrirModalCancelacion(pedido)">
+                                            <i class="bi bi-x-circle"></i>
+                                            Cancelar
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -199,39 +170,86 @@
     </section>
 </main>
 
+@if (mostrarModalCancelacion && pedidoCancelacion is not null)
+{
+    <div class="admin-order-warning-overlay" @onclick="CerrarModalCancelacion">
+        <section class="admin-order-warning-card" @onclick:stopPropagation="true">
+            <div class="admin-order-warning-icon">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+
+            @if (modoCancelacion == ModoCancelacion.Bloqueado)
+            {
+                <h2>No se puede cancelar el pedido</h2>
+                <p>
+                    El pedido <strong>@pedidoCancelacion.Id</strong> no se puede cancelar porque ya est&aacute;
+                    <strong>@pedidoCancelacion.EstadoEnvio.ToLowerInvariant()</strong>.
+                    @if (RequiereReembolso(pedidoCancelacion))
+                    {
+                        <span>Adem&aacute;s, har&aacute; falta gestionar el refund o reembolso del pago.</span>
+                    }
+                </p>
+
+                <div class="admin-order-warning-actions single">
+                    <button type="button" class="admin-order-warning-confirm" @onclick="CerrarModalCancelacion">
+                        Entendido
+                    </button>
+                </div>
+            }
+            else if (modoCancelacion == ModoCancelacion.YaCancelado)
+            {
+                <h2>Pedido ya cancelado</h2>
+                <p>
+                    El pedido <strong>@pedidoCancelacion.Id</strong> ya se encuentra marcado como cancelado.
+                </p>
+
+                <div class="admin-order-warning-actions single">
+                    <button type="button" class="admin-order-warning-confirm" @onclick="CerrarModalCancelacion">
+                        Entendido
+                    </button>
+                </div>
+            }
+            else
+            {
+                <h2>&iquest;Cancelar pedido?</h2>
+                <p>
+                    El pedido <strong>@pedidoCancelacion.Id</strong> cambiar&aacute; su estado a
+                    <strong>Cancelado</strong>. &iquest;Deseas continuar?
+                    @if (RequiereReembolso(pedidoCancelacion))
+                    {
+                        <span>Este pedido ya fue pagado, por lo que har&aacute; falta gestionar el refund o reembolso.</span>
+                    }
+                </p>
+
+                <div class="admin-order-warning-actions">
+                    <button type="button" class="admin-order-warning-cancel" @onclick="CerrarModalCancelacion">
+                        No
+                    </button>
+                    <button type="button" class="admin-order-warning-confirm" @onclick="ConfirmarCancelacionPedido">
+                        S&iacute;
+                    </button>
+                </div>
+            }
+        </section>
+    </div>
+}
+
 @code {
     private string busqueda = "";
     private string estadoSeleccionado = "Cualquier estado";
 
-    private int anioInicio;
-    private int mesInicio;
-    private int diaInicio;
-    private int anioFin;
-    private int mesFin;
-    private int diaFin;
+    private DateTime? fechaInicio;
+    private DateTime? fechaFin;
+
+    private PedidoAdmin? pedidoCancelacion;
+    private ModoCancelacion modoCancelacion = ModoCancelacion.Confirmar;
+    private bool mostrarModalCancelacion = false;
 
     private int paginaActual = 1;
     private const int PedidosPorPagina = 5;
 
-    private List<int> anios = new() { 2026, 2025, 2024 };
-
-    private List<MesFiltro> meses = new()
-    {
-        new MesFiltro(1, "Enero"),
-        new MesFiltro(2, "Febrero"),
-        new MesFiltro(3, "Marzo"),
-        new MesFiltro(4, "Abril"),
-        new MesFiltro(5, "Mayo"),
-        new MesFiltro(6, "Junio"),
-        new MesFiltro(7, "Julio"),
-        new MesFiltro(8, "Agosto"),
-        new MesFiltro(9, "Septiembre"),
-        new MesFiltro(10, "Octubre"),
-        new MesFiltro(11, "Noviembre"),
-        new MesFiltro(12, "Diciembre")
-    };
-
-    private List<int> dias = Enumerable.Range(1, 31).ToList();
+    private string? FechaInicioMaxima => fechaFin?.ToString("yyyy-MM-dd");
+    private string? FechaFinMinima => fechaInicio?.ToString("yyyy-MM-dd");
 
     private List<PedidoAdmin> pedidos = new()
     {
@@ -282,40 +300,20 @@
 
     private bool CoincideFechaInicio(PedidoAdmin pedido)
     {
-        var fechaInicio = CrearFecha(anioInicio, mesInicio, diaInicio);
-
         return fechaInicio is null || pedido.Fecha.Date >= fechaInicio.Value.Date;
     }
 
     private bool CoincideFechaFin(PedidoAdmin pedido)
     {
-        var fechaFin = CrearFecha(anioFin, mesFin, diaFin);
-
         return fechaFin is null || pedido.Fecha.Date <= fechaFin.Value.Date;
-    }
-
-    private static DateTime? CrearFecha(int anio, int mes, int dia)
-    {
-        if (anio == 0 || mes == 0 || dia == 0)
-        {
-            return null;
-        }
-
-        var ultimoDia = DateTime.DaysInMonth(anio, mes);
-
-        return new DateTime(anio, mes, Math.Min(dia, ultimoDia));
     }
 
     private void LimpiarFiltros()
     {
         busqueda = "";
         estadoSeleccionado = "Cualquier estado";
-        anioInicio = 0;
-        mesInicio = 0;
-        diaInicio = 0;
-        anioFin = 0;
-        mesFin = 0;
-        diaFin = 0;
+        fechaInicio = null;
+        fechaFin = null;
         paginaActual = 1;
     }
 
@@ -340,14 +338,74 @@
         }
     }
 
-    private record MesFiltro(int Valor, string Texto);
+    private void AbrirModalCancelacion(PedidoAdmin pedido)
+    {
+        pedidoCancelacion = pedido;
+        modoCancelacion = pedido.EstadoEnvio switch
+        {
+            "Enviado" or "Entregado" => ModoCancelacion.Bloqueado,
+            "Cancelado" => ModoCancelacion.YaCancelado,
+            _ => ModoCancelacion.Confirmar
+        };
+        mostrarModalCancelacion = true;
+    }
 
-    private record PedidoAdmin(
-        string Id,
-        string Cliente,
-        string Correo,
-        DateTime Fecha,
-        decimal Total,
-        string EstadoEnvio,
-        string ClaseEstado);
+    private void CerrarModalCancelacion()
+    {
+        mostrarModalCancelacion = false;
+        pedidoCancelacion = null;
+    }
+
+    private void ConfirmarCancelacionPedido()
+    {
+        if (pedidoCancelacion is null)
+        {
+            return;
+        }
+
+        pedidoCancelacion.EstadoEnvio = "Cancelado";
+        pedidoCancelacion.ClaseEstado = "danger";
+        CerrarModalCancelacion();
+    }
+
+    private static bool RequiereReembolso(PedidoAdmin pedido)
+    {
+        return pedido.EstadoEnvio is "Pagado" or "En preparaciÃ³n" or "Enviado" or "Entregado";
+    }
+
+    private enum ModoCancelacion
+    {
+        Confirmar,
+        Bloqueado,
+        YaCancelado
+    }
+
+    private class PedidoAdmin
+    {
+        public PedidoAdmin(
+            string id,
+            string cliente,
+            string correo,
+            DateTime fecha,
+            decimal total,
+            string estadoEnvio,
+            string claseEstado)
+        {
+            Id = id;
+            Cliente = cliente;
+            Correo = correo;
+            Fecha = fecha;
+            Total = total;
+            EstadoEnvio = estadoEnvio;
+            ClaseEstado = claseEstado;
+        }
+
+        public string Id { get; }
+        public string Cliente { get; }
+        public string Correo { get; }
+        public DateTime Fecha { get; }
+        public decimal Total { get; }
+        public string EstadoEnvio { get; set; }
+        public string ClaseEstado { get; set; }
+    }
 }
