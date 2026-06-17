@@ -234,6 +234,7 @@
             editingAddress.Departamento = "Lima";
             editingAddress.Provincia = "Lima";
             editingAddress.CodigoPostal = string.IsNullOrWhiteSpace(editingAddress.CodigoPostal) ? "15000" : editingAddress.CodigoPostal;
+            editingAddress.Usuario = new UsuarioDireccion { Id = UsuarioId };
 
             if (editingAddress.Id == 0)
             {

@@ -10,6 +10,7 @@ namespace BlazorAppKillaBeauty.Services
         private readonly JsonSerializerOptions jsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // Aquí está la magia
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
@@ -116,6 +117,7 @@ namespace BlazorAppKillaBeauty.Services
                     ? $"Error REST {(int)response.StatusCode} {response.ReasonPhrase}"
                     : body);
         }
+
     }
 
     public class Address
@@ -134,6 +136,7 @@ namespace BlazorAppKillaBeauty.Services
         [JsonPropertyName("esPredeterminada")]
         public bool IsDefault { get; set; }
 
+        [JsonPropertyName("usuario")]
         public UsuarioDireccion? Usuario { get; set; }
     }
 
