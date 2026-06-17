@@ -4,9 +4,12 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import pe.edu.pucp.killaBeauty.bl.Impl.Promocionales.CuponBLImpl;
+import pe.edu.pucp.killaBeauty.bl.Impl.ResenaBLImpl;
 import pe.edu.pucp.killaBeauty.bl.Impl.UsuarioBLImpl;
 import pe.edu.pucp.killaBeauty.bl.Promocionales.CuponBL;
+import pe.edu.pucp.killaBeauty.bl.ResenaBL;
 import pe.edu.pucp.killaBeauty.bl.UsuarioBL;
+import pe.edu.pucp.killaBeauty.killaModelo.Resena;
 import pe.edu.pucp.killaBeauty.killaModelo.Usuario;
 
 import java.util.List;
@@ -16,6 +19,7 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class UsuarioRS {
     private final UsuarioBL usuarioBL = new UsuarioBLImpl();
+    private final ResenaBL resenaBL = new ResenaBLImpl();
     @GET
     public Response listarPorTipoUsuario(@QueryParam("tipo") int idTipoUsuario) {
         try {
@@ -69,6 +73,17 @@ public class UsuarioRS {
             usuarioBL.remove(usuarioAEliminar);
             return Response.noContent().build();
         } catch (Exception e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+    // reseñas emitidas por el usuario, si se muestra en la pagina de inicio
+    @GET
+    @Path("{id}/resenas")
+    public Response buscarResenasPorUsuario(@PathParam("id")int idUsuario){
+        try{
+            List<Resena> resenas = resenaBL.listByUsuarioId(idUsuario);
+            return Response.ok(resenas).build();
+        }catch(Exception e){
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
