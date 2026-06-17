@@ -11,4 +11,6 @@ public interface ResenaBL {
     void remove(Resena r) throws BusinessLogicException;
     Resena load(Integer id) throws BusinessLogicException;
     List<Resena> listAll() throws BusinessLogicException;
+    List<Resena> listByProductoId(int idProducto) throws BusinessLogicException;
+    List<Resena> listByUsuarioId(int idUsuario) throws BusinessLogicException;
 }
