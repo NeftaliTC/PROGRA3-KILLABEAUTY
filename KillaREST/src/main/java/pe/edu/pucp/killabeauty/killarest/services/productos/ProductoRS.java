@@ -26,6 +26,11 @@ public class ProductoRS {
     private final ProductoBL productoBL = new ProductoBLImpl();
 
     @GET
+    @Path("/test")
+    public String test() {
+        return "FUNCIONA";
+    }
+    @GET
     public Response listar() {
         try {
             return Response.ok(productoBL.listAll()).build();
