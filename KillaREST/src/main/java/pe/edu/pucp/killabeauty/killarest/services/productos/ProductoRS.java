@@ -10,6 +10,9 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import pe.edu.pucp.killaBeauty.bl.Impl.ResenaBLImpl;
+import pe.edu.pucp.killaBeauty.bl.ResenaBL;
+import pe.edu.pucp.killaBeauty.killaModelo.Resena;
 import pe.edu.pucp.killabeauty.killarest.dto.ErrorDTO;
 import pe.edu.pucp.killabeauty.killarest.dto.ProductoCatalogoDTO;
 import pe.edu.pucp.killaBeauty.bl.Impl.ProductoBLImpl;
@@ -24,7 +27,7 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class ProductoRS {
     private final ProductoBL productoBL = new ProductoBLImpl();
-
+    private final ResenaBL resenaBL = new ResenaBLImpl();
     @GET
     @Path("/test")
     public String test() {
@@ -116,5 +119,34 @@ public class ProductoRS {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(new ErrorDTO(ex.getMessage()))
                 .build();
+    }
+
+
+    // RESEÑAS DEL PRODUCTO
+    @GET
+    @Path("{id}/resenas")
+    public Response listarResenasPorProducto(@PathParam("id") int idProducto) {
+        try {
+            List<Resena> resenas = resenaBL.listByProductoId(idProducto);
+            return Response.ok(resenas).build();
+        } catch (BusinessLogicException ex) {
+            return serverError(ex);
+        }
+    }
+
+    // agregar reseña en un producto especifico
+    @POST
+    @Path("{id}/resenas")
+    public Response agregarResena(@PathParam("id") int idProducto, Resena resena) {
+        try {
+            Producto productoAsociado = new Producto();
+            productoAsociado.setId(idProducto);
+
+            resena.setProducto(productoAsociado);
+            Resena resenaCreada = resenaBL.create(resena);
+            return Response.status(Response.Status.CREATED).entity(resenaCreada).build();
+        } catch (BusinessLogicException ex) {
+            return badRequest(ex);
+        }
     }
 }
