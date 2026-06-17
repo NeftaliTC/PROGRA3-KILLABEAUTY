@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-
+using BlazorAppKillaBeauty.ClienteREST.Models;
 namespace BlazorAppKillaBeauty.Services
 {
     public class Producto

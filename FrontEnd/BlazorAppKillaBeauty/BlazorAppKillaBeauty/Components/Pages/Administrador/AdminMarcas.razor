@@ -4,22 +4,21 @@
 @rendermode InteractiveServer
 
 @using BlazorAppKillaBeauty.Services
+@using BlazorAppKillaBeauty.ClienteREST.Models
 @inject MarcaService MarcaService
 @inject NavigationManager NavManager
 
 <PageTitle>Marcas Admin - Killa Beauty</PageTitle>
+
 <main class="admin-page">
     <AdminNavbar />
 
     <section class="admin-content admin-orders-content">
-
-
         <div class="admin-breadcrumb">
             <span>Administrador</span>
             <i class="bi bi-chevron-right"></i>
             <span>Marcas</span>
         </div>
-
 
         <header class="admin-header admin-orders-header d-flex justify-content-between align-items-center">
             <div>
@@ -31,9 +30,7 @@
             </button>
         </header>
 
-
         <section class="admin-orders-filters">
-
             <div class="admin-orders-search">
                 <i class="bi bi-search"></i>
                 <input type="text" placeholder="Buscar por descripcion..."
@@ -41,7 +38,6 @@
             </div>
 
             <div class="admin-orders-filter-row marcas-filter-grid">
-
                 <div class="admin-status-filter">
                     <span>Estado :</span>
                     <select @bind="filtroEstado" @bind:after="AplicarFiltros">
@@ -55,14 +51,13 @@
                     <span>País :</span>
                     <select @bind="filtroPais" @bind:after="AplicarFiltros">
                         <option value="Todos">Todos</option>
-                        @foreach (var pais in listaPaises)
+                        @foreach (var pais in Enum.GetValues(typeof(Pais)))
                         {
                             <option value="@pais">@pais</option>
                         }
                     </select>
                 </div>
 
-                <!-- Botones de Ordenar exclusivos de Marcas -->
                 <div class="marcas-sort-container">
                     <span class="sort-label">Ordenar por : <span class="badge-count">Cantidad productos</span></span>
                     <div class="marcas-sort-buttons">
@@ -74,7 +69,6 @@
                         </button>
                     </div>
                 </div>
-
             </div>
         </section>
 
@@ -108,7 +102,7 @@
                             <tr>
                                 <td style="color: #777;">@m.Id.ToString("D5")</td>
                                 <td style="font-weight: 800; color: #4f4148;">@m.Descripcion</td>
-                                <td>@m.PaisNombre</td>
+                                <td>@m.Pais</td>
                                 <td>
                                     <span class="admin-status @(m.Activo ? "success" : "danger")">
                                         @(m.Activo ? "Activo" : "Inactivo")
@@ -127,7 +121,6 @@
             </table>
         </section>
 
-       
         @if (totalPaginas > 1)
         {
             <footer class="admin-pagination">
@@ -143,27 +136,18 @@
                 </div>
             </footer>
         }
-
     </section>
 </main>
 
 
 @if (showModalForm)
 {
-@*     <div class="modal fade show d-block modal-overlay" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content modal-content-kb"> *@
-
-
-
-     <div class="admin-modal-overlay"> 
-        <div class="admin-modal-card"> <!-- Usamos tu clase probada -->
-            
+    <div class="admin-modal-overlay">
+        <div class="admin-modal-card">
             <div class="modal-content-kb">
-
                 <h3 class="modal-title-kb">@(EsEdicion ? "Editar Marca" : "Registrar Nueva Marca")</h3>
 
-                <EditForm Model="marcaActual" OnValidSubmit="GuardarCambios">
+                <EditForm Model="marcaActual" OnValidSubmit="GuardarCambiosAsync">
                     @if (EsEdicion)
                     {
                         <div class="mb-3">
@@ -179,9 +163,8 @@
 
                     <div class="mb-3">
                         <label class="form-label-kb">País de origen</label>
-                        <InputSelect @bind-Value="marcaActual.PaisNombre" class="form-control-pill">
-                            <option value="">Seleccione...</option>
-                            @foreach (var pais in listaPaises)
+                        <InputSelect @bind-Value="marcaActual.Pais" class="form-control-pill">
+                            @foreach (var pais in Enum.GetValues(typeof(Pais)))
                             {
                                 <option value="@pais">@pais</option>
                             }
@@ -212,7 +195,6 @@
     <div class="modal fade show d-block modal-overlay" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content modal-content-kb" style="padding: 2.5rem;">
-
                 <h3 class="modal-title-kb" style="margin-bottom: 1rem;">¿Eliminar Marca?</h3>
 
                 <div class="delete-modal-info">
@@ -227,7 +209,7 @@
 
                 <div class="modal-actions-kb" style="margin-top: 30px;">
                     <button type="button" class="btn-modal-cancel" @onclick='() => NavManager.NavigateTo("/admin/marcas")'>Cancelar</button>
-                    <button type="button" class="btn-modal-confirm" @onclick="ConfirmarEliminacion">Confirmar Eliminacion</button>
+                    <button type="button" class="btn-modal-confirm" @onclick="ConfirmarEliminacionAsync">Confirmar Eliminacion</button>
                 </div>
             </div>
         </div>
@@ -239,7 +221,6 @@
     [Parameter] public int? IdParam { get; set; }
 
     private IReadOnlyList<Marca> marcasBD = new List<Marca>();
-    private List<string> listaPaises = new() { "Estados Unidos", "Francia", "Corea del Sur", "Brasil", "Perú", "Japón" };
 
     private Marca marcaActual = new Marca();
     private Marca marcaAEliminar = null;
@@ -258,7 +239,7 @@
     private IEnumerable<Marca> marcasPaginadas => marcasFiltradas.Skip((paginaActual - 1) * itemsPorPagina).Take(itemsPorPagina);
     private int totalPaginas => (int)Math.Ceiling((double)marcasFiltradas.Count / itemsPorPagina);
 
-    protected override void OnInitialized() => RefrescarTabla();
+    protected override async Task OnInitializedAsync() => await RefrescarTablaAsync();
 
     protected override void OnParametersSet()
     {
@@ -266,33 +247,44 @@
 
         if (Accion == "nuevo")
         {
-            marcaActual = new Marca(); EsEdicion = false; showModalForm = true;
+            marcaActual = new Marca();
+            EsEdicion = false;
+            showModalForm = true;
         }
         else if (Accion == "editar" && IdParam.HasValue)
         {
-            var bd = MarcaService.ObtenerPorId(IdParam.Value);
-            marcaActual = new Marca { Id = bd.Id, Descripcion = bd.Descripcion, PaisId = bd.PaisId, PaisNombre = bd.PaisNombre, Activo = bd.Activo };
-            EsEdicion = true; showModalForm = true;
+            var bd = marcasBD.FirstOrDefault(m => m.Id == IdParam.Value);
+            if (bd != null)
+            {
+                marcaActual = new Marca { Id = bd.Id, Descripcion = bd.Descripcion, Pais = bd.Pais, Activo = bd.Activo };
+                EsEdicion = true;
+                showModalForm = true;
+            }
         }
         else if (Accion == "eliminar" && IdParam.HasValue)
         {
-            marcaAEliminar = MarcaService.ObtenerPorId(IdParam.Value);
-            showModalDelete = true;
+            marcaAEliminar = marcasBD.FirstOrDefault(m => m.Id == IdParam.Value);
+            if (marcaAEliminar != null) showModalDelete = true;
         }
     }
 
-    private void RefrescarTabla()
+    private async Task RefrescarTablaAsync()
     {
-        marcasBD = MarcaService.ObtenerTodas();
+        marcasBD = await MarcaService.ListarTodasAsync();
         AplicarFiltros();
     }
 
     private void AplicarFiltros()
     {
         var q = marcasBD.AsEnumerable();
-        if (!string.IsNullOrWhiteSpace(filtroNombre)) q = q.Where(m => m.Descripcion.Contains(filtroNombre.Trim(), StringComparison.OrdinalIgnoreCase));
-        if (filtroEstado != "Todos") q = q.Where(m => m.Activo == (filtroEstado == "Activo"));
-        if (filtroPais != "Todos") q = q.Where(m => m.PaisNombre == filtroPais);
+        if (!string.IsNullOrWhiteSpace(filtroNombre))
+            q = q.Where(m => m.Descripcion.Contains(filtroNombre.Trim(), StringComparison.OrdinalIgnoreCase));
+
+        if (filtroEstado != "Todos")
+            q = q.Where(m => m.Activo == (filtroEstado == "Activo"));
+
+        if (filtroPais != "Todos")
+            q = q.Where(m => m.Pais.ToString() == filtroPais);
 
         if (ordenAscendente) q = q.OrderBy(m => m.Descripcion);
         else q = q.OrderByDescending(m => m.Descripcion);
@@ -302,19 +294,28 @@
     }
 
     private void CambiarOrden(bool ascendente) { ordenAscendente = ascendente; AplicarFiltros(); }
+
     private void CambiarPagina(int pagina) { paginaActual = pagina; }
 
-    private void GuardarCambios()
+    private async Task GuardarCambiosAsync()
     {
-        if (!string.IsNullOrEmpty(marcaActual.PaisNombre))
-            marcaActual.PaisId = listaPaises.IndexOf(marcaActual.PaisNombre) + 1;
-        MarcaService.Guardar(marcaActual);
+        if (EsEdicion)
+        {
+            await MarcaService.ActualizarMarcaAsync(marcaActual);
+        }
+        else
+        {
+            await MarcaService.CrearAsync(marcaActual);
+        }
         NavManager.NavigateTo("/admin/marcas");
     }
 
-    private void ConfirmarEliminacion()
+    private async Task ConfirmarEliminacionAsync()
     {
-        if (marcaAEliminar != null) MarcaService.EliminarLogico(marcaAEliminar.Id);
+        if (marcaAEliminar != null)
+        {
+            // await MarcaService.EliminarMarcaAsync(marcaAEliminar.Id);
+        }
         NavManager.NavigateTo("/admin/marcas");
     }
 }

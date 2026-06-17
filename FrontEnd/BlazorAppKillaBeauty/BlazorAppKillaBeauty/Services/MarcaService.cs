@@ -1,4 +1,10 @@
-﻿namespace BlazorAppKillaBeauty.Services
+﻿using System;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using BlazorAppKillaBeauty.ClienteREST.Models;
+namespace BlazorAppKillaBeauty.Services
 {
     public class MarcaService
     {
@@ -74,16 +80,6 @@
             }
         }
     }
-    public class Marca
-    {
-        public int Id { get; set; }
-        public string Descripcion { get; set; } = "";
-
-      
-        public int? PaisId { get; set; }
-        public string PaisNombre { get; set; } = "";
-
-        public bool Activo { get; set; } = true;
-    }
+  
 }
 
