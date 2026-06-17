@@ -2,7 +2,17 @@
 
 html,
 body {
+    width: 100%;
+    max-width: 100%;
     overflow-x: hidden;
+}
+
+main,
+.admin-page {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: clip;
 }
 
 * {
@@ -60,13 +70,26 @@ table {
 .admin-content,
 .admin-table-card,
 .admin-orders-table-card,
+.admin-products-table-card,
+.admin-products-content,
+.admin-orders-content,
+.admin-employees-content,
+.admin-providers-content,
+.admin-reports-content,
+.admin-product-form-content,
+.admin-product-detail-content,
+.admin-order-detail-content,
+.admin-scales-content,
 .cupones-card,
 .marcas-main {
+    width: 100%;
+    max-width: 100%;
     min-width: 0;
 }
 
 .admin-table-card,
 .admin-orders-table-card,
+.admin-products-table-card,
 .cupones-card {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
@@ -133,9 +156,9 @@ table {
         justify-content: flex-end;
     }
 
-    .nav-links a {
-        font-size: 14px;
-    }
+        .nav-links a {
+            font-size: 14px;
+        }
 
     .btn-register {
         padding: 9px 15px;
@@ -147,9 +170,9 @@ table {
         height: 34px;
     }
 
-    .cart-navbar-btn i {
-        font-size: 25px;
-    }
+        .cart-navbar-btn i {
+            font-size: 25px;
+        }
 
     .account-layout-grid {
         flex-direction: column;
@@ -184,9 +207,9 @@ table {
         border-radius: 14px;
     }
 
-    .menu-link-item.logout-btn {
-        grid-column: 1 / -1;
-    }
+        .menu-link-item.logout-btn {
+            grid-column: 1 / -1;
+        }
 
     .admin-navbar {
         align-items: stretch;
@@ -236,13 +259,13 @@ table {
         gap: 14px;
     }
 
-    .admin-header > *,
-    .admin-header-flex > *,
-    .admin-orders-header > *,
-    .admin-cupones-header > *,
-    .admin-product-form-header > * {
-        width: 100%;
-    }
+        .admin-header > *,
+        .admin-header-flex > *,
+        .admin-orders-header > *,
+        .admin-cupones-header > *,
+        .admin-product-form-header > * {
+            width: 100%;
+        }
 
     .admin-primary-action,
     .btn-add-marca,
@@ -321,12 +344,18 @@ table {
     }
 
     .hero-buttons,
-    .benefits,
     .card-title-row,
     .coupon-row,
     .modal-actions {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .benefits {
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+        padding: 34px 20px;
     }
 
     .btn-primary,
@@ -492,10 +521,10 @@ table {
         width: 100%;
     }
 
-    .admin-sort-btn,
-    .marcas-sort-buttons button {
-        flex: 1;
-    }
+        .admin-sort-btn,
+        .marcas-sort-buttons button {
+            flex: 1;
+        }
 
     .admin-pagination,
     .paginacion-wrap {
@@ -714,15 +743,15 @@ table {
         min-width: 620px;
     }
 
-    .admin-table th,
-    .admin-table td,
-    .admin-orders-table th,
-    .admin-orders-table td,
-    .cupones-table th,
-    .cupones-table td {
-        padding: 12px;
-        font-size: 0.86rem;
-    }
+        .admin-table th,
+        .admin-table td,
+        .admin-orders-table th,
+        .admin-orders-table td,
+        .cupones-table th,
+        .cupones-table td {
+            padding: 12px;
+            font-size: 0.86rem;
+        }
 
     .cat-sub-panel {
         padding: 16px;

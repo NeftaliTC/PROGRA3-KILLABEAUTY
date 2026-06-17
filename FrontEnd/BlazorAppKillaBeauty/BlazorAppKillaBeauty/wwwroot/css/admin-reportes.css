@@ -266,6 +266,16 @@
     color: #a12828;
 }
 
+.kpi-review-button {
+    border: none;
+    cursor: pointer;
+}
+
+.kpi-review-button:hover {
+    filter: brightness(0.98);
+    transform: translateY(-1px);
+}
+
 /* Charts layout */
 .admin-reports-charts {
     display: grid;
@@ -381,6 +391,178 @@
     margin: 0 0;
 }
 
+/* Inventory stock modal */
+.inventory-stock-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(47, 37, 42, 0.48);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.inventory-stock-modal-card {
+    width: min(1080px, 94vw);
+    max-height: 88vh;
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 18px;
+    box-shadow: 0 22px 70px rgba(47, 37, 42, 0.24);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.inventory-stock-modal-title {
+    border-bottom: 1px solid #f0e7eb;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 22px 14px;
+}
+
+.inventory-stock-modal-title h2 {
+    color: #2f252a;
+    font-size: 1.32rem;
+    font-weight: 900;
+    margin: 0 0 5px;
+}
+
+.inventory-stock-modal-title p {
+    color: #7a6b72;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.inventory-stock-modal-title button {
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--gray-border);
+    border-radius: 11px;
+    background: var(--white);
+    color: #6b5b62;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.inventory-stock-modal-title button:hover {
+    background: var(--rose-pale);
+    color: var(--rose);
+}
+
+.inventory-stock-table-card {
+    background: var(--white);
+    border: none;
+    border-top: 1px solid var(--gray-border);
+    border-radius: 0;
+    box-shadow: none;
+    overflow-x: auto;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.inventory-stock-header {
+    background: #fff8fa;
+    border-bottom: 1px solid #f0e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+}
+
+.inventory-stock-header h2 {
+    color: #2f252a;
+    font-size: 1.08rem;
+    font-weight: 900;
+    margin: 0 0 4px;
+}
+
+.inventory-stock-header p {
+    color: #7a6b72;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.inventory-stock-header > span {
+    background: var(--white);
+    border: 1px solid var(--rose-light);
+    border-radius: 999px;
+    color: var(--rose);
+    font-size: 0.84rem;
+    font-weight: 900;
+    padding: 7px 12px;
+    white-space: nowrap;
+}
+
+.inventory-stock-table th,
+.inventory-stock-table td {
+    white-space: nowrap;
+}
+
+.inventory-product-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 280px;
+}
+
+.inventory-product-cell img {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #f0e7eb;
+    border-radius: 12px;
+    background: var(--white);
+    object-fit: cover;
+}
+
+.inventory-product-cell strong {
+    color: #2f252a;
+    display: block;
+    font-weight: 900;
+}
+
+.inventory-product-cell span {
+    color: #7a6b72;
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 800;
+    margin-top: 3px;
+}
+
+.inventory-stock-badge {
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 0.82rem;
+    font-weight: 900;
+    padding: 6px 12px;
+}
+
+.inventory-stock-badge.stock-warning {
+    background: #fff3cd;
+    border: 1px solid #f0dfab;
+    color: #856404;
+}
+
+.inventory-stock-badge.stock-danger {
+    background: #ffe0e0;
+    border: 1px solid #f3bcbc;
+    color: #a12828;
+}
+
+.inventory-stock-badge.stock-success {
+    background: #dff7e7;
+    border: 1px solid #bdeccc;
+    color: #1f7a3d;
+}
+
 @media (max-width: 1050px) {
     .admin-reports-kpis {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -412,6 +594,11 @@
 
     .admin-reports-kpis {
         grid-template-columns: 1fr;
+    }
+
+    .inventory-stock-header {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }
 

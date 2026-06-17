@@ -233,7 +233,11 @@
                     <div>
                         <span>Productos con stock crítico</span>
                         <strong>@inventarioKpis.StockCritico</strong>
-                        <small class="kpi-pill-warning">revisar</small>
+                        <button type="button"
+                                class="kpi-review-button kpi-pill-warning"
+                                @onclick="() => SeleccionarStockTab(StockTab.Critico)">
+                            revisar más
+                        </button>
                     </div>
                     <i class="bi bi-exclamation-triangle"></i>
                 </article>
@@ -242,7 +246,11 @@
                     <div>
                         <span>Productos agotados</span>
                         <strong>@inventarioKpis.Agotados</strong>
-                        <small class="kpi-pill-danger">revisar</small>
+                        <button type="button"
+                                class="kpi-review-button kpi-pill-danger"
+                                @onclick="() => SeleccionarStockTab(StockTab.Agotado)">
+                            revisar más
+                        </button>
                     </div>
                     <i class="bi bi-x-circle"></i>
                 </article>
@@ -251,7 +259,11 @@
                     <div>
                         <span>Productos con stock saludable</span>
                         <strong>@inventarioKpis.Saludable</strong>
-                        <small class="kpi-pill-success">revisar</small>
+                        <button type="button"
+                                class="kpi-review-button kpi-pill-success"
+                                @onclick="() => SeleccionarStockTab(StockTab.Saludable)">
+                            revisar más
+                        </button>
                     </div>
                     <i class="bi bi-check2-circle"></i>
                 </article>
@@ -277,15 +289,85 @@
                     </div>
                 </article>
             </section>
+
         }
 
     </section>
 </main>
 
+@if (mostrarModalInventario)
+{
+    <div class="inventory-stock-modal-overlay" @onclick="CerrarStockModal">
+        <section class="inventory-stock-modal-card" @onclick:stopPropagation="true">
+            <header class="inventory-stock-modal-title">
+                <div>
+                    <h2>Detalle de inventario</h2>
+                    <p>Revisa los productos según su estado de stock.</p>
+                </div>
+
+                <button type="button" @onclick="CerrarStockModal" aria-label="Cerrar">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </header>
+
+            <section class="inventory-stock-table-card">
+                <header class="inventory-stock-header">
+                    <div>
+                        <h2>@TituloStockTab</h2>
+                        <p>@DescripcionStockTab</p>
+                    </div>
+                    <span>@ProductosInventarioFiltrados.Count producto@(ProductosInventarioFiltrados.Count == 1 ? "" : "s")</span>
+                </header>
+
+                <table class="admin-table inventory-stock-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Marca</th>
+                            <th>Stock</th>
+                            <th>Precio unitario</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var producto in ProductosInventarioFiltrados)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="inventory-product-cell">
+                                        <img src="@producto.ImagenUrl" alt="@producto.Nombre" />
+                                        <div>
+                                            <strong>@producto.Nombre</strong>
+                                            <span>@producto.Sku</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@producto.Categoria</td>
+                                <td>@producto.Marca</td>
+                                <td>@producto.StockActual u.</td>
+                                <td>S/. @producto.PrecioUnitario.ToString("N2")</td>
+                                <td>
+                                    <span class="inventory-stock-badge @GetStockBadgeClass(producto.StockEstado)">
+                                        @GetStockEstadoTexto(producto.StockEstado)
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </section>
+        </section>
+    </div>
+}
+
 @code {
     private enum ReporteTipo { Ventas, Inventario }
+    private enum StockTab { Critico, Agotado, Saludable }
 
     private ReporteTipo reporteActual = ReporteTipo.Ventas;
+    private StockTab stockTabActual = StockTab.Critico;
+    private bool mostrarModalInventario = false;
     private bool mostrarMenuReportes = false;
 
     private int mesSeleccionado = 5;
@@ -310,7 +392,11 @@
 
     // mock data
     private VentasKpis ventasKpis = new(50560.00m, 1138, 122.50m, 5.4m, 5);
-    private InventarioKpis inventarioKpis = new(150560.00m, 8, 5, 118);
+    private InventarioKpis inventarioKpis => new(
+        productosInventario.Sum(p => p.StockActual * p.PrecioUnitario),
+        productosInventario.Count(p => p.StockEstado == StockTab.Critico),
+        productosInventario.Count(p => p.StockEstado == StockTab.Agotado),
+        productosInventario.Count(p => p.StockEstado == StockTab.Saludable));
 
     private List<TopProducto> productosMasVendidos = new()
     {
@@ -318,6 +404,8 @@
         new TopProducto("Máscara Essence Prince False Lash Effect", "Essence", "Maquillaje", 285, 52.90m, "/Images/placeholder-product.png"),
         new TopProducto("Protector Solar SPF50", "La Roche-Posay", "Skincare", 210, 79.00m, "/Images/placeholder-product.png"),
     };
+
+    private List<ProductoInventario> productosInventario = CrearProductosInventario();
 
     private string MesTexto => meses.First(m => m.Valor == mesSeleccionado).Texto;
 
@@ -339,6 +427,14 @@
         _ = InvokeAsync(RenderChartsAsync);
     }
 
+    private void SeleccionarStockTab(StockTab tab)
+    {
+        stockTabActual = tab;
+        mostrarModalInventario = true;
+    }
+
+    private void CerrarStockModal() => mostrarModalInventario = false;
+
     private void DescargarReporte()
     {
         // interacción mock
@@ -352,6 +448,93 @@
     private record InventarioKpis(decimal ValorTotal, int StockCritico, int Agotados, int Saludable);
 
     private record TopProducto(string Nombre, string Marca, string Categoria, int CantidadVendida, decimal PrecioUnitario, string ImagenUrl);
+
+    private record ProductoInventario(
+        string Sku,
+        string Nombre,
+        string Marca,
+        string Categoria,
+        int StockActual,
+        decimal PrecioUnitario,
+        StockTab StockEstado,
+        string ImagenUrl);
+
+    private List<ProductoInventario> ProductosInventarioFiltrados =>
+        productosInventario
+            .Where(p => p.StockEstado == stockTabActual)
+            .OrderBy(p => p.StockActual)
+            .ThenBy(p => p.Nombre)
+            .ToList();
+
+    private string TituloStockTab => stockTabActual switch
+    {
+        StockTab.Critico => "Productos con stock crítico",
+        StockTab.Agotado => "Productos agotados",
+        _ => "Productos con stock saludable"
+    };
+
+    private string DescripcionStockTab => stockTabActual switch
+    {
+        StockTab.Critico => "Productos que necesitan reposición pronto por estar debajo del umbral mínimo.",
+        StockTab.Agotado => "Productos sin unidades disponibles para venta.",
+        _ => "Productos con disponibilidad suficiente para atender pedidos."
+    };
+
+    private static string GetStockEstadoTexto(StockTab estado) => estado switch
+    {
+        StockTab.Critico => "Crítico",
+        StockTab.Agotado => "Agotado",
+        _ => "Saludable"
+    };
+
+    private static string GetStockBadgeClass(StockTab estado) => estado switch
+    {
+        StockTab.Critico => "stock-warning",
+        StockTab.Agotado => "stock-danger",
+        _ => "stock-success"
+    };
+
+    private static List<ProductoInventario> CrearProductosInventario()
+    {
+        var productos = new List<ProductoInventario>
+        {
+            new("KB-SK-001", "Sérum vitamina C 30ml", "The Ordinary", "Skincare", 4, 45.00m, StockTab.Critico, "/Images/Serum.jpg"),
+            new("KB-SK-002", "Crema hidratante CeraVe", "CeraVe", "Skincare", 7, 69.90m, StockTab.Critico, "/Images/Cerave.jpg"),
+            new("KB-MQ-003", "Máscara Essence Lash Effect", "Essence", "Maquillaje", 5, 52.90m, StockTab.Critico, "/Images/Mascara.jpg"),
+            new("KB-CB-004", "Tratamiento Lorinique cabello", "Lorinique", "Cabello", 3, 88.00m, StockTab.Critico, "/Images/LoriniqueCabello.jpg"),
+            new("KB-MQ-005", "Labial Peripera Ink", "Peripera", "Maquillaje", 6, 40.00m, StockTab.Critico, "/Images/LabialPeripera.jpg"),
+            new("KB-SK-006", "Agua micelar Garnier 100ml", "Garnier", "Skincare", 8, 19.50m, StockTab.Critico, "/Images/CuidadoPiel.png"),
+            new("KB-MQ-007", "Paleta básica de maquillaje", "Killa Beauty", "Maquillaje", 2, 79.90m, StockTab.Critico, "/Images/Maquillaje.png"),
+            new("KB-FR-008", "Fragancia floral compacta", "Killa Beauty", "Fragancias", 1, 59.00m, StockTab.Critico, "/Images/Fragancia.png"),
+
+            new("KB-SK-009", "Protector solar SPF50", "La Roche-Posay", "Skincare", 0, 79.00m, StockTab.Agotado, "/Images/CuidadoPiel.png"),
+            new("KB-CB-010", "Shampoo reparador premium", "Lorinique", "Cabello", 0, 36.90m, StockTab.Agotado, "/Images/CuidadoCabello.png"),
+            new("KB-MQ-011", "Delineador negro waterproof", "NYX", "Maquillaje", 0, 29.90m, StockTab.Agotado, "/Images/Maquillaje.png"),
+            new("KB-SK-012", "Tónico hidratante facial", "CeraVe", "Skincare", 0, 49.90m, StockTab.Agotado, "/Images/Cerave.jpg"),
+            new("KB-FR-013", "Body mist vainilla", "Killa Beauty", "Fragancias", 0, 34.90m, StockTab.Agotado, "/Images/Fragancia.png"),
+        };
+
+        productos.AddRange(Enumerable.Range(1, 118).Select(i =>
+        {
+            var categoria = i % 3 == 0 ? "Skincare" : i % 3 == 1 ? "Maquillaje" : "Cabello";
+            var marca = i % 4 == 0 ? "CeraVe" : i % 4 == 1 ? "Killa Beauty" : i % 4 == 2 ? "Essence" : "Lorinique";
+            var imagen = categoria == "Skincare" ? "/Images/CuidadoPiel.png" :
+                         categoria == "Maquillaje" ? "/Images/Maquillaje.png" :
+                         "/Images/CuidadoCabello.png";
+
+            return new ProductoInventario(
+                $"KB-ST-{i:000}",
+                $"Producto saludable {i:000}",
+                marca,
+                categoria,
+                20 + (i % 60),
+                24.90m + (i % 9) * 5,
+                StockTab.Saludable,
+                imagen);
+        }));
+
+        return productos;
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
