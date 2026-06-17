@@ -1,6 +1,8 @@
 @page "/admin/productos"
 @rendermode InteractiveServer
+@using BlazorAppKillaBeauty.Services
 @inject NavigationManager Navigation
+@inject ProductoService ProductoService
 
 <PageTitle>Productos Admin - Killa Beauty</PageTitle>
 
@@ -168,7 +170,7 @@
                                 </td>
                                 <td style="text-align:right;">
                                     <div class="admin-products-actions">
-                                        <button type="button" class="admin-products-btn" @onclick="() => IrADetalleProducto(p.Codigo)">
+                                        <button type="button" class="admin-products-btn" @onclick="() => IrADetalleProducto(p.Id)">
                                             <i class="bi bi-eye"></i> Ver
                                         </button>
 
@@ -361,6 +363,7 @@
     private ProductoAdmin? productoSeleccionado;
     private ProductoAdmin modeloFormulario = new();
     private ModoModal modoModal = ModoModal.Ver;
+    private bool cargandoProductos = true;
 
     private enum ModoModal { Ver, Crear, Editar, Reactivar }
 
@@ -378,14 +381,62 @@
 
     private class ProductoAdmin
     {
+        public int Id { get; set; }
         public string Codigo { get; set; } = "";
         public string Nombre { get; set; } = "";
         public string Categoria { get; set; } = "";
+        public string Subcategoria { get; set; } = "";
         public string Marca { get; set; } = "";
+        public int MarcaId { get; set; }
+        public int SubcategoriaId { get; set; }
         public decimal PrecioBase { get; set; }
         public int Stock { get; set; }
         public bool EnPromocion { get; set; }
         public bool Activo { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarProductosAsync();
+    }
+
+    private async Task CargarProductosAsync()
+    {
+        cargandoProductos = true;
+        mensajeError = null;
+
+        try
+        {
+            var productosApi = await ProductoService.ObtenerTodosApiAsync();
+            productos = productosApi.Select(MapearProductoAdmin).ToList();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"No se pudieron cargar los productos: {ex.Message}";
+        }
+        finally
+        {
+            cargandoProductos = false;
+        }
+    }
+
+    private static ProductoAdmin MapearProductoAdmin(ProductoApi producto)
+    {
+        return new ProductoAdmin
+        {
+            Id = producto.Id,
+            Codigo = $"KB-{producto.Id:000}",
+            Nombre = producto.Nombre,
+            Categoria = producto.Subcategoria?.Categoria?.Descripcion ?? "",
+            Subcategoria = producto.Subcategoria?.Descripcion ?? "",
+            Marca = producto.Marca?.Descripcion ?? "",
+            MarcaId = producto.Marca?.Id ?? 0,
+            SubcategoriaId = producto.Subcategoria?.Id ?? 0,
+            PrecioBase = producto.PrecioBase,
+            Stock = producto.Stock,
+            EnPromocion = producto.Promocion,
+            Activo = producto.Activo && producto.Disponible
+        };
     }
 
     // KPIs
@@ -488,9 +539,9 @@
         mostrarModal = true;
     }
 
-    private void IrADetalleProducto(string codigo)
+    private void IrADetalleProducto(int id)
     {
-        Navigation.NavigateTo($"/admin/productos/{codigo}");
+        Navigation.NavigateTo($"/admin/productos/{id}");
     }
 
     private void AbrirEditar(ProductoAdmin p)
@@ -500,10 +551,14 @@
         productoSeleccionado = p;
         modeloFormulario = new ProductoAdmin
         {
+            Id = p.Id,
             Codigo = p.Codigo,
             Nombre = p.Nombre,
             Categoria = p.Categoria,
+            Subcategoria = p.Subcategoria,
             Marca = p.Marca,
+            MarcaId = p.MarcaId,
+            SubcategoriaId = p.SubcategoriaId,
             PrecioBase = p.PrecioBase,
             Stock = p.Stock,
             EnPromocion = p.EnPromocion,
@@ -534,7 +589,7 @@
         productoSeleccionado = null;
     }
 
-    private void GuardarProducto()
+    private async Task GuardarProducto()
     {
         if (string.IsNullOrWhiteSpace(modeloFormulario.Codigo) ||
             string.IsNullOrWhiteSpace(modeloFormulario.Nombre) ||
@@ -586,14 +641,24 @@
                 return;
             }
 
-            productoSeleccionado.Codigo = modeloFormulario.Codigo.Trim();
-            productoSeleccionado.Nombre = modeloFormulario.Nombre.Trim();
-            productoSeleccionado.Categoria = modeloFormulario.Categoria.Trim();
-            productoSeleccionado.Marca = modeloFormulario.Marca.Trim();
-            productoSeleccionado.PrecioBase = modeloFormulario.PrecioBase;
-            productoSeleccionado.Stock = modeloFormulario.Stock;
-            productoSeleccionado.EnPromocion = modeloFormulario.EnPromocion;
-            productoSeleccionado.Activo = modeloFormulario.Activo;
+            var actualizado = await ProductoService.ActualizarAsync(new ProductoApi
+            {
+                Id = productoSeleccionado.Id,
+                Nombre = modeloFormulario.Nombre.Trim(),
+                PrecioBase = modeloFormulario.PrecioBase,
+                Stock = modeloFormulario.Stock,
+                Promocion = modeloFormulario.EnPromocion,
+                Disponible = modeloFormulario.Activo,
+                Activo = modeloFormulario.Activo,
+                Marca = new Marca { Id = modeloFormulario.MarcaId > 0 ? modeloFormulario.MarcaId : productoSeleccionado.MarcaId },
+                Subcategoria = new Subcategoria { Id = modeloFormulario.SubcategoriaId > 0 ? modeloFormulario.SubcategoriaId : productoSeleccionado.SubcategoriaId }
+            });
+
+            var index = productos.FindIndex(p => p.Id == productoSeleccionado.Id);
+            if (index >= 0)
+            {
+                productos[index] = MapearProductoAdmin(actualizado);
+            }
         }
 
         mensajeError = null;
@@ -601,9 +666,29 @@
         CerrarModal();
     }
 
-    private void ConfirmarReactivacion()
+    private async Task ConfirmarReactivacion()
     {
-        if (productoSeleccionado != null) productoSeleccionado.Activo = true;
+        if (productoSeleccionado != null)
+        {
+            var actualizado = await ProductoService.ActualizarAsync(new ProductoApi
+            {
+                Id = productoSeleccionado.Id,
+                Nombre = productoSeleccionado.Nombre,
+                PrecioBase = productoSeleccionado.PrecioBase,
+                Stock = productoSeleccionado.Stock,
+                Promocion = productoSeleccionado.EnPromocion,
+                Disponible = true,
+                Activo = true,
+                Marca = new Marca { Id = productoSeleccionado.MarcaId },
+                Subcategoria = new Subcategoria { Id = productoSeleccionado.SubcategoriaId }
+            });
+
+            var index = productos.FindIndex(p => p.Id == productoSeleccionado.Id);
+            if (index >= 0)
+            {
+                productos[index] = MapearProductoAdmin(actualizado);
+            }
+        }
         CerrarModal();
     }
 
