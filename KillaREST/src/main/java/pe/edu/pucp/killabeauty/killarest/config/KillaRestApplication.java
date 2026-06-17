@@ -5,6 +5,7 @@ import jakarta.ws.rs.core.Application;
 import pe.edu.pucp.killabeauty.killarest.services.logistica.CourierRS;
 import pe.edu.pucp.killabeauty.killarest.services.productos.CategoriaRS;
 import pe.edu.pucp.killabeauty.killarest.services.productos.MarcaRS;
+import pe.edu.pucp.killabeauty.killarest.services.productos.PaisRS;
 import pe.edu.pucp.killabeauty.killarest.services.productos.ProductoRS;
 import pe.edu.pucp.killabeauty.killarest.services.promocionales.CampanaRS;
 import pe.edu.pucp.killabeauty.killarest.services.promocionales.CuponRS;
@@ -23,6 +24,7 @@ public class KillaRestApplication extends Application {
         resources.add(ProductoRS.class);
         resources.add(CategoriaRS.class);
         resources.add(MarcaRS.class);
+        resources.add(PaisRS.class);
         resources.add(CourierRS.class);
         resources.add(CampanaRS.class);
         resources.add(CuponRS.class);
@@ -32,3 +34,4 @@ public class KillaRestApplication extends Application {
         return resources;
     }
 }
+

@@ -4,6 +4,7 @@
 @rendermode InteractiveServer
 
 @using BlazorAppKillaBeauty.Services
+@using BlazorAppKillaBeauty.ClienteREST.Models
 @using Microsoft.AspNetCore.Components
 
 @inject ProductoService ProductoService
@@ -64,156 +65,47 @@
                 Todas las categorías
             </button>
 
-            <button class="filter-option filter-category-row @(categoriaSeleccionada == "Skincare" ? "active-text" : "")"
-                    @onclick="ToggleSkincare">
-                <span>Skincare</span>
-
-                @if (mostrarSkincare)
-                {
-                    <i class="bi bi-chevron-up"></i>
-                }
-                else
-                {
-                    <i class="bi bi-chevron-down"></i>
-                }
-            </button>
-
-            @if (mostrarSkincare)
+            @foreach (var categoria in categoriasFiltro)
             {
-                <button class="filter-suboption @(subcategoriaSeleccionada == "Limpiadores faciales" ? "active-subcategory" : "")"
-                        @onclick='() => SeleccionarSubcategoria("Skincare", "Limpiadores faciales")'>
-                    Limpiadores faciales
+                var expandida = categoriasExpandidas.Contains(categoria.Descripcion);
+
+                <button class="filter-option filter-category-row @(categoriaSeleccionada == categoria.Descripcion ? "active-text" : "")"
+                        @onclick="() => ToggleCategoria(categoria.Descripcion)">
+                    <span>@categoria.Descripcion</span>
+
+                    @if (expandida)
+                    {
+                        <i class="bi bi-chevron-up"></i>
+                    }
+                    else
+                    {
+                        <i class="bi bi-chevron-down"></i>
+                    }
                 </button>
 
-                <button class="filter-suboption @(subcategoriaSeleccionada == "Serums" ? "active-subcategory" : "")"
-                        @onclick='() => SeleccionarSubcategoria("Skincare", "Serums")'>
-                    Serums
-                </button>
-
-                <button class="filter-suboption @(subcategoriaSeleccionada == "Crema Hidratante" ? "active-subcategory" : "")"
-                        @onclick='() => SeleccionarSubcategoria("Skincare", "Crema Hidratante")'>
-                    Crema Hidratante
-                </button>
-            }
-
-            <button class="filter-option filter-category-row @(categoriaSeleccionada == "Makeup" ? "active-text" : "")"
-                    @onclick="ToggleMakeup">
-                <span>Makeup</span>
-
-                @if (mostrarMakeup)
+                @if (expandida)
                 {
-                    <i class="bi bi-chevron-up"></i>
+                    @foreach (var subcategoria in SubcategoriasDeCategoria(categoria.Id))
+                    {
+                        <button class="filter-suboption @(subcategoriaSeleccionada == subcategoria.Descripcion ? "active-subcategory" : "")"
+                                @onclick="() => SeleccionarSubcategoria(categoria.Descripcion, subcategoria.Descripcion)">
+                            @subcategoria.Descripcion
+                        </button>
+                    }
                 }
-                else
-                {
-                    <i class="bi bi-chevron-down"></i>
-                }
-            </button>
-
-            @if (mostrarMakeup)
-            {
-                <button class="filter-suboption @(subcategoriaSeleccionada == "Bases" ? "active-subcategory" : "")"
-                        @onclick='() => SeleccionarSubcategoria("Makeup", "Bases")'>
-                    Bases
-                </button>
-
-                <button class="filter-suboption @(subcategoriaSeleccionada == "Labiales" ? "active-subcategory" : "")"
-                        @onclick='() => SeleccionarSubcategoria("Makeup", "Labiales")'>
-                    Labiales
-                </button>
-
-                <button class="filter-suboption @(subcategoriaSeleccionada == "Máscaras" ? "active-subcategory" : "")"
-                        @onclick='() => SeleccionarSubcategoria("Makeup", "Máscaras")'>
-                    Máscaras
-                </button>
-
-                <button class="filter-suboption @(subcategoriaSeleccionada == "Correctores" ? "active-subcategory" : "")"
-                        @onclick='() => SeleccionarSubcategoria("Makeup", "Correctores")'>
-                    Correctores
-                </button>
-            }
-
-            <button class="filter-option filter-category-row @(categoriaSeleccionada == "Cuidado del cabello" ? "active-text" : "")"
-                    @onclick="ToggleCabello">
-                <span>Cuidado del cabello</span>
-
-                @if (mostrarCabello)
-                {
-                    <i class="bi bi-chevron-up"></i>
-                }
-                else
-                {
-                    <i class="bi bi-chevron-down"></i>
-                }
-            </button>
-
-            @if (mostrarCabello)
-            {
-                <button class="filter-suboption @(subcategoriaSeleccionada == "Shampoo" ? "active-subcategory" : "")"
-                        @onclick='() => SeleccionarSubcategoria("Cuidado del cabello", "Shampoo")'>
-                    Shampoo
-                </button>
-
-                <button class="filter-suboption @(subcategoriaSeleccionada == "Acondicionador" ? "active-subcategory" : "")"
-                        @onclick='() => SeleccionarSubcategoria("Cuidado del cabello", "Acondicionador")'>
-                    Acondicionador
-                </button>
-
-                <button class="filter-suboption @(subcategoriaSeleccionada == "Tratamientos" ? "active-subcategory" : "")"
-                        @onclick='() => SeleccionarSubcategoria("Cuidado del cabello", "Tratamientos")'>
-                    Tratamientos
-                </button>
-
-                <button class="filter-suboption @(subcategoriaSeleccionada == "Cremas de peinar" ? "active-subcategory" : "")"
-                        @onclick='() => SeleccionarSubcategoria("Cuidado del cabello", "Cremas de peinar")'>
-                    Cremas de peinar
-                </button>
-            }
-
-            <button class="filter-option filter-category-row @(categoriaSeleccionada == "Fragancias" ? "active-text" : "")"
-                    @onclick="ToggleFragancias">
-                <span>Fragancias</span>
-
-                @if (mostrarFragancias)
-                {
-                    <i class="bi bi-chevron-up"></i>
-                }
-                else
-                {
-                    <i class="bi bi-chevron-down"></i>
-                }
-            </button>
-
-            @if (mostrarFragancias)
-            {
-                <button class="filter-suboption @(subcategoriaSeleccionada == "Perfumes" ? "active-subcategory" : "")"
-                        @onclick='() => SeleccionarSubcategoria("Fragancias", "Perfumes")'>
-                    Perfumes
-                </button>
             }
 
             <h4>TOP MARCAS</h4>
 
-            <label class="filter-row">
-                <input type="checkbox" @bind="soloCerave" @bind:after="ResetearPagina" />
-                CeraVe
-            </label>
-
-            <label class="filter-row">
-                <input type="checkbox" @bind="soloOrdinary" @bind:after="ResetearPagina" />
-                The Ordinary
-            </label>
-
-            <label class="filter-row">
-                <input type="checkbox" @bind="soloLaRoche" @bind:after="ResetearPagina" />
-                La Roche-Posay
-            </label>
-
-            <label class="filter-row">
-                <input type="checkbox" @bind="soloGarnier" @bind:after="ResetearPagina" />
-                Garnier
-            </label>
-
+            @foreach (var marca in marcasFiltro)
+            {
+                <label class="filter-row">
+                    <input type="checkbox"
+                           checked="@marcasSeleccionadas.Contains(marca.Descripcion)"
+                           @onchange="e => CambiarMarca(marca.Descripcion, e)" />
+                    @marca.Descripcion
+                </label>
+            }
             <h4>PRECIO</h4>
 
             <div class="single-price-range">
@@ -343,10 +235,6 @@
 
     private List<Producto> productos = new();
 
-    private bool mostrarSkincare = true;
-    private bool mostrarMakeup = false;
-    private bool mostrarCabello = false;
-    private bool mostrarFragancias = false;
 
     private string categoriaSeleccionada = "Todas";
     private string subcategoriaSeleccionada = "";
@@ -355,10 +243,11 @@
     private bool cargandoProductos = true;
     private string? errorProductos;
 
-    private bool soloCerave;
-    private bool soloOrdinary;
-    private bool soloLaRoche;
-    private bool soloGarnier;
+    private List<Categoria> categoriasFiltro = new();
+    private List<Subcategoria> subcategoriasFiltro = new();
+    private List<Marca> marcasFiltro = new();
+    private HashSet<string> marcasSeleccionadas = new(StringComparer.OrdinalIgnoreCase);
+    private HashSet<string> categoriasExpandidas = new(StringComparer.OrdinalIgnoreCase);
 
     protected override async Task OnParametersSetAsync()
     {
@@ -368,6 +257,18 @@
         try
         {
             productos = await ProductoService.ObtenerCatalogoAsync();
+            categoriasFiltro = (await ProductoService.ObtenerCategoriasAsync())
+                .Where(c => c.Activo)
+                .OrderBy(c => c.Descripcion)
+                .ToList();
+            subcategoriasFiltro = (await ProductoService.ObtenerSubcategoriasAsync())
+                .Where(s => s.Activo)
+                .OrderBy(s => s.Descripcion)
+                .ToList();
+            marcasFiltro = (await ProductoService.ObtenerMarcasAsync())
+                .Where(m => m.Activo)
+                .OrderBy(m => m.Descripcion)
+                .ToList();
         }
         catch (Exception ex)
         {
@@ -459,17 +360,8 @@
 
     private bool FiltroMarca(Producto producto)
     {
-        if (!soloCerave && !soloOrdinary && !soloLaRoche && !soloGarnier)
-        {
-            return true;
-        }
-
-        return (soloCerave && producto.Marca == "CeraVe")
-            || (soloOrdinary && producto.Marca == "The Ordinary")
-            || (soloLaRoche && producto.Marca == "La Roche-Posay")
-            || (soloGarnier && producto.Marca == "Garnier");
+        return marcasSeleccionadas.Count == 0 || marcasSeleccionadas.Contains(producto.Marca);
     }
-
     private void SeleccionarCategoria(string categoria)
     {
         if (categoria == "Todas")
@@ -486,38 +378,52 @@
         Navigation.NavigateTo($"/catalogo/{ConvertirParaUrl(categoria)}/{ConvertirParaUrl(subcategoria)}");
     }
 
-    private void ToggleSkincare()
+    private IEnumerable<Subcategoria> SubcategoriasDeCategoria(int categoriaId)
     {
-        mostrarSkincare = !mostrarSkincare;
-        SeleccionarCategoria("Skincare");
+        return subcategoriasFiltro.Where(s => s.Categoria?.Id == categoriaId);
     }
 
-    private void ToggleMakeup()
+    private void ToggleCategoria(string categoria)
     {
-        mostrarMakeup = !mostrarMakeup;
-        SeleccionarCategoria("Makeup");
+        if (categoriasExpandidas.Contains(categoria))
+        {
+            categoriasExpandidas.Remove(categoria);
+        }
+        else
+        {
+            categoriasExpandidas.Add(categoria);
+        }
+
+        SeleccionarCategoria(categoria);
     }
 
-    private void ToggleCabello()
+    private void CambiarMarca(string marca, ChangeEventArgs e)
     {
-        mostrarCabello = !mostrarCabello;
-        SeleccionarCategoria("Cuidado del cabello");
-    }
+        var seleccionado = e.Value is bool valor && valor;
 
-    private void ToggleFragancias()
-    {
-        mostrarFragancias = !mostrarFragancias;
-        SeleccionarCategoria("Fragancias");
+        if (seleccionado)
+        {
+            marcasSeleccionadas.Add(marca);
+        }
+        else
+        {
+            marcasSeleccionadas.Remove(marca);
+        }
+
+        ResetearPagina();
     }
 
     private void AbrirCategoriaActual()
     {
-        mostrarSkincare = categoriaSeleccionada == "Skincare" || categoriaSeleccionada == "Todas";
-        mostrarMakeup = categoriaSeleccionada == "Makeup";
-        mostrarCabello = categoriaSeleccionada == "Cuidado del cabello";
-        mostrarFragancias = categoriaSeleccionada == "Fragancias";
+        if (categoriaSeleccionada != "Todas")
+        {
+            categoriasExpandidas.Add(categoriaSeleccionada);
+        }
+        else if (categoriasFiltro.Any() && categoriasExpandidas.Count == 0)
+        {
+            categoriasExpandidas.Add(categoriasFiltro.First().Descripcion);
+        }
     }
-
     private string MostrarPrecio(Producto producto)
     {
         if (producto.PrecioMinimo == producto.PrecioMaximo)
@@ -578,3 +484,7 @@
         return texto.Replace("-", " ");
     }
 }
+
+
+
+

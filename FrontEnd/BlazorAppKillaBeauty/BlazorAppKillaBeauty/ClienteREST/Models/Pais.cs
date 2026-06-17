@@ -14,4 +14,18 @@ namespace BlazorAppKillaBeauty.ClienteREST.Models
         COLOMBIA = 7,
         CHINA = 8
     }
+
+    public class PaisOpcion
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("codigo")]
+        public string Codigo { get; set; } = "";
+
+        [JsonPropertyName("descripcion")]
+        public string Descripcion { get; set; } = "";
+
+        public Pais PaisEnum => Enum.TryParse<Pais>(Codigo, out var pais) ? pais : default;
+    }
 }

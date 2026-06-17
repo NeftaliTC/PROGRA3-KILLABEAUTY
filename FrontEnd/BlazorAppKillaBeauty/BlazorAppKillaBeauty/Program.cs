@@ -1,4 +1,4 @@
-using BlazorAppKillaBeauty.Components;
+﻿using BlazorAppKillaBeauty.Components;
 using BlazorAppKillaBeauty.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +22,8 @@ builder.Services.AddSingleton<CartService>();
 builder.Services.AddScoped<CuponService>();
 builder.Services.AddScoped<CampanaService>();
 builder.Services.AddScoped<MarcaService>();
+builder.Services.AddScoped<CategoriaService>();
+builder.Services.AddScoped<PaisService>();
 builder.Services.AddHttpClient("KillaApi", client =>
 {
     var baseUrl = builder.Configuration["KillaApi:BaseUrl"]
@@ -55,3 +57,4 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
+

@@ -1,85 +1,77 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+﻿using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using BlazorAppKillaBeauty.ClienteREST.Models;
+
 namespace BlazorAppKillaBeauty.Services
 {
     public class MarcaService
     {
-        private readonly HttpClient _httpClient;
-
-        
-        public MarcaService(HttpClient httpClient)
+        private readonly HttpClient http;
+        private readonly JsonSerializerOptions jsonOptions = new()
         {
-            _httpClient = httpClient;
+            PropertyNameCaseInsensitive = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+
+        public MarcaService(IHttpClientFactory httpClientFactory)
+        {
+            http = httpClientFactory.CreateClient("KillaApi");
         }
-
-
-        // GET: Listar todas las marcas de Java
-        // URL: http://localhost:8080/KillaREST-1.0-SNAPSHOT/services/marcas
 
         public async Task<List<Marca>> ListarTodasAsync()
         {
-            try
-            {
-                // Convierte automáticamente el JSON que manda tu Java en una Lista de C#
-                var marcas = await _httpClient.GetFromJsonAsync<List<Marca>>("marcas");
-                return marcas ?? new List<Marca>();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error al listar marcas: {ex.Message}");
-                return new List<Marca>(); // Retorna lista vacía para que la interfaz no colapse
-            }
+            return await GetAsync<List<Marca>>("marcas") ?? new List<Marca>();
         }
 
-
-        // POST: Registrar una nueva marca en Java
-        // URL: http://localhost:8080/KillaREST-1.0-SNAPSHOT/services/marcas
-
-        public async Task<Marca?> CrearAsync(Marca nuevaMarca)
+        public async Task<Marca?> ObtenerPorIdAsync(int id)
         {
-            try
-            {
-                // Envía el objeto C# serializado en JSON hacia el @POST 
-                var response = await _httpClient.PostAsJsonAsync("marcas", nuevaMarca);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    // Retorna la marca con el id generado por la bd 
-                    return await response.Content.ReadFromJsonAsync<Marca>();
-                }
-                return null;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error al crear marca: {ex.Message}");
-                return null;
-            }
+            return await GetAsync<Marca>($"marcas/{id}");
         }
 
-        // POST: Registrar una nueva marca en Java
-        // URL: http://localhost:8080/KillaREST-1.0-SNAPSHOT/services/marcas
-
-        public async Task<bool> ActualizarMarcaAsync(Marca marca)
+        public async Task<Marca> CrearAsync(Marca nuevaMarca)
         {
-            try
-            {
-                // Concatenamos el ID en la URL para que coincida con tu @Path("{id}") en Java
-                var response = await _httpClient.PutAsJsonAsync($"marcas/{marca.Id}", marca);
+            using var response = await http.PostAsJsonAsync("marcas", nuevaMarca, jsonOptions);
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<Marca>(jsonOptions) ?? nuevaMarca;
+        }
 
-                // Devuelve true si se actualizó correctamente (código 200 OK)
-                return response.IsSuccessStatusCode;
-            }
-            catch (Exception ex)
+        public async Task<Marca> ActualizarMarcaAsync(Marca marca)
+        {
+            using var response = await http.PutAsJsonAsync($"marcas/{marca.Id}", marca, jsonOptions);
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<Marca>(jsonOptions) ?? marca;
+        }
+
+        public async Task EliminarMarcaAsync(int id)
+        {
+            using var response = await http.DeleteAsync($"marcas/{id}");
+            await EnsureSuccessAsync(response);
+        }
+
+        private async Task<T?> GetAsync<T>(string url)
+        {
+            using var response = await http.GetAsync(url);
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                Console.WriteLine($"Error al actualizar marca: {ex.Message}");
-                return false;
+                return default;
             }
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<T>(jsonOptions);
+        }
+
+        private static async Task EnsureSuccessAsync(HttpResponseMessage response)
+        {
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException(
+                string.IsNullOrWhiteSpace(body)
+                    ? $"Error REST {(int)response.StatusCode} {response.ReasonPhrase}"
+                    : body);
         }
     }
-  
 }
-
