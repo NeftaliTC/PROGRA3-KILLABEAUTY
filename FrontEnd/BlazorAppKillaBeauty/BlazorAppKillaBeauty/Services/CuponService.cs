@@ -67,9 +67,10 @@ namespace BlazorAppKillaBeauty.Services
 
         public async Task<Cupon> GuardarAsync(Cupon cupon)
         {
+            var request = CuponRequest.From(cupon);
             using var response = cupon.Id == 0
-                ? await http.PostAsJsonAsync("cupones", cupon, jsonOptions)
-                : await http.PutAsJsonAsync($"cupones/{cupon.Id}", cupon, jsonOptions);
+                ? await http.PostAsJsonAsync("cupones", request, jsonOptions)
+                : await http.PutAsJsonAsync($"cupones/{cupon.Id}", request, jsonOptions);
 
             await EnsureSuccessAsync(response);
             return await response.Content.ReadFromJsonAsync<Cupon>(jsonOptions) ?? cupon;
@@ -105,6 +106,72 @@ namespace BlazorAppKillaBeauty.Services
                 string.IsNullOrWhiteSpace(body)
                     ? $"Error REST {(int)response.StatusCode} {response.ReasonPhrase}"
                     : body);
+        }
+
+        private class CuponRequest
+        {
+            [JsonPropertyName("id")]
+            public int Id { get; set; }
+
+            [JsonPropertyName("codigo")]
+            public string Codigo { get; set; } = "";
+
+            [JsonPropertyName("descripcion")]
+            public string Descripcion { get; set; } = "";
+
+            [JsonPropertyName("valorDescuento")]
+            public decimal ValorDescuento { get; set; }
+
+            [JsonPropertyName("tipoDescuento")]
+            public string TipoDescuento { get; set; } = "PORCENTAJE";
+
+            [JsonPropertyName("fechaInicio")]
+            public string? FechaInicio { get; set; }
+
+            [JsonPropertyName("fechaFin")]
+            public string? FechaFin { get; set; }
+
+            [JsonPropertyName("activo")]
+            public bool Activo { get; set; }
+
+            [JsonPropertyName("montoMaximoDescuento")]
+            public decimal? MontoMaximoDescuento { get; set; }
+
+            [JsonPropertyName("montoMinimoCompra")]
+            public decimal? MontoMinimoCompra { get; set; }
+
+            [JsonPropertyName("maxUsosGenerales")]
+            public int? MaxUsosGenerales { get; set; }
+
+            [JsonPropertyName("campana")]
+            public CampanaRequest? Campana { get; set; }
+
+            public static CuponRequest From(Cupon cupon)
+            {
+                return new CuponRequest
+                {
+                    Id = cupon.Id,
+                    Codigo = cupon.Codigo?.Trim() ?? "",
+                    Descripcion = cupon.Descripcion ?? "",
+                    ValorDescuento = cupon.ValorDescuento,
+                    TipoDescuento = cupon.TipoDescuento,
+                    FechaInicio = cupon.FechaInicio?.ToString("yyyy-MM-dd"),
+                    FechaFin = cupon.FechaFin?.ToString("yyyy-MM-dd"),
+                    Activo = cupon.Activo,
+                    MontoMaximoDescuento = cupon.MontoMaximoDescuento,
+                    MontoMinimoCompra = cupon.MontoMinimoCompra,
+                    MaxUsosGenerales = cupon.MaxUsosGenerales,
+                    Campana = cupon.CampanaId.HasValue
+                        ? new CampanaRequest { IdCampana = cupon.CampanaId.Value }
+                        : null
+                };
+            }
+        }
+
+        private class CampanaRequest
+        {
+            [JsonPropertyName("idCampana")]
+            public int IdCampana { get; set; }
         }
     }
 
@@ -187,7 +254,7 @@ namespace BlazorAppKillaBeauty.Services
                 var partes = new List<string>();
                 if (MontoMinimoCompra.HasValue && MontoMinimoCompra.Value > 0)
                 {
-                    partes.Add($"Compra mínima S/ {MontoMinimoCompra.Value:0.##}");
+                    partes.Add($"Compra minima S/ {MontoMinimoCompra.Value:0.##}");
                 }
                 if (MontoMaximoDescuento.HasValue && MontoMaximoDescuento.Value > 0)
                 {
@@ -199,7 +266,7 @@ namespace BlazorAppKillaBeauty.Services
 
         [JsonIgnore]
         public string DescripcionLegal => string.IsNullOrWhiteSpace(Descripcion)
-            ? "Cupón sujeto a términos y condiciones de Killa Beauty."
+            ? "Cupon sujeto a terminos y condiciones de Killa Beauty."
             : Descripcion;
     }
 }

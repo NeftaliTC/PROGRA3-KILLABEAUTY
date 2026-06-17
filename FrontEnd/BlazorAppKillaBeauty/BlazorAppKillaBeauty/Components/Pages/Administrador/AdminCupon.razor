@@ -25,7 +25,7 @@
         <header class="admin-header admin-orders-header d-flex justify-content-between align-items-center">
             <div>
                 <h1>Gestion de Cupones</h1>
-                <p>Consulta y filtra las compras registradas en la tienda.</p>
+                <p>Consulta y administra los cupones registrados en la tienda.</p>
             </div>
             <button class="btn-add-marca" @onclick="AbrirModalNuevo">
                 + Nuevo Cupon
@@ -157,6 +157,10 @@
 
                 <div class="modal-body p-4">
                     <EditForm Model="cuponActual" OnValidSubmit="GuardarCambios">
+                        @if (!string.IsNullOrWhiteSpace(mensajeError))
+                        {
+                            <div class="alert alert-danger py-2 mb-3">@mensajeError</div>
+                        }
 
                         <div class="row mb-3">
                             <div class="col-md-5">
@@ -314,7 +318,7 @@
                 </div>
                 <div class="col-6">
                     <div class="detalle-data-card" style="background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
-                        <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Monto mi­nimo</div>
+                        <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Monto minimo</div>
                         <div class="detalle-data-value" style="font-weight: bold; font-size: 1.1rem; margin-top: 4px;">
                             @(cuponDetalle?.MontoMinimoCompra.HasValue == true ? $"S/ {cuponDetalle?.MontoMinimoCompra}" : "Sin minimo")
                         </div>
@@ -324,7 +328,7 @@
                     <div class="detalle-data-card" style="background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
                         <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Max. descuento</div>
                         <div class="detalle-data-value" style="font-weight: bold; font-size: 1.1rem; margin-top: 4px;">
-                            @(cuponDetalle?.MontoMaximoDescuento.HasValue == true ? $"S/ {cuponDetalle?.MontoMaximoDescuento}" : "Sin li­mite")
+                            @(cuponDetalle?.MontoMaximoDescuento.HasValue == true ? $"S/ {cuponDetalle?.MontoMaximoDescuento}" : "Sin limite")
                         </div>
                     </div>
                 </div>
@@ -457,7 +461,7 @@
     {
         if (Accion == "nuevo")
         {
-            cuponActual = new Cupon { TipoDescuento = "PORCENTAJE", Activo = true };
+            cuponActual = new Cupon { TipoDescuento = "PORCENTAJE", Activo = true, FechaInicio = DateTime.Today, FechaFin = DateTime.Today.AddDays(7) };
             idCampanaSeleccionada = 0;
             opcionUsos = "Mantener";
             EsEdicion = false;
@@ -506,7 +510,7 @@
 
     private void AbrirModalNuevo()
     {
-        cuponActual = new Cupon { TipoDescuento = "PORCENTAJE", Activo = true };
+        cuponActual = new Cupon { TipoDescuento = "PORCENTAJE", Activo = true, FechaInicio = DateTime.Today, FechaFin = DateTime.Today.AddDays(7) };
         idCampanaSeleccionada = 0;
         opcionUsos = "Mantener";
         EsEdicion = false;
@@ -585,9 +589,18 @@
 
     private async Task GuardarCambios()
     {
+        mensajeError = null;
+
+        if (!ValidarCuponFormulario())
+        {
+            return;
+        }
+
         try
         {
             cuponActual.CampanaId = idCampanaSeleccionada == 0 ? null : idCampanaSeleccionada;
+            cuponActual.Codigo = cuponActual.Codigo.Trim().ToUpperInvariant();
+            cuponActual.Descripcion ??= "";
 
             if (EsEdicion && opcionUsos == "Reiniciar")
                 cuponActual.UsosActuales = 0;
@@ -599,8 +612,65 @@
         }
         catch (Exception ex)
         {
-            mensajeError = $"No se pudo guardar el cupon: {ex.Message}";
+            mensajeError = $"No se pudo guardar el cupon: {LimpiarMensajeError(ex.Message)}";
         }
+    }
+
+    private bool ValidarCuponFormulario()
+    {
+        if (string.IsNullOrWhiteSpace(cuponActual.Codigo))
+        {
+            mensajeError = "El codigo del cupon es obligatorio.";
+            return false;
+        }
+
+        if (cuponActual.TipoDescuento != "PORCENTAJE" && cuponActual.TipoDescuento != "MONTO_FIJO")
+        {
+            mensajeError = "Debe seleccionar un tipo de descuento valido.";
+            return false;
+        }
+
+        if (cuponActual.ValorDescuento <= 0)
+        {
+            mensajeError = "El valor de descuento debe ser mayor a cero.";
+            return false;
+        }
+
+        if (cuponActual.TipoDescuento == "PORCENTAJE" && cuponActual.ValorDescuento > 100)
+        {
+            mensajeError = "El porcentaje de descuento no puede ser mayor a 100.";
+            return false;
+        }
+
+        if (!cuponActual.FechaInicio.HasValue || !cuponActual.FechaFin.HasValue)
+        {
+            mensajeError = "Debe ingresar fecha de inicio y fecha de expiracion.";
+            return false;
+        }
+
+        if (cuponActual.FechaInicio.Value.Date > cuponActual.FechaFin.Value.Date)
+        {
+            mensajeError = "La fecha de inicio no puede ser posterior a la fecha de expiracion.";
+            return false;
+        }
+
+        return true;
+    }
+
+    private static string LimpiarMensajeError(string mensaje)
+    {
+        if (string.IsNullOrWhiteSpace(mensaje))
+        {
+            return "Error desconocido.";
+        }
+
+        var inicioHtml = mensaje.IndexOf("<html", StringComparison.OrdinalIgnoreCase);
+        if (inicioHtml >= 0)
+        {
+            return "El servidor rechazo la solicitud. Revise los datos ingresados.";
+        }
+
+        return mensaje;
     }
 
     private async Task EliminarCupon(int id)
