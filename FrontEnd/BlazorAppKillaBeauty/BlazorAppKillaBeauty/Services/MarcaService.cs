@@ -1,4 +1,6 @@
-﻿namespace BlazorAppKillaBeauty.Services
+﻿using System.Text.Json.Serialization;
+
+namespace BlazorAppKillaBeauty.Services
 {
     public class MarcaService
     {
@@ -69,13 +71,19 @@
     }
     public class Marca
     {
+        [JsonPropertyName("id")]
         public int Id { get; set; }
+        [JsonPropertyName("descripcion")]
         public string Descripcion { get; set; } = "";
 
       
+        [JsonIgnore]
         public int? PaisId { get; set; }
+        [JsonIgnore]
         public string PaisNombre { get; set; } = "";
 
+        [JsonPropertyName("activo")]
         public bool Activo { get; set; } = true;
     }
 }
+

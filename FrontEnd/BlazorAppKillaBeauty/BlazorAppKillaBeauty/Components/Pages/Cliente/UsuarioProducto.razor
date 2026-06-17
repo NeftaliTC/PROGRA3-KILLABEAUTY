@@ -1,5 +1,5 @@
 ﻿@page "/usuario-producto"
-@page "/usuario-producto/{NombreProducto}"
+@page "/usuario-producto/{Id:int}"
 @rendermode InteractiveServer
 
 @using BlazorAppKillaBeauty.Services
@@ -9,7 +9,27 @@
 
 <Navbar CantidadCarrito="@CartService.CantidadTotal" />
 
-@if (producto == null)
+@if (cargandoProducto)
+{
+    <section class="usuario-producto-page">
+        <div class="producto-no-encontrado">
+            <h2>Cargando producto...</h2>
+        </div>
+    </section>
+}
+else if (!string.IsNullOrWhiteSpace(errorProducto))
+{
+    <section class="usuario-producto-page">
+        <div class="producto-no-encontrado">
+            <h2>No se pudo cargar el producto</h2>
+            <p>@errorProducto</p>
+            <button @onclick="@(() => Navigation.NavigateTo("/catalogo"))">
+                Volver al catálogo
+            </button>
+        </div>
+    </section>
+}
+else if (producto == null)
 {
     <section class="usuario-producto-page">
         <div class="producto-no-encontrado">
@@ -105,21 +125,21 @@ else
                     <button class="producto-escala @(cantidad >= 1 && cantidad <= 5 ? "activa" : "")"
                             @onclick="@(() => cantidad = 1)">
                         <span>1 - 5 Unidades</span>
-                        <strong>S/ 80.00</strong>
+                        <strong>S/ @PrecioBase.ToString("0.00")</strong>
                         <small>por unidad</small>
                     </button>
 
                     <button class="producto-escala @(cantidad >= 6 && cantidad <= 23 ? "activa" : "")"
                             @onclick="@(() => cantidad = 6)">
                         <span>6 - 23 Unidades</span>
-                        <strong>S/ 70.00</strong>
+                        <strong>S/ @PrecioMediaDocena.ToString("0.00")</strong>
                         <small>por unidad</small>
                     </button>
 
                     <button class="producto-escala @(cantidad >= 24 ? "activa" : "")"
                             @onclick="@(() => cantidad = 24)">
                         <span>24+ Unidades</span>
-                        <strong>S/ 65.00</strong>
+                        <strong>S/ @PrecioCajon.ToString("0.00")</strong>
                         <small>por unidad</small>
                     </button>
                 </div>
@@ -263,35 +283,57 @@ else
 
 @code {
     [Parameter]
-    public string? NombreProducto { get; set; }
+    public int? Id { get; set; }
 
     private Producto? producto;
+    private ProductoApi? productoApi;
     private string imagenSeleccionada = "";
     private int cantidad = 1;
+    private bool cargandoProducto = true;
+    private string? errorProducto;
+    private List<ResenaVista> resenas = new();
 
     private int filtroCalificacion = 0;
     private string ordenResena = "recientes";
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        var productos = ProductoService.ObtenerTodos();
-
-        if (string.IsNullOrWhiteSpace(NombreProducto))
+        try
         {
-            producto = productos.FirstOrDefault();
-        }
-        else
-        {
-            producto = productos.FirstOrDefault(p =>
-                ConvertirParaUrl(p.Nombre).Equals(NombreProducto, StringComparison.OrdinalIgnoreCase));
-        }
+            var productos = await ProductoService.ObtenerCatalogoAsync();
+            producto = Id.HasValue
+                ? productos.FirstOrDefault(p => p.Id == Id.Value)
+                : productos.FirstOrDefault();
 
-        if (producto == null)
-        {
-            return;
-        }
+            if (producto == null)
+            {
+                return;
+            }
 
-        imagenSeleccionada = ImagenesProducto.FirstOrDefault() ?? producto.Imagen;
+            productoApi = await ProductoService.ObtenerPorIdAsync(producto.Id);
+            resenas = (await ProductoService.ObtenerResenasAsync(producto.Id))
+                .Select((r, index) => new ResenaVista
+                {
+                    Cliente = "Cliente Killa",
+                    Iniciales = "CK",
+                    Calificacion = r.Calificacion,
+                    Fecha = r.Fecha?.ToString("dd MMM yyyy") ?? "",
+                    Pedido = $"REST-{index + 1}",
+                    Titulo = string.IsNullOrWhiteSpace(r.Titulo) ? "Reseña del producto" : r.Titulo,
+                    Comentario = r.Comentario
+                })
+                .ToList();
+
+            imagenSeleccionada = ImagenesProducto.FirstOrDefault() ?? producto.Imagen;
+        }
+        catch (Exception ex)
+        {
+            errorProducto = ex.Message;
+        }
+        finally
+        {
+            cargandoProducto = false;
+        }
     }
 
     private bool EsProductoConDetalleHardcodeado =>
@@ -330,21 +372,28 @@ else
     {
         get
         {
+            var precioMaximo = producto?.PrecioMaximo > 0 ? producto.PrecioMaximo : producto?.PrecioMinimo ?? 0;
+            var precioMinimo = producto?.PrecioMinimo > 0 ? producto.PrecioMinimo : precioMaximo;
+
             if (cantidad >= 24)
             {
-                return 65.00m;
+                return precioMinimo;
             }
 
             if (cantidad >= 6)
             {
-                return 70.00m;
+                return decimal.Round((precioMaximo + precioMinimo) / 2, 2);
             }
 
-            return 80.00m;
+            return precioMaximo;
         }
     }
 
-    private decimal PrecioBase => 80.00m;
+    private decimal PrecioBase => producto?.PrecioMaximo > 0 ? producto.PrecioMaximo : producto?.PrecioMinimo ?? 0;
+
+    private decimal PrecioCajon => producto?.PrecioMinimo > 0 ? producto.PrecioMinimo : PrecioBase;
+
+    private decimal PrecioMediaDocena => decimal.Round((PrecioBase + PrecioCajon) / 2, 2);
 
     private decimal PrecioTotal => PrecioUnitarioActual * cantidad;
 
@@ -364,70 +413,7 @@ else
             ? Resenas.Average(r => r.Calificacion)
             : 0;
 
-    private List<ResenaVista> Resenas
-    {
-        get
-        {
-            if (!EsProductoConDetalleHardcodeado)
-            {
-                return new List<ResenaVista>();
-            }
-
-            return new List<ResenaVista>
-            {
-                new ResenaVista
-                {
-                    Cliente = "Maria Lopez",
-                    Iniciales = "ML",
-                    Calificacion = 5,
-                    Fecha = "10 mayo 2026",
-                    Pedido = "PED-2241",
-                    Titulo = "Excelente producto, lo recomiendo",
-                    Comentario = "Me encantó el sérum. Lo uso desde hace 3 semanas y ya noto diferencia en el tono de mi piel. Llegó bien empacado y rápido."
-                },
-                new ResenaVista
-                {
-                    Cliente = "Carla Gutierrez",
-                    Iniciales = "CG",
-                    Calificacion = 4,
-                    Fecha = "08 mayo 2026",
-                    Pedido = "PED-2198",
-                    Titulo = "Bueno pero tarda en hacer efecto",
-                    Comentario = "El producto es bueno, pero los resultados no son inmediatos. Igual lo seguiría usando."
-                },
-                new ResenaVista
-                {
-                    Cliente = "Ana Torres",
-                    Iniciales = "AT",
-                    Calificacion = 5,
-                    Fecha = "03 mayo 2026",
-                    Pedido = "PED-2102",
-                    Titulo = "Muy buen sérum",
-                    Comentario = "Tiene buena textura, no deja sensación pesada y combina bien con mi rutina de skincare."
-                },
-                new ResenaVista
-                {
-                    Cliente = "Lucia Ramos",
-                    Iniciales = "LR",
-                    Calificacion = 3,
-                    Fecha = "29 abril 2026",
-                    Pedido = "PED-2055",
-                    Titulo = "Regular",
-                    Comentario = "El producto llegó bien, pero esperaba ver resultados más rápidos."
-                },
-                new ResenaVista
-                {
-                    Cliente = "Valeria Diaz",
-                    Iniciales = "VD",
-                    Calificacion = 5,
-                    Fecha = "21 abril 2026",
-                    Pedido = "PED-1988",
-                    Titulo = "Me encantó",
-                    Comentario = "Lo volvería a comprar. Me gustó bastante para mi rutina diaria."
-                }
-            };
-        }
-    }
+    private List<ResenaVista> Resenas => resenas;
 
     private IEnumerable<ResenaVista> ResenasFiltradas
     {
@@ -523,6 +509,7 @@ else
         }
 
         CartService.AgregarProducto(
+            producto.Id,
             producto.Nombre,
             PrecioUnitarioActual,
             producto.Imagen

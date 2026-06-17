@@ -234,7 +234,21 @@
 
         <div class="catalog-content">
 
-            <div class="catalog-products">
+            @if (cargandoProductos)
+            {
+                <div class="catalog-products">
+                    <p>Cargando productos desde KillaREST...</p>
+                </div>
+            }
+            else if (!string.IsNullOrWhiteSpace(errorProductos))
+            {
+                <div class="catalog-products">
+                    <p>@errorProductos</p>
+                </div>
+            }
+            else
+            {
+                <div class="catalog-products">
 
                 @foreach (var producto in ProductosPaginados)
                 {
@@ -272,7 +286,8 @@
                     </div>
                 }
 
-            </div>
+                </div>
+            }
 
             @if (TotalPaginas > 1)
             {
@@ -337,15 +352,32 @@
     private string subcategoriaSeleccionada = "";
 
     private decimal precioMaximo = 500;
+    private bool cargandoProductos = true;
+    private string? errorProductos;
 
     private bool soloCerave;
     private bool soloOrdinary;
     private bool soloLaRoche;
     private bool soloGarnier;
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
-        productos = ProductoService.ObtenerTodos().ToList();
+        cargandoProductos = true;
+        errorProductos = null;
+
+        try
+        {
+            productos = await ProductoService.ObtenerCatalogoAsync();
+        }
+        catch (Exception ex)
+        {
+            productos = new List<Producto>();
+            errorProductos = $"No se pudieron cargar los productos: {ex.Message}";
+        }
+        finally
+        {
+            cargandoProductos = false;
+        }
 
         if (!string.IsNullOrEmpty(CategoriaUrl))
         {
@@ -499,6 +531,7 @@
     private void AgregarCarrito(Producto producto)
     {
         CartService.AgregarProducto(
+            producto.Id,
             producto.Nombre,
             producto.PrecioMinimo,
             producto.Imagen
@@ -506,7 +539,7 @@
     }
     private void IrADetalleProducto(Producto producto)
     {
-        Navigation.NavigateTo($"/usuario-producto/{ConvertirParaUrl(producto.Nombre)}");
+        Navigation.NavigateTo($"/usuario-producto/{producto.Id}");
     }
 
     private void CambiarPagina(int numeroPagina)

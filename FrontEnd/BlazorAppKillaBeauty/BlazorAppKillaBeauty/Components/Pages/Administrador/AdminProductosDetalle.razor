@@ -1,6 +1,8 @@
 ﻿@page "/admin/productos/{Codigo}"
 @rendermode InteractiveServer
+@using BlazorAppKillaBeauty.Services
 @inject NavigationManager Navigation
+@inject ProductoService ProductoService
 
 <PageTitle>Detalle producto - Killa Beauty</PageTitle>
 
@@ -395,71 +397,104 @@
     private string filtroVerificadas = "todas"; // todas/verificadas/noverificadas
 
     private ProductoDetalle producto = new();
+    private ProductoApi? productoApi;
     private List<EscalaDetalle> escalas = new();
     private List<ResenaDetalle> resenas = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        producto = Codigo switch
+        var id = ObtenerIdProducto();
+
+        try
         {
-            "KB-001" => new ProductoDetalle
+            productoApi = await ProductoService.ObtenerPorIdAsync(id);
+
+            if (productoApi == null)
             {
-                Codigo = "KB-001",
-                Nombre = "Sérum vitamina C 30ml",
-                Categoria = "Skincare",
-                Subcategoria = "Serums",
-                Marca = "The Ordinary",
-                PrecioBase = 45.00m,
-                Stock = 38,
-                Disponible = true,
-                EnPromocion = true,
-                ImagenUrl = "/Images/placeholder-product.png"
-            },
-            _ => new ProductoDetalle
+                producto = new ProductoDetalle { Codigo = Codigo, Nombre = $"Producto {Codigo}" };
+                return;
+            }
+
+            producto = MapearDetalle(productoApi);
+
+            resenas = (await ProductoService.ObtenerResenasAsync(id))
+                .Select((r, index) => new ResenaDetalle(
+                    "Cliente Killa",
+                    string.IsNullOrWhiteSpace(r.Titulo) ? "Reseña del producto" : r.Titulo,
+                    r.Comentario,
+                    r.Calificacion,
+                    true,
+                    r.Fecha ?? DateTime.Today,
+                    $"REST-{index + 1}"))
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            producto = new ProductoDetalle
             {
                 Codigo = Codigo,
-                Nombre = $"Producto {Codigo}",
-                Categoria = "Maquillaje",
-                Subcategoria = "Base",
-                Marca = "Marca demo",
-                PrecioBase = 35.00m,
-                Stock = 12,
-                Disponible = true,
-                EnPromocion = false,
+                Nombre = "No se pudo cargar el producto",
+                Categoria = ex.Message,
                 ImagenUrl = "/Images/placeholder-product.png"
-            }
-        };
+            };
+        }
 
         escalas = new()
         {
             new EscalaDetalle("Precio unitario", 1,  producto.PrecioBase, "—"),
-            new EscalaDetalle("Media docena", 6,  38.00m, "-15%"),
-            new EscalaDetalle("Cajón", 12, 30.00m, "-33%")
+            new EscalaDetalle("Media docena", 6,  decimal.Round(producto.PrecioBase * 0.89m, 2), "-11%"),
+            new EscalaDetalle("Cajón", 24, decimal.Round(producto.PrecioBase * 0.78m, 2), "-22%")
         };
+    }
 
-        // mock reseñas con más data para el diseño figma
-        resenas = new()
+    private int ObtenerIdProducto()
+    {
+        if (int.TryParse(Codigo, out var id))
         {
-            new ResenaDetalle("María Lopez", "Excelente producto, lo recomiendo",
-                "Me encantó el sérum. Lo uso desde hace 3 semanas y ya noto diferencia en el tono de mi piel. Llegó bien empacado y rápido. Definitivamente lo volvería a comprar.",
-                5, true, new DateTime(2026, 5, 10), "PED-2241"),
-            new ResenaDetalle("Carla Gutierrez", "Bueno pero tarda en hacer efecto",
-                "El producto es de buena calidad, el olor es agradable y la textura me gustó. Siento que tarda un poco más de lo que esperaba para ver resultados, pero igual lo recomendaría.",
-                4, true, new DateTime(2026, 5, 8), "PED-2198"),
-            new ResenaDetalle("Ana Torres", "Bien", "Cumple lo que promete.", 4, false, new DateTime(2026, 4, 28), "PED-2102"),
-            new ResenaDetalle("Luis Perez", "No era para mi tipo de piel", "Me generó ligera irritación.", 2, false, new DateTime(2026, 4, 21), "PED-2055"),
-            new ResenaDetalle("Camila Rios", "Excelente", "Muy ligero y efectivo.", 5, true, new DateTime(2026, 4, 18), "PED-2033")
+            return id;
+        }
+
+        if (Codigo.StartsWith("KB-", StringComparison.OrdinalIgnoreCase)
+            && int.TryParse(Codigo[3..], out var codigoId))
+        {
+            return codigoId;
+        }
+
+        return 0;
+    }
+
+    private static ProductoDetalle MapearDetalle(ProductoApi producto)
+    {
+        return new ProductoDetalle
+        {
+            Id = producto.Id,
+            Codigo = $"KB-{producto.Id:000}",
+            Nombre = producto.Nombre,
+            Categoria = producto.Subcategoria?.Categoria?.Descripcion ?? "",
+            Subcategoria = producto.Subcategoria?.Descripcion ?? "",
+            Marca = producto.Marca?.Descripcion ?? "",
+            MarcaId = producto.Marca?.Id ?? 0,
+            SubcategoriaId = producto.Subcategoria?.Id ?? 0,
+            PrecioBase = producto.PrecioBase,
+            Stock = producto.Stock,
+            Disponible = producto.Disponible,
+            EnPromocion = producto.Promocion,
+            ImagenUrl = "/Images/Logo.png"
         };
     }
 
     private void Volver() => Navigation.NavigateTo("/admin/productos");
-    private void IrAEscalas() => Navigation.NavigateTo($"/admin/productos/{Codigo}/escalas");
+    private void IrAEscalas() => Navigation.NavigateTo($"/admin/productos/{producto.Id}/escalas");
 
     private void AbrirDarDeBaja() => mostrarModalBaja = true;
     private void CerrarDarDeBaja() => mostrarModalBaja = false;
 
-    private void ConfirmarDarDeBaja()
+    private async Task ConfirmarDarDeBaja()
     {
+        if (productoApi != null)
+        {
+            await ProductoService.DarDeBajaAsync(productoApi);
+        }
         producto.Disponible = false;
         mostrarModalBaja = false;
     }
@@ -519,11 +554,14 @@
 
     private class ProductoDetalle
     {
+        public int Id { get; set; }
         public string Codigo { get; set; } = "";
         public string Nombre { get; set; } = "";
         public string Categoria { get; set; } = "";
         public string Subcategoria { get; set; } = "";
         public string Marca { get; set; } = "";
+        public int MarcaId { get; set; }
+        public int SubcategoriaId { get; set; }
         public decimal PrecioBase { get; set; }
         public int Stock { get; set; }
         public bool Disponible { get; set; }
@@ -589,7 +627,7 @@
         mostrarModalEditar = false;
     }
 
-    private void GuardarEdicionProducto()
+    private async Task GuardarEdicionProducto()
     {
         // Validaciones front
         if (string.IsNullOrWhiteSpace(formEditar.Nombre))
@@ -628,18 +666,29 @@
             return;
         }
 
-        // Aplicar cambios al mock actual
-        producto.Nombre = formEditar.Nombre.Trim();
-        producto.Categoria = formEditar.Categoria;
-        producto.Subcategoria = formEditar.Subcategoria;
-        producto.Marca = formEditar.Marca;
-        producto.PrecioBase = formEditar.PrecioBase;
-        producto.Stock = formEditar.Stock;
-        producto.Disponible = formEditar.Disponible;
-        producto.EnPromocion = formEditar.EnPromocion;
+        try
+        {
+            productoApi = await ProductoService.ActualizarAsync(new ProductoApi
+            {
+                Id = producto.Id,
+                Nombre = formEditar.Nombre.Trim(),
+                PrecioBase = formEditar.PrecioBase,
+                Stock = formEditar.Stock,
+                Disponible = formEditar.Disponible,
+                Activo = formEditar.Disponible,
+                Promocion = formEditar.EnPromocion,
+                Marca = new Marca { Id = producto.MarcaId },
+                Subcategoria = new Subcategoria { Id = producto.SubcategoriaId }
+            });
 
-        mensajeErrorEditar = null;
-        mostrarModalEditar = false;
+            producto = MapearDetalle(productoApi);
+            mensajeErrorEditar = null;
+            mostrarModalEditar = false;
+        }
+        catch (Exception ex)
+        {
+            mensajeErrorEditar = $"No se pudo actualizar el producto: {ex.Message}";
+        }
     }
 
     private class ProductoEditForm
