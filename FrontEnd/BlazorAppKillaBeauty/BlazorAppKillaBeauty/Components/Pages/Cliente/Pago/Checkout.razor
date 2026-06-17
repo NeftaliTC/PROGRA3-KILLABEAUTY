@@ -16,7 +16,7 @@
         <div class="checkout-card">
             <h2>
                 <i class="bi bi-truck"></i>
-                Método de entrega
+                MÃ©todo de entrega
             </h2>
 
             <div class="delivery-options">
@@ -25,7 +25,7 @@
                         @onclick='() => SeleccionarEntrega("DELIVERY")'>
                     <i class="bi bi-truck"></i>
                     <strong>Delivery</strong>
-                    <span>Según distrito</span>
+                    <span>SegÃºn distrito</span>
                 </button>
 
                 <button class="delivery-option @(metodoEntrega == "RECOJO" ? "selected" : "")"
@@ -50,12 +50,12 @@
                 <div class="card-title-row">
                     <h2>
                         <i class="bi bi-geo-alt"></i>
-                        Dirección de Entrega
+                        DirecciÃ³n de Entrega
                     </h2>
 
                     <button class="btn-new-address"
                             @onclick="AbrirModalDireccion">
-                        + Nueva Dirección
+                        + Nueva DirecciÃ³n
                     </button>
                 </div>
 
@@ -70,7 +70,7 @@
                             @if (direccion.IsDefault)
                             {
                                 <span class="default-badge">
-                                    ★ Predeterminada
+                                    â˜… Predeterminada
                                 </span>
                             }
                         </h3>
@@ -95,11 +95,11 @@
         <div class="checkout-card">
             <h2>
                 <i class="bi bi-tag"></i>
-                Cupón de Descuento
+                CupÃ³n de Descuento
             </h2>
 
             <div class="coupon-row">
-                <input placeholder="Ingresa tu código de cupón"
+                <input placeholder="Ingresa tu cÃ³digo de cupÃ³n"
                        @bind="cupon" />
 
                 <button class="coupon-button"
@@ -116,7 +116,7 @@
                 </p>
 
                 <div class="coupon-success">
-                    ✓ Cupón <strong>@cuponAplicado.?Codigo</strong> aplicado correctamente
+                    âœ“ CupÃ³n <strong>@cuponAplicado.Codigo</strong> aplicado correctamente
                 </div>
             }
             @if (!string.IsNullOrEmpty(errorCupon))
@@ -173,14 +173,14 @@
                 </div>
 
                 <div class="checkout-field">
-                    <label>Razón Social</label>
-                    <input placeholder="Nombre o razón social de la empresa"
+                    <label>RazÃ³n Social</label>
+                    <input placeholder="Nombre o razÃ³n social de la empresa"
                            @bind="razonSocial" />
                 </div>
 
                 <div class="checkout-field">
-                    <label>Dirección Fiscal</label>
-                    <input placeholder="Dirección registrada en SUNAT"
+                    <label>DirecciÃ³n Fiscal</label>
+                    <input placeholder="DirecciÃ³n registrada en SUNAT"
                            @bind="direccionFiscal" />
                 </div>
             }
@@ -194,7 +194,7 @@
         <div class="checkout-card">
             <h2>
                 <i class="bi bi-credit-card"></i>
-                Método de pago
+                MÃ©todo de pago
             </h2>
 
             <div class="payment-options">
@@ -204,7 +204,7 @@
                         @onclick='() => SeleccionarPago("TARJETA")'>
                     <span class="payment-radio @(metodoPago == "TARJETA" ? "active" : "")"></span>
                     <i class="bi bi-credit-card"></i>
-                    Tarjeta de Crédito/Débito
+                    Tarjeta de CrÃ©dito/DÃ©bito
                 </button>
 
                 <button type="button"
@@ -223,7 +223,7 @@
                     <p class="payment-provider">Datos de la Tarjeta</p>
 
                     <div class="checkout-field">
-                        <label>Número de Tarjeta</label>
+                        <label>NÃºmero de Tarjeta</label>
                         <input placeholder="1234 5678 9012 3456" maxlength="19" @bind="numeroTarjeta" />
                     </div>
 
@@ -255,7 +255,7 @@
                     </div>
 
                     <p class="payment-note">
-                        Escanea el QR y confirma tu operación.
+                        Escanea el QR y confirma tu operaciÃ³n.
                     </p>
                 </div>
             }
@@ -299,7 +299,7 @@
             <div class="summary-row discount">
                 <span>
                     <i class="bi bi-tag"></i>
-                    Cupón de descuento
+                    CupÃ³n de descuento
                 </span>
                 <strong>-S/ @descuentoCupon.ToString("0.00")</strong>
             </div>
@@ -308,7 +308,7 @@
         @if (metodoEntrega == "DELIVERY")
         {
             <div class="summary-row">
-                <span>Envío</span>
+                <span>EnvÃ­o</span>
                 @if (direccionSeleccionada is null)
                 {
                     <strong>-</strong>
@@ -322,7 +322,7 @@
         else if (metodoEntrega == "RECOJO")
         {
             <div class="summary-row">
-                <span>Envío</span>
+                <span>EnvÃ­o</span>
                 <strong>Gratis</strong>
             </div>
         }
@@ -347,7 +347,7 @@
 
         <div class="address-modal">
 
-            <h2>Nueva Dirección</h2>
+            <h2>Nueva DirecciÃ³n</h2>
 
             <div class="modal-grid">
                 <div class="form-group">
@@ -356,14 +356,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Teléfono</label>
+                    <label>TelÃ©fono</label>
                     <input @bind="nuevaDireccion.Telefono" maxlength="9" placeholder="987654321" />
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Dirección</label>
-                <input @bind="nuevaDireccion.DireccionDetalle" placeholder="Calle, número, departamento" />
+                <label>DirecciÃ³n</label>
+                <input @bind="nuevaDireccion.DireccionDetalle" placeholder="Calle, nÃºmero, departamento" />
             </div>
 
             <div class="modal-grid">
@@ -401,7 +401,7 @@
 
             <div class="modal-actions">
                 <button class="btn-cancel" @onclick="CerrarModalDireccion">Cancelar</button>
-                <button class="btn-save" @onclick="GuardarNuevaDireccion">Usar esta Dirección</button>
+                <button class="btn-save" @onclick="GuardarNuevaDireccion">Usar esta DirecciÃ³n</button>
             </div>
 
         </div>
@@ -463,43 +463,53 @@
     private decimal descuentoCupon = 0;
     private string errorCupon = "";
 
-    private void AplicarCupon()
+    private async Task AplicarCupon()
     {
         errorCupon = "";
+        cuponAplicado = null;
+        descuentoCupon = 0;
 
-        var encontrado = cuponService.BuscarCupon(cupon);
-
-        if (encontrado == null)
+        try
         {
-            errorCupon = "Cupón no válido.";
-            return;
+            var encontrado = await cuponService.BuscarCuponAsync(cupon);
+
+            if (encontrado == null)
+            {
+                errorCupon = "CupÃ³n no vÃ¡lido.";
+                return;
+            }
+
+            descuentoCupon = cuponService.CalcularDescuento(encontrado, CartService.Total);
+
+            if (descuentoCupon <= 0)
+            {
+                errorCupon = encontrado.MontoMinimoCompra.HasValue
+                    ? $"Compra mÃ­nima S/ {encontrado.MontoMinimoCompra.Value:0.00} o cupÃ³n fuera de vigencia."
+                    : "El cupÃ³n no estÃ¡ vigente.";
+                return;
+            }
+
+            cuponAplicado = encontrado;
         }
-
-        descuentoCupon = cuponService.CalcularDescuento(encontrado, CartService.Total);
-
-        if (descuentoCupon <= 0)
+        catch (Exception ex)
         {
-            errorCupon = $"Compra mínima S/ {encontrado.MontoMinimoCompra}";
-            return;
+            errorCupon = $"No se pudo validar el cupÃ³n: {ex.Message}";
         }
-
-        cuponAplicado = encontrado;
     }
-
     private bool mostrarModalDireccion = false;
     private string errorDireccion = "";
     private Address nuevaDireccion = new();
 
     private List<string> DistritosLima = new()
     {
-        "Ancón", "Ate", "Barranco", "Breña", "Carabayllo",
+        "AncÃ³n", "Ate", "Barranco", "BreÃ±a", "Carabayllo",
         "Cercado de Lima", "Chaclacayo", "Chorrillos",
         "Cieneguilla", "Comas", "El Agustino",
-        "Independencia", "Jesús María", "La Molina",
+        "Independencia", "JesÃºs MarÃ­a", "La Molina",
         "La Victoria", "Lince", "Los Olivos",
         "Miraflores", "San Isidro", "San Borja",
         "Santiago de Surco", "Surquillo",
-        "Villa El Salvador", "Villa María del Triunfo"
+        "Villa El Salvador", "Villa MarÃ­a del Triunfo"
     };
 
     private void AbrirModalDireccion()
@@ -532,7 +542,7 @@
             !nuevaDireccion.Telefono.All(char.IsDigit) ||
             !nuevaDireccion.Telefono.StartsWith("9"))
         {
-            errorDireccion = "Ingrese un celular válido.";
+            errorDireccion = "Ingrese un celular vÃ¡lido.";
             return;
         }
 
@@ -573,19 +583,19 @@
 
         if (string.IsNullOrEmpty(metodoEntrega))
         {
-            errorEntrega = "Selecciona un método de entrega.";
+            errorEntrega = "Selecciona un mÃ©todo de entrega.";
             valido = false;
         }
 
         if (metodoEntrega == "DELIVERY" && direccionSeleccionada is null)
         {
-            errorDireccionEntrega = "Selecciona una dirección de entrega.";
+            errorDireccionEntrega = "Selecciona una direcciÃ³n de entrega.";
             valido = false;
         }
 
         if (string.IsNullOrEmpty(metodoPago))
         {
-            errorPago = "Selecciona un método de pago.";
+            errorPago = "Selecciona un mÃ©todo de pago.";
             valido = false;
         }
 
@@ -605,7 +615,7 @@
         {
             if (dni.Length != 8 || !dni.All(char.IsDigit))
             {
-                errorComprobante = "Ingrese un DNI válido de 8 dígitos.";
+                errorComprobante = "Ingrese un DNI vÃ¡lido de 8 dÃ­gitos.";
                 valido = false;
             }
         }
@@ -614,7 +624,7 @@
         {
             if (ruc.Length != 11 || !ruc.All(char.IsDigit))
             {
-                errorComprobante = "Ingrese un RUC válido de 11 dígitos.";
+                errorComprobante = "Ingrese un RUC vÃ¡lido de 11 dÃ­gitos.";
                 valido = false;
             }
             else if (!(ruc.StartsWith("10") || ruc.StartsWith("20")))
@@ -624,7 +634,7 @@
             }
             else if (string.IsNullOrWhiteSpace(razonSocial) || string.IsNullOrWhiteSpace(direccionFiscal))
             {
-                errorComprobante = "Complete los datos de facturación.";
+                errorComprobante = "Complete los datos de facturaciÃ³n.";
                 valido = false;
             }
         }
@@ -647,3 +657,4 @@
     private decimal TotalFinal =>
         CartService.Total + costoEnvio - descuentoCupon;
 }
+

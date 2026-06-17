@@ -24,7 +24,7 @@
 
         <header class="admin-header admin-orders-header d-flex justify-content-between align-items-center">
             <div>
-                <h1>Gestión de Cupones</h1>
+                <h1>Gestion de Cupones</h1>
                 <p>Consulta y filtra las compras registradas en la tienda.</p>
             </div>
             <button class="btn-add-marca" @onclick="AbrirModalNuevo">
@@ -37,7 +37,7 @@
         <section class="admin-orders-filters">
             <div class="admin-orders-search">
                 <i class="bi bi-search"></i>
-                <input type="text" placeholder="Buscar por código..."
+                <input type="text" placeholder="Buscar por codigo..."
                        @bind="filtroCodigo" @bind:event="oninput" @bind:after="AplicarFiltros" />
             </div>
 
@@ -78,10 +78,10 @@
                 <thead>
                     <tr>
                         <th style="padding-left: 2rem !important;">ID</th>
-                        <th>CÓDIGO</th>
+                        <th>CODIGO</th>
                         <th>DESCUENTO</th>
                         <th>FECHA INICIO</th>
-                        <th>FECHA EXPIRACIÓN</th>
+                        <th>FECHA EXPIRACION</th>
                         <th class="text-center">ESTADO</th>
                         <th class="text-end" style="padding-right: 2rem !important;">ACCIONES</th>
                     </tr>
@@ -93,7 +93,7 @@
                         <tr>
                             <td style="padding-left: 2rem !important; color: #777;">@c.Id.ToString("D5")</td>
                             <td class="td-codigo">@c.Codigo</td>
-                            <td style="font-weight: 700;">@(c.TipoDescuento == "Porcentaje" ? $"{c.ValorDescuento}%" : $"S/ {c.ValorDescuento}")</td>
+                            <td style="font-weight: 700;">@(c.EsPorcentaje ? $"{c.ValorDescuento}%" : $"S/ {c.ValorDescuento}")</td>
                             <td>@(c.FechaInicio?.ToString("dd/MM/yyyy") ?? "-")</td>
                             <td>@(c.FechaFin?.ToString("dd/MM/yyyy") ?? "-")</td>
                             <td class="text-center">
@@ -128,16 +128,16 @@
         {
             <footer class="admin-pagination">
                 <span style="font-weight: 600; color: #777;">
-                    Mostrando @(((paginaActual - 1) * itemsPorPagina) + 1)–@(Math.Min(paginaActual * itemsPorPagina, cuponesFiltrados.Count)) de @cuponesFiltrados.Count resultados
+                    Mostrando @(((paginaActual - 1) * itemsPorPagina) + 1) @(Math.Min(paginaActual * itemsPorPagina, cuponesFiltrados.Count)) de @cuponesFiltrados.Count resultados
                 </span>
                 <div class="admin-pagination-buttons d-flex gap-2">
-                    <button class="btn btn-light rounded-circle" style="width:35px; height:35px; border: 1px solid #ddd;" disabled="@(paginaActual == 1)" @onclick="() => CambiarPagina(paginaActual - 1)">‹</button>
+                    <button class="btn btn-light rounded-circle" style="width:35px; height:35px; border: 1px solid #ddd;" disabled="@(paginaActual == 1)" @onclick="() => CambiarPagina(paginaActual - 1)"> </button>
                     @for (int p = 1; p <= totalPaginas; p++)
                     {
                         int pg = p;
                         <button class="btn rounded-circle fw-bold" style="width:35px; height:35px; @(paginaActual == pg ? "background-color: #f5a3b7; color: white; border:none;" : "background-color: transparent; color: #555; border: 1px solid #ddd;")" @onclick="() => CambiarPagina(pg)">@pg</button>
                     }
-                    <button class="btn btn-light rounded-circle" style="width:35px; height:35px; border: 1px solid #ddd;" disabled="@(paginaActual == totalPaginas)" @onclick="() => CambiarPagina(paginaActual + 1)">›</button>
+                    <button class="btn btn-light rounded-circle" style="width:35px; height:35px; border: 1px solid #ddd;" disabled="@(paginaActual == totalPaginas)" @onclick="() => CambiarPagina(paginaActual + 1)"> </button>
                 </div>
             </footer>
         }
@@ -152,7 +152,7 @@
         <div class="admin-modal-card" style="text-align: left; max-width: 700px; width: 90%;">
           
                 <div class="modal-header" style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                <h5 class="modal-kb-title" style="margin: 0; font-size: 1.4rem;">@(EsEdicion ? "Modificar cupón" : "Nuevo cupón")</h5>
+                <h5 class="modal-kb-title" style="margin: 0; font-size: 1.4rem;">@(EsEdicion ? "Modificar cupon" : "Nuevo cupon")</h5>
                 </div>
 
                 <div class="modal-body p-4">
@@ -160,7 +160,7 @@
 
                         <div class="row mb-3">
                             <div class="col-md-5">
-                                <label class="form-label-kb">Código de cupón</label>
+                                <label class="form-label-kb">Codigo de cupon</label>
                                 <InputText @bind-Value="cuponActual.Codigo"
                                            class="@(EsEdicion ? "form-control-kb disabled-field" : "form-control-kb")"
                                            disabled="@EsEdicion" placeholder="NUEVOCUPON" />
@@ -173,7 +173,7 @@
                                 </InputSelect>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label-kb">Monto mínimo de compra</label>
+                                <label class="form-label-kb">Monto minimo de compra</label>
                                 <InputNumber @bind-Value="cuponActual.MontoMinimoCompra" class="form-control-kb" placeholder="0.00" />
                             </div>
                         </div>
@@ -186,7 +186,7 @@
                                     <input type="text" class="form-control-kb disabled-field" disabled value="@cuponActual.UsosActuales" />
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label-kb">Gestión de usos</label>
+                                    <label class="form-label-kb">Gestion de usos</label>
                                     <select class="form-select-kb" @bind="opcionUsos">
                                         <option value="Mantener">Mantener</option>
                                         <option value="Reiniciar">Reiniciar</option>
@@ -197,11 +197,11 @@
 
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label class="form-label-kb">Monto máximo de descuento</label>
+                                <label class="form-label-kb">Monto maximo de descuento</label>
                                 <InputNumber @bind-Value="cuponActual.MontoMaximoDescuento" class="form-control-kb" placeholder="0.00" />
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label-kb">Límite de uso general</label>
+                                <label class="form-label-kb">Limite de uso general</label>
                                 <InputNumber @bind-Value="cuponActual.MaxUsosGenerales" class="form-control-kb" placeholder="0" />
                             </div>
                         </div>
@@ -211,8 +211,8 @@
                                 <label class="form-label-kb">Tipo de descuento</label>
                                 <InputSelect @bind-Value="cuponActual.TipoDescuento" class="form-select-kb">
                                     <option value="seleccione">Seleccione</option>
-                                    <option value="Porcentaje">Porcentaje</option>
-                                    <option value="Monto Fijo">Monto Fijo</option>
+                                    <option value="PORCENTAJE">Porcentaje</option>
+                                    <option value="MONTO_FIJO">Monto Fijo</option>
                                 </InputSelect>
                             </div>
                             <div class="col-md-6">
@@ -227,11 +227,11 @@
                                 <InputDate @bind-Value="cuponActual.FechaInicio" class="form-control-kb" />
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label-kb">Fecha de expiración</label>
+                                <label class="form-label-kb">Fecha de expiracion</label>
                                 <InputDate @bind-Value="cuponActual.FechaFin" class="form-control-kb" />
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label-kb">Campaña asociada</label>
+                                <label class="form-label-kb">Campana asociada</label>
                                 <InputSelect @bind-Value="idCampanaSeleccionada" class="form-select-kb">
                                     <option value="0">Ninguna</option>
                                     @foreach (var campana in campanasDisponibles)
@@ -243,9 +243,9 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label-kb">Descripción / Legales</label>
+                            <label class="form-label-kb">Descripcion / Legales</label>
                             <InputTextArea @bind-Value="cuponActual.Descripcion" class="form-textarea-kb w-100" rows="2"
-                                           placeholder="Términos y condiciones del cupón..." />
+                                           placeholder="Terminos y condiciones del cupon..." />
                         </div>
 
                         <div class="d-flex justify-content-end gap-2">
@@ -254,7 +254,7 @@
                                 Cancelar
                             </button>
                             <button type="submit" class="btn-modal-submit">
-                                @(EsEdicion ? "Guardar cambios" : "Agregar cupón")
+                                @(EsEdicion ? "Guardar cambios" : "Agregar cupon")
                             </button>
                         </div>
 
@@ -274,7 +274,7 @@
             
             <div class="modal-header" style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                    <h5 class="modal-kb-title" style="margin: 0; font-size: 1.4rem;">Detalle del cupón</h5>
+                    <h5 class="modal-kb-title" style="margin: 0; font-size: 1.4rem;">Detalle del cupon</h5>
                     <span class="text-muted" style="font-size:0.82rem;">ID: @cuponDetalle?.Id.ToString("D5")</span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
@@ -307,24 +307,24 @@
                     <div class="detalle-data-card" style="background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
                         <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Descuento</div>
                         <div class="detalle-data-value accent" style="color: #a12828; font-weight: bold; font-size: 1.1rem; margin: 4px 0;">
-                            @(cuponDetalle?.TipoDescuento == "Porcentaje" ? $"{cuponDetalle?.ValorDescuento}%" : $"S/ {cuponDetalle?.ValorDescuento}")
+                            @(cuponDetalle?.EsPorcentaje == true ? $"{cuponDetalle?.ValorDescuento}%" : $"S/ {cuponDetalle?.ValorDescuento}")
                         </div>
-                        <div class="detalle-data-sub" style="font-size: 0.75rem; color: #999;">@cuponDetalle?.TipoDescuento</div>
+                        <div class="detalle-data-sub" style="font-size: 0.75rem; color: #999;">@cuponDetalle?.TipoDescuentoTexto</div>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="detalle-data-card" style="background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
-                        <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Monto mínimo</div>
+                        <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Monto mi­nimo</div>
                         <div class="detalle-data-value" style="font-weight: bold; font-size: 1.1rem; margin-top: 4px;">
-                            @(cuponDetalle?.MontoMinimoCompra.HasValue == true ? $"S/ {cuponDetalle?.MontoMinimoCompra}" : "Sin mínimo")
+                            @(cuponDetalle?.MontoMinimoCompra.HasValue == true ? $"S/ {cuponDetalle?.MontoMinimoCompra}" : "Sin minimo")
                         </div>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="detalle-data-card" style="background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
-                        <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Máx. descuento</div>
+                        <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Max. descuento</div>
                         <div class="detalle-data-value" style="font-weight: bold; font-size: 1.1rem; margin-top: 4px;">
-                            @(cuponDetalle?.MontoMaximoDescuento.HasValue == true ? $"S/ {cuponDetalle?.MontoMaximoDescuento}" : "Sin límite")
+                            @(cuponDetalle?.MontoMaximoDescuento.HasValue == true ? $"S/ {cuponDetalle?.MontoMaximoDescuento}" : "Sin li­mite")
                         </div>
                     </div>
                 </div>
@@ -332,7 +332,7 @@
                     <div class="detalle-data-card" style="background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
                         <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Usos</div>
                         <div class="detalle-data-value" style="font-weight: bold; font-size: 1.1rem; margin-top: 4px;">
-                            @cuponDetalle?.UsosActuales / @(cuponDetalle?.MaxUsosGenerales.HasValue == true ? cuponDetalle?.MaxUsosGenerales.ToString() : "∞")
+                            @cuponDetalle?.UsosActuales / @(cuponDetalle?.MaxUsosGenerales.HasValue == true ? cuponDetalle?.MaxUsosGenerales.ToString() : " ")
                         </div>
                     </div>
                 </div>
@@ -344,7 +344,7 @@
                 </div>
                 <div class="col-6">
                     <div class="detalle-data-card" style="background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
-                        <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Fecha expiración</div>
+                        <div class="detalle-data-label" style="font-size: 0.8rem; color: #666; font-weight: 600; text-transform: uppercase;">Fecha expiracion</div>
                         <div class="detalle-data-value" style="font-weight: bold; font-size: 1.1rem; margin-top: 4px;">@(cuponDetalle?.FechaFin?.ToString("dd/MM/yyyy") ?? "-")</div>
                     </div>
                 </div>
@@ -379,20 +379,22 @@
 
 
 @code {
-    [Parameter] public string Accion { get; set; }
+    [Parameter] public string? Accion { get; set; }
     [Parameter] public int? IdParam { get; set; }
 
     private IReadOnlyList<Cupon> cupones = new List<Cupon>();
     private IReadOnlyList<Campana> campanasDisponibles = new List<Campana>();
+    private IReadOnlyList<Campana> campanasTodas = new List<Campana>();
 
     private Cupon cuponActual = new Cupon();
     private bool showModal = false;
     private bool EsEdicion = false;
     private int idCampanaSeleccionada = 0;
     private string opcionUsos = "Mantener";
+    private string? mensajeError;
 
     private bool showModalDetalle = false;
-    private Cupon cuponDetalle = null;
+    private Cupon? cuponDetalle;
 
     private string filtroCodigo = "";
     private string filtroEstado = "";
@@ -402,21 +404,60 @@
     private int paginaActual = 1;
     private int itemsPorPagina = 6;
 
+    private bool datosCargados = false;
     private List<Cupon> cuponesFiltrados = new();
     private IEnumerable<Cupon> cuponesPaginados => cuponesFiltrados.Skip((paginaActual - 1) * itemsPorPagina).Take(itemsPorPagina);
     private int totalPaginas => (int)Math.Ceiling((double)cuponesFiltrados.Count / itemsPorPagina);
 
-    protected override void OnInitialized()
+    protected override async Task OnParametersSetAsync()
     {
-        RefrescarTabla();
-        campanasDisponibles = CampanaService.ObtenerActivas();
+        if (!datosCargados)
+        {
+            await CargarDatosAsync();
+        }
+
+        await ConfigurarModalDesdeRutaAsync();
     }
 
-    protected override void OnParametersSet()
+    private async Task CargarDatosAsync()
+    {
+        try
+        {
+            cupones = await CuponService.ObtenerTodosAsync();
+            campanasTodas = await CampanaService.ObtenerTodasAsync();
+            campanasDisponibles = campanasTodas.Where(c => c.Activa).ToList();
+            EnlazarCampanas();
+            datosCargados = true;
+            mensajeError = null;
+            AplicarFiltros();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"No se pudieron cargar los cupones: {ex.Message}";
+            cupones = new List<Cupon>();
+            campanasDisponibles = new List<Campana>();
+            campanasTodas = new List<Campana>();
+            cuponesFiltrados = new List<Cupon>();
+        }
+    }
+
+    private async Task RefrescarTablaAsync()
+    {
+        cupones = await CuponService.ObtenerTodosAsync();
+        if (!campanasTodas.Any())
+        {
+            campanasTodas = await CampanaService.ObtenerTodasAsync();
+            campanasDisponibles = campanasTodas.Where(c => c.Activa).ToList();
+        }
+        EnlazarCampanas();
+        AplicarFiltros();
+    }
+
+    private async Task ConfigurarModalDesdeRutaAsync()
     {
         if (Accion == "nuevo")
         {
-            cuponActual = new Cupon();
+            cuponActual = new Cupon { TipoDescuento = "PORCENTAJE", Activo = true };
             idCampanaSeleccionada = 0;
             opcionUsos = "Mantener";
             EsEdicion = false;
@@ -424,7 +465,13 @@
         }
         else if (Accion == "editar" && IdParam.HasValue)
         {
-            var bd = CuponService.ObtenerPorId(IdParam.Value);
+            var bd = await CuponService.ObtenerPorIdAsync(IdParam.Value);
+            if (bd == null)
+            {
+                showModal = false;
+                return;
+            }
+
             cuponActual = new Cupon
             {
                 Id = bd.Id,
@@ -438,8 +485,14 @@
                 MontoMinimoCompra = bd.MontoMinimoCompra,
                 MaxUsosGenerales = bd.MaxUsosGenerales,
                 UsosActuales = bd.UsosActuales,
-                Descripcion = bd.Descripcion
+                Descripcion = bd.Descripcion,
+                Campana = bd.Campana
             };
+            if (cuponActual.CampanaId.HasValue)
+            {
+                var campana = campanasTodas.FirstOrDefault(c => c.Id == cuponActual.CampanaId.Value);
+                if (campana != null) cuponActual.Campana = campana;
+            }
             idCampanaSeleccionada = bd.CampanaId ?? 0;
             opcionUsos = "Mantener";
             EsEdicion = true;
@@ -450,19 +503,29 @@
             showModal = false;
         }
     }
+
     private void AbrirModalNuevo()
     {
-        cuponActual = new Cupon();
+        cuponActual = new Cupon { TipoDescuento = "PORCENTAJE", Activo = true };
         idCampanaSeleccionada = 0;
         opcionUsos = "Mantener";
         EsEdicion = false;
         showModal = true;
     }
 
-    private void RefrescarTabla()
+    private void EnlazarCampanas()
     {
-        cupones = CuponService.ObtenerTodos();
-        AplicarFiltros();
+        foreach (var cupon in cupones)
+        {
+            if (cupon.CampanaId.HasValue)
+            {
+                var campana = campanasTodas.FirstOrDefault(c => c.Id == cupon.CampanaId.Value);
+                if (campana != null)
+                {
+                    cupon.Campana = campana;
+                }
+            }
+        }
     }
 
     private void AplicarFiltros()
@@ -481,7 +544,7 @@
         if (filtroHasta.HasValue)
             q = q.Where(c => c.FechaFin <= filtroHasta);
 
-        cuponesFiltrados = q.ToList();
+        cuponesFiltrados = q.OrderByDescending(c => c.Id).ToList();
         paginaActual = 1;
     }
 
@@ -499,7 +562,7 @@
     private string ObtenerEstado(Cupon c)
     {
         if (!c.Activo) return "Inactivo";
-        if (c.FechaFin.HasValue && c.FechaFin.Value < DateTime.Today) return "Vencido";
+        if (c.FechaFin.HasValue && c.FechaFin.Value.Date < DateTime.Today) return "Vencido";
         return "Disponible";
     }
 
@@ -508,7 +571,7 @@
         cuponDetalle = c;
         if (c.CampanaId.HasValue && c.CampanaId > 0)
         {
-            var camp = campanasDisponibles.FirstOrDefault(x => x.Id == c.CampanaId);
+            var camp = campanasTodas.FirstOrDefault(x => x.Id == c.CampanaId);
             if (camp != null) cuponDetalle.CampanaNombre = camp.Nombre;
         }
         showModalDetalle = true;
@@ -520,22 +583,36 @@
         cuponDetalle = null;
     }
 
-    private void GuardarCambios()
+    private async Task GuardarCambios()
     {
-        cuponActual.CampanaId = idCampanaSeleccionada == 0 ? null : idCampanaSeleccionada;
+        try
+        {
+            cuponActual.CampanaId = idCampanaSeleccionada == 0 ? null : idCampanaSeleccionada;
 
-        if (EsEdicion && opcionUsos == "Reiniciar")
-            cuponActual.UsosActuales = 0;
+            if (EsEdicion && opcionUsos == "Reiniciar")
+                cuponActual.UsosActuales = 0;
 
-        CuponService.Guardar(cuponActual);
-        // NavManager.NavigateTo("/admin/cupones");
-        showModal = false; 
-        RefrescarTabla();
+            await CuponService.GuardarAsync(cuponActual);
+            showModal = false;
+            await RefrescarTablaAsync();
+            NavManager.NavigateTo("/admin/cupones");
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"No se pudo guardar el cupon: {ex.Message}";
+        }
     }
 
-    private void EliminarCupon(int id)
+    private async Task EliminarCupon(int id)
     {
-        CuponService.EliminarLogico(id);
-        RefrescarTabla();
+        try
+        {
+            await CuponService.EliminarLogicoAsync(id);
+            await RefrescarTablaAsync();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"No se pudo desactivar el cupon: {ex.Message}";
+        }
     }
 }

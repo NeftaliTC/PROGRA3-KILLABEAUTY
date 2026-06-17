@@ -1,6 +1,6 @@
 package pe.edu.pucp.killaDAO.Impl.Promocionales;
 
-import pe.edu.pucp.dbManager.DBManager;
+import pe.edu.pucp.dbManager.TransactionContext;
 import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Campana;
 import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Cupon;
 import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.TipoDescuento;
@@ -21,8 +21,8 @@ public class CuponDAOImpl implements CuponDAO {
                        id_tipo_descuento, id_campana
                 FROM Cupon
                 """;
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql);
+        Connection connection = TransactionContext.getConnection();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) cupones.add(mapRow(rs));
         }
@@ -37,8 +37,8 @@ public class CuponDAOImpl implements CuponDAO {
                        id_tipo_descuento, id_campana
                 FROM Cupon WHERE id_cupon = ?
                 """;
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        Connection connection = TransactionContext.getConnection();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) return mapRow(rs);
@@ -56,8 +56,8 @@ public class CuponDAOImpl implements CuponDAO {
                  id_tipo_descuento, id_campana)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        Connection connection = TransactionContext.getConnection();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             setCuponParams(pstmt, cupon);
             pstmt.executeUpdate();
             try (ResultSet keys = pstmt.getGeneratedKeys()) {
@@ -76,8 +76,8 @@ public class CuponDAOImpl implements CuponDAO {
                     max_usos_generales = ?, id_tipo_descuento = ?, id_campana = ?
                 WHERE id_cupon = ?
                 """;
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        Connection connection = TransactionContext.getConnection();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             setCuponParams(pstmt, cupon);
             pstmt.setInt(12, cupon.getId());
             pstmt.executeUpdate();
@@ -88,8 +88,8 @@ public class CuponDAOImpl implements CuponDAO {
     @Override
     public void remove(Cupon cupon) throws SQLException {
         String sql = "UPDATE Cupon SET activo = 0 WHERE id_cupon = ?";
-        try (Connection connection = DBManager.getInstance().getConnection();
-             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        Connection connection = TransactionContext.getConnection();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, cupon.getId());
             pstmt.executeUpdate();
         }
