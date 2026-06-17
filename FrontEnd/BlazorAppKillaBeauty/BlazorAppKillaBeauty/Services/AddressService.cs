@@ -1,40 +1,75 @@
-﻿namespace BlazorAppKillaBeauty.Services
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace BlazorAppKillaBeauty.Services
 {
     public class AddressService
     {
-        public List<Address> UserAddresses { get; set; } = new()
+        private readonly HttpClient http;
+        private readonly JsonSerializerOptions jsonOptions = new()
         {
-            new Address
-            {
-                Id = 1,
-                Alias = "Casa",
-                DireccionDetalle = "Av. Javier Prado 123",
-                Distrito = "Miraflores",
-                Provincia = "Lima Metropolitana",
-                Departamento = "Lima",
-                Telefono = "987654321",
-                Referencia = "A dos cuadras de la Plaza",
-                IsDefault = true
-            },
-            new Address
-            {
-                Id = 2,
-                Alias = "Trabajo",
-                DireccionDetalle = "Calle Las Begonias 456",
-                Distrito = "San Isidro",
-                Provincia = "Lima Metropolitana",
-                Departamento = "Lima",
-                Telefono = "912345678",
-                Referencia = "Frente al parque Las Magnolias",
-                IsDefault = false
-            }
+            PropertyNameCaseInsensitive = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
+        public AddressService(IHttpClientFactory httpClientFactory)
+        {
+            http = httpClientFactory.CreateClient("KillaApi");
+        }
+
+        public List<Address> UserAddresses { get; private set; } = new();
         public Address? DireccionSeleccionada { get; set; }
+
+        public async Task<List<Address>> CargarPorUsuarioAsync(int usuarioId)
+        {
+            UserAddresses = await GetAsync<List<Address>>($"direcciones?usuarioId={usuarioId}") ?? new List<Address>();
+            DireccionSeleccionada = ObtenerPredeterminada();
+            return UserAddresses;
+        }
 
         public Address? ObtenerPredeterminada()
         {
             return UserAddresses.FirstOrDefault(a => a.IsDefault);
+        }
+
+        public async Task<Address> CrearAsync(Address direccion, int usuarioId)
+        {
+            direccion.Usuario = new UsuarioDireccion { Id = usuarioId };
+            direccion.Activo = true;
+
+            using var response = await http.PostAsJsonAsync("direcciones", direccion, jsonOptions);
+            await EnsureSuccessAsync(response);
+
+            var creada = await response.Content.ReadFromJsonAsync<Address>(jsonOptions) ?? direccion;
+            await CargarPorUsuarioAsync(usuarioId);
+            return creada;
+        }
+
+        public async Task<Address> ActualizarAsync(Address direccion, int usuarioId)
+        {
+            direccion.Usuario = new UsuarioDireccion { Id = usuarioId };
+            direccion.Activo = true;
+
+            using var response = await http.PutAsJsonAsync($"direcciones/{direccion.Id}", direccion, jsonOptions);
+            await EnsureSuccessAsync(response);
+
+            var actualizada = await response.Content.ReadFromJsonAsync<Address>(jsonOptions) ?? direccion;
+            await CargarPorUsuarioAsync(usuarioId);
+            return actualizada;
+        }
+
+        public async Task EliminarAsync(int id, int usuarioId)
+        {
+            using var response = await http.DeleteAsync($"direcciones/{id}");
+            await EnsureSuccessAsync(response);
+            await CargarPorUsuarioAsync(usuarioId);
+        }
+
+        public async Task MarcarPredeterminadaAsync(Address direccion, int usuarioId)
+        {
+            direccion.IsDefault = true;
+            await ActualizarAsync(direccion, usuarioId);
         }
 
         public decimal CalcularEnvio(Address direccion)
@@ -51,9 +86,35 @@
                 "Los Olivos" => 16,
                 "San Juan de Lurigancho" => 20,
                 "Villa El Salvador" => 20,
-
                 _ => 15
             };
+        }
+
+        private async Task<T?> GetAsync<T>(string url)
+        {
+            using var response = await http.GetAsync(url);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return default;
+            }
+
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<T>(jsonOptions);
+        }
+
+        private static async Task EnsureSuccessAsync(HttpResponseMessage response)
+        {
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException(
+                string.IsNullOrWhiteSpace(body)
+                    ? $"Error REST {(int)response.StatusCode} {response.ReasonPhrase}"
+                    : body);
         }
     }
 
@@ -67,6 +128,17 @@
         public string Departamento { get; set; } = "";
         public string Telefono { get; set; } = "";
         public string Referencia { get; set; } = "";
+        public string CodigoPostal { get; set; } = "";
+        public bool Activo { get; set; } = true;
+
+        [JsonPropertyName("esPredeterminada")]
         public bool IsDefault { get; set; }
+
+        public UsuarioDireccion? Usuario { get; set; }
+    }
+
+    public class UsuarioDireccion
+    {
+        public int Id { get; set; }
     }
 }
