@@ -144,6 +144,13 @@
     color: #a12828;
 }
 
+.admin-order-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    white-space: nowrap;
+}
+
 .admin-detail-button {
     min-height: 36px;
     border-radius: 11px;
@@ -160,6 +167,119 @@
 
 .admin-detail-button:hover {
     background: #d94865;
+}
+
+.admin-cancel-order-button {
+    min-height: 36px;
+    border: 1px solid #f3bcbc;
+    border-radius: 11px;
+    background: #fff7f7;
+    color: #a12828;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 13px;
+    font-weight: 800;
+}
+
+.admin-cancel-order-button:hover {
+    background: #ffe0e0;
+}
+
+.admin-order-warning-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(47, 37, 42, 0.48);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.admin-order-warning-card {
+    width: min(430px, 94vw);
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 18px;
+    box-shadow: 0 22px 70px rgba(47, 37, 42, 0.24);
+    padding: 30px;
+    text-align: center;
+}
+
+.admin-order-warning-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 999px;
+    background: #fff3cd;
+    color: #b98200;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.9rem;
+    margin-bottom: 16px;
+}
+
+.admin-order-warning-card h2 {
+    color: #2f252a;
+    font-size: 1.35rem;
+    font-weight: 900;
+    margin: 0 0 10px;
+}
+
+.admin-order-warning-card p {
+    color: #6b5b62;
+    font-size: 0.96rem;
+    font-weight: 700;
+    line-height: 1.45;
+    margin: 0 0 24px;
+}
+
+.admin-order-warning-card p strong {
+    color: #2f252a;
+    font-weight: 900;
+}
+
+.admin-order-warning-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.admin-order-warning-actions.single {
+    justify-content: center;
+}
+
+.admin-order-warning-actions button {
+    min-height: 42px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 22px;
+    font-weight: 900;
+    min-width: 116px;
+}
+
+.admin-order-warning-cancel {
+    border: 1px solid var(--gray-border);
+    background: var(--white);
+    color: #4f4148;
+}
+
+.admin-order-warning-cancel:hover {
+    background: var(--gray-light);
+}
+
+.admin-order-warning-confirm {
+    border: 1px solid #f3bcbc;
+    background: #a12828;
+    color: var(--white);
+}
+
+.admin-order-warning-confirm:hover {
+    background: #8d2020;
 }
 
 .admin-empty-orders {
@@ -544,6 +664,16 @@
 
     .admin-pagination-buttons {
         flex-wrap: wrap;
+    }
+
+    .admin-order-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-detail-button,
+    .admin-cancel-order-button {
+        width: 100%;
     }
 
     .admin-order-detail-header,
