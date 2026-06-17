@@ -1,66 +1,88 @@
-﻿namespace BlazorAppKillaBeauty.Services
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace BlazorAppKillaBeauty.Services
 {
     public class CampanaService
     {
-        private List<Campana> campanas = new();
+        private readonly HttpClient http;
+        private readonly JsonSerializerOptions jsonOptions = new()
+        {
+            PropertyNameCaseInsensitive = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
 
-        public CampanaService()
+        public CampanaService(IHttpClientFactory httpClientFactory)
         {
-            // Mock Data inicial
-            campanas.Add(new Campana
-            {
-                Id = 1,
-                Nombre = "Cyber Wow 2026",
-                Descripcion = "Descuentos masivos de mitad de año",
-                Activa = true
-            });
-            campanas.Add(new Campana
-            {
-                Id = 2,
-                Nombre = "Día de la Madre",
-                Descripcion = "Promociones especiales para mamá",
-                Activa = false
-            });
-        }
-        public IReadOnlyList<Campana> ObtenerTodas()
-        {
-            return campanas;
+            http = httpClientFactory.CreateClient("KillaApi");
         }
 
-        public IReadOnlyList<Campana> ObtenerActivas()
+        public async Task<List<Campana>> ObtenerTodasAsync()
         {
-            // Este método será útil para el dropdown del formulario de cupones
+            return await GetAsync<List<Campana>>("campanas") ?? new List<Campana>();
+        }
+
+        public async Task<List<Campana>> ObtenerActivasAsync()
+        {
+            var campanas = await ObtenerTodasAsync();
             return campanas.Where(c => c.Activa).ToList();
         }
 
-        public Campana ObtenerPorId(int id)
+        public async Task<Campana?> ObtenerPorIdAsync(int id)
         {
-            return campanas.FirstOrDefault(c => c.Id == id) ?? new Campana();
+            return await GetAsync<Campana>($"campanas/{id}");
         }
 
-        public void Guardar(Campana campana)
+        public async Task<Campana> GuardarAsync(Campana campana)
         {
-            if (campana.Id == 0)
+            using var response = campana.Id == 0
+                ? await http.PostAsJsonAsync("campanas", campana, jsonOptions)
+                : await http.PutAsJsonAsync($"campanas/{campana.Id}", campana, jsonOptions);
+
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<Campana>(jsonOptions) ?? campana;
+        }
+
+        private async Task<T?> GetAsync<T>(string url)
+        {
+            using var response = await http.GetAsync(url);
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                campana.Id = campanas.Count > 0 ? campanas.Max(c => c.Id) + 1 : 1;
-                campana.Activa = true;
-                campanas.Add(campana);
+                return default;
             }
-            else
+
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<T>(jsonOptions);
+        }
+
+        private static async Task EnsureSuccessAsync(HttpResponseMessage response)
+        {
+            if (response.IsSuccessStatusCode)
             {
-                var index = campanas.FindIndex(c => c.Id == campana.Id);
-                if (index != -1)
-                {
-                    campanas[index] = campana;
-                }
+                return;
             }
+
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException(
+                string.IsNullOrWhiteSpace(body)
+                    ? $"Error REST {(int)response.StatusCode} {response.ReasonPhrase}"
+                    : body);
         }
     }
+
     public class Campana
     {
+        [JsonPropertyName("idCampana")]
         public int Id { get; set; }
+
+        [JsonPropertyName("nombre")]
         public string Nombre { get; set; } = "";
+
+        [JsonPropertyName("descripcion")]
         public string Descripcion { get; set; } = "";
+
+        [JsonPropertyName("activo")]
         public bool Activa { get; set; } = true;
     }
 }

@@ -1,178 +1,205 @@
-﻿namespace BlazorAppKillaBeauty.Services
-{
-    /*CuponService va a actuar como tu pequeña bd mientras la app web esté abierta
-        Como Blazor no cierra el servicio al cambiar de página, cualquier pantalla que lo "inyecte" 
-        verá exactamente la misma lista*/
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
+namespace BlazorAppKillaBeauty.Services
+{
     public class CuponService
     {
-        private List<Cupon> cupones = new();
-        public CuponService()
+        private readonly HttpClient http;
+        private readonly JsonSerializerOptions jsonOptions = new()
         {
-            cupones.Add(new Cupon
-            {
-                Id = 1,
-                Codigo = "KILLA20",
-                ValorDescuento = 20,
-                TipoDescuento = "Porcentaje",
-                Activo = true,
-                FechaFin = new DateTime(2026, 11, 10)
-            });
-            cupones.Add(new Cupon
-            {
-                Id = 2,
-                Codigo = "MAMA50",
-                ValorDescuento = 50,
-                TipoDescuento = "Monto Fijo",
-                Activo = false,
-                FechaFin = new DateTime(2025, 5, 10)
-            });
-            cupones.Add(new Cupon
-            {
-                Id = 2,
-                Codigo = "MAMA50",
-                ValorDescuento = 50,
-                TipoDescuento = "Monto Fijo",
-                FechaInicio = new DateTime(2026, 06, 02),
-                FechaFin = new DateTime(2026, 06, 30),
-                Activo = true,
-                MontoMinimoCompra = 200,
-                MaxUsosGenerales = 50,
-                UsosActuales = 45,
-                Descripcion = "Promoción mes de la madre"
-            });
+            PropertyNameCaseInsensitive = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
 
-            cupones.Add(new Cupon
-            {
-                Id = 3,
-                Codigo = "ENVIOFREE",
-                ValorDescuento = 10,
-                TipoDescuento = "Monto Fijo",
-                FechaInicio = new DateTime(2026, 05, 01),
-                FechaFin = new DateTime(2026, 05, 31),
-                Activo = false,
-                MontoMinimoCompra = 150,
-                MaxUsosGenerales = 200,
-                UsosActuales = 200,
-                Descripcion = "Cupón vencido de envío"
-            });
-
-            cupones.Add(new Cupon
-            {
-                Id = 4,
-                Codigo = "SUMMER26",
-                ValorDescuento = 15,
-                TipoDescuento = "Porcentaje",
-                FechaInicio = new DateTime(2026, 07, 01),
-                FechaFin = new DateTime(2026, 09, 20),
-                Activo = true,
-                MontoMinimoCompra = 80,
-                MaxUsosGenerales = 500,
-                UsosActuales = 0,
-                Descripcion = "Descuento de temporada de verano"
-            });
-
-            cupones.Add(new Cupon
-            {
-                Id = 5,
-                Codigo = "FLASH100",
-                ValorDescuento = 100,
-                TipoDescuento = "Monto Fijo",
-                FechaInicio = new DateTime(2026, 06, 01),
-                FechaFin = new DateTime(2026, 06, 05),
-                Activo = true,
-                MontoMinimoCompra = 400,
-                MaxUsosGenerales = 20,
-                UsosActuales = 5,
-                Descripcion = "Oferta relámpago"
-            });
-            cupones.Add(new Cupon
-            {
-                Id = 10, Codigo = "BELLEZA2026", ValorDescuento = 15, TipoDescuento = "Porcentaje", FechaInicio = DateTime.Now.AddDays(-15), FechaFin = DateTime.Now.AddDays(90), Activo = true, MontoMinimoCompra = 90, Descripcion = "Aniversario Killa" 
-
-            });
-            cupones.Add(new Cupon
-            {
-                Id = 11, Codigo = "DESCUENTON", ValorDescuento = 100, TipoDescuento = "Monto Fijo", FechaInicio = DateTime.Now.AddDays(-5), FechaFin = DateTime.Now.AddDays(10), Activo = true, MontoMinimoCompra = 500, Descripcion = "Mega ahorro" 
-            });
+        public CuponService(IHttpClientFactory httpClientFactory)
+        {
+            http = httpClientFactory.CreateClient("KillaApi");
         }
 
-        public Cupon? BuscarCupon(string codigo)
+        public async Task<List<Cupon>> ObtenerTodosAsync()
         {
+            return await GetAsync<List<Cupon>>("cupones") ?? new List<Cupon>();
+        }
+
+        public async Task<Cupon?> ObtenerPorIdAsync(int id)
+        {
+            return await GetAsync<Cupon>($"cupones/{id}");
+        }
+
+        public async Task<Cupon?> BuscarCuponAsync(string codigo)
+        {
+            if (string.IsNullOrWhiteSpace(codigo))
+            {
+                return null;
+            }
+
+            var cupones = await ObtenerTodosAsync();
             return cupones.FirstOrDefault(c =>
+                c.Activo &&
                 c.Codigo.Equals(codigo.Trim(), StringComparison.OrdinalIgnoreCase));
         }
 
         public decimal CalcularDescuento(Cupon cupon, decimal subtotal)
         {
-            if (subtotal < cupon.MontoMinimoCompra)
+            if (subtotal < (cupon.MontoMinimoCompra ?? 0))
+            {
                 return 0;
+            }
 
-            decimal descuento = cupon.TipoDescuento == "PORCENTAJE"
+            if (cupon.FechaInicio.HasValue && cupon.FechaInicio.Value.Date > DateTime.Today)
+            {
+                return 0;
+            }
+
+            if (cupon.FechaFin.HasValue && cupon.FechaFin.Value.Date < DateTime.Today)
+            {
+                return 0;
+            }
+
+            var descuento = cupon.EsPorcentaje
                 ? subtotal * (cupon.ValorDescuento / 100)
                 : cupon.ValorDescuento;
 
-            //return Math.Min(descuento, cupon.MontoMaximoDescuento);
             return Math.Min(descuento, cupon.MontoMaximoDescuento ?? decimal.MaxValue);
         }
 
-        public IReadOnlyList<Cupon> ObtenerTodos()
+        public async Task<Cupon> GuardarAsync(Cupon cupon)
         {
-            return cupones;
+            using var response = cupon.Id == 0
+                ? await http.PostAsJsonAsync("cupones", cupon, jsonOptions)
+                : await http.PutAsJsonAsync($"cupones/{cupon.Id}", cupon, jsonOptions);
+
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<Cupon>(jsonOptions) ?? cupon;
         }
 
-        public Cupon ObtenerPorId(int id)
+        public async Task EliminarLogicoAsync(int id)
         {
-            // Busca el cupón. Si es 0 o no lo encuentra, devuelve uno nuevo y limpio.
-            return cupones.FirstOrDefault(c => c.Id == id) ?? new Cupon();
+            using var response = await http.DeleteAsync($"cupones/{id}");
+            await EnsureSuccessAsync(response);
         }
 
-        public void Guardar(Cupon cupon)
+        private async Task<T?> GetAsync<T>(string url)
         {
-            if (cupon.Id == 0)
+            using var response = await http.GetAsync(url);
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                // Simula el "Auto Increment" de la base de datos
-                cupon.Id = cupones.Count > 0 ? cupones.Max(c => c.Id) + 1 : 1;
-                cupon.Activo = true;
-                cupones.Add(cupon);
+                return default;
             }
-            else
-            {
-                // Es un UPDATE: Buscamos el original y lo reemplazamos
-                var index = cupones.FindIndex(c => c.Id == cupon.Id);
-                if (index != -1)
-                {
-                    cupones[index] = cupon;
-                }
-            }
+
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<T>(jsonOptions);
         }
-        public void EliminarLogico(int id)
+
+        private static async Task EnsureSuccessAsync(HttpResponseMessage response)
         {
-            var cupon = cupones.FirstOrDefault(c => c.Id == id);
-            if (cupon != null)
+            if (response.IsSuccessStatusCode)
             {
-                cupon.Activo = false; // Mismo concepto de eliminación lógica de Java
+                return;
             }
+
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException(
+                string.IsNullOrWhiteSpace(body)
+                    ? $"Error REST {(int)response.StatusCode} {response.ReasonPhrase}"
+                    : body);
         }
     }
+
     public class Cupon
     {
+        [JsonPropertyName("id")]
         public int Id { get; set; }
+
+        [JsonPropertyName("codigo")]
         public string Codigo { get; set; } = "";
+
+        [JsonPropertyName("descripcion")]
         public string Descripcion { get; set; } = "";
+
+        [JsonPropertyName("valorDescuento")]
         public decimal ValorDescuento { get; set; }
-        public string TipoDescuento { get; set; } = "seleccione";
-        public DateTime? FechaInicio { get; set; } = DateTime.Now;
-        public DateTime? FechaFin { get; set; } = DateTime.Now.AddDays(7);
+
+        [JsonPropertyName("tipoDescuento")]
+        public string TipoDescuento { get; set; } = "PORCENTAJE";
+
+        [JsonPropertyName("fechaInicio")]
+        public DateTime? FechaInicio { get; set; } = DateTime.Today;
+
+        [JsonPropertyName("fechaFin")]
+        public DateTime? FechaFin { get; set; } = DateTime.Today.AddDays(7);
+
+        [JsonPropertyName("activo")]
         public bool Activo { get; set; } = true;
+
+        [JsonPropertyName("montoMaximoDescuento")]
         public decimal? MontoMaximoDescuento { get; set; }
+
+        [JsonPropertyName("montoMinimoCompra")]
         public decimal? MontoMinimoCompra { get; set; }
+
+        [JsonPropertyName("maxUsosGenerales")]
         public int? MaxUsosGenerales { get; set; }
 
+        [JsonPropertyName("campana")]
+        public Campana? Campana { get; set; }
 
+        [JsonIgnore]
         public int UsosActuales { get; set; } = 0;
 
-        public int? CampanaId { get; set; }
-        public string CampanaNombre { get; set; } = "";
+        [JsonIgnore]
+        public int? CampanaId
+        {
+            get => Campana?.Id;
+            set => Campana = value.HasValue && value.Value > 0 ? new Campana { Id = value.Value } : null;
+        }
+
+        [JsonIgnore]
+        public string CampanaNombre
+        {
+            get => Campana?.Nombre ?? "";
+            set
+            {
+                Campana ??= new Campana();
+                Campana.Nombre = value;
+            }
+        }
+
+        [JsonIgnore]
+        public bool EsPorcentaje => TipoDescuento.Equals("PORCENTAJE", StringComparison.OrdinalIgnoreCase)
+            || TipoDescuento.Equals("Porcentaje", StringComparison.OrdinalIgnoreCase);
+
+        [JsonIgnore]
+        public string TipoDescuentoTexto => EsPorcentaje ? "Porcentaje" : "Monto Fijo";
+
+        [JsonIgnore]
+        public string Titulo => EsPorcentaje
+            ? $"{ValorDescuento:0.##}% OFF"
+            : $"S/ {ValorDescuento:0.##} OFF";
+
+        [JsonIgnore]
+        public string Subtitulo
+        {
+            get
+            {
+                var partes = new List<string>();
+                if (MontoMinimoCompra.HasValue && MontoMinimoCompra.Value > 0)
+                {
+                    partes.Add($"Compra mínima S/ {MontoMinimoCompra.Value:0.##}");
+                }
+                if (MontoMaximoDescuento.HasValue && MontoMaximoDescuento.Value > 0)
+                {
+                    partes.Add($"Tope S/ {MontoMaximoDescuento.Value:0.##}");
+                }
+                return partes.Count == 0 ? TipoDescuentoTexto : string.Join("<br />", partes);
+            }
+        }
+
+        [JsonIgnore]
+        public string DescripcionLegal => string.IsNullOrWhiteSpace(Descripcion)
+            ? "Cupón sujeto a términos y condiciones de Killa Beauty."
+            : Descripcion;
     }
 }
