@@ -44,9 +44,9 @@
     outline: none;
 }
 
-.search-box::placeholder {
-    color: var(--gray-text);
-}
+    .search-box::placeholder {
+        color: var(--gray-text);
+    }
 
 .nav-links {
     display: flex;
@@ -97,13 +97,13 @@
     padding: 0;
 }
 
-.cart-navbar-btn i {
-    font-size: 28px;
-}
+    .cart-navbar-btn i {
+        font-size: 28px;
+    }
 
-.cart-navbar-btn:hover {
-    color: var(--rose);
-}
+    .cart-navbar-btn:hover {
+        color: var(--rose);
+    }
 
 /* BURBUJITA */
 

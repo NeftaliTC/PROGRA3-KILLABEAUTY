@@ -114,6 +114,7 @@ body {
 /* BENEFICIOS */
 
 .benefits {
+    background: var(--white);
     display: flex;
     justify-content: center;
     gap: 120px;
