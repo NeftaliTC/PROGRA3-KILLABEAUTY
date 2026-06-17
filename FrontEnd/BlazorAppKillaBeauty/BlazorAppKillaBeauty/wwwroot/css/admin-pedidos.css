@@ -79,13 +79,11 @@
     font-weight: 800;
 }
 
-.admin-date-selects {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px;
+.admin-date-picker {
+    min-height: 42px;
 }
 
-.admin-date-selects select,
+.admin-date-picker .form-control,
 .admin-status-filter select {
     min-height: 42px;
     width: 100%;
@@ -97,7 +95,18 @@
     outline: none;
 }
 
-.admin-date-selects select:focus,
+.admin-date-picker .form-control {
+    border-radius: 12px;
+    box-shadow: none;
+    font-weight: 700;
+}
+
+.admin-date-picker .form-control::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.72;
+}
+
+.admin-date-picker .form-control:focus,
 .admin-status-filter select:focus {
     border-color: var(--rose-soft);
 }
@@ -524,8 +533,7 @@
 }
 
 @media (max-width: 720px) {
-    .admin-orders-filter-row,
-    .admin-date-selects {
+    .admin-orders-filter-row {
         grid-template-columns: 1fr;
     }
 

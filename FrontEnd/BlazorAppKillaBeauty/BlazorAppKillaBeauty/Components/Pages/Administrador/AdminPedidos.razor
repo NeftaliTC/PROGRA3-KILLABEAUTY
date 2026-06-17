@@ -33,59 +33,21 @@
             <div class="admin-orders-filter-row">
                 <div class="admin-date-group">
                     <span>Fecha inicial</span>
-                    <div class="admin-date-selects">
-                        <select @bind="anioInicio">
-                            <option value="0">Ano</option>
-                            @foreach (var anio in anios)
-                            {
-                                <option value="@anio">@anio</option>
-                            }
-                        </select>
-
-                        <select @bind="mesInicio">
-                            <option value="0">Mes</option>
-                            @foreach (var mes in meses)
-                            {
-                                <option value="@mes.Valor">@mes.Texto</option>
-                            }
-                        </select>
-
-                        <select @bind="diaInicio">
-                            <option value="0">Dia</option>
-                            @foreach (var dia in dias)
-                            {
-                                <option value="@dia">@dia</option>
-                            }
-                        </select>
+                    <div class="admin-date-picker">
+                        <input type="date"
+                               class="form-control"
+                               max="@FechaInicioMaxima"
+                               @bind="fechaInicio" />
                     </div>
                 </div>
 
                 <div class="admin-date-group">
                     <span>Fecha final</span>
-                    <div class="admin-date-selects">
-                        <select @bind="anioFin">
-                            <option value="0">Ano</option>
-                            @foreach (var anio in anios)
-                            {
-                                <option value="@anio">@anio</option>
-                            }
-                        </select>
-
-                        <select @bind="mesFin">
-                            <option value="0">Mes</option>
-                            @foreach (var mes in meses)
-                            {
-                                <option value="@mes.Valor">@mes.Texto</option>
-                            }
-                        </select>
-
-                        <select @bind="diaFin">
-                            <option value="0">Dia</option>
-                            @foreach (var dia in dias)
-                            {
-                                <option value="@dia">@dia</option>
-                            }
-                        </select>
+                    <div class="admin-date-picker">
+                        <input type="date"
+                               class="form-control"
+                               min="@FechaFinMinima"
+                               @bind="fechaFin" />
                     </div>
                 </div>
 
@@ -203,35 +165,14 @@
     private string busqueda = "";
     private string estadoSeleccionado = "Cualquier estado";
 
-    private int anioInicio;
-    private int mesInicio;
-    private int diaInicio;
-    private int anioFin;
-    private int mesFin;
-    private int diaFin;
+    private DateTime? fechaInicio;
+    private DateTime? fechaFin;
 
     private int paginaActual = 1;
     private const int PedidosPorPagina = 5;
 
-    private List<int> anios = new() { 2026, 2025, 2024 };
-
-    private List<MesFiltro> meses = new()
-    {
-        new MesFiltro(1, "Enero"),
-        new MesFiltro(2, "Febrero"),
-        new MesFiltro(3, "Marzo"),
-        new MesFiltro(4, "Abril"),
-        new MesFiltro(5, "Mayo"),
-        new MesFiltro(6, "Junio"),
-        new MesFiltro(7, "Julio"),
-        new MesFiltro(8, "Agosto"),
-        new MesFiltro(9, "Septiembre"),
-        new MesFiltro(10, "Octubre"),
-        new MesFiltro(11, "Noviembre"),
-        new MesFiltro(12, "Diciembre")
-    };
-
-    private List<int> dias = Enumerable.Range(1, 31).ToList();
+    private string? FechaInicioMaxima => fechaFin?.ToString("yyyy-MM-dd");
+    private string? FechaFinMinima => fechaInicio?.ToString("yyyy-MM-dd");
 
     private List<PedidoAdmin> pedidos = new()
     {
@@ -282,40 +223,20 @@
 
     private bool CoincideFechaInicio(PedidoAdmin pedido)
     {
-        var fechaInicio = CrearFecha(anioInicio, mesInicio, diaInicio);
-
         return fechaInicio is null || pedido.Fecha.Date >= fechaInicio.Value.Date;
     }
 
     private bool CoincideFechaFin(PedidoAdmin pedido)
     {
-        var fechaFin = CrearFecha(anioFin, mesFin, diaFin);
-
         return fechaFin is null || pedido.Fecha.Date <= fechaFin.Value.Date;
-    }
-
-    private static DateTime? CrearFecha(int anio, int mes, int dia)
-    {
-        if (anio == 0 || mes == 0 || dia == 0)
-        {
-            return null;
-        }
-
-        var ultimoDia = DateTime.DaysInMonth(anio, mes);
-
-        return new DateTime(anio, mes, Math.Min(dia, ultimoDia));
     }
 
     private void LimpiarFiltros()
     {
         busqueda = "";
         estadoSeleccionado = "Cualquier estado";
-        anioInicio = 0;
-        mesInicio = 0;
-        diaInicio = 0;
-        anioFin = 0;
-        mesFin = 0;
-        diaFin = 0;
+        fechaInicio = null;
+        fechaFin = null;
         paginaActual = 1;
     }
 
@@ -339,8 +260,6 @@
             paginaActual++;
         }
     }
-
-    private record MesFiltro(int Valor, string Texto);
 
     private record PedidoAdmin(
         string Id,
