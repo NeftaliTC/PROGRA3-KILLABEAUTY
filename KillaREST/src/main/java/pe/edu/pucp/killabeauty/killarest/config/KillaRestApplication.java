@@ -9,6 +9,7 @@ import pe.edu.pucp.killabeauty.killarest.services.productos.PaisRS;
 import pe.edu.pucp.killabeauty.killarest.services.productos.ProductoRS;
 import pe.edu.pucp.killabeauty.killarest.services.promocionales.CampanaRS;
 import pe.edu.pucp.killabeauty.killarest.services.promocionales.CuponRS;
+import pe.edu.pucp.killabeauty.killarest.services.usuarios.DireccionRS;
 import pe.edu.pucp.killabeauty.killarest.services.usuarios.PermisoRS;
 import pe.edu.pucp.killabeauty.killarest.services.usuarios.UsuarioRS;
 import pe.edu.pucp.killabeauty.killarest.services.ventas.PedidoRS;
@@ -31,6 +32,7 @@ public class KillaRestApplication extends Application {
         resources.add(PermisoRS.class);
         resources.add(UsuarioRS.class);
         resources.add(PedidoRS.class);
+        resources.add(DireccionRS.class);
         return resources;
     }
 }

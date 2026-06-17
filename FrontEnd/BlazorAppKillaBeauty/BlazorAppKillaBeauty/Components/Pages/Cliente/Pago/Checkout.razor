@@ -112,11 +112,11 @@
             @if (cuponAplicado != null)
             {
                 <p class="coupon-discount">
-                    @cuponAplicado.Codigo
+                    @cuponAplicado.?Codigo
                 </p>
 
                 <div class="coupon-success">
-                    ✓ Cupón <strong>@cuponAplicado.Codigo</strong> aplicado correctamente
+                    ✓ Cupón <strong>@cuponAplicado.?Codigo</strong> aplicado correctamente
                 </div>
             }
             @if (!string.IsNullOrEmpty(errorCupon))
