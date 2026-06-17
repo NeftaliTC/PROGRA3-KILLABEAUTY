@@ -184,6 +184,10 @@
                 <p>
                     El pedido <strong>@pedidoCancelacion.Id</strong> no se puede cancelar porque ya est&aacute;
                     <strong>@pedidoCancelacion.EstadoEnvio.ToLowerInvariant()</strong>.
+                    @if (RequiereReembolso(pedidoCancelacion))
+                    {
+                        <span>Adem&aacute;s, har&aacute; falta gestionar el refund o reembolso del pago.</span>
+                    }
                 </p>
 
                 <div class="admin-order-warning-actions single">
@@ -211,6 +215,10 @@
                 <p>
                     El pedido <strong>@pedidoCancelacion.Id</strong> cambiar&aacute; su estado a
                     <strong>Cancelado</strong>. &iquest;Deseas continuar?
+                    @if (RequiereReembolso(pedidoCancelacion))
+                    {
+                        <span>Este pedido ya fue pagado, por lo que har&aacute; falta gestionar el refund o reembolso.</span>
+                    }
                 </p>
 
                 <div class="admin-order-warning-actions">
@@ -358,6 +366,11 @@
         pedidoCancelacion.EstadoEnvio = "Cancelado";
         pedidoCancelacion.ClaseEstado = "danger";
         CerrarModalCancelacion();
+    }
+
+    private static bool RequiereReembolso(PedidoAdmin pedido)
+    {
+        return pedido.EstadoEnvio is "Pagado" or "En preparaciÃ³n" or "Enviado" or "Entregado";
     }
 
     private enum ModoCancelacion
