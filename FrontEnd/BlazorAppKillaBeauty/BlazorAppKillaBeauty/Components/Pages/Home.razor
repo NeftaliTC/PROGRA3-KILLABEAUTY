@@ -3,6 +3,7 @@
 @using BlazorAppKillaBeauty.Services
 @inject NavigationManager Navigation
 @inject CartService CartService
+@inject ProductoService ProductoService
 
 
 <PageTitle>KILLA Beauty – Belleza que Inspira</PageTitle>
@@ -216,11 +217,176 @@
         Cotiza desde media docena hasta cajones completos.
     </p>
 
-    <button class="btn-distributor">
+    <button class="btn-distributor"
+            @onclick="AbrirModalMayorista">
         Ver precios mayoristas
     </button>
 
 </section>
+
+@if (mostrarModalMayorista)
+{
+    <div class="wholesale-modal-overlay">
+        <section class="wholesale-modal">
+            @if (productoMayoristaSeleccionado == null)
+            {
+                <header class="wholesale-modal-header">
+                    <div>
+                        <h2>Elige un producto</h2>
+                        <p>Selecciona el producto para ver sus precios</p>
+                    </div>
+
+                    <button type="button"
+                            class="wholesale-icon-btn"
+                            aria-label="Cerrar"
+                            @onclick="CerrarModalMayorista">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </header>
+
+                <div class="wholesale-search-wrap">
+                    <i class="bi bi-search"></i>
+                    <input type="search"
+                           placeholder="Buscar producto o marca..."
+                           @bind="busquedaMayorista"
+                           @bind:event="oninput" />
+                </div>
+
+                <div class="wholesale-list">
+                    @if (!ProductosMayoristasFiltrados.Any())
+                    {
+                        <div class="wholesale-empty">
+                            No encontramos productos con esa búsqueda.
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var producto in ProductosMayoristasFiltrados)
+                        {
+                            <button type="button"
+                                    class="wholesale-product-row"
+                                    @onclick="() => SeleccionarProductoMayorista(producto)">
+                                <img src="@producto.Imagen" alt="@producto.Nombre" />
+
+                                <span class="wholesale-product-name">
+                                    @producto.Nombre
+                                    <small>@producto.Marca</small>
+                                </span>
+
+                                <span class="wholesale-product-price">
+                                    <small>Desde</small>
+                                    S/ @producto.PrecioMinimo.ToString("0.00")
+                                </span>
+                            </button>
+                        }
+                    }
+                </div>
+
+                <footer class="wholesale-modal-footer">
+                    <button type="button"
+                            class="wholesale-btn ghost"
+                            @onclick="CerrarModalMayorista">
+                        Cerrar
+                    </button>
+
+                    <button type="button"
+                            class="wholesale-btn primary"
+                            @onclick='() => Navigation.NavigateTo("/catalogo")'>
+                        Ir al catálogo
+                    </button>
+                </footer>
+            }
+            else
+            {
+                <header class="wholesale-modal-header detail">
+                    <button type="button"
+                            class="wholesale-icon-btn"
+                            aria-label="Volver"
+                            @onclick="VolverAListaMayorista">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+
+                    <div>
+                        <h2>Precios mayoristas</h2>
+                        <p>@productoMayoristaSeleccionado.Nombre</p>
+                    </div>
+
+                    <button type="button"
+                            class="wholesale-icon-btn"
+                            aria-label="Cerrar"
+                            @onclick="CerrarModalMayorista">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </header>
+
+                <div class="wholesale-detail-body">
+                    <article class="wholesale-selected-product">
+                        <img src="@productoMayoristaSeleccionado.Imagen" alt="@productoMayoristaSeleccionado.Nombre" />
+
+                        <div>
+                            <h3>@productoMayoristaSeleccionado.Nombre</h3>
+                            <p>Stock: 150 unidades</p>
+                        </div>
+                    </article>
+
+                    @foreach (var escala in EscalasMayoristas)
+                    {
+                        <article class="wholesale-scale @(escala.EsMejorPrecio ? "best" : "")">
+                            <div>
+                                <h3>
+                                    @escala.Nombre
+
+                                    @if (!string.IsNullOrEmpty(escala.Descuento))
+                                    {
+                                        <span>@escala.Descuento</span>
+                                    }
+
+                                    @if (escala.EsMejorPrecio)
+                                    {
+                                        <strong>Mejor precio</strong>
+                                    }
+                                </h3>
+
+                                <p>@escala.Descripcion</p>
+                            </div>
+
+                            <div class="wholesale-scale-price">
+                                <small>Precio c/u</small>
+                                <b>S/ @escala.PrecioUnitario.ToString("0.00")</b>
+
+                                @if (escala.Total > escala.PrecioUnitario)
+                                {
+                                    <small>Total: S/ @escala.Total.ToString("0.00")</small>
+                                }
+                            </div>
+                        </article>
+                    }
+
+                    <div class="wholesale-note">
+                        <i class="bi bi-box-seam"></i>
+                        <span>
+                            Los precios se aplican <strong>automáticamente en el carrito</strong> según la cantidad que elijas.
+                        </span>
+                    </div>
+                </div>
+
+                <footer class="wholesale-modal-footer">
+                    <button type="button"
+                            class="wholesale-btn ghost"
+                            @onclick="CerrarModalMayorista">
+                        Cerrar
+                    </button>
+
+                    <button type="button"
+                            class="wholesale-btn primary"
+                            @onclick="VerProductoMayorista">
+                        Ver producto
+                    </button>
+                </footer>
+            }
+        </section>
+    </div>
+}
 
 @code {
     private int cantidadCarrito = 0;
@@ -272,11 +438,101 @@
         Navigation.NavigateTo($"/usuario-producto/{ConvertirParaUrl(nombreProducto)}");
     }
 
+    private bool mostrarModalMayorista = false;
+    private string busquedaMayorista = "";
+    private BlazorAppKillaBeauty.Services.Producto? productoMayoristaSeleccionado;
+
+    private IEnumerable<BlazorAppKillaBeauty.Services.Producto> ProductosMayoristasFiltrados
+    {
+        get
+        {
+            var query = ProductoService.ObtenerTodos().AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(busquedaMayorista))
+            {
+                query = query.Where(producto =>
+                    producto.Nombre.Contains(busquedaMayorista, StringComparison.OrdinalIgnoreCase)
+                    || producto.Marca.Contains(busquedaMayorista, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return query;
+        }
+    }
+
+    private IEnumerable<EscalaMayorista> EscalasMayoristas
+    {
+        get
+        {
+            if (productoMayoristaSeleccionado == null)
+            {
+                return Enumerable.Empty<EscalaMayorista>();
+            }
+
+            var precioBase = productoMayoristaSeleccionado.PrecioMaximo > 0
+                ? productoMayoristaSeleccionado.PrecioMaximo
+                : productoMayoristaSeleccionado.PrecioMinimo;
+
+            var mediaDocena = decimal.Round(precioBase * 0.89m, 2);
+            var cajon = decimal.Round(precioBase * 0.78m, 2);
+
+            return new List<EscalaMayorista>
+            {
+                new EscalaMayorista("Unidad", "1 unidad", precioBase, 1, "", false),
+                new EscalaMayorista("Media docena", "6 unidades", mediaDocena, 6, "-11%", false),
+                new EscalaMayorista("Cajón (24 unidades)", "24 unidades", cajon, 24, "-22%", true)
+            };
+        }
+    }
+
+    private void AbrirModalMayorista()
+    {
+        mostrarModalMayorista = true;
+        productoMayoristaSeleccionado = null;
+    }
+
+    private void CerrarModalMayorista()
+    {
+        mostrarModalMayorista = false;
+        productoMayoristaSeleccionado = null;
+        busquedaMayorista = "";
+    }
+
+    private void SeleccionarProductoMayorista(BlazorAppKillaBeauty.Services.Producto producto)
+    {
+        productoMayoristaSeleccionado = producto;
+    }
+
+    private void VolverAListaMayorista()
+    {
+        productoMayoristaSeleccionado = null;
+    }
+
+    private void VerProductoMayorista()
+    {
+        if (productoMayoristaSeleccionado == null)
+        {
+            return;
+        }
+
+        Navigation.NavigateTo($"/usuario-producto/{ConvertirParaUrl(productoMayoristaSeleccionado.Nombre)}");
+    }
+
     private string ConvertirParaUrl(string texto)
     {
         return texto
             .Trim()
             .Replace(" ", "-")
             .Replace("/", "-");
+    }
+
+    private record EscalaMayorista(
+        string Nombre,
+        string Descripcion,
+        decimal PrecioUnitario,
+        int Cantidad,
+        string Descuento,
+        bool EsMejorPrecio)
+    {
+        public decimal Total => PrecioUnitario * Cantidad;
     }
 }
