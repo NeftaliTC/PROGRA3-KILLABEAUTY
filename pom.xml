@@ -16,6 +16,7 @@
         <module>dbManager</module>
         <module>killaDAO</module>
         <module>killaBusiness</module>
+        <module>KillaREST</module>
     </modules>
 
     <properties>
