@@ -2,10 +2,19 @@ using BlazorAppKillaBeauty.Components;
 using BlazorAppKillaBeauty.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+
+
+
+builder.Services.AddScoped(sp => new HttpClient
+{
+    BaseAddress = new Uri("http://localhost:8080/KillaREST-1.0-SNAPSHOT/services/")
+});
+
+
 
 // SERVICE
 builder.Services.AddSingleton<AuthService>();
