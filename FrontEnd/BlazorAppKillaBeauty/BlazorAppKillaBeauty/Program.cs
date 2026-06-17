@@ -35,6 +35,7 @@ builder.Services.AddHttpClient("KillaApi", client =>
 
 builder.Services.AddSingleton<AddressService>();
 builder.Services.AddScoped<ProductoService>();
+builder.Services.AddScoped<CourierService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
