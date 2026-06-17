@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace BlazorAppKillaBeauty.Services
 {
-    public class CampanaService
+    public class CourierService
     {
         private readonly HttpClient http;
         private readonly JsonSerializerOptions jsonOptions = new()
@@ -13,40 +13,39 @@ namespace BlazorAppKillaBeauty.Services
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
-        public CampanaService(IHttpClientFactory httpClientFactory)
+        public CourierService(IHttpClientFactory httpClientFactory)
         {
             http = httpClientFactory.CreateClient("KillaApi");
         }
 
-        public async Task<List<Campana>> ObtenerTodasAsync()
+        public async Task<List<Courier>> ObtenerTodosAsync()
         {
-            return await GetAsync<List<Campana>>("campanas") ?? new List<Campana>();
+            return await GetAsync<List<Courier>>("courier") ?? new List<Courier>();
         }
 
-        public async Task<List<Campana>> ObtenerActivasAsync()
+        public async Task<Courier?> ObtenerPorIdAsync(int id)
         {
-            var campanas = await ObtenerTodasAsync();
-            return campanas.Where(c => c.Activa).ToList();
+            return await GetAsync<Courier>($"courier/{id}");
         }
 
-        public async Task<Campana?> ObtenerPorIdAsync(int id)
+        public async Task<Courier> CrearAsync(Courier courier)
         {
-            return await GetAsync<Campana>($"campanas/{id}");
-        }
-
-        public async Task<Campana> GuardarAsync(Campana campana)
-        {
-            using var response = campana.Id == 0
-                ? await http.PostAsJsonAsync("campanas", campana, jsonOptions)
-                : await http.PutAsJsonAsync($"campanas/{campana.Id}", campana, jsonOptions);
-
+            using var response = await http.PostAsJsonAsync("courier", courier, jsonOptions);
             await EnsureSuccessAsync(response);
-            return await response.Content.ReadFromJsonAsync<Campana>(jsonOptions) ?? campana;
+            return await response.Content.ReadFromJsonAsync<Courier>(jsonOptions) ?? courier;
+        }
+
+        public async Task<Courier> ActualizarAsync(Courier courier)
+        {
+            using var response = await http.PutAsJsonAsync($"courier/{courier.Id}", courier, jsonOptions);
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<Courier>(jsonOptions) ?? courier;
         }
 
         private async Task<T?> GetAsync<T>(string url)
         {
             using var response = await http.GetAsync(url);
+
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 return default;
@@ -71,18 +70,24 @@ namespace BlazorAppKillaBeauty.Services
         }
     }
 
-    public class Campana
+    public class Courier
     {
-        [JsonPropertyName("idCampana")]
+        [JsonPropertyName("id")]
         public int Id { get; set; }
 
         [JsonPropertyName("nombre")]
         public string Nombre { get; set; } = "";
 
-        [JsonPropertyName("descripcion")]
-        public string Descripcion { get; set; } = "";
+        [JsonPropertyName("ruc")]
+        public string Ruc { get; set; } = "";
+
+        [JsonPropertyName("telefono")]
+        public string Telefono { get; set; } = "";
 
         [JsonPropertyName("activo")]
-        public bool Activa { get; set; } = true;
+        public bool Activo { get; set; }
+
+        [JsonPropertyName("correo")]
+        public string Correo { get; set; } = "";
     }
 }

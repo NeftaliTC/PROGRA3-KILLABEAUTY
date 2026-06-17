@@ -145,14 +145,28 @@
     <h2 class="section-title">Productos Populares</h2>
     <p class="section-subtitle">Nuestros favoritos</p>
 
-    <div class="product-grid">
+    @if (cargandoProductos)
+    {
+        <div class="product-grid">
+            <p>Cargando productos desde KillaREST...</p>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorProductos))
+    {
+        <div class="product-grid">
+            <p>@errorProductos</p>
+        </div>
+    }
+    else
+    {
+        <div class="product-grid">
 
         @for (int i = 0; i < productos.Count; i++)
         {
             var producto = productos[i];
             var index = i;
 
-            <div class="product-card" @onclick="@(() => IrADetalleProducto(producto.Nombre))">
+            <div class="product-card" @onclick="@(() => IrADetalleProducto(producto.Id))">
 
                 <div class="product-image">
 
@@ -175,7 +189,7 @@
                     <div class="product-footer">
 
                         <span class="price">
-                            S/ @producto.Precio
+                            @MostrarPrecio(producto)
                         </span>
 
                         <button type="button"
@@ -200,7 +214,8 @@
             </div>
         }
 
-    </div>
+        </div>
+    }
 
 </section>
 
@@ -392,22 +407,19 @@
     private int cantidadCarrito = 0;
 
 
-    private List<Producto> productos = new()
-    {
-        new Producto("Sérum Vitamina C Gold Kiwi", "65.00", "Images/Serum.jpg"),
-        new Producto("Crema Hidratante Facial CeraVe", "69.90", "Images/Cerave.jpg"),
-        new Producto("Labial Matte Ink Mood PERIPERA", "45.90", "Images/LabialPeripera.jpg"),
-        new Producto("Máscara Essence Prince False Lash Effect", "52.90", "Images/Mascara.jpg"),
-        new Producto("L03 Professional Protein Treatment LORINIQUE", "42.50", "Images/LoriniqueCabello.jpg")
-    };
+    private List<BlazorAppKillaBeauty.Services.Producto> productos = new();
+    private List<BlazorAppKillaBeauty.Services.Producto> productosMayoristas = new();
+    private bool cargandoProductos = true;
+    private string? errorProductos;
 
     private HashSet<int> productosAnimados = new();
 
     private async Task AgregarCarrito(int index)
     {
         CartService.AgregarProducto(
+            productos[index].Id,
             productos[index].Nombre,
-            decimal.Parse(productos[index].Precio),
+            productos[index].PrecioMinimo,
             productos[index].Imagen
         );
 
@@ -420,22 +432,44 @@
         StateHasChanged();
     }
 
-    private class Producto
+    protected override async Task OnInitializedAsync()
     {
-        public string Nombre { get; set; }
-        public string Precio { get; set; }
-        public string Imagen { get; set; }
-
-        public Producto(string descripcion, string precio, string imagen)
+        try
         {
-            Nombre = descripcion;
-            Precio = precio;
-            Imagen = imagen;
+            productosMayoristas = await ProductoService.ObtenerCatalogoAsync();
+            productos = productosMayoristas
+                .Where(p => p.EsPopular)
+                .Take(5)
+                .ToList();
+
+            if (productos.Count == 0)
+            {
+                productos = productosMayoristas.Take(5).ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            errorProductos = $"No se pudieron cargar los productos: {ex.Message}";
+        }
+        finally
+        {
+            cargandoProductos = false;
         }
     }
-    private void IrADetalleProducto(string nombreProducto)
+
+    private string MostrarPrecio(BlazorAppKillaBeauty.Services.Producto producto)
     {
-        Navigation.NavigateTo($"/usuario-producto/{ConvertirParaUrl(nombreProducto)}");
+        if (producto.PrecioMinimo == producto.PrecioMaximo)
+        {
+            return $"S/ {producto.PrecioMinimo:0.00}";
+        }
+
+        return $"S/ {producto.PrecioMinimo:0.00} - S/ {producto.PrecioMaximo:0.00}";
+    }
+
+    private void IrADetalleProducto(int idProducto)
+    {
+        Navigation.NavigateTo($"/usuario-producto/{idProducto}");
     }
 
     private bool mostrarModalMayorista = false;
@@ -446,7 +480,7 @@
     {
         get
         {
-            var query = ProductoService.ObtenerTodos().AsEnumerable();
+            var query = productosMayoristas.AsEnumerable();
 
             if (!string.IsNullOrWhiteSpace(busquedaMayorista))
             {
@@ -514,7 +548,7 @@
             return;
         }
 
-        Navigation.NavigateTo($"/usuario-producto/{ConvertirParaUrl(productoMayoristaSeleccionado.Nombre)}");
+        Navigation.NavigateTo($"/usuario-producto/{productoMayoristaSeleccionado.Id}");
     }
 
     private string ConvertirParaUrl(string texto)

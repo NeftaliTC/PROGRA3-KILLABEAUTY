@@ -1,81 +1,77 @@
-﻿namespace BlazorAppKillaBeauty.Services
+﻿using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using BlazorAppKillaBeauty.ClienteREST.Models;
+
+namespace BlazorAppKillaBeauty.Services
 {
     public class MarcaService
     {
-        private List<Marca> marcas = new();
-
-        public MarcaService()
+        private readonly HttpClient http;
+        private readonly JsonSerializerOptions jsonOptions = new()
         {
+            PropertyNameCaseInsensitive = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
 
-            marcas.Add(new Marca { Id = 1, Descripcion = "L'Oréal Paris", PaisId = 2, PaisNombre = "Francia", Activo = true });
-            marcas.Add(new Marca { Id = 2, Descripcion = "Maybelline", PaisId = 1, PaisNombre = "Estados Unidos", Activo = false });
-            marcas.Add(new Marca { Id = 3, Descripcion = "Sulwhasoo", PaisId = 3, PaisNombre = "Corea del Sur", Activo = true });
-            marcas.Add(new Marca { Id = 4, Descripcion = "Natura", PaisId = 4, PaisNombre = "Brasil", Activo = true });
-            marcas.Add(new Marca { Id = 5, Descripcion = "SKIN1004", PaisId = 3, PaisNombre = "Corea del Sur", Activo = true });
-            marcas.Add(new Marca { Id = 6, Descripcion = "CELIMAX", PaisId = 3, PaisNombre = "Corea del Sur", Activo = true });
-            marcas.Add(new Marca { Id = 7, Descripcion = "The Ordinary", PaisId = 5, PaisNombre = "Canadá", Activo = true });
-            marcas.Add(new Marca { Id = 8, Descripcion = "CeraVe", PaisId = 1, PaisNombre = "Estados Unidos", Activo = true });
-            marcas.Add(new Marca { Id = 9, Descripcion = "MAC Cosmetics", PaisId = 1, PaisNombre = "Estados Unidos", Activo = true });
-            marcas.Add(new Marca { Id = 10, Descripcion = "Vichy", PaisId = 2, PaisNombre = "Francia", Activo = false });
-            marcas.Add(new Marca { Id = 11, Descripcion = "COSRX", PaisId = 3, PaisNombre = "Corea del Sur", Activo = true });
-            marcas.Add(new Marca { Id = 12, Descripcion = "Isdin", PaisId = 2, PaisNombre = "Francia", Activo = true });
+        public MarcaService(IHttpClientFactory httpClientFactory)
+        {
+            http = httpClientFactory.CreateClient("KillaApi");
         }
 
-       
-
-        public IReadOnlyList<Marca> ObtenerTodas()
+        public async Task<List<Marca>> ListarTodasAsync()
         {
-            return marcas;
+            return await GetAsync<List<Marca>>("marcas") ?? new List<Marca>();
         }
 
-        public IReadOnlyList<Marca> ObtenerActivas()
+        public async Task<Marca?> ObtenerPorIdAsync(int id)
         {
-            return marcas.Where(m => m.Activo).ToList();
+            return await GetAsync<Marca>($"marcas/{id}");
         }
 
-        public Marca ObtenerPorId(int id)
+        public async Task<Marca> CrearAsync(Marca nuevaMarca)
         {
-            return marcas.FirstOrDefault(m => m.Id == id) ?? new Marca();
+            using var response = await http.PostAsJsonAsync("marcas", nuevaMarca, jsonOptions);
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<Marca>(jsonOptions) ?? nuevaMarca;
         }
 
-        public void Guardar(Marca marca)
+        public async Task<Marca> ActualizarMarcaAsync(Marca marca)
         {
-            if (marca.Id == 0)
+            using var response = await http.PutAsJsonAsync($"marcas/{marca.Id}", marca, jsonOptions);
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<Marca>(jsonOptions) ?? marca;
+        }
+
+        public async Task EliminarMarcaAsync(int id)
+        {
+            using var response = await http.DeleteAsync($"marcas/{id}");
+            await EnsureSuccessAsync(response);
+        }
+
+        private async Task<T?> GetAsync<T>(string url)
+        {
+            using var response = await http.GetAsync(url);
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                // Simula el Auto-Increment
-                marca.Id = marcas.Count > 0 ? marcas.Max(m => m.Id) + 1 : 1;
-                marca.Activo = true;
-                marcas.Add(marca);
+                return default;
             }
-            else
-            {
-                // Es un UPDATE
-                var index = marcas.FindIndex(m => m.Id == marca.Id);
-                if (index != -1)
-                {
-                    marcas[index] = marca;
-                }
-            }
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<T>(jsonOptions);
         }
 
-        public void EliminarLogico(int id)
+        private static async Task EnsureSuccessAsync(HttpResponseMessage response)
         {
-            var marca = marcas.FirstOrDefault(m => m.Id == id);
-            if (marca != null)
+            if (response.IsSuccessStatusCode)
             {
-                marca.Activo = false;
+                return;
             }
+
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException(
+                string.IsNullOrWhiteSpace(body)
+                    ? $"Error REST {(int)response.StatusCode} {response.ReasonPhrase}"
+                    : body);
         }
-    }
-    public class Marca
-    {
-        public int Id { get; set; }
-        public string Descripcion { get; set; } = "";
-
-      
-        public int? PaisId { get; set; }
-        public string PaisNombre { get; set; } = "";
-
-        public bool Activo { get; set; } = true;
     }
 }

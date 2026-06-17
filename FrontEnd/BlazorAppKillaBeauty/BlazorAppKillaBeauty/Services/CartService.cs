@@ -17,8 +17,13 @@
 
         public void AgregarProducto(string nombre, decimal precio, string imagen)
         {
+            AgregarProducto(0, nombre, precio, imagen);
+        }
+
+        public void AgregarProducto(int productoId, string nombre, decimal precio, string imagen)
+        {
             var productoExistente =
-                productos.FirstOrDefault(p => p.Nombre == nombre);
+                productos.FirstOrDefault(p => p.ProductoId == productoId && p.Nombre == nombre);
 
             if (productoExistente != null)
             {
@@ -29,6 +34,7 @@
             {
                 productos.Add(new CartItem
                 {
+                    ProductoId = productoId,
                     Nombre = nombre,
                     PrecioOriginal = precio,
                     PrecioUnitario = precio,
@@ -81,6 +87,7 @@
 
     public class CartItem
     {
+        public int ProductoId { get; set; }
         public string Nombre { get; set; } = "";
         public string Imagen { get; set; } = "";
 

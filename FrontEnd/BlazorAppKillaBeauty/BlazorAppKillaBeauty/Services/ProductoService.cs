@@ -1,262 +1,168 @@
-﻿
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using BlazorAppKillaBeauty.ClienteREST.Models;
 
 namespace BlazorAppKillaBeauty.Services
 {
     public class ProductoService
     {
-            
-     private List<Producto> productos = new(){
-        new Producto(
-        "Sérum Vitamina C Gold Kiwi",
-        65.00m,
-        80.00m,
-        "Images/Serum.jpg",
-        "Skincare",
-        "Serums",
-        "Garnier",
-        4,
-        true
-    ),
+        private readonly HttpClient http;
+        private readonly JsonSerializerOptions jsonOptions = new()
+        {
+            PropertyNameCaseInsensitive = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
 
-    new Producto(
-        "Crema Hidratante Facial CeraVe",
-        69.90m,
-        69.90m,
-        "Images/Cerave.jpg",
-        "Skincare",
-        "Crema Hidratante",
-        "CeraVe",
-        4,
-        true
-    ),
+        public ProductoService(IHttpClientFactory httpClientFactory)
+        {
+            http = httpClientFactory.CreateClient("KillaApi");
+        }
 
-    new Producto(
-        "Labial Matte Ink Mood PERIPERA",
-        45.90m,
-        45.90m,
-        "Images/LabialPeripera.jpg",
-        "Makeup",
-        "Labiales",
-        "Peripera",
-        5,
-        true
-    ),
+        public async Task<List<Producto>> ObtenerCatalogoAsync()
+        {
+            return await GetAsync<List<Producto>>("productos/catalogo") ?? new List<Producto>();
+        }
 
-    new Producto(
-        "Máscara Essence Prince False Lash Effect",
-        52.90m,
-        52.90m,
-        "Images/Mascara.jpg",
-        "Makeup",
-        "Máscaras",
-        "Essence",
-        4,
-        true
-    ),
+        public async Task<List<Producto>> ObtenerPopularesAsync()
+        {
+            var productos = await ObtenerCatalogoAsync();
+            return productos.Where(p => p.EsPopular).ToList();
+        }
 
-    new Producto(
-        "L03 Professional Protein Treatment LORINIQUE",
-        42.50m,
-        42.50m,
-        "Images/LoriniqueCabello.jpg",
-        "Cuidado del cabello",
-        "Tratamientos",
-        "Lorinique",
-        4,
-        true
-    ),
+        public async Task<List<ProductoApi>> ObtenerTodosApiAsync()
+        {
+            return await GetAsync<List<ProductoApi>>("productos") ?? new List<ProductoApi>();
+        }
 
-    new Producto(
-        "Limpiador Facial CeraVe Espumoso",
-        58.00m,
-        75.00m,
-        "Images/Logo.png",
-        "Skincare",
-        "Limpiadores faciales",
-        "CeraVe",
-        4,
-        false
-    ),
+        public async Task<ProductoApi?> ObtenerPorIdAsync(int id)
+        {
+            return await GetAsync<ProductoApi>($"productos/{id}");
+        }
 
-    new Producto(
-        "The Ordinary Niacinamide 10% + Zinc 1%",
-        55.00m,
-        70.00m,
-        "Images/Logo.png",
-        "Skincare",
-        "Serums",
-        "The Ordinary",
-        5,
-        false
-    ),
+        public async Task<Producto?> ObtenerCatalogoPorIdAsync(int id)
+        {
+            var productos = await ObtenerCatalogoAsync();
+            return productos.FirstOrDefault(p => p.Id == id);
+        }
 
-    new Producto(
-        "La Roche-Posay Effaclar Gel Limpiador",
-        85.00m,
-        110.00m,
-        "Images/Logo.png",
-        "Skincare",
-        "Limpiadores faciales",
-        "La Roche-Posay",
-        5,
-        false
-    ),
+        public async Task<List<ResenaProducto>> ObtenerResenasAsync(int productoId)
+        {
+            return await GetAsync<List<ResenaProducto>>($"productos/{productoId}/resenas") ?? new List<ResenaProducto>();
+        }
 
-    new Producto(
-        "Garnier Agua Micelar Todo en 1",
-        28.00m,
-        39.90m,
-        "Images/Logo.png",
-        "Skincare",
-        "Limpiadores faciales",
-        "Garnier",
-        4,
-        false
-    ),
+        public async Task<List<Categoria>> ObtenerCategoriasAsync()
+        {
+            return await GetAsync<List<Categoria>>("categorias") ?? new List<Categoria>();
+        }
 
-    new Producto(
-        "CeraVe Crema Hidratante Tarro",
-        95.00m,
-        130.00m,
-        "Images/Logo.png",
-        "Skincare",
-        "Crema Hidratante",
-        "CeraVe",
-        5,
-        false
-    ),
+        public async Task<List<Subcategoria>> ObtenerSubcategoriasAsync()
+        {
+            return await GetAsync<List<Subcategoria>>("categorias/subcategorias") ?? new List<Subcategoria>();
+        }
 
-    new Producto(
-        "Maybelline Fit Me Base Líquida",
-        39.90m,
-        49.90m,
-        "Images/Logo.png",
-        "Makeup",
-        "Bases",
-        "Maybelline",
-        4,
-        false
-    ),
+        public async Task<List<Marca>> ObtenerMarcasAsync()
+        {
+            return await GetAsync<List<Marca>>("marcas") ?? new List<Marca>();
+        }
 
-    new Producto(
-        "Maybelline Sky High Mascara",
-        48.00m,
-        65.00m,
-        "Images/Logo.png",
-        "Makeup",
-        "Máscaras",
-        "Maybelline",
-        5,
-        false
-    ),
+        public async Task<ProductoApi> CrearAsync(ProductoApi producto)
+        {
+            using var response = await http.PostAsJsonAsync("productos", ProductoRequest.From(producto), jsonOptions);
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<ProductoApi>(jsonOptions) ?? producto;
+        }
 
-    new Producto(
-        "Gloss Extreme Shine Essence 09",
-        6.00m,
-        15.00m,
-        "Images/Logo.png",
-        "Makeup",
-        "Labiales",
-        "Essence",
-        4,
-        false
-    ),
+        public async Task<ProductoApi> ActualizarAsync(ProductoApi producto)
+        {
+            using var response = await http.PutAsJsonAsync($"productos/{producto.Id}", ProductoRequest.From(producto), jsonOptions);
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<ProductoApi>(jsonOptions) ?? producto;
+        }
 
-    new Producto(
-        "Rubor Líquido Rare Beauty Soft Pinch",
-        85.00m,
-        120.00m,
-        "Images/Logo.png",
-        "Makeup",
-        "Rubores",
-        "Rare Beauty",
-        5,
-        false
-    ),
+        public async Task DarDeBajaAsync(ProductoApi producto)
+        {
+            producto.Activo = false;
+            producto.Disponible = false;
+            await ActualizarAsync(producto);
+        }
 
-    new Producto(
-        "Corrector Instant Age Rewind Maybelline",
-        35.00m,
-        45.00m,
-        "Images/Logo.png",
-        "Makeup",
-        "Correctores",
-        "Maybelline",
-        4,
-        false
-    ),
+        private async Task<T?> GetAsync<T>(string url)
+        {
+            using var response = await http.GetAsync(url);
 
-    new Producto(
-        "Shampoo Elvive Reparación Total 5",
-        22.00m,
-        29.90m,
-        "Images/Logo.png",
-        "Cuidado del cabello",
-        "Shampoo",
-        "L'Oréal",
-        4,
-        false
-    ),
-
-    new Producto(
-        "Acondicionador Elvive Hidra Hialurónico",
-        22.00m,
-        29.90m,
-        "Images/Logo.png",
-        "Cuidado del cabello",
-        "Acondicionador",
-        "L'Oréal",
-        4,
-        false
-    ),
-
-    new Producto(
-        "Crema de Peinado Rizos Argan Oil 300 ml Lan Pro",
-        20.50m,
-        39.90m,
-        "Images/Logo.png",
-        "Cuidado del cabello",
-        "Cremas de peinar",
-        "Lan Pro",
-        4,
-        false
-    ),
-
-    new Producto(
-        "Tratamiento Capilar Kativa Keratina",
-        45.00m,
-        65.00m,
-        "Images/Logo.png",
-        "Cuidado del cabello",
-        "Tratamientos",
-        "Kativa",
-        5,
-        false
-    ),
-
-    new Producto(
-        "Perfume Ariana Grande Cloud",
-        140.00m,
-        190.00m,
-        "Images/Logo.png",
-        "Fragancias",
-        "Perfumes",
-        "Ariana Grande",
-        5,
-        false
-    )
-};
-   
-
-            public IReadOnlyList<Producto> ObtenerTodos()
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                return productos;
+                return default;
             }
 
-            public IReadOnlyList<Producto> ObtenerPopulares()
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<T>(jsonOptions);
+        }
+
+        private static async Task EnsureSuccessAsync(HttpResponseMessage response)
+        {
+            if (response.IsSuccessStatusCode)
             {
-                return productos.Where(p => p.EsPopular).ToList();
+                return;
+            }
+
+            var body = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException(
+                string.IsNullOrWhiteSpace(body)
+                    ? $"Error REST {(int)response.StatusCode} {response.ReasonPhrase}"
+                    : body);
+        }
+        private class ProductoRequest
+        {
+            [JsonPropertyName("id")]
+            public int Id { get; set; }
+
+            [JsonPropertyName("nombre")]
+            public string Nombre { get; set; } = "";
+
+            [JsonPropertyName("precioBase")]
+            public decimal PrecioBase { get; set; }
+
+            [JsonPropertyName("stock")]
+            public int Stock { get; set; }
+
+            [JsonPropertyName("disponible")]
+            public bool Disponible { get; set; }
+
+            [JsonPropertyName("promocion")]
+            public bool Promocion { get; set; }
+
+            [JsonPropertyName("activo")]
+            public bool Activo { get; set; }
+
+            [JsonPropertyName("marca")]
+            public IdRef Marca { get; set; } = new();
+
+            [JsonPropertyName("subcategoria")]
+            public IdRef Subcategoria { get; set; } = new();
+
+            public static ProductoRequest From(ProductoApi producto)
+            {
+                return new ProductoRequest
+                {
+                    Id = producto.Id,
+                    Nombre = producto.Nombre?.Trim() ?? "",
+                    PrecioBase = producto.PrecioBase,
+                    Stock = producto.Stock,
+                    Disponible = producto.Disponible,
+                    Promocion = producto.Promocion,
+                    Activo = producto.Activo,
+                    Marca = new IdRef { Id = producto.Marca?.Id ?? 0 },
+                    Subcategoria = new IdRef { Id = producto.Subcategoria?.Id ?? 0 }
+                };
             }
         }
-    }
 
+        private class IdRef
+        {
+            [JsonPropertyName("id")]
+            public int Id { get; set; }
+        }
+    }
+}

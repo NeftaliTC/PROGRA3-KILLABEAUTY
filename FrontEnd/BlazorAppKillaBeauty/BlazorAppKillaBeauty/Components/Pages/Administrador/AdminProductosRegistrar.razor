@@ -1,6 +1,9 @@
-﻿@page "/admin/productos/nuevo"
+@page "/admin/productos/nuevo"
 @rendermode InteractiveServer
+@using BlazorAppKillaBeauty.Services
 @inject NavigationManager Navigation
+@inject ProductoService ProductoService
+@using BlazorAppKillaBeauty.ClienteREST.Models
 
 <PageTitle>Registrar nuevo producto - Killa Beauty</PageTitle>
 
@@ -43,22 +46,22 @@
         <section class="admin-product-form-card">
             <div class="admin-form-section-title">
                 <i class="bi bi-tag"></i>
-                <h2>Identificación</h2>
+                <h2>Identificacion</h2>
             </div>
 
             <div class="admin-form-grid-2">
                 <div class="admin-form-field">
-                    <label>Código del producto</label>
+                    <label>Codigo del producto</label>
                     <div class="admin-form-field-readonly">
                         <input disabled value="@codigoGenerado" />
-                        <small>El sistema genera el código único al guardar.</small>
+                        <small>El sistema genera el codigo unico al guardar.</small>
                     </div>
                 </div>
 
                 <div class="admin-form-field">
                     <label>Nombre del producto <span class="required">*</span></label>
                     <input type="text"
-                           placeholder="Ej: Sérum vitamina C 30ml"
+                           placeholder="Ej: Serum vitamina C 30ml"
                            @bind="descripcion" />
                 </div>
             </div>
@@ -67,39 +70,39 @@
         <section class="admin-product-form-card">
             <div class="admin-form-section-title">
                 <i class="bi bi-bookmark"></i>
-                <h2>Clasificación</h2>
+                <h2>Clasificacion</h2>
             </div>
 
             <div class="admin-form-grid-3">
                 <div class="admin-form-field">
-                    <label>Categoría <span class="required">*</span></label>
-                    <select @bind="categoria">
-                        <option value="">Seleccionar categoría</option>
+                    <label>Categoria <span class="required">*</span></label>
+                    <select @bind="categoriaId">
+                        <option value="0">Seleccionar categoria</option>
                         @foreach (var c in categorias)
                         {
-                            <option value="@c">@c</option>
+                            <option value="@c.Id">@c.Descripcion</option>
                         }
                     </select>
                 </div>
 
                 <div class="admin-form-field">
-                    <label>Subcategoría <span class="required">*</span></label>
-                    <select @bind="subcategoria" disabled="@(string.IsNullOrWhiteSpace(categoria))">
-                        <option value="">Seleccionar subcategoría</option>
+                    <label>Subcategoria <span class="required">*</span></label>
+                    <select @bind="subcategoriaId" disabled="@(categoriaId == 0)">
+                        <option value="0">Seleccionar subcategoria</option>
                         @foreach (var s in SubcategoriasFiltradas)
                         {
-                            <option value="@s">@s</option>
+                            <option value="@s.Id">@s.Descripcion</option>
                         }
                     </select>
                 </div>
 
                 <div class="admin-form-field">
                     <label>Marca <span class="required">*</span></label>
-                    <select @bind="marca">
-                        <option value="">Seleccionar marca</option>
+                    <select @bind="marcaId">
+                        <option value="0">Seleccionar marca</option>
                         @foreach (var m in marcas)
                         {
-                            <option value="@m">@m</option>
+                            <option value="@m.Id">@m.Descripcion</option>
                         }
                     </select>
                 </div>
@@ -133,7 +136,7 @@
 
             <div class="admin-form-toggles">
                 <div class="toggle-row">
-                    <span>Disponible en catálogo</span>
+                    <span>Disponible en catalogo</span>
                     <label class="switch">
                         <input type="checkbox" @bind="disponible" />
                         <span class="slider"></span>
@@ -141,7 +144,7 @@
                 </div>
 
                 <div class="toggle-row">
-                    <span>En promoción</span>
+                    <span>En promocion</span>
                     <label class="switch">
                         <input type="checkbox" @bind="enPromocion" />
                         <span class="slider"></span>
@@ -151,7 +154,7 @@
         </section>
 
         <div class="admin-product-form-hint">
-            Las escalas de precio (precio por unidad, media docena, cajón) se configuran después de guardar el producto, desde la pantalla de escalas.
+            Las escalas de precio (precio por unidad, media docena, cajon) se configuran despues de guardar el producto, desde la pantalla de escalas.
         </div>
 
         <footer class="admin-product-form-footer">
@@ -172,7 +175,7 @@
                     </div>
                     <h2>Producto registrado</h2>
                     <p class="admin-modal-text">
-                        Se guardó el producto <strong>@descripcion</strong> (simulado).
+                        Se guardo el producto <strong>@descripcion</strong> EXITOSAMENTE.
                     </p>
 
                     <div class="admin-modal-actions">
@@ -191,64 +194,96 @@
     private string? mensajeError;
     private bool mostrarExito = false;
 
-    // mock “codigo generado”
-    private string codigoGenerado = "KB-149 (generado automáticamente)";
+    // codigo generado
+    private string codigoGenerado = "KB-149 (generado automaticamente)";
 
-    // form fields
     private string descripcion = "";
-    private string categoria = "";
-    private string subcategoria = "";
-    private string marca = "";
+    private int categoriaId;
+    private int subcategoriaId;
+    private int marcaId;
     private decimal precioBase = 0;
     private int stockInicial = 0;
     private bool disponible = true;
     private bool enPromocion = false;
 
-    // mock selects
-    private List<string> categorias = new() { "Skincare", "Maquillaje", "Cabello" };
+    private List<Categoria> categorias = new();
+    private List<Subcategoria> subcategorias = new();
+    private List<Marca> marcas = new();
 
-    private Dictionary<string, List<string>> subcategoriasPorCategoria = new()
+    private List<Subcategoria> SubcategoriasFiltradas =>
+        categoriaId == 0
+            ? new List<Subcategoria>()
+            : subcategorias
+                .Where(s => s.Categoria?.Id == categoriaId)
+                .OrderBy(s => s.Descripcion)
+                .ToList();
+
+    protected override async Task OnInitializedAsync()
     {
-        ["Skincare"] = new() { "Limpieza", "Hidratación", "Protección solar" },
-        ["Maquillaje"] = new() { "Base", "Labios", "Ojos" },
-        ["Cabello"] = new() { "Shampoo", "Mascarillas", "Tratamientos" }
-    };
+        try
+        {
+            categorias = (await ProductoService.ObtenerCategoriasAsync())
+                .Where(c => c.Activo)
+                .OrderBy(c => c.Descripcion)
+                .ToList();
 
-    private List<string> marcas = new() { "The Ordinary", "Maybelline", "Pantene", "NYX", "CeraVe" };
+            subcategorias = (await ProductoService.ObtenerSubcategoriasAsync())
+                .Where(s => s.Activo)
+                .OrderBy(s => s.Descripcion)
+                .ToList();
 
-    private List<string> SubcategoriasFiltradas =>
-        string.IsNullOrWhiteSpace(categoria) ? new List<string>() :
-        (subcategoriasPorCategoria.TryGetValue(categoria, out var list) ? list : new List<string>());
+            marcas = (await ProductoService.ObtenerMarcasAsync())
+                .Where(m => m.Activo)
+                .OrderBy(m => m.Descripcion)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"No se pudieron cargar los datos del formulario: {ex.Message}";
+        }
+    }
 
     private void Cancelar()
     {
         Navigation.NavigateTo("/admin/productos");
     }
 
-    private void Guardar()
+    private async Task Guardar()
     {
-        // Validaciones front (solo interacción)
+        // Validaciones front (solo interaccion)
         if (string.IsNullOrWhiteSpace(descripcion))
         {
             mensajeError = "El descripcion del producto es obligatorio.";
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(categoria))
+        if (categoriaId == 0)
         {
-            mensajeError = "Selecciona una categoría.";
+            mensajeError = "Selecciona una categoria.";
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(subcategoria))
+        if (subcategoriaId == 0)
         {
-            mensajeError = "Selecciona una subcategoría.";
+            mensajeError = "Selecciona una subcategoria.";
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(marca))
+        if (marcaId == 0)
         {
             mensajeError = "Selecciona una marca.";
+            return;
+        }
+
+        if (!marcas.Any(m => m.Id == marcaId))
+        {
+            mensajeError = "La marca seleccionada no existe o no esta activa.";
+            return;
+        }
+
+        if (!SubcategoriasFiltradas.Any(s => s.Id == subcategoriaId))
+        {
+            mensajeError = "La subcategoria seleccionada no pertenece a la categoria elegida.";
             return;
         }
 
@@ -264,13 +299,54 @@
             return;
         }
 
-        mensajeError = null;
-        mostrarExito = true;
+        try
+        {
+            await ProductoService.CrearAsync(new ProductoApi
+            {
+                Nombre = descripcion.Trim(),
+                PrecioBase = precioBase,
+                Stock = stockInicial,
+                Disponible = disponible,
+                Promocion = enPromocion,
+                Activo = disponible,
+                Marca = new Marca { Id = marcaId },
+                Subcategoria = new Subcategoria { Id = subcategoriaId }
+            });
+
+            mensajeError = null;
+            mostrarExito = true;
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"No se pudo registrar el producto: {LimpiarMensajeError(ex.Message)}";
+        }
     }
 
+
+    private static string LimpiarMensajeError(string mensaje)
+    {
+        if (string.IsNullOrWhiteSpace(mensaje))
+        {
+            return "Error desconocido.";
+        }
+
+        if (mensaje.Contains("foreign key", StringComparison.OrdinalIgnoreCase) ||
+            mensaje.Contains("fk_p_m", StringComparison.OrdinalIgnoreCase))
+        {
+            return "La marca seleccionada no existe en la base de datos. Recarga la pagina y selecciona una marca activa.";
+        }
+
+        if (mensaje.Contains("fk_p_s", StringComparison.OrdinalIgnoreCase))
+        {
+            return "La subcategoria seleccionada no existe en la base de datos. Recarga la pagina y selecciona una subcategoria activa.";
+        }
+
+        return mensaje;
+    }
     private void VolverAProductos()
     {
         mostrarExito = false;
         Navigation.NavigateTo("/admin/productos");
     }
 }
+

@@ -1,6 +1,8 @@
 ﻿@page "/admin/productos/{Codigo}/escalas"
 @rendermode InteractiveServer
+@using BlazorAppKillaBeauty.Services
 @inject NavigationManager Navigation
+@inject ProductoService ProductoService
 
 <PageTitle>Escalas de precio - Killa Beauty</PageTitle>
 
@@ -188,19 +190,42 @@
 
     private EscalaForm form = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        // Mock según código
-        producto = Codigo == "KB-001"
-            ? new ProductoMock("KB-001", "Sérum vitamina C 30ml", 45.00m, 38)
-            : new ProductoMock(Codigo, $"Producto {Codigo}", 35.00m, 12);
+        try
+        {
+            var productoApi = await ProductoService.ObtenerPorIdAsync(ObtenerIdProducto());
+            producto = productoApi == null
+                ? new ProductoMock(Codigo, $"Producto {Codigo}", 0m, 0)
+                : new ProductoMock($"KB-{productoApi.Id:000}", productoApi.Nombre, productoApi.PrecioBase, productoApi.Stock);
+        }
+        catch (Exception)
+        {
+            producto = new ProductoMock(Codigo, $"Producto {Codigo}", 0m, 0);
+        }
 
         escalas = new()
         {
             new EscalaMock { Id = 1, Nombre = "Precio unitario", CantidadMinima = 1,  PrecioUnitario = producto.PrecioBase, Activa = true },
-            new EscalaMock { Id = 2, Nombre = "Media docena",    CantidadMinima = 6,  PrecioUnitario = 38.00m, Activa = true },
-            new EscalaMock { Id = 3, Nombre = "Cajón",            CantidadMinima = 12, PrecioUnitario = 30.00m, Activa = true },
+            new EscalaMock { Id = 2, Nombre = "Media docena",    CantidadMinima = 6,  PrecioUnitario = decimal.Round(producto.PrecioBase * 0.89m, 2), Activa = true },
+            new EscalaMock { Id = 3, Nombre = "Cajón",            CantidadMinima = 24, PrecioUnitario = decimal.Round(producto.PrecioBase * 0.78m, 2), Activa = true },
         };
+    }
+
+    private int ObtenerIdProducto()
+    {
+        if (int.TryParse(Codigo, out var id))
+        {
+            return id;
+        }
+
+        if (Codigo.StartsWith("KB-", StringComparison.OrdinalIgnoreCase)
+            && int.TryParse(Codigo[3..], out var codigoId))
+        {
+            return codigoId;
+        }
+
+        return 0;
     }
 
     private void VolverAlProducto() => Navigation.NavigateTo($"/admin/productos/{Codigo}");

@@ -1,11 +1,20 @@
-using BlazorAppKillaBeauty.Components;
+﻿using BlazorAppKillaBeauty.Components;
 using BlazorAppKillaBeauty.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+
+
+
+builder.Services.AddScoped(sp => new HttpClient
+{
+    BaseAddress = new Uri("http://localhost:8080/KillaREST-1.0-SNAPSHOT/services/")
+});
+
+
 
 // SERVICE
 builder.Services.AddSingleton<AuthService>();
@@ -13,11 +22,22 @@ builder.Services.AddSingleton<CartService>();
 builder.Services.AddScoped<CuponService>();
 builder.Services.AddScoped<CampanaService>();
 builder.Services.AddScoped<MarcaService>();
+builder.Services.AddScoped<CategoriaService>();
+builder.Services.AddScoped<PaisService>();
+builder.Services.AddHttpClient("KillaApi", client =>
+{
+    var baseUrl = builder.Configuration["KillaApi:BaseUrl"]
+        ?? "http://localhost:8080/KillaREST-1.0-SNAPSHOT/services/";
+
+    client.BaseAddress = new Uri(baseUrl);
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
 
 
 
 builder.Services.AddSingleton<AddressService>();
-builder.Services.AddSingleton<ProductoService>();
+builder.Services.AddScoped<ProductoService>();
+builder.Services.AddScoped<CourierService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -37,3 +57,4 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
+

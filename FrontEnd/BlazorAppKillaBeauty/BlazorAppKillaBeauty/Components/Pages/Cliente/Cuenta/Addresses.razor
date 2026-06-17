@@ -1,6 +1,9 @@
-﻿@page "/account/addresses"
+@page "/account/addresses"
 @layout AccountLayout
 @rendermode InteractiveServer
+@using BlazorAppKillaBeauty.Services
+@inject AddressService AddressService
+@inject AuthService AuthService
 
 <div class="addresses-content">
     <div class="section-header">
@@ -9,34 +12,49 @@
     </div>
     <span class="description-text">Administra tus direcciones de entrega</span>
 
-    @foreach (var addr in UserAddresses)
+    @if (isLoading)
     {
-        <div class="address-card">
-            <div class="house-icon"><i class="bi bi-house-door-fill"></i></div>
-            <div style="flex-grow: 1;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-                    <strong>@addr.Alias</strong>
-                    @if (addr.IsDefault)
-                    {
-                        <span class="badge-default"><i class="bi bi-star-fill"></i> Predeterminada</span>
-                    }
-                </div>
-                <p style="margin:0; font-size: 14px; color: #555;">
-                    @addr.DireccionDetalle<br />
-                    @addr.Distrito, @addr.Provincia<br />
-                    @addr.Referencia<br />
-                    <i class="bi bi-telephone"></i> @addr.Telefono<br />
-                </p>
-                <div class="card-actions">
-                    @if (!addr.IsDefault)
-                    {
-                        <button class="btn-action btn-purple" @onclick="() => MarcarPredeterminada(addr)"><i class="bi bi-star-fill"></i> Predeterminar</button>
-                    }
-                    <button class="btn-action btn-outline" @onclick="() => AbrirModal(addr)"><i class="bi bi-pencil"></i> Editar</button>
-                    <button class="btn-action btn-delete" @onclick="() => ConfirmarEliminar(addr)"><i class="bi bi-trash"></i> Eliminar</button>
+        <p class="description-text">Cargando direcciones...</p>
+    }
+    else if (!string.IsNullOrEmpty(loadError))
+    {
+        <p class="error-hint-text"><i class="bi bi-exclamation-circle"></i> @loadError</p>
+    }
+    else if (!UserAddresses.Any())
+    {
+        <p class="description-text">Aún no tienes direcciones registradas.</p>
+    }
+    else
+    {
+        @foreach (var addr in UserAddresses)
+        {
+            <div class="address-card">
+                <div class="house-icon"><i class="bi bi-house-door-fill"></i></div>
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                        <strong>@addr.Alias</strong>
+                        @if (addr.IsDefault)
+                        {
+                            <span class="badge-default"><i class="bi bi-star-fill"></i> Predeterminada</span>
+                        }
+                    </div>
+                    <p style="margin:0; font-size: 14px; color: #555;">
+                        @addr.DireccionDetalle<br />
+                        @addr.Distrito, @addr.Provincia<br />
+                        @addr.Referencia<br />
+                        <i class="bi bi-telephone"></i> @addr.Telefono<br />
+                    </p>
+                    <div class="card-actions">
+                        @if (!addr.IsDefault)
+                        {
+                            <button class="btn-action btn-purple" @onclick="() => MarcarPredeterminada(addr)"><i class="bi bi-star-fill"></i> Predeterminar</button>
+                        }
+                        <button class="btn-action btn-outline" @onclick="() => AbrirModal(addr)"><i class="bi bi-pencil"></i> Editar</button>
+                        <button class="btn-action btn-delete" @onclick="() => ConfirmarEliminar(addr)"><i class="bi bi-trash"></i> Eliminar</button>
+                    </div>
                 </div>
             </div>
-        </div>
+        }
     }
 
     <div class="security-banner">
@@ -78,7 +96,6 @@
                 <div class="form-input-group">
                     <label>Departamento</label>
                     <div class="select-wrapper">
-                        @* Por reglas del negocio, limitado a Lima *@
                         <select class="form-control" value="Lima" disabled>
                             <option value="Lima">Lima</option>
                         </select>
@@ -87,9 +104,8 @@
                 <div class="form-input-group">
                     <label>Provincia</label>
                     <div class="select-wrapper">
-                        @* Por reglas del negocio, limitado a Lima Metropolitana *@
-                        <select class="form-control" value="Lima Metropolitana" disabled>
-                            <option value="Lima Metropolitana">Lima Metropolitana</option>
+                        <select class="form-control" value="Lima" disabled>
+                            <option value="Lima">Lima</option>
                         </select>
                     </div>
                 </div>
@@ -118,6 +134,11 @@
                 <p class="error-hint-text"><i class="bi bi-exclamation-circle"></i> Complete todos los campos obligatorios.</p>
             }
 
+            @if (!string.IsNullOrEmpty(saveError))
+            {
+                <p class="error-hint-text"><i class="bi bi-exclamation-circle"></i> @saveError</p>
+            }
+
             <div class="modal-footer">
                 <button class="btn-modal-cancel" @onclick="CerrarModal">Cancelar</button>
                 <button class="btn-modal-save" @onclick="GuardarDireccion">Guardar</button>
@@ -131,10 +152,15 @@
     <div class="modal-overlay">
         <div class="modal-box" style="text-align: center; padding: 30px;">
             <h4 style="font-size: 20px; font-weight: 700; margin-bottom: 15px;">¿Eliminar dirección?</h4>
-            
+
             <p style="color: #6b7280; font-size: 14px; margin-bottom: 25px;">
                 Esta acción no se puede deshacer.
             </p>
+
+            @if (!string.IsNullOrEmpty(saveError))
+            {
+                <p class="error-hint-text"><i class="bi bi-exclamation-circle"></i> @saveError</p>
+            }
 
             <div class="modal-footer" style="display: flex; justify-content: center; gap: 15px;">
                 <button class="btn-modal-cancel" @onclick="() => showDeleteModal = false">Cancelar</button>
@@ -145,76 +171,94 @@
 }
 
 @code {
-    // Lista estática fija con los distritos de Lima Metropolitana para el ComboBox
-    private List<string> DistritosLima = new() {
-    "Ancón", "Ate", "Barranco", "Breña", "Carabayllo", "Cercado de Lima", "Chaclacayo", "Chorrillos", "Cieneguilla", "Comas",
-    "El Agustino", "Independencia", "Jesús María", "La Molina", "La Victoria", "Lince", "Los Olivos", "Lurigancho (Chosica)",
-    "Lurín", "Magdalena del Mar", "Miraflores", "Pachacámac", "Pucusana", "Pueblo Libre", "Puente Piedra", "Punta Hermosa",
-    "Punta Negra", "Rímac", "San Bartolo", "San Borja", "San Isidro", "San Juan de Lurigancho", "San Juan de Miraflores",
-    "San Luis", "San Martín de Porres", "San Miguel", "Santa Anita", "Santa María del Mar", "Santa Rosa", "Santiago de Surco",
-    "Surquillo", "Villa El Salvador", "Villa María del Triunfo"
-};
-
-    // Lista con datos de prueba iniciales
-    private List<Address> UserAddresses = new() {
-        new Address {
-            Id = 1,
-            Alias = "Casa",
-            DireccionDetalle = "Av. Javier Prado 123",
-            Distrito = "Miraflores",
-            Provincia = "Lima Metropolitana",
-            Departamento = "Lima",
-            Telefono = "987654321",
-            Referencia = "A dos cuadras de la Plaza",
-            IsDefault = true
-        },
-        new Address {
-            Id = 2,
-            Alias = "Trabajo",
-            DireccionDetalle = "Calle Las Begonias 456",
-            Distrito = "San Isidro",
-            Provincia = "Lima Metropolitana",
-            Departamento = "Lima",
-            Telefono = "912345678",
-            Referencia = "Frente al parque Las Magnolias",
-            IsDefault = false
-        }
-    };
+    private const int ClienteDemoId = 2;
+    private List<Address> UserAddresses => AddressService.UserAddresses;
     private Address editingAddress = new();
-    private Address addressToDelete;
-    private bool showModal, showDeleteModal, isError, isPhoneError;
+    private Address? addressToDelete;
+    private bool showModal, showDeleteModal, isError, isPhoneError, isLoading;
+    private string loadError = "";
+    private string saveError = "";
 
-    private void GuardarDireccion()
+    private int UsuarioId => AuthService.UsuarioId ?? ClienteDemoId;
+
+    private List<string> DistritosLima = new() {
+        "Ancón", "Ate", "Barranco", "Breña", "Carabayllo", "Cercado de Lima", "Chaclacayo", "Chorrillos", "Cieneguilla", "Comas",
+        "El Agustino", "Independencia", "Jesús María", "La Molina", "La Victoria", "Lince", "Los Olivos", "Lurigancho (Chosica)",
+        "Lurín", "Magdalena del Mar", "Miraflores", "Pachacámac", "Pucusana", "Pueblo Libre", "Puente Piedra", "Punta Hermosa",
+        "Punta Negra", "Rímac", "San Bartolo", "San Borja", "San Isidro", "San Juan de Lurigancho", "San Juan de Miraflores",
+        "San Luis", "San Martín de Porres", "San Miguel", "Santa Anita", "Santa María del Mar", "Santa Rosa", "Santiago de Surco",
+        "Surquillo", "Villa El Salvador", "Villa María del Triunfo"
+    };
+
+    protected override async Task OnInitializedAsync()
     {
-        // Validar si hay campos vacíos (esto es para el aviso de "Completar todos los campos")
-        isError = string.IsNullOrEmpty(editingAddress.Alias) ||
-                  string.IsNullOrEmpty(editingAddress.DireccionDetalle) ||
-                  string.IsNullOrEmpty(editingAddress.Distrito) ||
-                  string.IsNullOrEmpty(editingAddress.Telefono) ||
-                  string.IsNullOrEmpty(editingAddress.Referencia);
+        await CargarDirecciones();
+    }
 
-        // Validar formato de teléfono (esto es para el aviso específico de "9 dígitos")
-        isPhoneError = !string.IsNullOrEmpty(editingAddress.Telefono) && (editingAddress.Telefono.Length != 9 || !editingAddress.Telefono.StartsWith("9"));
+    private async Task CargarDirecciones()
+    {
+        try
+        {
+            isLoading = true;
+            loadError = "";
+            await AddressService.CargarPorUsuarioAsync(UsuarioId);
+        }
+        catch (Exception ex)
+        {
+            loadError = $"No se pudieron cargar las direcciones: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
 
-        // Si hay errores, no guardamos
+    private async Task GuardarDireccion()
+    {
+        saveError = "";
+        isError = string.IsNullOrWhiteSpace(editingAddress.Alias) ||
+                  string.IsNullOrWhiteSpace(editingAddress.DireccionDetalle) ||
+                  string.IsNullOrWhiteSpace(editingAddress.Distrito) ||
+                  string.IsNullOrWhiteSpace(editingAddress.Telefono) ||
+                  string.IsNullOrWhiteSpace(editingAddress.Referencia);
+
+        isPhoneError = !string.IsNullOrWhiteSpace(editingAddress.Telefono) &&
+                       (editingAddress.Telefono.Length != 9 ||
+                        !editingAddress.Telefono.All(char.IsDigit) ||
+                        !editingAddress.Telefono.StartsWith("9"));
+
         if (isError || isPhoneError) return;
 
-        // Guardar
-        if (editingAddress.Id == 0)
+        try
         {
-            editingAddress.Id = UserAddresses.Count + 1;
-            UserAddresses.Add(editingAddress);
+            editingAddress.Departamento = "Lima";
+            editingAddress.Provincia = "Lima";
+            editingAddress.CodigoPostal = string.IsNullOrWhiteSpace(editingAddress.CodigoPostal) ? "15000" : editingAddress.CodigoPostal;
+            editingAddress.Usuario = new UsuarioDireccion { Id = UsuarioId };
+
+            if (editingAddress.Id == 0)
+            {
+                await AddressService.CrearAsync(editingAddress, UsuarioId);
+            }
+            else
+            {
+                await AddressService.ActualizarAsync(editingAddress, UsuarioId);
+            }
+
+            CerrarModal();
         }
-        else
+        catch (Exception ex)
         {
-            var index = UserAddresses.FindIndex(a => a.Id == editingAddress.Id);
-            editingAddress.IsDefault = UserAddresses[index].IsDefault;
-            UserAddresses[index] = editingAddress;
+            saveError = $"No se pudo guardar la dirección: {ex.Message}";
         }
-    
-        CerrarModal();
     }
-    private void AbrirModal(Address addr = null) {
+
+    private void AbrirModal(Address? addr = null)
+    {
+        saveError = "";
+        isError = false;
+        isPhoneError = false;
+
         if (addr != null)
         {
             editingAddress = new Address
@@ -226,56 +270,60 @@
                 Provincia = addr.Provincia,
                 Distrito = addr.Distrito,
                 Telefono = addr.Telefono,
-                Referencia = addr.Referencia
+                Referencia = addr.Referencia,
+                CodigoPostal = addr.CodigoPostal,
+                IsDefault = addr.IsDefault
             };
         }
         else
         {
-            // Al ser nueva, forzamos que por defecto nazca con Lima y Lima Metropolitana
             editingAddress = new Address
             {
                 Departamento = "Lima",
-                Provincia = "Lima Metropolitana",
+                Provincia = "Lima",
+                CodigoPostal = "15000",
                 Distrito = ""
             };
         }
+
         showModal = true;
     }
+
     private void CerrarModal() => showModal = false;
 
-    private void ConfirmarEliminar(Address addr) {
+    private void ConfirmarEliminar(Address addr)
+    {
+        saveError = "";
         addressToDelete = addr;
         showDeleteModal = true;
     }
 
-    private void EjecutarEliminar() {
-        // Verificamos si la que vamos a borrar es la predeterminada
-        bool eraPredeterminada = addressToDelete.IsDefault;
+    private async Task EjecutarEliminar()
+    {
+        if (addressToDelete is null) return;
 
-        UserAddresses.Remove(addressToDelete); // Eliminar dirección
-
-        if (eraPredeterminada && UserAddresses.Count > 0)
+        try
         {
-            UserAddresses[0].IsDefault = true;
+            await AddressService.EliminarAsync(addressToDelete.Id, UsuarioId);
+            showDeleteModal = false;
+            addressToDelete = null;
         }
-
-        showDeleteModal = false;
-        addressToDelete = null;
-    }
-    private void MarcarPredeterminada(Address addr) {
-        UserAddresses.ForEach(a => a.IsDefault = false);
-        addr.IsDefault = true;
+        catch (Exception ex)
+        {
+            saveError = $"No se pudo eliminar la dirección: {ex.Message}";
+        }
     }
 
-    public class Address {
-        public int Id { get; set; }
-        public string Alias { get; set; }
-        public string DireccionDetalle { get; set; }
-        public string Distrito { get; set; }
-        public string Provincia { get; set; }
-        public string Departamento { get; set; }
-        public string Telefono { get; set; }
-        public string Referencia { get; set; }
-        public bool IsDefault { get; set; }
+    private async Task MarcarPredeterminada(Address addr)
+    {
+        try
+        {
+            saveError = "";
+            await AddressService.MarcarPredeterminadaAsync(addr, UsuarioId);
+        }
+        catch (Exception ex)
+        {
+            saveError = $"No se pudo predeterminar la dirección: {ex.Message}";
+        }
     }
 }
