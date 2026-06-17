@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+
 public class DBManager {
 // publica para q los otros modelos puedan usar la clase
 
@@ -24,14 +25,21 @@ public class DBManager {
         properties = new Properties();
         try {
             InputStream inputStream = getClass().getClassLoader().getResourceAsStream(DB_CREDENTIALS_FILE);
+            if (inputStream == null) {
+                throw new IOException("No se encontro el archivo " + DB_CREDENTIALS_FILE);
+            }
             properties.load(inputStream);
+            Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (IOException ex) {
             System.out.println("Error when loading properties file: " + ex.getMessage());
+        } catch (ClassNotFoundException ex) {
+            System.out.println("Error when loading MySQL JDBC driver: " + ex.getMessage());
         }
         String host = properties.getProperty("host");
         String port = properties.getProperty("port");
         String database = properties.getProperty("database");
-        this.url = "jdbc:mysql://" + host + ":" + port + "/" + database;
+        this.url = "jdbc:mysql://" + host + ":" + port + "/" + database
+                + "?sslMode=DISABLED&allowPublicKeyRetrieval=true&serverTimezone=UTC";
         this.user = properties.getProperty("user");
         this.password = properties.getProperty("password");
     }
