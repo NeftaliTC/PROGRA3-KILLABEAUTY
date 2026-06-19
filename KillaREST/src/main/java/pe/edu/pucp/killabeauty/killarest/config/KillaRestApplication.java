@@ -12,6 +12,7 @@ import pe.edu.pucp.killabeauty.killarest.services.promocionales.CuponRS;
 import pe.edu.pucp.killabeauty.killarest.services.usuarios.DireccionRS;
 import pe.edu.pucp.killabeauty.killarest.services.usuarios.PermisoRS;
 import pe.edu.pucp.killabeauty.killarest.services.usuarios.UsuarioRS;
+import pe.edu.pucp.killabeauty.killarest.services.ventas.CarritoRS;
 import pe.edu.pucp.killabeauty.killarest.services.ventas.PedidoRS;
 
 import java.util.HashSet;
@@ -33,6 +34,7 @@ public class KillaRestApplication extends Application {
         resources.add(UsuarioRS.class);
         resources.add(PedidoRS.class);
         resources.add(DireccionRS.class);
+        resources.add(CarritoRS.class);
         return resources;
     }
 }

@@ -21,7 +21,7 @@
             Los mejores productos de skincare,
             maquillaje y cuidado capilar
         </p>
-        
+
         <div class="hero-buttons">
             <button class="btn-primary"
                     @onclick='() => Navigation.NavigateTo("/catalogo")'>
@@ -161,58 +161,58 @@
     {
         <div class="product-grid">
 
-        @for (int i = 0; i < productos.Count; i++)
-        {
-            var producto = productos[i];
-            var index = i;
+            @for (int i = 0; i < productos.Count; i++)
+            {
+                var producto = productos[i];
+                var index = i;
 
-            <div class="product-card" @onclick="@(() => IrADetalleProducto(producto.Id))">
+                <div class="product-card" @onclick="@(() => IrADetalleProducto(producto.Id))">
 
-                <div class="product-image">
+                    <div class="product-image">
 
-                    <img src="@producto.Imagen" alt="@producto.Nombre" />
-
-                </div>
-
-                <div class="product-info">
-
-                    <h3>@producto.Nombre</h3>
-
-                    <div class="stars">
-                        <span>★</span>
-                        <span>★</span>
-                        <span>★</span>
-                        <span>★</span>
-                        <span class="star-empty">★</span>
-                    </div>
-
-                    <div class="product-footer">
-
-                        <span class="price">
-                            @MostrarPrecio(producto)
-                        </span>
-
-                        <button type="button"
-                                class="cart-btn @(productosAnimados.Contains(index) ? "cart-added" : "")"
-                                @onclick:stopPropagation="true"
-                                @onclick="() => AgregarCarrito(index)">
-                            @if (productosAnimados.Contains(index))
-                            {
-                                <i class="bi bi-check-lg"></i>
-                            }
-                            else
-                            {
-                                <i class="bi bi-cart3"></i>
-                            }
-
-                        </button>
+                        <img src="@producto.Imagen" alt="@producto.Nombre" />
 
                     </div>
 
-                </div>
+                    <div class="product-info">
 
-            </div>
-        }
+                        <h3>@producto.Nombre</h3>
+
+                        <div class="stars">
+                            <span>★</span>
+                            <span>★</span>
+                            <span>★</span>
+                            <span>★</span>
+                            <span class="star-empty">★</span>
+                        </div>
+
+                        <div class="product-footer">
+
+                            <span class="price">
+                                @MostrarPrecio(producto)
+                            </span>
+
+                            <button type="button"
+                                    class="cart-btn @(productosAnimados.Contains(index) ? "cart-added" : "")"
+                                    @onclick:stopPropagation="true"
+                                    @onclick="() => AgregarCarrito(index)">
+                                @if (productosAnimados.Contains(index))
+                                {
+                                    <i class="bi bi-check-lg"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-cart3"></i>
+                                }
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
 
         </div>
     }
