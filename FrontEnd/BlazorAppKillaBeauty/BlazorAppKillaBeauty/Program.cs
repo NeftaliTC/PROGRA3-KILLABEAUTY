@@ -1,4 +1,5 @@
-﻿using BlazorAppKillaBeauty.Components;
+﻿using BlazorAppKillaBeauty.ClienteREST.Utils.BlazorAppKillaBeauty.Utils;
+using BlazorAppKillaBeauty.Components;
 using BlazorAppKillaBeauty.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,7 +35,7 @@ builder.Services.AddHttpClient("KillaApi", client =>
 });
 
 
-
+builder.Services.AddScoped<HttpClientUtils>();
 builder.Services.AddSingleton<AddressService>();
 builder.Services.AddScoped<ProductoService>();
 builder.Services.AddScoped<CourierService>();
