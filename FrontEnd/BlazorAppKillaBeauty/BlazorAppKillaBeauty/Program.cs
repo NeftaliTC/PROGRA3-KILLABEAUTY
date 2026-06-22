@@ -1,4 +1,5 @@
-﻿using BlazorAppKillaBeauty.ClienteREST.Utils.BlazorAppKillaBeauty.Utils;
+﻿using BlazorAppKillaBeauty.ClienteREST.ServicesAct;
+using BlazorAppKillaBeauty.ClienteREST.Utils.BlazorAppKillaBeauty.Utils;
 using BlazorAppKillaBeauty.Components;
 using BlazorAppKillaBeauty.Services;
 
