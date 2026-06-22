@@ -1,18 +1,15 @@
 package pe.edu.pucp.killabeauty.killarest.dto;
 
 import pe.edu.pucp.killaBeauty.killaModelo.Producto;
-
 public class ProductoCatalogoDTO {
     private int id;
     private String nombre;
-    private double precioMinimo;
-    private double precioMaximo;
-    private String imagen;
+    private double precioBase;
     private String categoria;
     private String subcategoria;
     private String marca;
-    private int calificacion;
-    private boolean esPopular;
+//    private Boolean esPopular;
+    private Boolean activo;
 
     public ProductoCatalogoDTO() {
     }
@@ -20,23 +17,51 @@ public class ProductoCatalogoDTO {
     public ProductoCatalogoDTO(Producto producto) {
         this.id = producto.getId();
         this.nombre = producto.getNombre();
-        this.precioMinimo = producto.getPrecioBase();
-        this.precioMaximo = producto.getPrecioBase();
-        this.imagen = "Images/Logo.png";
-        this.categoria = producto.getSubcategoria() != null
+        this.precioBase = producto.getPrecioBase();
+
+
+        this.categoria = (producto.getSubcategoria() != null
                 && producto.getSubcategoria().getCategoria() != null
-                && producto.getSubcategoria().getCategoria().getDescripcion() != null
+                && producto.getSubcategoria().getCategoria().getDescripcion() != null)
                 ? producto.getSubcategoria().getCategoria().getDescripcion()
-                : "Categoria " + getIdSubcategoria(producto);
-        this.subcategoria = producto.getSubcategoria() != null
-                && producto.getSubcategoria().getDescripcion() != null
+                : "Sin Categoría";
+
+        this.subcategoria = (producto.getSubcategoria() != null
+                && producto.getSubcategoria().getDescripcion() != null)
                 ? producto.getSubcategoria().getDescripcion()
-                : "Subcategoria " + getIdSubcategoria(producto);
-        this.marca = producto.getMarca() != null && producto.getMarca().getDescripcion() != null
+                : "Sin Subcategoría";
+
+        this.marca = (producto.getMarca() != null
+                && producto.getMarca().getDescripcion() != null)
                 ? producto.getMarca().getDescripcion()
-                : "Marca " + getIdMarca(producto);
-        this.calificacion = 4;
-        this.esPopular = Boolean.TRUE.equals(producto.getPromocion());
+                : "Sin Marca";
+
+//        this.esPopular = producto.getPromocion() != null ? producto.getPromocion() : false;
+        this.activo = producto.getDisponible() != null ? producto.getDisponible() : false;
+    }
+
+    public double getPrecioBase() {
+        return precioBase;
+    }
+
+    public void setPrecioBase(double precioBase) {
+        this.precioBase = precioBase;
+    }
+
+//    public Boolean getEsPopular() {
+//        return esPopular;
+//    }
+//
+//    public void setEsPopular(Boolean esPopular) {
+//        this.esPopular = esPopular;
+//    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 
     private int getIdMarca(Producto producto) {
@@ -63,30 +88,6 @@ public class ProductoCatalogoDTO {
         this.nombre = nombre;
     }
 
-    public double getPrecioMinimo() {
-        return precioMinimo;
-    }
-
-    public void setPrecioMinimo(double precioMinimo) {
-        this.precioMinimo = precioMinimo;
-    }
-
-    public double getPrecioMaximo() {
-        return precioMaximo;
-    }
-
-    public void setPrecioMaximo(double precioMaximo) {
-        this.precioMaximo = precioMaximo;
-    }
-
-    public String getImagen() {
-        return imagen;
-    }
-
-    public void setImagen(String imagen) {
-        this.imagen = imagen;
-    }
-
     public String getCategoria() {
         return categoria;
     }
@@ -111,19 +112,4 @@ public class ProductoCatalogoDTO {
         this.marca = marca;
     }
 
-    public int getCalificacion() {
-        return calificacion;
-    }
-
-    public void setCalificacion(int calificacion) {
-        this.calificacion = calificacion;
-    }
-
-    public boolean getEsPopular() {
-        return esPopular;
-    }
-
-    public void setEsPopular(boolean esPopular) {
-        this.esPopular = esPopular;
-    }
 }
