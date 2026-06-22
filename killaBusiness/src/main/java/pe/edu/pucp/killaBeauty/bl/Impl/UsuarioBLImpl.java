@@ -2,6 +2,7 @@ package pe.edu.pucp.killaBeauty.bl.Impl;
 
 import pe.edu.pucp.killaBeauty.bl.UsuarioBL;
 import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
+import pe.edu.pucp.killaBeauty.killaModelo.TipoUsuario;
 import pe.edu.pucp.killaBeauty.killaModelo.Usuario;
 import pe.edu.pucp.killaDAO.Impl.UsuarioDAOImpl;
 import pe.edu.pucp.killaDAO.UsuarioDAO;
@@ -15,11 +16,24 @@ public class UsuarioBLImpl implements UsuarioBL {
     @Override
     public Usuario create(Usuario usuario) throws BusinessLogicException {
         if(usuario.getCorreoElectronico() == null || usuario.getCorreoElectronico().isEmpty())
-            throw new BusinessLogicException("El correo no puede estar vacío");
+            throw new BusinessLogicException("El campo correo no puede estar vacío");
+        if (usuario.getFechaNacimiento() == null) {
+            throw new BusinessLogicException("La fecha de nacimiento es obligatoria.");
+        }
         try {
+            Usuario usuarioExistente = usuarioDAO.loadByEmail(usuario.getCorreoElectronico());
+            if (usuarioExistente != null) {
+                throw new BusinessLogicException("El correo electrónico ya se encuentra registrado.");
+            }
+            usuario.setActivo(true);
+//            TipoUsuario tipoCliente = new TipoUsuario();
+//            tipoCliente.setId(2);
+            usuario.setTipoUsuario(TipoUsuario.CLIENTE);
+            usuario.setFechaDeInscripcion(new java.util.Date());
             return usuarioDAO.save(usuario);
+            // ultimo acceso se actualizará con la fecha actual recién cuando haga su primer Login.
         } catch(SQLException e) {
-            throw new BusinessLogicException(e);
+            throw new BusinessLogicException("Error interno: " + e.getMessage());
         }
     }
 
