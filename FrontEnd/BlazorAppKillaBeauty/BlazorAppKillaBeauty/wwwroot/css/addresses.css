@@ -25,15 +25,32 @@
 }
 
 /* --- Tarjetas --- */
-.btn-new-address {
-    background-color: #f1b7c7;
-    color: white;
+.btn-new-address-button {
+    background-color: var(--rose-soft);
+    color: var(--white);
     border: none;
-    padding: 8px 16px;
+    padding: 10px 20px;
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
+    box-shadow: 0 2px 6px rgba(241, 183, 199, 0.3);
+    transition: all 0.2s ease-in-out;
 }
+
+    /* Efecto al pasar el mouse por encima (Hover) */
+    .btn-new-address-button:hover {
+        background-color: var(--rose);
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(241, 183, 199, 0.4);
+    }
+
+    /* Efecto exacto al pulsarlo / darle clic */
+    .btn-new-address-button:active {
+        background-color: #d28da0;
+        transform: translateY(1px);
+        box-shadow: 0 2px 4px rgba(241, 183, 199, 0.2);
+    }
 
 .address-card {
     border: 1.5px solid #fde8ec;
