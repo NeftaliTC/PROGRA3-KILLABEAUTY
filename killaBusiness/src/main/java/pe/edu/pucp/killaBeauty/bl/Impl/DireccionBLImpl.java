@@ -6,6 +6,7 @@ import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
 import pe.edu.pucp.killaBeauty.killaModelo.Direccion;
 import pe.edu.pucp.killaDAO.DireccionDAO;
 import pe.edu.pucp.killaDAO.Impl.DireccionDAOImpl;
+import pe.edu.pucp.killaBeauty.bl.utils.FormatHelper;
 
 import java.util.List;
 
@@ -13,29 +14,15 @@ public class DireccionBLImpl implements DireccionBL {
 
     private DireccionDAO direccionDAO = new DireccionDAOImpl();
 
-    private String capitalizarTexto(String texto) {
-        if (texto == null || texto.trim().isEmpty()) return texto;
-        String[] palabras = texto.trim().split("\\s+");
-        StringBuilder resultado = new StringBuilder();
-        for (String palabra : palabras) {
-            if (!palabra.isEmpty()) {
-                resultado.append(palabra.substring(0, 1).toUpperCase())
-                        .append(palabra.substring(1).toLowerCase())
-                        .append(" ");
-            }
-        }
-        return resultado.toString().trim();
-    }
-
     @Override
     public Direccion create(Direccion d) throws BusinessLogicException {
         try {
             TransactionContext.getConnection();
 
             // Capitalizar Alias y Detalle de Dirección
-            d.setAlias(capitalizarTexto(d.getAlias()));
-            d.setDireccionDetalle(capitalizarTexto(d.getDireccionDetalle()));
-            if (d.getReferencia() != null) d.setReferencia(capitalizarTexto(d.getReferencia()));
+            d.setAlias(FormatHelper.capitalizarTexto(d.getAlias()));
+            d.setDireccionDetalle(FormatHelper.capitalizarTexto(d.getDireccionDetalle()));
+            if (d.getReferencia() != null) d.setReferencia(FormatHelper.capitalizarTexto(d.getReferencia()));
 
             // No permitir nombres (alias) repetidos para el mismo usuario
             List<Direccion> lista = direccionDAO.listarPorUsuario(d.getUsuario().getId());
@@ -69,9 +56,9 @@ public class DireccionBLImpl implements DireccionBL {
             TransactionContext.getConnection();
 
             // CAPITALIZACIÓN: Solo lo necesario
-            d.setAlias(capitalizarTexto(d.getAlias()));
-            d.setDireccionDetalle(capitalizarTexto(d.getDireccionDetalle()));
-            if (d.getReferencia() != null) d.setReferencia(capitalizarTexto(d.getReferencia()));
+            d.setAlias(FormatHelper.capitalizarTexto(d.getAlias()));
+            d.setDireccionDetalle(FormatHelper.capitalizarTexto(d.getDireccionDetalle()));
+            if (d.getReferencia() != null) d.setReferencia(FormatHelper.capitalizarTexto(d.getReferencia()));
 
             // VALIDACIÓN: No duplicados en edición (excluyendo su propio ID)
             List<Direccion> lista = direccionDAO.listarPorUsuario(d.getUsuario().getId());
