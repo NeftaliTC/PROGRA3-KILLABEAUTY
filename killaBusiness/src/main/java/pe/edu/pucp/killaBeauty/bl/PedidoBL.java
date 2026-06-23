@@ -1,12 +1,14 @@
 package pe.edu.pucp.killaBeauty.bl;
 
 import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
+import pe.edu.pucp.killaBeauty.killaModelo.DetallePedido;
 import pe.edu.pucp.killaBeauty.killaModelo.Pedido;
 
 import java.util.List;
 
 public interface PedidoBL {
     Pedido create(Pedido p) throws BusinessLogicException;
+    Pedido createFromCart(Integer idCliente, Integer idDireccion, Integer idCupon, List<DetallePedido> detalles) throws BusinessLogicException;
     Pedido update(Pedido p) throws BusinessLogicException;
     void remove(Pedido p) throws BusinessLogicException;
     Pedido load(Integer id) throws BusinessLogicException;
