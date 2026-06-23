@@ -6,6 +6,7 @@ import pe.edu.pucp.killaBeauty.killaModelo.Usuario;
 import pe.edu.pucp.killaDAO.UsuarioDAO;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,7 +106,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         ps.setString(2, u.getApellidoPaterno());
         ps.setString(3, u.getApellidoMaterno());
         ps.setString(4, u.getCorreoElectronico());
-        setDate(ps, 5, u.getFechaNacimiento());
+        ps.setObject( 5, u.getFechaNacimiento());
         setTimestamp(ps, 6, u.getFechaDeInscripcion());
         ps.setString(7, u.getContrasena());
         ps.setString(8, u.getTelefono());
@@ -123,7 +124,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         u.setApellidoPaterno(rs.getString("apellido_paterno"));
         u.setApellidoMaterno(rs.getString("apellido_materno"));
         u.setCorreoElectronico(rs.getString("correo_electronico"));
-        u.setFechaNacimiento(rs.getDate("fecha_nacimiento"));
+        u.setFechaNacimiento(rs.getObject("fecha_nacimiento", LocalDate.class));
         u.setFechaDeInscripcion(rs.getTimestamp("fecha_inscripcion"));
         u.setContrasena(rs.getString("contrasena"));
         u.setTelefono(rs.getString("telefono"));

@@ -1,5 +1,6 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 // REVISADA
@@ -9,7 +10,7 @@ public class Usuario {
     private String apellidoPaterno;
     private String apellidoMaterno;
     private String correoElectronico;
-    private Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
     private String genero;
     private Date fechaDeInscripcion;
     private String contrasena; //-> activo
@@ -24,7 +25,7 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(int id, String nombre, String apellidoPaterno, String apellidoMaterno, String correoElectronico, Date fechaNacimiento, Date fechaDeInscripcion, String contrasena, String telefono, Boolean activo, String dni, TipoUsuario tipoUsuario) {
+    public Usuario(int id, String nombre, String apellidoPaterno, String apellidoMaterno, String correoElectronico, LocalDate fechaNacimiento, Date fechaDeInscripcion, String contrasena, String telefono, Boolean activo, String dni, TipoUsuario tipoUsuario) {
         this.id = id;
         this.nombre = nombre;
         this.apellidoPaterno = apellidoPaterno;
@@ -79,11 +80,11 @@ public class Usuario {
         this.correoElectronico = correoElectronico;
     }
 
-    public Date getFechaNacimiento() {
+    public LocalDate getFechaNacimiento() {
         return fechaNacimiento;
     }
 
-    public void setFechaNacimiento(Date fechaNacimiento) {
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
 
