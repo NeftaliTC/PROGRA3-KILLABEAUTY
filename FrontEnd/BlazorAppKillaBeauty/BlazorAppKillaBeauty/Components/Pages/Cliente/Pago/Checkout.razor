@@ -1,9 +1,12 @@
 ﻿@page "/checkout"
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
+@using BlazorAppKillaBeauty.ClienteREST.Models
 @inject CartService CartService
 @inject AddressService AddressService
 @inject CuponService cuponService
+@inject PedidoService PedidoService
+@inject AuthService AuthService
 
 <Navbar CantidadCarrito="@CartService.CantidadTotal" />
 
@@ -16,7 +19,7 @@
         <div class="checkout-card">
             <h2>
                 <i class="bi bi-truck"></i>
-                MÃ©todo de entrega
+                Método de entrega
             </h2>
 
             <div class="delivery-options">
@@ -25,7 +28,7 @@
                         @onclick='() => SeleccionarEntrega("DELIVERY")'>
                     <i class="bi bi-truck"></i>
                     <strong>Delivery</strong>
-                    <span>SegÃºn distrito</span>
+                    <span>Según distrito</span>
                 </button>
 
                 <button class="delivery-option @(metodoEntrega == "RECOJO" ? "selected" : "")"
@@ -50,12 +53,12 @@
                 <div class="card-title-row">
                     <h2>
                         <i class="bi bi-geo-alt"></i>
-                        DirecciÃ³n de Entrega
+                        Dirección de Entrega
                     </h2>
 
                     <button class="btn-new-address"
                             @onclick="AbrirModalDireccion">
-                        + Nueva DirecciÃ³n
+                        + Nueva Dirección
                     </button>
                 </div>
 
@@ -70,7 +73,7 @@
                             @if (direccion.IsDefault)
                             {
                                 <span class="default-badge">
-                                    â˜… Predeterminada
+                                    ★ Predeterminada
                                 </span>
                             }
                         </h3>
@@ -95,11 +98,11 @@
         <div class="checkout-card">
             <h2>
                 <i class="bi bi-tag"></i>
-                CupÃ³n de Descuento
+                Cupón de Descuento
             </h2>
 
             <div class="coupon-row">
-                <input placeholder="Ingresa tu cÃ³digo de cupÃ³n"
+                <input placeholder="Ingresa tu código de cupón"
                        @bind="cupon" />
 
                 <button class="coupon-button"
@@ -112,11 +115,11 @@
             @if (cuponAplicado != null)
             {
                 <p class="coupon-discount">
-                    @cuponAplicado.?Codigo
+                    @cuponAplicado?.Codigo
                 </p>
 
                 <div class="coupon-success">
-                    âœ“ CupÃ³n <strong>@cuponAplicado.Codigo</strong> aplicado correctamente
+                    ✓ Cupón <strong>@cuponAplicado.Codigo</strong> aplicado correctamente
                 </div>
             }
             @if (!string.IsNullOrEmpty(errorCupon))
@@ -173,14 +176,14 @@
                 </div>
 
                 <div class="checkout-field">
-                    <label>RazÃ³n Social</label>
-                    <input placeholder="Nombre o razÃ³n social de la empresa"
+                    <label>Razón Social</label>
+                    <input placeholder="Nombre o razón social de la empresa"
                            @bind="razonSocial" />
                 </div>
 
                 <div class="checkout-field">
-                    <label>DirecciÃ³n Fiscal</label>
-                    <input placeholder="DirecciÃ³n registrada en SUNAT"
+                    <label>Dirección Fiscal</label>
+                    <input placeholder="Dirección registrada en SUNAT"
                            @bind="direccionFiscal" />
                 </div>
             }
@@ -194,7 +197,7 @@
         <div class="checkout-card">
             <h2>
                 <i class="bi bi-credit-card"></i>
-                MÃ©todo de pago
+                Método de pago
             </h2>
 
             <div class="payment-options">
@@ -204,7 +207,7 @@
                         @onclick='() => SeleccionarPago("TARJETA")'>
                     <span class="payment-radio @(metodoPago == "TARJETA" ? "active" : "")"></span>
                     <i class="bi bi-credit-card"></i>
-                    Tarjeta de CrÃ©dito/DÃ©bito
+                    Tarjeta de Crédito/Débito
                 </button>
 
                 <button type="button"
@@ -216,49 +219,6 @@
                 </button>
 
             </div>
-
-            @if (metodoPago == "TARJETA")
-            {
-                <div class="payment-extra">
-                    <p class="payment-provider">Datos de la Tarjeta</p>
-
-                    <div class="checkout-field">
-                        <label>NÃºmero de Tarjeta</label>
-                        <input placeholder="1234 5678 9012 3456" maxlength="19" @bind="numeroTarjeta" />
-                    </div>
-
-                    <div class="checkout-field">
-                        <label>Nombre en la Tarjeta</label>
-                        <input placeholder="NOMBRE APELLIDO" @bind="nombreTarjeta" />
-                    </div>
-
-                    <div class="payment-grid">
-                        <div class="checkout-field">
-                            <label>Fecha de Vencimiento</label>
-                            <input placeholder="MM/AA" maxlength="5" @bind="vencimientoTarjeta" />
-                        </div>
-                        <div class="checkout-field">
-                            <label>CVV</label>
-                            <input placeholder="123" maxlength="4" @bind="cvvTarjeta" />
-                        </div>
-                    </div>
-                </div>
-            }
-
-            @if (metodoPago == "YAPE_PLIN")
-            {
-                <div class="payment-extra">
-                    <p class="payment-provider">Pago con Yape/Plin</p>
-
-                    <div class="qr-box">
-                        <img src="Images/qr-yape-plin.png" alt="QR Yape/Plin" />
-                    </div>
-
-                    <p class="payment-note">
-                        Escanea el QR y confirma tu operaciÃ³n.
-                    </p>
-                </div>
-            }
 
             @if (!string.IsNullOrEmpty(errorPago))
             {
@@ -274,8 +234,8 @@
         @foreach (var producto in CartService.Productos)
         {
             <div class="summary-product">
-                <span>@($"{producto.Nombre} x{producto.Cantidad}")</span>
-                <strong>S/ @producto.Subtotal.ToString("0.00")</strong>
+                <span>@($"{producto.Producto?.Nombre} x{producto.Cantidad}")</span>
+                <strong>S/ @((producto.Cantidad * producto.Producto?.PrecioBase ?? 0).ToString("0.00"))</strong>
             </div>
         }
 
@@ -299,7 +259,7 @@
             <div class="summary-row discount">
                 <span>
                     <i class="bi bi-tag"></i>
-                    CupÃ³n de descuento
+                    Cupón de descuento
                 </span>
                 <strong>-S/ @descuentoCupon.ToString("0.00")</strong>
             </div>
@@ -308,7 +268,7 @@
         @if (metodoEntrega == "DELIVERY")
         {
             <div class="summary-row">
-                <span>EnvÃ­o</span>
+                <span>Envío</span>
                 @if (direccionSeleccionada is null)
                 {
                     <strong>-</strong>
@@ -322,7 +282,7 @@
         else if (metodoEntrega == "RECOJO")
         {
             <div class="summary-row">
-                <span>EnvÃ­o</span>
+                <span>Envío</span>
                 <strong>Gratis</strong>
             </div>
         }
@@ -356,13 +316,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label>TelÃ©fono</label>
+                    <label>Teléfono</label>
                     <input @bind="nuevaDireccion.Telefono" maxlength="9" placeholder="987654321" />
                 </div>
             </div>
 
             <div class="form-group">
-                <label>DirecciÃ³n</label>
+                <label>Dirección</label>
                 <input @bind="nuevaDireccion.DireccionDetalle" placeholder="Calle, nÃºmero, departamento" />
             </div>
 
@@ -401,7 +361,7 @@
 
             <div class="modal-actions">
                 <button class="btn-cancel" @onclick="CerrarModalDireccion">Cancelar</button>
-                <button class="btn-save" @onclick="GuardarNuevaDireccion">Usar esta DirecciÃ³n</button>
+                <button class="btn-save" @onclick="GuardarNuevaDireccion">Usar esta Dirección</button>
             </div>
 
         </div>
@@ -561,11 +521,6 @@
     private string direccionFiscal = "";
     private string errorComprobante = "";
 
-    private string numeroTarjeta = "";
-    private string nombreTarjeta = "";
-    private string vencimientoTarjeta = "";
-    private string cvvTarjeta = "";
-
     private void SeleccionarComprobante(string tipo)
     {
         tipoComprobante = tipo;
@@ -597,18 +552,6 @@
         {
             errorPago = "Selecciona un mÃ©todo de pago.";
             valido = false;
-        }
-
-        if (metodoPago == "TARJETA")
-        {
-            if (string.IsNullOrWhiteSpace(numeroTarjeta) ||
-                string.IsNullOrWhiteSpace(nombreTarjeta) ||
-                string.IsNullOrWhiteSpace(vencimientoTarjeta) ||
-                string.IsNullOrWhiteSpace(cvvTarjeta))
-            {
-                errorPago = "Completa todos los datos de la tarjeta.";
-                valido = false;
-            }
         }
 
         if (tipoComprobante == "BOLETA")
@@ -645,12 +588,47 @@
     [Inject]
     private NavigationManager Navigation { get; set; } = default!;
 
-    private void ConfirmarPedido()
+    private async Task ConfirmarPedido()
     {
         if (!ValidarTodo())
             return;
 
-        CartService.VaciarCarrito();
+        if (!AuthService.UsuarioId.HasValue)
+        {
+            Navigation.NavigateTo("/login?returnUrl=/checkout");
+            return;
+        }
+
+        var pedido = new Pedido
+        {
+            Fecha = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            Estado = "REGISTRADO",
+            Subtotal = (double)CartService.Total,
+            Total = (double)TotalFinal,
+
+            Cliente = new Usuario
+            {
+                Id = AuthService.UsuarioId.Value
+            },
+
+            Detalles = CartService.Productos
+        .Where(item => item.Producto != null)
+        .Select(item => new DetallePedido
+        {
+            Cantidad = item.Cantidad,
+            PrecioAplicado = (double)item.Producto!.PrecioBase,
+            Producto = new ProductoRef
+            {
+                Id = item.Producto.Id
+            }
+        })
+        .ToList()
+        };
+
+        await PedidoService.CrearAsync(pedido);
+
+        //await CartService.VaciarCarritoAsync(AuthService.UsuarioId.Value);
+
         Navigation.NavigateTo("/order-confirmed");
     }
 

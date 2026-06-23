@@ -13,12 +13,14 @@ public class Producto {
     private Subcategoria subcategoria;
     private Boolean activo;
     private List<Resena> resenas;
+    private List<ImagenProducto> imagenes;
 
 
     public Producto() {
         this.marca = new Marca();
         this.subcategoria = new Subcategoria();
         this.resenas = new ArrayList<>();
+        this.imagenes = new ArrayList<>();
     }
 
     public int getId() {
@@ -99,5 +101,13 @@ public class Producto {
 
     public void setResenas(List<Resena> resenas) {
         this.resenas = resenas;
+    }
+
+    public List<ImagenProducto> getImagenes() {
+        return imagenes;
+    }
+
+    public void setImagenes(List<ImagenProducto> imagenes) {
+        this.imagenes = imagenes;
     }
 }

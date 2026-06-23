@@ -143,7 +143,11 @@ public class PedidoDAOImpl implements PedidoDAO {
         ps.setDouble(3, pedido.getIgv());
         ps.setDouble(4, pedido.getTotal());
         ps.setInt(5, pedido.getCliente().getId());
-        ps.setInt(6, pedido.getDireccionEnvio().getId());
+        if (pedido.getDireccionEnvio() != null) {
+            ps.setInt(6, pedido.getDireccionEnvio().getId());
+        } else {
+            ps.setNull(6, Types.INTEGER);
+        }
         if (pedido.getCupon() != null) ps.setInt(7, pedido.getCupon().getId());
         else ps.setNull(7, Types.INTEGER);
         ps.setInt(8, pedido.getEstadoPedido().getId());
@@ -179,7 +183,8 @@ public class PedidoDAOImpl implements PedidoDAO {
         if (pedido.getCliente() == null || pedido.getCliente().getId() <= 0) {
             throw new SQLException("Pedido: cliente invalido");
         }
-        if (pedido.getDireccionEnvio() == null || pedido.getDireccionEnvio().getId() <= 0) {
+        if (pedido.getDireccionEnvio() != null &&
+                pedido.getDireccionEnvio().getId() <= 0) {
             throw new SQLException("Pedido: direccion de envio invalida");
         }
         if (pedido.getEstadoPedido() == null) {

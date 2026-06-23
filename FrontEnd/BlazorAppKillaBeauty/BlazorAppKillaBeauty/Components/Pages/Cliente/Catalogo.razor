@@ -10,6 +10,7 @@
 @inject ProductoService ProductoService
 @inject CartService CartService
 @inject NavigationManager Navigation
+@inject AuthService AuthService
 
 <Navbar CantidadCarrito="@CartService.CantidadTotal" />
 
@@ -148,7 +149,7 @@
                              @onclick="@(() => IrADetalleProducto(producto))">
                             <div class="catalog-product-image-area">
                                 <img class="catalog-product-img"
-                                     src="@producto.Imagen"
+                                     src="@producto.ImagenPrincipal"
                                      alt="@producto.Nombre" />
                             </div>
 
@@ -340,22 +341,19 @@
             return new List<int> { 1, -1, paginaActual, -1, TotalPaginas };
         }
     }
-
-    private bool FiltroCategoria(Producto producto)
-    {
-        return categoriaSeleccionada == "Todas"
-            || producto.Categoria == categoriaSeleccionada;
+    private bool FiltroCategoria(Producto producto) 
+    { 
+        return categoriaSeleccionada == "Todas" || producto.Categoria == categoriaSeleccionada; 
     }
 
-    private bool FiltroSubcategoria(Producto producto)
-    {
-        return string.IsNullOrEmpty(subcategoriaSeleccionada)
-            || producto.Subcategoria == subcategoriaSeleccionada;
+    private bool FiltroSubcategoria(Producto producto) 
+    { 
+        return string.IsNullOrEmpty(subcategoriaSeleccionada) || producto.Subcategoria == subcategoriaSeleccionada; 
     }
 
     private bool FiltroPrecio(Producto producto)
     {
-        return producto.PrecioMinimo <= precioMaximo;
+        return producto.PrecioBase <= precioMaximo;
     }
 
     private bool FiltroMarca(Producto producto)
@@ -426,23 +424,17 @@
     }
     private string MostrarPrecio(Producto producto)
     {
-        if (producto.PrecioMinimo == producto.PrecioMaximo)
-        {
-            return $"S/ {producto.PrecioMinimo:0.00}";
-        }
-
-        return $"S/ {producto.PrecioMinimo:0.00} - {producto.PrecioMaximo:0.00}";
+        return $"S/ {producto.PrecioBase:0.00}";
     }
 
-    private void AgregarCarrito(Producto producto)
+    private async Task AgregarCarrito(Producto producto)
     {
-        CartService.AgregarProducto(
-            producto.Id,
-            producto.Nombre,
-            producto.PrecioMinimo,
-            producto.Imagen
-        );
+        if (!AuthService.UsuarioId.HasValue)
+            return;
+
+        await CartService.AgregarProductoAsync(producto, AuthService.UsuarioId.Value, 1);
     }
+
     private void IrADetalleProducto(Producto producto)
     {
         Navigation.NavigateTo($"/usuario-producto/{producto.Id}");

@@ -1,4 +1,6 @@
-﻿using BlazorAppKillaBeauty.Components;
+﻿using BlazorAppKillaBeauty.ClienteREST.ServicesAct;
+using BlazorAppKillaBeauty.ClienteREST.Utils.BlazorAppKillaBeauty.Utils;
+using BlazorAppKillaBeauty.Components;
 using BlazorAppKillaBeauty.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +26,8 @@ builder.Services.AddScoped<CampanaService>();
 builder.Services.AddScoped<MarcaService>();
 builder.Services.AddScoped<CategoriaService>();
 builder.Services.AddScoped<PaisService>();
+builder.Services.AddScoped<PedidoService>();
+builder.Services.AddScoped<EscalaPrecioService>();
 builder.Services.AddHttpClient("KillaApi", client =>
 {
     var baseUrl = builder.Configuration["KillaApi:BaseUrl"]
@@ -34,7 +38,7 @@ builder.Services.AddHttpClient("KillaApi", client =>
 });
 
 
-
+builder.Services.AddScoped<HttpClientUtils>();
 builder.Services.AddSingleton<AddressService>();
 builder.Services.AddScoped<ProductoService>();
 builder.Services.AddScoped<CourierService>();

@@ -88,11 +88,23 @@ public class PedidoBLImpl implements PedidoBL {
     }
 
     private void validarPedido(Pedido pedido) throws BusinessLogicException {
-        if (pedido == null) throw new BusinessLogicException("El pedido no puede ser nulo.");
-        if (pedido.getCliente() == null || pedido.getCliente().getId() <= 0) throw new BusinessLogicException("El pedido debe tener un cliente valido.");
-        if (pedido.getDireccionEnvio() == null || pedido.getDireccionEnvio().getId() <= 0) throw new BusinessLogicException("El pedido debe tener una direccion de envio valida.");
-        if (pedido.getDetalles() == null || pedido.getDetalles().isEmpty()) throw new BusinessLogicException("El pedido debe tener al menos un detalle.");
-        for (DetallePedido detalle : pedido.getDetalles()) validarDetalle(detalle);
+        if (pedido == null)
+            throw new BusinessLogicException("El pedido no puede ser nulo.");
+
+        if (pedido.getCliente() == null || pedido.getCliente().getId() <= 0)
+            throw new BusinessLogicException("El pedido debe tener un cliente valido.");
+
+        // Temporalmente no validar dirección
+        if (pedido.getDireccionEnvio() != null &&
+                pedido.getDireccionEnvio().getId() <= 0) {
+            throw new BusinessLogicException("El pedido debe tener una direccion de envio valida.");
+        }
+
+        if (pedido.getDetalles() == null || pedido.getDetalles().isEmpty())
+            throw new BusinessLogicException("El pedido debe tener al menos un detalle.");
+
+        for (DetallePedido detalle : pedido.getDetalles())
+            validarDetalle(detalle);
     }
 
     private void validarDetalle(DetallePedido detalle) throws BusinessLogicException {

@@ -2,12 +2,15 @@ package pe.edu.pucp.killaDAO.Impl;
 
 import pe.edu.pucp.dbManager.DBManager;
 import pe.edu.pucp.killaBeauty.killaModelo.Producto;
+import pe.edu.pucp.killaDAO.ImagenProductoDAO;
 import pe.edu.pucp.killaDAO.ProductoDAO;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProductoDAOImpl implements ProductoDAO {
+
+    ImagenProductoDAO imagenDAO = new ImagenProductoDAOImpl();
 
     @Override
     public List<Producto> listAll() throws SQLException {
@@ -29,6 +32,8 @@ public class ProductoDAOImpl implements ProductoDAO {
                 p.setActivo(rs.getBoolean("activo"));
                 p.getMarca().setId(rs.getInt("id_marca"));
                 p.getSubcategoria().setId(rs.getInt("id_subcategoria"));
+                p.setImagenes(imagenDAO.listByProductoId(p.getId()));
+
                 lista.add(p);
             }
         }
@@ -53,6 +58,8 @@ public class ProductoDAOImpl implements ProductoDAO {
                     p.setActivo(rs.getBoolean("activo"));
                     p.getMarca().setId(rs.getInt("id_marca"));
                     p.getSubcategoria().setId(rs.getInt("id_subcategoria"));
+                    p.setImagenes(imagenDAO.listByProductoId(p.getId()));
+
                     return p;
                 }
             }

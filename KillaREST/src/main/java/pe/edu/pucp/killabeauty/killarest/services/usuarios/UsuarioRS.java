@@ -9,8 +9,10 @@ import pe.edu.pucp.killaBeauty.bl.Impl.UsuarioBLImpl;
 import pe.edu.pucp.killaBeauty.bl.Promocionales.CuponBL;
 import pe.edu.pucp.killaBeauty.bl.ResenaBL;
 import pe.edu.pucp.killaBeauty.bl.UsuarioBL;
+import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
 import pe.edu.pucp.killaBeauty.killaModelo.Resena;
 import pe.edu.pucp.killaBeauty.killaModelo.Usuario;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.List;
 
@@ -46,9 +48,23 @@ public class UsuarioRS {
     @POST
     public Response insertarUsuario(Usuario usuario) {
         try {
+            // 1. Extraemos la contraseña en texto plano que envió Blazor
+            String passwordPlano = usuario.getContrasena();
+
+            // 2. Generamos el hash con BCrypt
+            String passwordHasheado = BCrypt.hashpw(passwordPlano, BCrypt.gensalt());
+
+            // 3. Reemplazamos la contraseña plana por el hash en el objeto
+            usuario.setContrasena(passwordHasheado);
+
+            // 4. Guardamos en la base de datos de forma segura
             Usuario usuarioCreado = usuarioBL.create(usuario);
             return Response.status(Response.Status.CREATED).entity(usuarioCreado).build();
+        } catch (BusinessLogicException e) {
+            // Devuelve 400 Bad Request con tu mensaje ("El correo electrónico ya se...")
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
+            // Errores de servidor (500)
             return Response.serverError().entity(e.getMessage()).build();
         }
     }
@@ -74,6 +90,37 @@ public class UsuarioRS {
             return Response.noContent().build();
         } catch (Exception e) {
             return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+    @POST
+    @Path("/login")
+    public Response login(Usuario credenciales) {
+        try {
+            // 1. Buscas al usuario en la BD usando su correo o nombre de usuario
+            Usuario usuarioBD = usuarioBL.loadByEmail(credenciales.getCorreoElectronico());
+
+            // Si el usuario no existe
+            if (usuarioBD == null) {
+                return Response.status(Response.Status.UNAUTHORIZED)
+                        .entity("Correo o contraseña incorrectos").build();
+            }
+
+            // 2. Verificas la contraseña con BCrypt
+            // Parámetro 1: La clave plana que tecleó el usuario ahora
+            // Parámetro 2: El hash ilegible que sacaste de la BD
+            boolean credencialesValidas = BCrypt.checkpw(credenciales.getContrasena(), usuarioBD.getContrasena());
+
+            if (credencialesValidas) {
+                // ¡Login exitoso!
+                return Response.ok(usuarioBD).build();
+            } else {
+                // Contraseña incorrecta
+                return Response.status(Response.Status.UNAUTHORIZED)
+                        .entity("Correo o contraseña incorrectos").build();
+            }
+
+        } catch (Exception ex) {
+            return Response.serverError().entity(ex.getMessage()).build();
         }
     }
     // reseñas emitidas por el usuario, si se muestra en la pagina de inicio

@@ -1,6 +1,9 @@
 ﻿@page "/cart"
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
+@using BlazorAppKillaBeauty.ClienteREST.Models
+@using Microsoft.AspNetCore.Components
+
 @inject AuthService AuthService
 @inject NavigationManager Navigation
 @inject CartService CartService
@@ -37,55 +40,33 @@
 
                 <h1>Carrito de Compras</h1>
 
-                @foreach (var producto in CartService.Productos)
+                @foreach (var detalle in CartService.Productos)
                 {
+                    var producto = detalle.Producto;
+
                     <div class="cart-item">
 
-                        <img src="@producto.Imagen"
-                             alt="@producto.Nombre"
+                        <img src="@(producto?.Imagen ?? "/Images/product-placeholder.png")"
+                             alt="@(producto?.Nombre ?? "Producto")"
                              class="cart-item-img" />
 
                         <div class="cart-item-info">
-                            <h3>@producto.Nombre</h3>
-
-                            <div class="discount-line">
-                                <span class="cart-tag">
-                                    @producto.TipoCompra
-                                </span>
-
-                                @if (producto.PrecioUnitario < producto.PrecioOriginal)
-                                {
-                                    <span class="saving-text">
-                                        ↝ Ahorro: S/ @((producto.PrecioOriginal - producto.PrecioUnitario).ToString("0.00"))
-                                    </span>
-                                }
-                            </div>
+                            <h3>@(producto?.Nombre ?? $"Producto #{producto?.Id}")</h3>
 
                             <p class="unit-price">
                                 Precio unitario:
-                                S/ @producto.PrecioUnitario.ToString("0.00")
-
-                                @if (producto.PrecioUnitario < producto.PrecioOriginal)
-                                {
-                                    <span class="old-price">
-                                        S/ @producto.PrecioOriginal.ToString("0.00")
-                                    </span>
-
-                                    <span class="off-text">
-                                        (@producto.PorcentajeDescuento% OFF)
-                                    </span>
-                                }
+                                S/ @((producto?.PrecioBase ?? 0).ToString("0.00"))
                             </p>
                         </div>
 
                         <div class="cart-actions">
-                            <button @onclick="() => CartService.DisminuirCantidad(producto.Nombre)">
+                            <button @onclick="() => CartService.DisminuirCantidadAsync(detalle.Id)">
                                 -
                             </button>
 
-                            <span>@producto.Cantidad</span>
+                            <span>@detalle.Cantidad</span>
 
-                            <button @onclick="() => CartService.AumentarCantidad(producto.Nombre)">
+                            <button @onclick="() => CartService.AumentarCantidadAsync(detalle.Id)">
                                 +
                             </button>
                         </div>
@@ -93,12 +74,12 @@
                         <div class="cart-subtotal">
                             <small>Subtotal</small>
                             <strong>
-                                S/ @producto.Subtotal.ToString("0.00")
+                                S/ @((detalle.Cantidad * (producto?.PrecioBase ?? 0)).ToString("0.00"))
                             </strong>
                         </div>
 
                         <button class="delete-btn"
-                                @onclick="() => CartService.EliminarProducto(producto.Nombre)">
+                                @onclick="() => CartService.EliminarDetalleAsync(detalle.Id)">
                             <i class="bi bi-trash"></i>
                         </button>
 
@@ -157,9 +138,6 @@
 
 @code {
     private int CantidadCarrito => CartService.CantidadTotal;
-
-    private IReadOnlyList<CartItem> productosCarrito =>
-        CartService.Productos;
 
     private decimal Total => CartService.Total;
 

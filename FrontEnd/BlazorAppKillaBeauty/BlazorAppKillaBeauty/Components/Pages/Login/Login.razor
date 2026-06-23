@@ -1,7 +1,10 @@
 ﻿@page "/login"
 @rendermode InteractiveServer
+@using BlazorAppKillaBeauty.Services
+
 @inject AuthService AuthService
 @inject NavigationManager Navigation
+@inject CartService CartService
 
 <PageTitle>Iniciar Sesión - Killa Beauty</PageTitle>
 
@@ -69,7 +72,7 @@
     [SupplyParameterFromQuery(Name = "returnUrl")]
     private string? ReturnUrl { get; set; }
 
-    private void IniciarSesion()
+    private async Task IniciarSesion()
     {
         mensajeError = "";
 
@@ -83,12 +86,17 @@
         }
 
         // LOGIN CLIENTE
-        if (usuario == "cliente" &&
-            password == "cliente123")
+        if (usuario == "cliente" && password == "cliente123")
         {
             AuthService.LoginCliente("Cliente");
 
-            Navigation.NavigateTo(ReturnUrl ?? "/", forceLoad: true);
+            if (AuthService.UsuarioId.HasValue)
+            {
+                await CartService.MigrarCarritoLocalAUsuarioAsync(
+                    AuthService.UsuarioId.Value);
+            }
+
+            Navigation.NavigateTo(ReturnUrl ?? "/");
             return;
         }
 
