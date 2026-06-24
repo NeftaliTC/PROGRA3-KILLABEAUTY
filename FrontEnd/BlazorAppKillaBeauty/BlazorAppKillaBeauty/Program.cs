@@ -41,6 +41,7 @@ builder.Services.AddScoped<HttpClientUtils>();
 builder.Services.AddSingleton<AddressService>();
 builder.Services.AddScoped<ProductoService>();
 builder.Services.AddScoped<CourierService>();
+builder.Services.AddScoped<PedidoService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

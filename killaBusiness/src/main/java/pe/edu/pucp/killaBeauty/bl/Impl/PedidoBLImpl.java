@@ -6,14 +6,23 @@ import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
 import pe.edu.pucp.killaBeauty.killaModelo.DetallePedido;
 import pe.edu.pucp.killaBeauty.killaModelo.Direccion;
 import pe.edu.pucp.killaBeauty.killaModelo.EstadoPedido;
+import pe.edu.pucp.killaBeauty.killaModelo.Marca;
 import pe.edu.pucp.killaBeauty.killaModelo.Pedido;
 import pe.edu.pucp.killaBeauty.killaModelo.Producto;
 import pe.edu.pucp.killaBeauty.killaModelo.Usuario;
 import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Cupon;
+import pe.edu.pucp.killaDAO.DetallePedidoDAO;
+import pe.edu.pucp.killaDAO.DireccionDAO;
+import pe.edu.pucp.killaDAO.Impl.DetallePedidoDAOImpl;
+import pe.edu.pucp.killaDAO.Impl.DireccionDAOImpl;
+import pe.edu.pucp.killaDAO.Impl.MarcaDAOImpl;
 import pe.edu.pucp.killaDAO.Impl.PedidoDAOImpl;
 import pe.edu.pucp.killaDAO.Impl.ProductoDAOImpl;
+import pe.edu.pucp.killaDAO.Impl.UsuarioDAOImpl;
+import pe.edu.pucp.killaDAO.MarcaDAO;
 import pe.edu.pucp.killaDAO.PedidoDAO;
 import pe.edu.pucp.killaDAO.ProductoDAO;
+import pe.edu.pucp.killaDAO.UsuarioDAO;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,7 +31,11 @@ import java.util.List;
 
 public class PedidoBLImpl implements PedidoBL {
     private PedidoDAO pedidoDAO = new PedidoDAOImpl();
+    private DetallePedidoDAO detallePedidoDAO = new DetallePedidoDAOImpl();
     private ProductoDAO productoDAO = new ProductoDAOImpl();
+    private UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
+    private DireccionDAO direccionDAO = new DireccionDAOImpl();
+    private MarcaDAO marcaDAO = new MarcaDAOImpl();
 
     @Override
     public Pedido create(Pedido pedido) throws BusinessLogicException {
@@ -35,7 +48,7 @@ public class PedidoBLImpl implements PedidoBL {
             TransactionContext.getConnection();
             Pedido guardado = pedidoDAO.save(pedido);
             TransactionContext.commit();
-            return guardado;
+            return completarPedido(guardado);
         } catch (SQLException e) {
             TransactionContext.rollback();
             throw new BusinessLogicException(e);
@@ -71,6 +84,36 @@ public class PedidoBLImpl implements PedidoBL {
     }
 
     @Override
+    public Pedido cancel(Integer id) throws BusinessLogicException {
+        if (id == null || id <= 0) throw new BusinessLogicException("Debe indicar un pedido valido.");
+
+        try {
+            Pedido pedido = pedidoDAO.load(id);
+            if (pedido == null) throw new BusinessLogicException("No se encontro el pedido indicado.");
+
+            EstadoPedido estado = pedido.getEstadoPedido();
+            if (estado == EstadoPedido.ENVIADO || estado == EstadoPedido.ENTREGADO) {
+                throw new BusinessLogicException("No se puede cancelar el pedido porque ya esta enviado o entregado.");
+            }
+            if (estado == EstadoPedido.CANCELADO) {
+                return completarPedido(pedido);
+            }
+
+            TransactionContext.getConnection();
+            pedidoDAO.updateEstado(id, EstadoPedido.CANCELADO.getId());
+            TransactionContext.commit();
+
+            pedido.setEstadoPedido(EstadoPedido.CANCELADO);
+            return completarPedido(pedido);
+        } catch (SQLException e) {
+            TransactionContext.rollback();
+            throw new BusinessLogicException(e);
+        } finally {
+            TransactionContext.close();
+        }
+    }
+
+    @Override
     public Pedido update(Pedido pedido) throws BusinessLogicException {
         validarPedido(pedido);
         recalcularTotales(pedido);
@@ -79,7 +122,7 @@ public class PedidoBLImpl implements PedidoBL {
             TransactionContext.getConnection();
             Pedido actualizado = pedidoDAO.update(pedido);
             TransactionContext.commit();
-            return actualizado;
+            return completarPedido(actualizado);
         } catch (SQLException e) {
             TransactionContext.rollback();
             throw new BusinessLogicException(e);
@@ -106,7 +149,7 @@ public class PedidoBLImpl implements PedidoBL {
     @Override
     public Pedido load(Integer id) throws BusinessLogicException {
         try {
-            return pedidoDAO.load(id);
+            return completarPedido(pedidoDAO.load(id));
         } catch (SQLException e) {
             throw new BusinessLogicException(e);
         }
@@ -115,7 +158,7 @@ public class PedidoBLImpl implements PedidoBL {
     @Override
     public List<Pedido> listAll() throws BusinessLogicException {
         try {
-            return pedidoDAO.listAll();
+            return completarPedidos(pedidoDAO.listAll());
         } catch (SQLException e) {
             throw new BusinessLogicException(e);
         }
@@ -176,6 +219,86 @@ public class PedidoBLImpl implements PedidoBL {
         }
         if (producto.getStock() != null && producto.getStock() < cantidad) {
             throw new BusinessLogicException("No hay stock suficiente para " + producto.getNombre() + ".");
+        }
+    }
+
+    private List<Pedido> completarPedidos(List<Pedido> pedidos) throws SQLException {
+        for (Pedido pedido : pedidos) {
+            completarPedido(pedido);
+        }
+        return pedidos;
+    }
+
+    private Pedido completarPedido(Pedido pedido) throws SQLException {
+        if (pedido == null) {
+            return null;
+        }
+
+        completarCliente(pedido);
+        completarDireccion(pedido);
+        completarDetalles(pedido);
+        completarProductos(pedido);
+        return pedido;
+    }
+
+    private void completarCliente(Pedido pedido) throws SQLException {
+        if (pedido.getCliente() == null || pedido.getCliente().getId() <= 0) {
+            return;
+        }
+
+        Usuario cliente = usuarioDAO.load(pedido.getCliente().getId());
+        if (cliente != null) {
+            pedido.setCliente(cliente);
+        }
+    }
+
+    private void completarDireccion(Pedido pedido) throws SQLException {
+        if (pedido.getDireccionEnvio() == null || pedido.getDireccionEnvio().getId() <= 0) {
+            return;
+        }
+
+        Direccion direccion = direccionDAO.load(pedido.getDireccionEnvio().getId());
+        if (direccion != null) {
+            pedido.setDireccionEnvio(direccion);
+        }
+    }
+
+    private void completarDetalles(Pedido pedido) throws SQLException {
+        if (pedido.getId() <= 0) {
+            return;
+        }
+
+        pedido.setDetalles(detallePedidoDAO.listByPedidoId(pedido.getId()));
+    }
+
+    private void completarProductos(Pedido pedido) throws SQLException {
+        if (pedido.getDetalles() == null) {
+            return;
+        }
+
+        for (DetallePedido detalle : pedido.getDetalles()) {
+            if (detalle.getProducto() == null || detalle.getProducto().getId() <= 0) {
+                continue;
+            }
+
+            Producto producto = productoDAO.load(detalle.getProducto().getId());
+            if (producto == null) {
+                continue;
+            }
+
+            completarMarca(producto);
+            detalle.setProducto(producto);
+        }
+    }
+
+    private void completarMarca(Producto producto) throws SQLException {
+        if (producto.getMarca() == null || producto.getMarca().getId() <= 0) {
+            return;
+        }
+
+        Marca marca = marcaDAO.load(producto.getMarca().getId());
+        if (marca != null) {
+            producto.setMarca(marca);
         }
     }
 

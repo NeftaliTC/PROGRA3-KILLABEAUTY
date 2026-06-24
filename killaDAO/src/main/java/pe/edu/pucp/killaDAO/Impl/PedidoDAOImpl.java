@@ -47,9 +47,7 @@ public class PedidoDAOImpl implements PedidoDAO {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    Pedido pedido = mapRow(rs);
-                    pedido.setDetalles(new DetallePedidoDAOImpl().listByPedidoId(pedido.getId()));
-                    return pedido;
+                    return mapRow(rs);
                 }
             }
         }
@@ -129,8 +127,8 @@ public class PedidoDAOImpl implements PedidoDAO {
     @Override
     public void updateEstado(Integer idPedido, Integer idNuevoEstado) throws SQLException {
         String sql = "UPDATE Pedido SET id_estado_pedido = ? WHERE id_pedido = ?";
-        try (Connection cn = DBManager.getInstance().getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
+        Connection cn = TransactionContext.getConnection();
+        try (PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, idNuevoEstado);
             ps.setInt(2, idPedido);
             ps.executeUpdate();
@@ -191,4 +189,5 @@ public class PedidoDAOImpl implements PedidoDAO {
         if (value == null) ps.setTimestamp(index, new Timestamp(System.currentTimeMillis()));
         else ps.setTimestamp(index, new Timestamp(value.getTime()));
     }
+
 }
