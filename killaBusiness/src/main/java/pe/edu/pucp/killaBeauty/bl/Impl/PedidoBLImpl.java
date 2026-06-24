@@ -133,7 +133,7 @@ public class PedidoBLImpl implements PedidoBL {
     @Override
     public Pedido load(Integer id) throws BusinessLogicException {
         try {
-            return pedidoDAO.load(id);
+            return completarPedido(pedidoDAO.load(id));
         } catch (SQLException e) {
             throw new BusinessLogicException(e);
         }
@@ -142,7 +142,7 @@ public class PedidoBLImpl implements PedidoBL {
     @Override
     public List<Pedido> listAll() throws BusinessLogicException {
         try {
-            return pedidoDAO.listAll();
+            return completarPedidos(pedidoDAO.listAll());
         } catch (SQLException e) {
             throw new BusinessLogicException(e);
         }
