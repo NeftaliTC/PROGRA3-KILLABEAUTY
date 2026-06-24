@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface CourierDAO extends BaseDAO<Courier, Integer> {
     List<Courier> listAll() throws SQLException;
+    boolean existeDato(String columna, String valor) throws SQLException;
+    boolean existeDatoExcluyendoId(String columna, String valor, Integer id) throws SQLException;
 }

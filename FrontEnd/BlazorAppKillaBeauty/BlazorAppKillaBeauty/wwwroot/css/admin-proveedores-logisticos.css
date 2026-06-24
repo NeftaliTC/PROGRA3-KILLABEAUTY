@@ -20,6 +20,23 @@
         background: var(--gray-light);
     }
 
+/* Botón Eliminar de la tabla */
+.admin-providers-btn-delete {
+    min-height: 36px;
+    border: 1px solid var(--red-border);
+    background: var(--white);
+    color: #a12828;
+    border-radius: 11px;
+    padding: 0 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+    .admin-providers-btn-delete:hover {
+        background: var(--gray-light);
+    }
+
 /* Botón interactivo de Asignación Exclusiva */
 .admin-providers-btn-assign {
     min-height: 36px;

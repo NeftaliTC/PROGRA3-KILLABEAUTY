@@ -63,10 +63,20 @@ namespace BlazorAppKillaBeauty.Services
             }
 
             var body = await response.Content.ReadAsStringAsync();
-            throw new InvalidOperationException(
-                string.IsNullOrWhiteSpace(body)
-                    ? $"Error REST {(int)response.StatusCode} {response.ReasonPhrase}"
-                    : body);
+            string mensajeLimpio = body;
+            if (body.Contains("\"message\":\""))
+            {
+                mensajeLimpio = body.Split("\"message\":\"")[1].Replace("\"}", "");
+            }
+
+            throw new Exception(mensajeLimpio);
+        }
+
+        public async Task EliminarAsync(int id)
+        {
+            var response = await http.DeleteAsync($"courier/{id}");
+
+            await EnsureSuccessAsync(response);
         }
     }
 
@@ -89,5 +99,8 @@ namespace BlazorAppKillaBeauty.Services
 
         [JsonPropertyName("correo")]
         public string Correo { get; set; } = "";
+
+        [JsonPropertyName("esAsignado")]
+        public bool EsAsignado { get; set; }
     }
 }
