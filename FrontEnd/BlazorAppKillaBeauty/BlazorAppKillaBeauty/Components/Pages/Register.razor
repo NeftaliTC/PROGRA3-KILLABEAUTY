@@ -133,6 +133,13 @@
         mensajeError = null;
         mostrarMensaje = false;
 
+        if (!EsMayorDeEdad(user.FechaNacimiento))
+        {
+            mensajeError = "Debes ser mayor de 18 años para registrarte.";
+            loading = false;
+            return;
+        }
+
         try
         {
             var result = await UsuarioService.RegistrarUsuarioAsync(user);
@@ -156,6 +163,24 @@
         {
             loading = false;
         }
+    }
+
+    private static bool EsMayorDeEdad(DateOnly? fechaNacimiento)
+    {
+        if (!fechaNacimiento.HasValue)
+        {
+            return false;
+        }
+
+        var hoy = DateOnly.FromDateTime(DateTime.Today);
+        var edad = hoy.Year - fechaNacimiento.Value.Year;
+
+        if (fechaNacimiento.Value > hoy.AddYears(-edad))
+        {
+            edad--;
+        }
+
+        return edad >= 18;
     }
 }
 

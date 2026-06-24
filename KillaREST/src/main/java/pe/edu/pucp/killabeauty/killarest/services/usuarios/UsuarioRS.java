@@ -12,6 +12,7 @@
     import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
     import pe.edu.pucp.killaBeauty.killaModelo.Resena;
     import pe.edu.pucp.killaBeauty.killaModelo.Usuario;
+    import pe.edu.pucp.killabeauty.killarest.dto.CambiarContrasenaDTO;
     import org.mindrot.jbcrypt.BCrypt;
 
     import java.util.List;
@@ -31,6 +32,22 @@
                 return Response.serverError().entity(e.getMessage()).build();
             }
         }
+
+        @GET
+        @Path("{id}")
+        public Response obtenerUsuarioPorId(@PathParam("id") int id) {
+            try {
+                Usuario usuario = usuarioBL.load(id);
+                if (usuario != null) {
+                    return Response.ok(usuario).build();
+                } else {
+                    return Response.status(Response.Status.NOT_FOUND).build();
+                }
+            } catch (Exception e) {
+                return Response.serverError().entity(e.getMessage()).build();
+            }
+        }
+
         @GET
         @Path("email/{correo}")
         public Response obtenerUsuarioPorEmail(@PathParam("correo") String email) {
@@ -68,6 +85,67 @@
                 return Response.serverError().entity(e.getMessage()).build();
             }
         }
+
+        @PUT
+        @Path("{id}/perfil")
+        public Response actualizarPerfil(@PathParam("id") int id, Usuario datosPerfil) {
+            try {
+                Usuario usuarioActual = usuarioBL.load(id);
+                if (usuarioActual == null) {
+                    return Response.status(Response.Status.NOT_FOUND).build();
+                }
+
+                usuarioActual.setNombre(datosPerfil.getNombre());
+                usuarioActual.setApellidoPaterno(datosPerfil.getApellidoPaterno());
+                usuarioActual.setApellidoMaterno(datosPerfil.getApellidoMaterno());
+                usuarioActual.setFechaNacimiento(datosPerfil.getFechaNacimiento());
+                usuarioActual.setGenero(datosPerfil.getGenero());
+                usuarioActual.setTelefono(datosPerfil.getTelefono());
+
+                Usuario usuarioActualizado = usuarioBL.update(usuarioActual);
+                return Response.ok(usuarioActualizado).build();
+            } catch (Exception e) {
+                return Response.serverError().entity(e.getMessage()).build();
+            }
+        }
+
+        @PUT
+        @Path("{id}/password")
+        public Response cambiarContrasena(@PathParam("id") int id, CambiarContrasenaDTO request) {
+            try {
+                Usuario usuarioActual = usuarioBL.load(id);
+                if (usuarioActual == null) {
+                    return Response.status(Response.Status.NOT_FOUND).build();
+                }
+
+                if (request == null ||
+                        request.getContrasenaActual() == null ||
+                        request.getNuevaContrasena() == null ||
+                        request.getNuevaContrasena().length() < 6) {
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .entity("La nueva contraseña debe tener al menos 6 caracteres.")
+                            .build();
+                }
+
+                boolean contrasenaValida = BCrypt.checkpw(
+                        request.getContrasenaActual(),
+                        usuarioActual.getContrasena()
+                );
+
+                if (!contrasenaValida) {
+                    return Response.status(Response.Status.UNAUTHORIZED)
+                            .entity("Contraseña actual incorrecta.")
+                            .build();
+                }
+
+                usuarioActual.setContrasena(BCrypt.hashpw(request.getNuevaContrasena(), BCrypt.gensalt()));
+                Usuario usuarioActualizado = usuarioBL.update(usuarioActual);
+                return Response.ok(usuarioActualizado).build();
+            } catch (Exception e) {
+                return Response.serverError().entity(e.getMessage()).build();
+            }
+        }
+
         @PUT
         @Path("{id}")
         public Response actualizarUsuario(@PathParam("id") int id, Usuario usuario) {
