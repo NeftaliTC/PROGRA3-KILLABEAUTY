@@ -75,7 +75,8 @@ body {
         margin-bottom: 8px;
     }
 
-    .form-group input {
+    .form-group input,
+    .form-group select {
         width: 100%;
         height: 46px;
         border: 1px solid var(--rose-light);
@@ -83,8 +84,30 @@ body {
         background: var(--cream);
         padding: 0 20px;
         font-size: 14px;
+        color: var(--gray-text);
         outline: none;
         box-sizing: border-box;
+    }
+
+        .form-group select {
+            appearance: none;
+            cursor: pointer;
+            padding-right: 42px;
+        }
+
+.register-select-wrapper {
+    position: relative;
+}
+
+    .register-select-wrapper::after {
+        content: "⌵";
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-58%);
+        color: var(--rose-soft);
+        font-size: 20px;
+        pointer-events: none;
     }
 
         .form-group input::placeholder {

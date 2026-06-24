@@ -25,6 +25,8 @@ namespace BlazorAppKillaBeauty.ClienteREST.Models
         [Required(ErrorMessage = "La fecha de nacimiento es obligatoria")]
         public DateOnly? FechaNacimiento { get; set; }
 
+        public string Genero { get; set; } = "Selecciona";
+
         [RegularExpression("^[0-9]+$", ErrorMessage = "El celular solo debe contener números")]
         public string Telefono { get; set; }
 
