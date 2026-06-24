@@ -4,6 +4,7 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -76,6 +77,27 @@ public class CourierRS {
         try {
             courier.setId(id);
             return Response.ok(courierBL.update(courier)).build();
+        } catch (Exception ex) {
+            return badRequest(ex);
+        }
+    }
+
+    @DELETE
+    @Path("{id}")
+    public Response eliminar(@PathParam("id") int id) {
+        try {
+            // Primero cargamos el courier para poder pasárselo al método remove
+            Courier courier = courierBL.load(id);
+            if (courier == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity(new ErrorDTO("No existe un courier con id " + id))
+                        .build();
+            }
+
+            // Llamamos a tu método de lógica de negocio
+            courierBL.remove(courier);
+
+            return Response.ok().build();
         } catch (Exception ex) {
             return badRequest(ex);
         }
