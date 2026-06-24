@@ -34,5 +34,6 @@ namespace BlazorAppKillaBeauty.ClienteREST.Models
         public string Dni { get; set; }
 
         public bool Activo { get; set; }
+        public string TipoUsuario { get; set; }
     }
 }
