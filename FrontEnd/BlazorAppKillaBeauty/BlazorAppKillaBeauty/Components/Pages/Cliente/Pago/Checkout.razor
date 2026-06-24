@@ -307,7 +307,7 @@
 
         <div class="address-modal">
 
-            <h2>Nueva DirecciÃ³n</h2>
+            <h2>Nueva Dirección</h2>
 
             <div class="modal-grid">
                 <div class="form-group">
@@ -323,7 +323,7 @@
 
             <div class="form-group">
                 <label>Dirección</label>
-                <input @bind="nuevaDireccion.DireccionDetalle" placeholder="Calle, nÃºmero, departamento" />
+                <input @bind="nuevaDireccion.DireccionDetalle" placeholder="Calle, número, departamento" />
             </div>
 
             <div class="modal-grid">
@@ -435,7 +435,7 @@
 
             if (encontrado == null)
             {
-                errorCupon = "CupÃ³n no vÃ¡lido.";
+                errorCupon = "Cupón no válido.";
                 return;
             }
 
@@ -444,8 +444,8 @@
             if (descuentoCupon <= 0)
             {
                 errorCupon = encontrado.MontoMinimoCompra.HasValue
-                    ? $"Compra mÃ­nima S/ {encontrado.MontoMinimoCompra.Value:0.00} o cupÃ³n fuera de vigencia."
-                    : "El cupÃ³n no estÃ¡ vigente.";
+                    ? $"Compra mínima S/ {encontrado.MontoMinimoCompra.Value:0.00} o cupón fuera de vigencia."
+                    : "El cupón no está vigente.";
                 return;
             }
 
@@ -453,7 +453,7 @@
         }
         catch (Exception ex)
         {
-            errorCupon = $"No se pudo validar el cupÃ³n: {ex.Message}";
+            errorCupon = $"No se pudo validar el cupón: {ex.Message}";
         }
     }
     private bool mostrarModalDireccion = false;
@@ -462,14 +462,14 @@
 
     private List<string> DistritosLima = new()
     {
-        "AncÃ³n", "Ate", "Barranco", "BreÃ±a", "Carabayllo",
+        "Ancón", "Ate", "Barranco", "Breña", "Carabayllo",
         "Cercado de Lima", "Chaclacayo", "Chorrillos",
         "Cieneguilla", "Comas", "El Agustino",
-        "Independencia", "JesÃºs MarÃ­a", "La Molina",
+        "Independencia", "Jesús María", "La Molina",
         "La Victoria", "Lince", "Los Olivos",
         "Miraflores", "San Isidro", "San Borja",
         "Santiago de Surco", "Surquillo",
-        "Villa El Salvador", "Villa MarÃ­a del Triunfo"
+        "Villa El Salvador", "Villa Marí­a del Triunfo"
     };
 
     private void AbrirModalDireccion()
@@ -502,7 +502,7 @@
             !nuevaDireccion.Telefono.All(char.IsDigit) ||
             !nuevaDireccion.Telefono.StartsWith("9"))
         {
-            errorDireccion = "Ingrese un celular vÃ¡lido.";
+            errorDireccion = "Ingrese un celular válido.";
             return;
         }
 
@@ -538,19 +538,19 @@
 
         if (string.IsNullOrEmpty(metodoEntrega))
         {
-            errorEntrega = "Selecciona un mÃ©todo de entrega.";
+            errorEntrega = "Selecciona un método de entrega.";
             valido = false;
         }
 
         if (metodoEntrega == "DELIVERY" && direccionSeleccionada is null)
         {
-            errorDireccionEntrega = "Selecciona una direcciÃ³n de entrega.";
+            errorDireccionEntrega = "Selecciona una dirección de entrega.";
             valido = false;
         }
 
         if (string.IsNullOrEmpty(metodoPago))
         {
-            errorPago = "Selecciona un mÃ©todo de pago.";
+            errorPago = "Selecciona un método de pago.";
             valido = false;
         }
 
@@ -558,7 +558,7 @@
         {
             if (dni.Length != 8 || !dni.All(char.IsDigit))
             {
-                errorComprobante = "Ingrese un DNI vÃ¡lido de 8 dÃ­gitos.";
+                errorComprobante = "Ingrese un DNI válido de 8 dígitos.";
                 valido = false;
             }
         }
@@ -567,7 +567,7 @@
         {
             if (ruc.Length != 11 || !ruc.All(char.IsDigit))
             {
-                errorComprobante = "Ingrese un RUC vÃ¡lido de 11 dÃ­gitos.";
+                errorComprobante = "Ingrese un RUC válido de 11 dígitos.";
                 valido = false;
             }
             else if (!(ruc.StartsWith("10") || ruc.StartsWith("20")))
@@ -577,7 +577,7 @@
             }
             else if (string.IsNullOrWhiteSpace(razonSocial) || string.IsNullOrWhiteSpace(direccionFiscal))
             {
-                errorComprobante = "Complete los datos de facturaciÃ³n.";
+                errorComprobante = "Complete los datos de facturación.";
                 valido = false;
             }
         }
