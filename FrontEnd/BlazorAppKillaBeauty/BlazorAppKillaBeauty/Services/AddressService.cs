@@ -10,7 +10,7 @@ namespace BlazorAppKillaBeauty.Services
         private readonly JsonSerializerOptions jsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // Aquï¿½ estï¿½ la magia
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // Aquí está la magia
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
@@ -126,7 +126,7 @@ namespace BlazorAppKillaBeauty.Services
                 }
                 catch (JsonException)
                 {
-                    // Si por alguna razï¿½n no es un JSON vï¿½lido, dejamos el comportamiento por defecto
+                    // Si por alguna razón no es un JSON válido, dejamos el comportamiento por defecto
                 }
             }
 

@@ -320,7 +320,7 @@
             {
                 a.IsDefault = (a.Id == addr.Id);
             }
-
+            
             // Creamos una copia ordenada temporal
             var listaOrdenada = AddressService.UserAddresses
                 .OrderByDescending(a => a.IsDefault)

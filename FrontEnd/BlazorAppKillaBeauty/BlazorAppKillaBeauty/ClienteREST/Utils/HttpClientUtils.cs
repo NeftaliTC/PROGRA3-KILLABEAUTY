@@ -10,7 +10,7 @@
         // es más moderno ponérselo solo a los métodos.
 
         public class HttpClientUtils
-        // clase plantilla generica para realizar llamados 
+            // clase plantilla generica para realizar llamados 
         {
             private readonly HttpClient _httpClient;
             private readonly JsonSerializerOptions _jsonOptions;
@@ -24,7 +24,7 @@
                 _jsonOptions = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true, /* al leer JSON no importe si las mayúsculas coinciden*/
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase, 
                     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull  /*Si una propiedad vale null, no la envía*/
                 };
             }

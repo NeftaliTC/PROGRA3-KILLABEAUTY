@@ -1,6 +1,7 @@
 @page "/admin/pedidos/detalle/{Codigo}"
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
+@inject PedidoService PedidoService
 
 <PageTitle>Detalle pedido - Killa Beauty</PageTitle>
 
@@ -17,12 +18,21 @@
             <span>Detalles</span>
         </div>
 
-        @if (pedido is null)
+        @if (cargando)
         {
             <header class="admin-order-detail-header">
                 <div>
                     <h1>Detalle de pedido @Codigo</h1>
-                    <p>No se encontro informacion para este pedido.</p>
+                    <p>Cargando informacion del pedido...</p>
+                </div>
+            </header>
+        }
+        else if (pedido is null)
+        {
+            <header class="admin-order-detail-header">
+                <div>
+                    <h1>Detalle de pedido @Codigo</h1>
+                    <p>@(mensajeError ?? "No se encontro informacion para este pedido.")</p>
                 </div>
 
                 <button type="button" class="btn-detail-outline" @onclick="Volver">
@@ -36,7 +46,7 @@
             <header class="admin-order-detail-header">
                 <div>
                     <h1>Detalle de pedido @pedido.Codigo</h1>
-                    <p>Realizado el @pedido.Fecha.ToString("dd/MM/yyyy")</p>
+                    <p>Realizado el @pedido.FechaPedido.ToString("dd/MM/yyyy")</p>
                 </div>
 
                 <button type="button" class="btn-detail-outline" @onclick="Volver">
@@ -51,7 +61,7 @@
                         <i class="bi @(pedido.Cancelado ? "bi-x-circle-fill" : "bi-check-circle-fill")"></i>
                         @(pedido.Cancelado ? "Pedido cancelado" : "Pedido no cancelado")
                     </span>
-                    <span class="admin-order-current-status">@pedido.Estado</span>
+                    <span class="admin-order-current-status">@MostrarEstado(pedido.EstadoTexto)</span>
                 </div>
 
                 <div class="admin-order-progress" aria-label="Estado del pedido">
@@ -59,7 +69,7 @@
                     {
                         <div class="admin-order-progress-step @GetProgressClass(estado)">
                             <span class="progress-dot"></span>
-                            <span>@estado</span>
+                            <span>@MostrarEstado(estado)</span>
                         </div>
                     }
                 </div>
@@ -76,10 +86,10 @@
                         @foreach (var item in pedido.Productos)
                         {
                             <div class="admin-order-product-row">
-                                <img src="@item.Imagen" alt="@item.Nombre" />
+                                <img src="/Images/Logo.png" alt="@item.NombreProducto" />
                                 <div class="product-info">
-                                    <strong>@item.Nombre</strong>
-                                    <span>@item.Marca</span>
+                                    <strong>@item.NombreProducto</strong>
+                                    <span>@(string.IsNullOrWhiteSpace(item.Marca) ? "Sin marca registrada" : item.Marca)</span>
                                 </div>
                                 <span>@item.Cantidad u.</span>
                                 <span>S/ @item.PrecioUnitario.ToString("F2")</span>
@@ -93,13 +103,17 @@
                             <span>Subtotal</span>
                             <strong>S/ @pedido.Subtotal.ToString("F2")</strong>
                         </div>
+                        <div>
+                            <span>IGV</span>
+                            <strong>S/ @pedido.Igv.ToString("F2")</strong>
+                        </div>
                         <div class="discount-line">
                             <span>Descuentos aplicados</span>
-                            <strong>- S/ @pedido.Descuento.ToString("F2")</strong>
+                            <strong>@(pedido.CuponId.HasValue ? $"Cupon #{pedido.CuponId}" : "Sin cupon")</strong>
                         </div>
                         <div>
                             <span>Costo de envio</span>
-                            <strong>S/ @pedido.CostoEnvio.ToString("F2")</strong>
+                            <strong>No registrado</strong>
                         </div>
                         <div class="total-line">
                             <span>Total final</span>
@@ -116,9 +130,9 @@
                         </div>
 
                         <div class="admin-order-info-list">
-                            <div><span>Nombre de usuario</span><strong>@pedido.Cliente.NombreUsuario</strong></div>
-                            <div><span>Correo</span><strong>@pedido.Cliente.Correo</strong></div>
-                            <div><span>Contacto</span><strong>@pedido.Cliente.Contacto</strong></div>
+                            <div><span>Nombre de usuario</span><strong>@Valor(pedido.Cliente)</strong></div>
+                            <div><span>Correo</span><strong>@Valor(pedido.Correo)</strong></div>
+                            <div><span>Contacto</span><strong>@Valor(pedido.Contacto)</strong></div>
                         </div>
                     </article>
 
@@ -129,9 +143,9 @@
                         </div>
 
                         <div class="admin-order-info-list">
-                            <div><span>Direccion</span><strong>@pedido.Envio.Direccion</strong></div>
-                            <div><span>Referencia</span><strong>@pedido.Envio.Referencia</strong></div>
-                            <div><span>Coordenadas</span><strong>@pedido.Envio.Coordenadas</strong></div>
+                            <div><span>Direccion</span><strong>@Valor(pedido.Direccion)</strong></div>
+                            <div><span>Referencia</span><strong>@Valor(pedido.Referencia)</strong></div>
+                            <div><span>Ubicacion</span><strong>@Valor(pedido.Ubicacion)</strong></div>
                         </div>
                     </article>
 
@@ -142,9 +156,9 @@
                         </div>
 
                         <div class="admin-order-info-list">
-                            <div><span>Tipo</span><strong>@pedido.Pago.Tipo</strong></div>
-                            <div><span>Operacion</span><strong>@pedido.Pago.Operacion</strong></div>
-                            <div><span>Detalle</span><strong>@pedido.Pago.Detalle</strong></div>
+                            <div><span>Tipo</span><strong>No registrado</strong></div>
+                            <div><span>Operacion</span><strong>No registrado</strong></div>
+                            <div><span>Detalle</span><strong>Sin pago asociado al pedido</strong></div>
                         </div>
                     </article>
                 </aside>
@@ -172,12 +186,35 @@
 @code {
     [Parameter] public string Codigo { get; set; } = "";
 
-    private PedidoDetalleAdmin? pedido;
-    private readonly List<string> estadosProgreso = new() { "Pendiente", "Pagado", "En preparación", "Enviado", "Entregado" };
+    private PedidoAdminDto? pedido;
+    private bool cargando = true;
+    private string? mensajeError;
+    private readonly List<string> estadosProgreso = new() { "Pendiente", "Pagado", "En preparacion", "Enviado", "Entregado" };
 
-    protected override void OnInitialized()
+    protected override async Task OnParametersSetAsync()
     {
-        pedido = ObtenerPedidosMock().FirstOrDefault(p => p.Codigo == Codigo);
+        cargando = true;
+        mensajeError = null;
+
+        try
+        {
+            var idTexto = Codigo.Replace("PED-", "", StringComparison.OrdinalIgnoreCase);
+            if (!int.TryParse(idTexto, out var id))
+            {
+                mensajeError = "El codigo de pedido no es valido.";
+                return;
+            }
+
+            pedido = await PedidoService.ObtenerPorIdAsync(id);
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"No se pudo cargar el pedido. {ex.Message}";
+        }
+        finally
+        {
+            cargando = false;
+        }
     }
 
     private void Volver() => Navigation.NavigateTo("/admin/pedidos");
@@ -190,7 +227,7 @@
         }
 
         var estadosNormalizados = estadosProgreso.Select(NormalizarEstado).ToList();
-        var indiceActual = estadosNormalizados.IndexOf(NormalizarEstado(pedido.Estado));
+        var indiceActual = estadosNormalizados.IndexOf(NormalizarEstado(pedido.EstadoTexto));
         var indicePaso = estadosNormalizados.IndexOf(NormalizarEstado(estado));
 
         if (indiceActual == indicePaso)
@@ -203,137 +240,16 @@
 
     private static string NormalizarEstado(string estado)
     {
-        return estado == "En preparación" ? "En preparacion" : estado;
+        return estado == "En preparacion" ? "En preparacion" : estado;
     }
 
-    private static List<PedidoDetalleAdmin> ObtenerPedidosMock() => new()
+    private static string MostrarEstado(string estado)
     {
-        new PedidoDetalleAdmin(
-            "KIL-202610081",
-            new DateTime(2026, 5, 30),
-            "En preparación",
-            false,
-            new ClientePedido("cliente", "cliente@correo.com", "+51 987 654 321"),
-            new EnvioPedido("Av. Arequipa 1234, Miraflores, Lima", "Frente al parque Kennedy", "-12.1219, -77.0297"),
-            new PagoPedido("Tarjeta", "Visa terminada en 0789", "Operacion POS-845921"),
-            10.00m,
-            12.00m,
-            new()
-            {
-                new ProductoPedido("Serum vitamina C", "Essence", "/Images/Serum.jpg", 1, 89.90m),
-                new ProductoPedido("Crema hidratante CeraVe", "CeraVe", "/Images/Cerave.jpg", 1, 69.90m),
-                new ProductoPedido("Labial Peripera Ink", "Peripera", "/Images/LabialPeripera.jpg", 1, 12.00m)
-            }),
-        new PedidoDetalleAdmin(
-            "KIL-202605002",
-            new DateTime(2026, 5, 25),
-            "Entregado",
-            false,
-            new ClientePedido("maria.lopez", "maria.lopez@correo.com", "+51 955 410 225"),
-            new EnvioPedido("Calle Las Orquideas 456, San Isidro, Lima", "Recepcion del edificio", "-12.0968, -77.0365"),
-            new PagoPedido("Billetera digital", "Yape asociado al 955 *** 225", "Operacion YP-529144"),
-            15.00m,
-            10.00m,
-            new()
-            {
-                new ProductoPedido("Mascara de pestanas", "Maybelline", "/Images/Mascara.jpg", 1, 38.20m),
-                new ProductoPedido("Fragancia floral", "Killa Beauty", "/Images/Fragancia.png", 2, 77.50m)
-            }),
-        new PedidoDetalleAdmin(
-            "KIL-202604115",
-            new DateTime(2026, 5, 10),
-            "Pagado",
-            false,
-            new ClientePedido("ana.torres", "ana.torres@correo.com", "+51 944 115 782"),
-            new EnvioPedido("Jr. Los Pinos 820, Surco, Lima", "Casa con porton negro", "-12.1396, -76.9918"),
-            new PagoPedido("Transferencia", "BCP cuenta terminada en 4912", "Operacion TR-667210"),
-            0.00m,
-            12.00m,
-            new()
-            {
-                new ProductoPedido("Lorinique cabello", "Lorinique", "/Images/LoriniqueCabello.jpg", 1, 120.00m)
-            }),
-        new PedidoDetalleAdmin(
-            "KIL-202604086",
-            new DateTime(2026, 4, 28),
-            "Enviado",
-            false,
-            new ClientePedido("luis.perez", "luis.perez@correo.com", "+51 901 220 778"),
-            new EnvioPedido("Av. Javier Prado 2500, San Borja, Lima", "Cerca a La Rambla", "-12.0871, -76.9996"),
-            new PagoPedido("Tarjeta", "Mastercard terminada en 4412", "Operacion POS-337890"),
-            0.00m,
-            9.90m,
-            new()
-            {
-                new ProductoPedido("Set cuidado de piel", "Killa Beauty", "/Images/CuidadoPiel.png", 1, 80.00m)
-            }),
-        new PedidoDetalleAdmin(
-            "KIL-202604033",
-            new DateTime(2026, 4, 18),
-            "Pendiente",
-            false,
-            new ClientePedido("camila.rios", "camila.rios@correo.com", "+51 933 214 909"),
-            new EnvioPedido("Av. Primavera 421, Surco, Lima", "Torre B, departamento 602", "-12.1117, -76.9810"),
-            new PagoPedido("Billetera digital", "Plin asociado al 933 *** 909", "Pendiente de confirmacion"),
-            20.00m,
-            10.00m,
-            new()
-            {
-                new ProductoPedido("Kit maquillaje", "Killa Beauty", "/Images/Maquillaje.png", 1, 255.70m)
-            }),
-        new PedidoDetalleAdmin(
-            "KIL-202603021",
-            new DateTime(2026, 3, 9),
-            "Cancelado",
-            true,
-            new ClientePedido("sofia.castro", "sofia.castro@correo.com", "+51 922 409 100"),
-            new EnvioPedido("Calle Roma 224, Pueblo Libre, Lima", "Segundo piso", "-12.0744, -77.0661"),
-            new PagoPedido("Tarjeta", "Visa terminada en 3901", "Reembolso solicitado"),
-            0.00m,
-            0.00m,
-            new()
-            {
-                new ProductoPedido("Mascara de pestanas", "Maybelline", "/Images/Mascara.jpg", 1, 52.90m)
-            }),
-        new PedidoDetalleAdmin(
-            "KIL-202602014",
-            new DateTime(2026, 2, 14),
-            "Entregado",
-            false,
-            new ClientePedido("valeria.diaz", "valeria.diaz@correo.com", "+51 988 010 410"),
-            new EnvioPedido("Av. Salaverry 1810, Jesus Maria, Lima", "Lobby principal", "-12.0814, -77.0464"),
-            new PagoPedido("Transferencia", "Interbank cuenta terminada en 8840", "Operacion TR-119024"),
-            25.00m,
-            12.00m,
-            new()
-            {
-                new ProductoPedido("Serum vitamina C", "Essence", "/Images/Serum.jpg", 2, 89.90m),
-                new ProductoPedido("Crema hidratante CeraVe", "CeraVe", "/Images/Cerave.jpg", 2, 67.30m)
-            })
-    };
-
-    private record PedidoDetalleAdmin(
-        string Codigo,
-        DateTime Fecha,
-        string Estado,
-        bool Cancelado,
-        ClientePedido Cliente,
-        EnvioPedido Envio,
-        PagoPedido Pago,
-        decimal Descuento,
-        decimal CostoEnvio,
-        List<ProductoPedido> Productos)
-    {
-        public decimal Subtotal => Productos.Sum(p => p.Subtotal);
-        public decimal Total => Subtotal - Descuento + CostoEnvio;
+        return estado == "En preparacion" ? "En preparaci\u00f3n" : estado;
     }
 
-    private record ProductoPedido(string Nombre, string Marca, string Imagen, int Cantidad, decimal PrecioUnitario)
+    private static string Valor(string? value)
     {
-        public decimal Subtotal => Cantidad * PrecioUnitario;
+        return string.IsNullOrWhiteSpace(value) ? "No registrado" : value;
     }
-
-    private record ClientePedido(string NombreUsuario, string Correo, string Contacto);
-    private record EnvioPedido(string Direccion, string Referencia, string Coordenadas);
-    private record PagoPedido(string Tipo, string Detalle, string Operacion);
 }
