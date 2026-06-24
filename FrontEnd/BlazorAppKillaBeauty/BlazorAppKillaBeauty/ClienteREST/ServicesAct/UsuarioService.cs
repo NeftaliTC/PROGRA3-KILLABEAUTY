@@ -1,6 +1,7 @@
 ﻿using BlazorAppKillaBeauty.ClienteREST.Models;
 using BlazorAppKillaBeauty.ClienteREST.Utils.BlazorAppKillaBeauty.Utils;
 using BlazorAppKillaBeauty.Services;
+using static System.Net.WebRequestMethods;
 
 namespace BlazorAppKillaBeauty.ClienteREST.ServicesAct
 {
@@ -27,7 +28,7 @@ namespace BlazorAppKillaBeauty.ClienteREST.ServicesAct
         // GET: /usuarios?tipo={idTipoUsuario}
         public async Task<List<Usuario>> ListarPorTipoUsuarioAsync(int idTipoUsuario)
         {
-            return await _httpClientUtils.GetAsync<List<Usuario>>($"usuarios?tipo={idTipoUsuario}");
+            return await _httpClientUtils.GetAsync<List<Usuario>>($"usuarios?tipo={idTipoUsuario}") ?? new List<Usuario>();
         }
 
         // GET: /usuarios/email/{correo}
@@ -47,10 +48,10 @@ namespace BlazorAppKillaBeauty.ClienteREST.ServicesAct
         {
             //devuelve un booleano confirmando el éxito
             return await _httpClientUtils.DeleteAsync($"usuarios/{id}");
-        }
+        }   
 
         //// GET: /usuarios/{id}/resenas
-   
+
         //public async Task<List<ResenaProducto>> BuscarResenasPorUsuarioAsync(int idUsuario)
         //{
         //    return await _httpClientUtils.GetAsync<List<ResenaProducto>>($"usuarios/{idUsuario}/resenas");
