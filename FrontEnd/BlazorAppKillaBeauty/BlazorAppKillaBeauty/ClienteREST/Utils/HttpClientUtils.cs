@@ -69,7 +69,14 @@
                 // Muy parecido al POST, pero usando PutAsJsonAsync
                 HttpResponseMessage response = await _httpClient.PutAsJsonAsync(url, data, _jsonOptions);
 
-                response.EnsureSuccessStatusCode();
+                if (!response.IsSuccessStatusCode)
+                {
+                    // Leemos el texto que Java nos envió de regreso (ej. "El correo ya existe")
+                    string errorDeJava = await response.Content.ReadAsStringAsync();
+
+                    // Lanzamos el error pero CON EL TEXTO REAL
+                    throw new Exception(errorDeJava);
+                }
 
                 return await response.Content.ReadFromJsonAsync<T>(_jsonOptions);
             }
