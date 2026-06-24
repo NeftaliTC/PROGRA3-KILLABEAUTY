@@ -120,11 +120,21 @@
 
             if (usuarioLogueado != null)
             {
-                // Si el backend devuelve el usuario, el login fue un éxito.
-                // Aquí más adelante guardaremos el usuario en el estado global o local storage
-                
+               
                 AuthService.Login(usuarioLogueado.Nombre, usuarioLogueado.Id, usuarioLogueado.TipoUsuario);
-                NavigationManager.NavigateTo("/"); // Redirigir al Home
+                string rolReal = usuarioLogueado.TipoUsuario?.Trim().ToUpper() ?? "";
+                if (rolReal == "VENDEDOR" || rolReal == "ADMINISTRADOR")
+                {
+                    // Si es personal de la tienda, lo mandamos a tu panel
+                    NavigationManager.NavigateTo("/admin");
+                }
+                else
+                {
+                    // Si es cliente normal, lo mandamos a la tienda
+                    NavigationManager.NavigateTo("/");
+                }
+               
+                // NavigationManager.NavigateTo("/"); // Redirigir al Home
             }
         }
         catch (Exception ex)
