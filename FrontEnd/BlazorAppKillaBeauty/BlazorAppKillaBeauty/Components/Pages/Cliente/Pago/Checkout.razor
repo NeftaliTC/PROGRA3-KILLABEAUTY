@@ -379,9 +379,16 @@
     private string errorDireccionEntrega = "";
     private string errorPago = "";
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        direccionSeleccionada = AddressService.ObtenerPredeterminada();
+        if (AuthService.UsuarioId.HasValue)
+        {
+            // Carga las direcciones del servidor hacia el servicio
+            await AddressService.CargarPorUsuarioAsync(AuthService.UsuarioId.Value);
+        
+            // Una vez cargadas, busca la predeterminada
+            direccionSeleccionada = AddressService.ObtenerPredeterminada();
+        }
     }
 
     private void SeleccionarEntrega(string metodo)
@@ -484,7 +491,7 @@
         mostrarModalDireccion = false;
     }
 
-    private void GuardarNuevaDireccion()
+    private async Task GuardarNuevaDireccion()
     {
         errorDireccion = "";
 
@@ -506,12 +513,22 @@
             return;
         }
 
-        nuevaDireccion.Id = AddressService.UserAddresses.Count + 1;
-        nuevaDireccion.IsDefault = false;
-        AddressService.UserAddresses.Add(nuevaDireccion);
-        direccionSeleccionada = nuevaDireccion;
-        costoEnvio = AddressService.CalcularEnvio(nuevaDireccion);
-        mostrarModalDireccion = false;
+        try
+        {
+            nuevaDireccion.Usuario = new UsuarioDireccion { Id = AuthService.UsuarioId.Value };
+        
+            await AddressService.CrearAsync(nuevaDireccion, AuthService.UsuarioId.Value);
+
+            await AddressService.CargarPorUsuarioAsync(AuthService.UsuarioId.Value);
+
+            direccionSeleccionada = nuevaDireccion;
+            costoEnvio = AddressService.CalcularEnvio(direccionSeleccionada);
+            mostrarModalDireccion = false;
+        }
+        catch (Exception ex)
+        {
+            errorDireccion = "Error al guardar en el servidor: " + ex.Message;
+        }
     }
 
     private string tipoComprobante = "BOLETA";
