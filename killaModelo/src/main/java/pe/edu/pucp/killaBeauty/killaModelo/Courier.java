@@ -6,6 +6,7 @@ public class Courier {
     private String ruc;
     private String telefono;
     private boolean activo;
+    private boolean esAsignado;
     private String correo;
 
     public Courier() {
@@ -49,6 +50,14 @@ public class Courier {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    public boolean isEsAsignado() {
+        return esAsignado;
+    }
+
+    public void setEsAsignado(boolean esAsignado) {
+        this.esAsignado = esAsignado;
     }
 
     public String getCorreo() {
