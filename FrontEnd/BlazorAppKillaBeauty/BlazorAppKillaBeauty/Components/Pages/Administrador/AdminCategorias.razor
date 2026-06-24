@@ -1,6 +1,7 @@
 ﻿@page "/admin/categorias"
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
+@using BlazorAppKillaBeauty.ClienteREST.Models
 @inject NavigationManager NavManager
 @inject CategoriaService CategoriaService
 
@@ -21,11 +22,11 @@
 
         <header class="admin-header admin-orders-header d-flex justify-content-between align-items-center">
             <div>
-                <h1>Gestion de Categori­as</h1>
-                <p>Administra las categori­as y subcategorias del catalogo de productos.</p>
+                <h1>Gestión de Categorías</h1>
+                <p>Administra las categorí­as y subcategorías del catalogo de productos.</p>
             </div>
             <button class="btn-add-marca" @onclick="AbrirNuevaCategoria">
-                <i class="bi bi-plus-circle"></i> Nueva Categori­a
+                <i class="bi bi-plus-circle"></i> Nueva Categoría
             </button>
         </header>
 
@@ -41,7 +42,7 @@
             <div class="admin-orders-search">
                 <i class="bi bi-search"></i>
                 <input type="text"
-                       placeholder="Buscar por descripcion de categori­a o subcategori­a..."
+                       placeholder="Buscar por descripción de categorí­a o subcategorí­a..."
                        @bind="filtroBusqueda"
                        @bind:event="oninput"
                        @bind:after="AplicarFiltros" />
@@ -71,8 +72,8 @@
                 <thead>
                     <tr>
                         <th style="padding-left: 2rem !important; width: 60px;">ID</th>
-                        <th>NOMBRE DE CATEGORIA</th>
-                        <th class="text-center">SUBCATEGORIAS</th>
+                        <th>NOMBRE DE CATEGORÍA</th>
+                        <th class="text-center">SUBCATEGORÍAS</th>
                         <th class="text-center">ESTADO</th>
                         <th class="text-end" style="padding-right: 2rem !important;">ACCIONES</th>
                     </tr>
@@ -84,7 +85,7 @@
                             <td colspan="5">
                                 <div class="admin-empty-orders">
                                     <i class="bi bi-inbox"></i>
-                                    <span>No se encontraron categori­as.</span>
+                                    <span>No se encontraron categorí­as.</span>
                                 </div>
                             </td>
                         </tr>
@@ -203,12 +204,12 @@
             </table>
         </section>
 
-        <!-- PAGINACIi“N -->
+        <!-- PAGINACION -->
         @if (totalPaginas > 1)
         {
             <footer class="admin-pagination">
                 <span style="font-weight: 600; color: #777;">
-                    Mostrando @(((paginaActual - 1) * itemsPorPagina) + 1)â€“@(Math.Min(paginaActual * itemsPorPagina, categoriasFiltradas.Count)) de @categoriasFiltradas.Count resultados
+                    Mostrando @(((paginaActual - 1) * itemsPorPagina) + 1)-@(Math.Min(paginaActual * itemsPorPagina, categoriasFiltradas.Count)) de @categoriasFiltradas.Count resultados
                 </span>
                 <div class="admin-pagination-buttons">
                     <button disabled="@(paginaActual == 1)" @onclick="() => CambiarPagina(paginaActual - 1)">
@@ -601,7 +602,7 @@
 
         if (existe)
         {
-            errorModalCat = "Ya existe una categoria con esa descripcion.";
+            errorModalCat = "Ya existe una categoría con esa descripción.";
             return;
         }
 
@@ -615,7 +616,7 @@
                     Descripcion = nombre,
                     Activo = formCat.Activo
                 });
-                mensajeExito = $"Categoria \"{nombre}\" actualizada correctamente.";
+                mensajeExito = $"Categoría \"{nombre}\" actualizada correctamente.";
             }
             else
             {

@@ -4,11 +4,12 @@
 @inject NavigationManager Navigation
 @inject CartService CartService
 @inject ProductoService ProductoService
+@inject AuthService AuthService
 
 
 <PageTitle>KILLA Beauty – Belleza que Inspira</PageTitle>
 
-<Navbar CantidadCarrito="@CartService.CantidadTotal" />
+<Navbar CantidadCarrito="@CartService.CantidadTotal" @key="CartService.CantidadTotal" />
 
 <!-- BANNER PRINCIPAL -->
 <section class="hero">
@@ -21,7 +22,7 @@
             Los mejores productos de skincare,
             maquillaje y cuidado capilar
         </p>
-        
+
         <div class="hero-buttons">
             <button class="btn-primary"
                     @onclick='() => Navigation.NavigateTo("/catalogo")'>
@@ -161,58 +162,58 @@
     {
         <div class="product-grid">
 
-        @for (int i = 0; i < productos.Count; i++)
-        {
-            var producto = productos[i];
-            var index = i;
+            @for (int i = 0; i < productos.Count; i++)
+            {
+                var producto = productos[i];
+                var index = i;
 
-            <div class="product-card" @onclick="@(() => IrADetalleProducto(producto.Id))">
+                <div class="product-card" @onclick="@(() => IrADetalleProducto(producto.Id))">
 
-                <div class="product-image">
+                    <div class="product-image">
 
-                    <img src="@producto.Imagen" alt="@producto.Nombre" />
-
-                </div>
-
-                <div class="product-info">
-
-                    <h3>@producto.Nombre</h3>
-
-                    <div class="stars">
-                        <span>★</span>
-                        <span>★</span>
-                        <span>★</span>
-                        <span>★</span>
-                        <span class="star-empty">★</span>
-                    </div>
-
-                    <div class="product-footer">
-
-                        <span class="price">
-                            @MostrarPrecio(producto)
-                        </span>
-
-                        <button type="button"
-                                class="cart-btn @(productosAnimados.Contains(index) ? "cart-added" : "")"
-                                @onclick:stopPropagation="true"
-                                @onclick="() => AgregarCarrito(index)">
-                            @if (productosAnimados.Contains(index))
-                            {
-                                <i class="bi bi-check-lg"></i>
-                            }
-                            else
-                            {
-                                <i class="bi bi-cart3"></i>
-                            }
-
-                        </button>
+                        <img src="@producto.ImagenPrincipal" alt="@producto.Nombre" />
 
                     </div>
 
-                </div>
+                    <div class="product-info">
 
-            </div>
-        }
+                        <h3>@producto.Nombre</h3>
+
+                        <div class="stars">
+                            <span>★</span>
+                            <span>★</span>
+                            <span>★</span>
+                            <span>★</span>
+                            <span class="star-empty">★</span>
+                        </div>
+
+                        <div class="product-footer">
+
+                            <span class="price">
+                                @MostrarPrecio(producto)
+                            </span>
+
+                            <button type="button"
+                                    class="cart-btn @(productosAnimados.Contains(index) ? "cart-added" : "")"
+                                    @onclick:stopPropagation="true"
+                                    @onclick="() => AgregarCarrito(index,1)">
+                                @if (productosAnimados.Contains(index))
+                                {
+                                    <i class="bi bi-check-lg"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-cart3"></i>
+                                }
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
 
         </div>
     }
@@ -281,7 +282,7 @@
                             <button type="button"
                                     class="wholesale-product-row"
                                     @onclick="() => SeleccionarProductoMayorista(producto)">
-                                <img src="@producto.Imagen" alt="@producto.Nombre" />
+                                <img src="@producto.ImagenPrincipal" alt="@producto.Nombre" />
 
                                 <span class="wholesale-product-name">
                                     @producto.Nombre
@@ -290,7 +291,7 @@
 
                                 <span class="wholesale-product-price">
                                     <small>Desde</small>
-                                    S/ @producto.PrecioMinimo.ToString("0.00")
+                                    S/ @producto.PrecioBase.ToString("0.00")
                                 </span>
                             </button>
                         }
@@ -336,7 +337,7 @@
 
                 <div class="wholesale-detail-body">
                     <article class="wholesale-selected-product">
-                        <img src="@productoMayoristaSeleccionado.Imagen" alt="@productoMayoristaSeleccionado.Nombre" />
+                        <img src="@productoMayoristaSeleccionado.ImagenPrincipal" alt="@productoMayoristaSeleccionado.Nombre" />
 
                         <div>
                             <h3>@productoMayoristaSeleccionado.Nombre</h3>
@@ -407,21 +408,28 @@
     private int cantidadCarrito = 0;
 
 
-    private List<BlazorAppKillaBeauty.Services.Producto> productos = new();
-    private List<BlazorAppKillaBeauty.Services.Producto> productosMayoristas = new();
+    private List<BlazorAppKillaBeauty.ClienteREST.Models.Producto> productos = new();
+    private List<BlazorAppKillaBeauty.ClienteREST.Models.Producto> productosMayoristas = new();
     private bool cargandoProductos = true;
     private string? errorProductos;
 
     private HashSet<int> productosAnimados = new();
 
-    private async Task AgregarCarrito(int index)
+    private async Task AgregarCarrito(int index, int cantidad)
     {
-        CartService.AgregarProducto(
-            productos[index].Id,
-            productos[index].Nombre,
-            productos[index].PrecioMinimo,
-            productos[index].Imagen
-        );
+        var producto = productos[index];
+
+        if (AuthService.UsuarioId.HasValue)
+        {
+            await CartService.AgregarProductoAsync(
+                producto,
+                AuthService.UsuarioId.Value,
+                cantidad);
+        }
+        else
+        {
+            CartService.AgregarProductoLocal(producto, cantidad);
+        }
 
         productosAnimados.Add(index);
         StateHasChanged();
@@ -457,14 +465,9 @@
         }
     }
 
-    private string MostrarPrecio(BlazorAppKillaBeauty.Services.Producto producto)
+    private string MostrarPrecio(BlazorAppKillaBeauty.ClienteREST.Models.Producto producto)
     {
-        if (producto.PrecioMinimo == producto.PrecioMaximo)
-        {
-            return $"S/ {producto.PrecioMinimo:0.00}";
-        }
-
-        return $"S/ {producto.PrecioMinimo:0.00} - S/ {producto.PrecioMaximo:0.00}";
+        return $"S/ {producto.PrecioBase}";
     }
 
     private void IrADetalleProducto(int idProducto)
@@ -474,23 +477,19 @@
 
     private bool mostrarModalMayorista = false;
     private string busquedaMayorista = "";
-    private BlazorAppKillaBeauty.Services.Producto? productoMayoristaSeleccionado;
+    private BlazorAppKillaBeauty.ClienteREST.Models.Producto? productoMayoristaSeleccionado;
 
-    private IEnumerable<BlazorAppKillaBeauty.Services.Producto> ProductosMayoristasFiltrados
-    {
-        get
-        {
-            var query = productosMayoristas.AsEnumerable();
-
-            if (!string.IsNullOrWhiteSpace(busquedaMayorista))
-            {
-                query = query.Where(producto =>
-                    producto.Nombre.Contains(busquedaMayorista, StringComparison.OrdinalIgnoreCase)
-                    || producto.Marca.Contains(busquedaMayorista, StringComparison.OrdinalIgnoreCase));
-            }
-
-            return query;
-        }
+    private IEnumerable<BlazorAppKillaBeauty.ClienteREST.Models.Producto> ProductosMayoristasFiltrados 
+    { 
+        get 
+        { 
+            var query = productosMayoristas.AsEnumerable(); 
+            if (!string.IsNullOrWhiteSpace(busquedaMayorista)) 
+            { 
+                query = query.Where(producto => producto.Nombre.Contains(busquedaMayorista, StringComparison.OrdinalIgnoreCase) || producto.Marca.Contains(busquedaMayorista, StringComparison.OrdinalIgnoreCase)); 
+            } 
+            return query; 
+        } 
     }
 
     private IEnumerable<EscalaMayorista> EscalasMayoristas
@@ -502,9 +501,7 @@
                 return Enumerable.Empty<EscalaMayorista>();
             }
 
-            var precioBase = productoMayoristaSeleccionado.PrecioMaximo > 0
-                ? productoMayoristaSeleccionado.PrecioMaximo
-                : productoMayoristaSeleccionado.PrecioMinimo;
+            var precioBase = productoMayoristaSeleccionado.PrecioBase;
 
             var mediaDocena = decimal.Round(precioBase * 0.89m, 2);
             var cajon = decimal.Round(precioBase * 0.78m, 2);
@@ -531,7 +528,7 @@
         busquedaMayorista = "";
     }
 
-    private void SeleccionarProductoMayorista(BlazorAppKillaBeauty.Services.Producto producto)
+    private void SeleccionarProductoMayorista(BlazorAppKillaBeauty.ClienteREST.Models.Producto producto)
     {
         productoMayoristaSeleccionado = producto;
     }

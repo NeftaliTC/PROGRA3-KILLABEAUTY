@@ -21,13 +21,15 @@ public class CarritoDeComprasBLImpl implements CarritoDeComprasBL {
 
     @Override
     public CarritoDeCompras create(CarritoDeCompras carrito) throws BusinessLogicException {
-        validarCarrito(carrito, true);
+        validarCarrito(carrito, false);
         try {
             TransactionContext.getConnection();
             carritoDAO.save(carrito);
-            for (DetalleCarrito detalle : carrito.getDetalleCarritoList()) {
-                detalle.setCarritoDeCompras(carrito);
-                detalleDAO.save(detalle);
+            if (carrito.getDetalleCarritoList() != null) {
+                for (DetalleCarrito detalle : carrito.getDetalleCarritoList()) {
+                    detalle.setCarritoDeCompras(carrito);
+                    detalleDAO.save(detalle);
+                }
             }
             TransactionContext.commit();
             return carrito;

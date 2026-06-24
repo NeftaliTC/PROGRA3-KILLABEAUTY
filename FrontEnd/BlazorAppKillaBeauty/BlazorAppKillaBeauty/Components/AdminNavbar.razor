@@ -63,7 +63,7 @@
 
     protected override void OnInitialized()
     {
-        if (AuthService.EstaLogueado && AuthService.Rol == "SuperAdmin")
+        if (AuthService.EstaLogueado && AuthService.Rol == "ADMINISTRADOR")
         {
             menu.Add(new MenuAdmin("Empleados", "/admin/empleados", "bi bi-people-fill"));
         }

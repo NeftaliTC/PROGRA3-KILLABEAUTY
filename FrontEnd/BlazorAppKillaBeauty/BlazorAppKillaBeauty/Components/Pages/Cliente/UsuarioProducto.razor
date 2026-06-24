@@ -3,9 +3,15 @@
 @rendermode InteractiveServer
 
 @using BlazorAppKillaBeauty.Services
+@using BlazorAppKillaBeauty.ClienteREST.Models
+@using Microsoft.AspNetCore.Components
+@using BlazorAppKillaBeauty.ClienteREST.ServicesAct
+
 @inject ProductoService ProductoService
 @inject CartService CartService
 @inject NavigationManager Navigation
+@inject AuthService AuthService
+@inject EscalaPrecioService EscalaPrecioService
 
 <Navbar CantidadCarrito="@CartService.CantidadTotal" />
 
@@ -122,26 +128,15 @@ else
                 </p>
 
                 <div class="producto-escalas">
-                    <button class="producto-escala @(cantidad >= 1 && cantidad <= 5 ? "activa" : "")"
-                            @onclick="@(() => cantidad = 1)">
-                        <span>1 - 5 Unidades</span>
-                        <strong>S/ @PrecioBase.ToString("0.00")</strong>
-                        <small>por unidad</small>
-                    </button>
-
-                    <button class="producto-escala @(cantidad >= 6 && cantidad <= 23 ? "activa" : "")"
-                            @onclick="@(() => cantidad = 6)">
-                        <span>6 - 23 Unidades</span>
-                        <strong>S/ @PrecioMediaDocena.ToString("0.00")</strong>
-                        <small>por unidad</small>
-                    </button>
-
-                    <button class="producto-escala @(cantidad >= 24 ? "activa" : "")"
-                            @onclick="@(() => cantidad = 24)">
-                        <span>24+ Unidades</span>
-                        <strong>S/ @PrecioCajon.ToString("0.00")</strong>
-                        <small>por unidad</small>
-                    </button>
+                    @foreach (var escala in EscalasOrdenadas)
+                    {
+                        <button class="producto-escala @(EscalaActual?.Id == escala.Id ? "activa" : "")"
+                                @onclick="@(() => cantidad = escala.CantidadMinima)">
+                            <span>@TextoRangoEscala(escala)</span>
+                            <strong>S/ @escala.PrecioUnitario.ToString("0.00")</strong>
+                            <small>por unidad</small>
+                        </button>
+                    }
                 </div>
 
                 <div class="producto-compra-row">
@@ -167,7 +162,7 @@ else
                 <div class="producto-meta">
                     <p><strong>Categoría:</strong> @producto.Categoria</p>
                     <p><strong>SubCategoría:</strong> @producto.Subcategoria</p>
-                    
+
                 </div>
 
             </section>
@@ -291,6 +286,7 @@ else
     private int cantidad = 1;
     private bool cargandoProducto = true;
     private string? errorProducto;
+    private List<EscalaPrecio> escalasPrecio = new();
     private List<ResenaVista> resenas = new();
 
     private int filtroCalificacion = 0;
@@ -311,6 +307,7 @@ else
             }
 
             productoApi = await ProductoService.ObtenerPorIdAsync(producto.Id);
+            escalasPrecio = await EscalaPrecioService.ListarPorProductoAsync(producto.Id);
             resenas = (await ProductoService.ObtenerResenasAsync(producto.Id))
                 .Select((r, index) => new ResenaVista
                 {
@@ -324,7 +321,7 @@ else
                 })
                 .ToList();
 
-            imagenSeleccionada = ImagenesProducto.FirstOrDefault() ?? producto.Imagen;
+            imagenSeleccionada = ImagenesProducto.FirstOrDefault() ?? producto.ImagenPrincipal;
         }
         catch (Exception ex)
         {
@@ -340,7 +337,7 @@ else
         producto != null &&
         producto.Nombre.Contains("Sérum Vitamina C Gold Kiwi", StringComparison.OrdinalIgnoreCase);
 
-    
+
 
     private List<string> ImagenesProducto
     {
@@ -355,7 +352,7 @@ else
             {
                 return new List<string>
                 {
-                    producto.Imagen,
+                    producto.ImagenPrincipal,
                     "Images/Logo.png",
                     "Images/Transporte.png"
                 };
@@ -363,37 +360,31 @@ else
 
             return new List<string>
             {
-                producto.Imagen
+                producto.ImagenPrincipal
             };
         }
     }
 
-    private decimal PrecioUnitarioActual
+    private List<EscalaPrecio> EscalasOrdenadas => escalasPrecio.OrderBy(e => e.CantidadMinima).ToList();
+
+    private EscalaPrecio? EscalaActual
     {
         get
         {
-            var precioMaximo = producto?.PrecioMaximo > 0 ? producto.PrecioMaximo : producto?.PrecioMinimo ?? 0;
-            var precioMinimo = producto?.PrecioMinimo > 0 ? producto.PrecioMinimo : precioMaximo;
-
-            if (cantidad >= 24)
-            {
-                return precioMinimo;
-            }
-
-            if (cantidad >= 6)
-            {
-                return decimal.Round((precioMaximo + precioMinimo) / 2, 2);
-            }
-
-            return precioMaximo;
+            return EscalasOrdenadas
+                .Where(e => cantidad >= e.CantidadMinima)
+                .OrderByDescending(e => e.CantidadMinima)
+                .FirstOrDefault();
         }
     }
 
-    private decimal PrecioBase => producto?.PrecioMaximo > 0 ? producto.PrecioMaximo : producto?.PrecioMinimo ?? 0;
+    private decimal PrecioUnitarioActual =>
+        EscalaActual?.PrecioUnitario ?? producto?.PrecioBase ?? 0;
 
-    private decimal PrecioCajon => producto?.PrecioMinimo > 0 ? producto.PrecioMinimo : PrecioBase;
-
-    private decimal PrecioMediaDocena => decimal.Round((PrecioBase + PrecioCajon) / 2, 2);
+    private decimal PrecioBase =>
+        EscalasOrdenadas.FirstOrDefault()?.PrecioUnitario
+        ?? producto?.PrecioBase
+        ?? 0;
 
     private decimal PrecioTotal => PrecioUnitarioActual * cantidad;
 
@@ -405,6 +396,21 @@ else
         PrecioTotalSinDescuento == 0
             ? 0
             : ((PrecioTotalSinDescuento - PrecioTotal) / PrecioTotalSinDescuento) * 100;
+
+    private string TextoRangoEscala(EscalaPrecio escala)
+    {
+        var escalas = EscalasOrdenadas;
+        var index = escalas.IndexOf(escala);
+
+        if (index == escalas.Count - 1)
+        {
+            return $"{escala.CantidadMinima}+ Unidades";
+        }
+
+        var siguiente = escalas[index + 1];
+
+        return $"{escala.CantidadMinima} - {siguiente.CantidadMinima - 1} Unidades";
+    }
 
     private bool TieneResenas => Resenas.Any();
 
@@ -501,18 +507,21 @@ else
         }
     }
 
-    private void AgregarAlCarrito()
+    private async Task AgregarAlCarrito()
     {
         if (producto == null)
+            return;
+
+        if (!AuthService.UsuarioId.HasValue)
         {
+            Navigation.NavigateTo("/login");
             return;
         }
 
-        CartService.AgregarProducto(
-            producto.Id,
-            producto.Nombre,
-            PrecioUnitarioActual,
-            producto.Imagen
+        await CartService.AgregarProductoAsync(
+            producto,
+            AuthService.UsuarioId.Value,
+            cantidad
         );
     }
 

@@ -8,7 +8,7 @@ public class ProductoCatalogoDTO {
     private String categoria;
     private String subcategoria;
     private String marca;
-//    private Boolean esPopular;
+    //    private Boolean esPopular;
     private Boolean activo;
 
     public ProductoCatalogoDTO() {

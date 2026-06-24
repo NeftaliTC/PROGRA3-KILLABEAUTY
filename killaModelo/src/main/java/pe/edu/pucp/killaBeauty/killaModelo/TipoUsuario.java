@@ -2,9 +2,9 @@ package pe.edu.pucp.killaBeauty.killaModelo;
 
 // CORREGIDA
 public enum TipoUsuario {
-    ADMINISTRADOR(1, "Administrador"),
-    CLIENTE(2, "Cliente"),
-    VENDEDOR(3, "Vendedor");
+    ADMINISTRADOR(1, "ADMINISTRADOR"),
+    CLIENTE(2, "CLIENTE"),
+    VENDEDOR(3, "TRABAJADOR");
 
     private final int id;
     private final String nombre;

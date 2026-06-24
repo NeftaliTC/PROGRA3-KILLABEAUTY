@@ -2,7 +2,9 @@
 @rendermode InteractiveServer
 @inject AuthService AuthService
 @inject NavigationManager NavManager
-
+@using ClienteREST.ServicesAct
+@using ClienteREST.Models
+@inject UsuarioService UsuarioService
 <PageTitle>Gestión de Empleados - Killa Beauty</PageTitle>
 
 <main class="admin-page">
@@ -11,8 +13,9 @@
     <section class="admin-content admin-employees-content">
         
         @* 🛡️ CONTROL DE ACCESO PERIMETRAL *@
-        @if (!AuthService.EstaLogueado || AuthService.Rol != "SuperAdmin")
+        @if (!AuthService.EstaLogueado || AuthService.Rol != "ADMINISTRADOR")
         {
+            
             <div class="access-denied-container">
                 <div class="access-denied-icon">
                     <i class="bi bi-shield-slash-fill"></i>
@@ -79,7 +82,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (EmpleadosFiltrados.Count == 0)
+                        @if (cargando)
+                        {
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 60px 0;">
+                                    <div class="spinner-border" role="status" style="color: #d84b6b; width: 3rem; height: 3rem; margin-bottom: 15px;">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                    <h5 style="color: #a18893; font-weight: 600; margin: 0;">Cargando lista de personal...</h5>
+                                </td>
+                            </tr>
+                        }
+                        else if (EmpleadosFiltrados.Count == 0)
                         {
                             <tr>
                                 <td colspan="7">
@@ -99,15 +113,15 @@
                                     <td>
                                         <div style="display: flex; flex-direction: column;">
                                             <span style="font-weight: 800; color: #2f252a;">@emp.Nombre @emp.ApellidoPaterno</span>
-                                            <small style="color: #a18893; font-size: 0.75rem;">ID: EMP-@emp.Dni.Substring(0, 4)</small>
+                                            <small style="color: #a18893; font-size: 0.75rem;">ID: EMP-@(emp.Dni?.Length >= 4 ? emp.Dni.Substring(0, 4) : "0000")</small>
                                         </div>
                                     </td>
                                     <td>@emp.CorreoElectronico</td>
                                     <td>@emp.Telefono</td>
                                     <td>
-                                        <span class="badge-role @(emp.Rol == "SuperAdmin" ? "role-super" : "role-admin")">
-                                            <i class="@(emp.Rol == "SuperAdmin" ? "bi bi-crown-fill" : "bi bi-person-badge-fill")"></i>
-                                            @emp.Rol
+                                        <span class="badge-role @(emp.TipoUsuario == "ADMINISTRADOR" ? "role-super" : "role-admin")">
+                                            <i class="@(emp.TipoUsuario == "ADMINISTRADOR" ? "bi bi-crown-fill" : "bi bi-person-badge-fill")"></i>
+                                            @emp.TipoUsuario
                                         </span>
                                     </td>
                                     <td>
@@ -149,9 +163,71 @@
         }
     </section>
 </main>
-
+tbody
 @* 📑 MODAL DE CREACIÓN / EDICIÓN *@
+
 @if (mostrarFormulario)
+{
+    <div class="admin-modal-overlay">
+        <div class="admin-modal-card" style="text-align: left; max-width: 550px;">
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; font-size: 1.4rem; color: #4a1525; font-weight: 700;">
+                    <i class="bi @(esEdicion ? "bi-pencil-square" : "bi-person-up")"></i>
+                    @(esEdicion ? "Editar Rol de Empleado" : "Ascender Cliente a Empleado")
+                </h2>
+                <button type="button" @onclick="CerrarFormulario" class="btn-close-modal">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </header>
+
+            @* PASO 1: Buscador (Solo aparece al crear) *@
+            @if (!esEdicion)
+            {
+                <div style="margin-bottom: 20px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Buscar por Correo del Cliente</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="email" class="form-control" placeholder="cliente@correo.com" @bind="emailBusqueda" style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 6px;" />
+                        <button type="button" class="admin-primary-action" style="padding: 8px 15px; min-height: auto;" @onclick="BuscarCliente">Buscar</button>
+                    </div>
+                </div>
+            }
+
+            @* PASO 2: Datos y Selector (Aparece si encontramos al cliente o estamos editando) *@
+            @if (clienteEncontrado || esEdicion)
+            {
+                <div style="margin-bottom: 15px; padding: 15px; background-color: #f9f9f9; border-radius: 8px;">
+                    <p style="margin: 0; font-size: 0.9rem; color: gray;">Usuario Seleccionado:</p>
+                    <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 1.1rem;">@modeloFormulario.Nombre @modeloFormulario.ApellidoPaterno</p>
+                    <p style="margin: 0; font-size: 0.85rem;">@modeloFormulario.CorreoElectronico | DNI: @modeloFormulario.Dni</p>
+                </div>
+
+                <div class="admin-form-group" style="margin-bottom: 25px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Asignar Nuevo Rol</label>
+                    <select @bind="modeloFormulario.TipoUsuario" class="admin-form-select">
+                        <option value="ADMINISTRADOR">Administrador</option>
+                        <option value="VENDEDOR">Vendedor</option>
+                        <option value="SUPERADMIN">SuperAdministrador</option>
+                    </select>
+                </div>
+
+                <div class="admin-modal-actions" style="margin-top: 28px; justify-content: flex-end;">
+                    <button type="button" class="admin-modal-btn-cancel" @onclick="CerrarFormulario">Cancelar</button>
+                    <button type="button" class="admin-primary-action" @onclick="GuardarEmpleado" style="box-shadow: none; min-height: 42px;">
+                        <i class="bi bi-hdd-fill"></i> Guardar Cambios
+                    </button>
+                </div>
+            }
+            else if (!esEdicion)
+            {
+                <div style="background-color: #e9ecef; color: #495057; padding: 15px; border-radius: 8px; text-align: center; font-size: 0.9rem;">
+                    <i class="bi bi-info-circle"></i> Ingresa el correo de un cliente registrado y presiona "Buscar" para asignarle un rol administrativo.
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@* @if (mostrarFormulario)
 {
     <div class="admin-modal-overlay">
         <div class="admin-modal-card" style="text-align: left; max-width: 550px;">
@@ -173,9 +249,9 @@
 
                     <div class="admin-form-group">
                         <label>Rol de Acceso</label>
-                        <select @bind="modeloFormulario.Rol" class="admin-form-select" required>
-                            <option value="Administrador">Administrador</option>
-                            <option value="SuperAdmin">SuperAdmin (Acceso Total)</option>
+                        <select @bind="modeloFormulario.TipoUsuario" class="admin-form-select" required>
+                            <option value="Trabajador">Administrador</option>
+                            <option value="Administrador">SuperAdmin (Acceso Total)</option>
                         </select>
                     </div>
                 </div>
@@ -211,65 +287,124 @@
             </EditForm>
         </div>
     </div>
-}
+} *@
 
 @code {
     private string busqueda = "";
     private string? mensajeError;
     private bool mostrarFormulario = false;
     private bool esEdicion = false;
+    private bool cargando = true;
 
-    private EmpleadoDTO modeloFormulario = new();
+    // --- VARIABLES PARA EL BUSCADOR DE CORREO ---
+    private string emailBusqueda = "";
+    private bool clienteEncontrado = false;
 
-    // Modelado de Datos Hardcodeado idéntico a tu lógica de persistencia planificada
-    public class EmpleadoDTO
+    private Usuario modeloFormulario = new Usuario();
+    private List<Usuario> listaEmpleados = new List<Usuario>();
+
+    private List<Usuario> EmpleadosFiltrados => listaEmpleados
+        .Where(e => string.IsNullOrWhiteSpace(busqueda) ||
+                    (e.Dni != null && e.Dni.Contains(busqueda)) ||
+                    (e.Nombre != null && e.Nombre.Contains(busqueda, StringComparison.OrdinalIgnoreCase)) ||
+                    (e.ApellidoPaterno != null && e.ApellidoPaterno.Contains(busqueda, StringComparison.OrdinalIgnoreCase)) ||
+                    (e.CorreoElectronico != null && e.CorreoElectronico.Contains(busqueda, StringComparison.OrdinalIgnoreCase)))
+        .ToList();
+
+    protected override async Task OnInitializedAsync()
     {
-        public string Dni { get; set; } = "";
-        public string Nombre { get; set; } = "";
-        public string AppellidoPaterno { get; set; } = ""; // Mapeo BD alternativo
-        public string ApellidoPaterno { get; set; } = "";
-        public string CorreoElectronico { get; set; } = "";
-        public string Telefono { get; set; } = "";
-        public string Rol { get; set; } = "Administrador";
-        public bool Activo { get; set; } = true;
+        await CargarEmpleados();
     }
 
-    // Datos iniciales consistentes simulados
-    private List<EmpleadoDTO> listaEmpleados = new() {
-        new EmpleadoDTO { Dni = "71234567", Nombre = "Killa", ApellidoPaterno = "Beauty", CorreoElectronico = "kbeauty@killabeauty.pe", Telefono = "951753852", Rol = "SuperAdmin", Activo = true },
-        new EmpleadoDTO { Dni = "72345678", Nombre = "Valeria", ApellidoPaterno = "Mendoza", CorreoElectronico = "vmendoza@killabeauty.pe", Telefono = "963852741", Rol = "Administrador", Activo = true },
-        new EmpleadoDTO { Dni = "45127896", Nombre = "Carlos", ApellidoPaterno = "Gómez", CorreoElectronico = "cgomez@killabeauty.pe", Telefono = "987456123", Rol = "Administrador", Activo = false }
-    };
+    private async Task CargarEmpleados()
+    {
+        cargando = true;
+        try
+        {
+            
+            
 
-    private List<EmpleadoDTO> EmpleadosFiltrados => listaEmpleados
-        .Where(e => string.IsNullOrWhiteSpace(busqueda) ||
-                    e.Dni.Contains(busqueda) ||
-                    e.Nombre.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
-                    e.ApellidoPaterno.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
-                    e.CorreoElectronico.Contains(busqueda, StringComparison.OrdinalIgnoreCase))
-        .ToList();
+            var superAdmins = await UsuarioService.ListarPorTipoUsuarioAsync(1);
+            // var admins = await UsuarioService.ListarPorTipoUsuarioAsync(2);
+            var trabajadores = await UsuarioService.ListarPorTipoUsuarioAsync(3);
+
+            listaEmpleados = superAdmins
+                .Concat(trabajadores)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = "Error de conexión: " + ex.Message;
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
 
     private void AbrirCrear()
     {
         esEdicion = false;
         mensajeError = null;
-        modeloFormulario = new EmpleadoDTO { Activo = true, Rol = "Administrador" };
+
+        // Reiniciamos las variables del buscador cada vez que abrimos el modal
+        emailBusqueda = "";
+        clienteEncontrado = false;
+
+        modeloFormulario = new Usuario();
         mostrarFormulario = true;
     }
 
-    private void AbrirEditar(EmpleadoDTO emp)
+    // --- NUEVO MÉTODO PARA BUSCAR AL CLIENTE ---
+    private async Task BuscarCliente()
+    {
+        mensajeError = null;
+        clienteEncontrado = false;
+
+        if (string.IsNullOrWhiteSpace(emailBusqueda))
+        {
+            mensajeError = "Por favor, ingresa un correo para buscar.";
+            return;
+        }
+
+        try
+        {
+            var cliente = await UsuarioService.ObtenerUsuarioPorEmailAsync(emailBusqueda);
+
+            if (cliente != null)
+            {
+                modeloFormulario = cliente;
+                clienteEncontrado = true;
+                // Le asignamos un rol predeterminado para sugerirle al SuperAdmin
+                modeloFormulario.TipoUsuario = "ADMINISTRADOR";
+            }
+            else
+            {
+                mensajeError = "No se encontró ningún cliente registrado con ese correo.";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = "Error al buscar el correo: " + ex.Message;
+        }
+    }
+
+    private void AbrirEditar(Usuario emp)
     {
         esEdicion = true;
         mensajeError = null;
-        modeloFormulario = new EmpleadoDTO
+        modeloFormulario = new Usuario
         {
+            Id = emp.Id,
             Dni = emp.Dni,
             Nombre = emp.Nombre,
             ApellidoPaterno = emp.ApellidoPaterno,
             CorreoElectronico = emp.CorreoElectronico,
             Telefono = emp.Telefono,
-            Rol = emp.Rol,
-            Activo = emp.Activo
+            TipoUsuario = emp.TipoUsuario,
+            Activo = emp.Activo,
+            Contrasena = emp.Contrasena,
+            FechaNacimiento = emp.FechaNacimiento
         };
         mostrarFormulario = true;
     }
@@ -279,47 +414,52 @@
         mostrarFormulario = false;
     }
 
-    private void GuardarEmpleado()
+    // CORRECCIÓN: Ahora es asíncrono y se simplificó la lógica
+    private async Task GuardarEmpleado()
     {
-        // Validaciones de Negocio Hardcodeadas consistentes
-        if (!esEdicion && listaEmpleados.Any(e => e.Dni == modeloFormulario.Dni))
-        {
-            mensajeError = "No se puede registrar. El número de DNI ya está asignado a otro colaborador.";
-            CerrarFormulario();
-            return;
-        }
-
-        if (esEdicion)
-        {
-            var emp = listaEmpleados.FirstOrDefault(e => e.Dni == modeloFormulario.Dni);
-            if (emp != null)
-            {
-                emp.Nombre = modeloFormulario.Nombre;
-                emp.ApellidoPaterno = modeloFormulario.ApellidoPaterno;
-                emp.CorreoElectronico = modeloFormulario.CorreoElectronico;
-                emp.Telefono = modeloFormulario.Telefono;
-                emp.Rol = modeloFormulario.Rol;
-            }
-        }
-        else
-        {
-            listaEmpleados.Add(modeloFormulario);
-        }
-
         mensajeError = null;
-        CerrarFormulario();
+
+        try
+        {
+            // Validamos que el modelo ya tenga los datos de un usuario real (que su ID no sea 0)
+            if (modeloFormulario.Id == 0)
+            {
+                mensajeError = "Debes buscar y seleccionar un cliente válido primero.";
+                return;
+            }
+
+            // Al ascender un cliente o editar un trabajador, siempre usamos Actualizar (PUT)
+            await UsuarioService.ActualizarUsuarioAsync(modeloFormulario.Id, modeloFormulario);
+
+            // CORRECCIÓN: Agregamos el await que faltaba
+            await CargarEmpleados();
+            CerrarFormulario();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = ex.Message;
+        }
     }
 
-    private void CambiarEstadoEmpleado(EmpleadoDTO emp)
+    // CORRECCIÓN: Faltaba el 'async Task' en la firma porque usas 'await' adentro
+    private async Task CambiarEstadoEmpleado(Usuario emp)
     {
-        // Regla de consistencia: El SuperAdmin no puede suspenderse a sí mismo por accidente
-        if (emp.CorreoElectronico == AuthService.NombreUsuario || emp.Dni == "71234567")
+        if (emp.Id == AuthService.UsuarioId)
         {
             mensajeError = "Operación denegada. No puedes suspender tu propia cuenta de SuperAdministrador activa.";
             return;
         }
+        try
+        {
+            emp.Activo = !emp.Activo;
 
-        emp.Activo = !emp.Activo;
-        mensajeError = null;
+            await UsuarioService.ActualizarUsuarioAsync(emp.Id, emp);
+            mensajeError = null;
+        }
+        catch (Exception ex)
+        {
+            emp.Activo = !emp.Activo;
+            mensajeError = "Error al suspender: " + ex.Message;
+        }
     }
 }
