@@ -1,5 +1,6 @@
 @page "/admin/pedidos"
 @rendermode InteractiveServer
+@inject PedidoService PedidoService
 
 <PageTitle>Pedidos Admin - Killa Beauty</PageTitle>
 
@@ -57,7 +58,7 @@
                         <option value="Cualquier estado">Cualquier estado</option>
                         <option value="Pendiente">Pendiente</option>
                         <option value="Pagado">Pagado</option>
-                        <option value="En preparación">En preparación</option>
+                        <option value="En preparacion">En preparaci&oacute;n</option>
                         <option value="Enviado">Enviado</option>
                         <option value="Entregado">Entregado</option>
                         <option value="Cancelado">Cancelado</option>
@@ -74,66 +75,83 @@
         </section>
 
         <section class="admin-table-card admin-orders-table-card">
-            <table class="admin-table admin-orders-table">
-                <thead>
-                    <tr>
-                        <th>Pedido</th>
-                        <th>Cliente</th>
-                        <th>Correo</th>
-                        <th>Fecha</th>
-                        <th>Total</th>
-                        <th>Estado de envio</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (PedidosPaginados.Count == 0)
-                    {
+            @if (cargandoPedidos)
+            {
+                <div class="admin-empty-orders">
+                    <i class="bi bi-arrow-repeat"></i>
+                    <span>Cargando pedidos...</span>
+                </div>
+            }
+            else if (!string.IsNullOrWhiteSpace(mensajeError))
+            {
+                <div class="admin-empty-orders">
+                    <i class="bi bi-exclamation-circle"></i>
+                    <span>@mensajeError</span>
+                </div>
+            }
+            else
+            {
+                <table class="admin-table admin-orders-table">
+                    <thead>
                         <tr>
-                            <td colspan="7">
-                                <div class="admin-empty-orders">
-                                    <i class="bi bi-inbox"></i>
-                                    <span>No se encontraron pedidos con esos filtros.</span>
-                                </div>
-                            </td>
+                            <th>Pedido</th>
+                            <th>Cliente</th>
+                            <th>Correo</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Estado de envio</th>
+                            <th>Acciones</th>
                         </tr>
-                    }
-                    else
-                    {
-                        @foreach (var pedido in PedidosPaginados)
+                    </thead>
+                    <tbody>
+                        @if (PedidosPaginados.Count == 0)
                         {
                             <tr>
-                                <td>@pedido.Id</td>
-                                <td>@pedido.Cliente</td>
-                                <td>@pedido.Correo</td>
-                                <td>@pedido.Fecha.ToString("dd/MM/yyyy")</td>
-                                <td>S/ @pedido.Total.ToString("F2")</td>
-                                <td>
-                                    <span class="admin-status @pedido.ClaseEstado">
-                                        @pedido.EstadoEnvio
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="admin-order-actions">
-                                        <a href="/admin/pedidos/detalle/@pedido.Id"
-                                           class="admin-detail-button">
-                                            <i class="bi bi-eye"></i>
-                                            Ver
-                                        </a>
-
-                                        <button type="button"
-                                                class="admin-cancel-order-button"
-                                                @onclick="() => AbrirModalCancelacion(pedido)">
-                                            <i class="bi bi-x-circle"></i>
-                                            Cancelar
-                                        </button>
+                                <td colspan="7">
+                                    <div class="admin-empty-orders">
+                                        <i class="bi bi-inbox"></i>
+                                        <span>No se encontraron pedidos con esos filtros.</span>
                                     </div>
                                 </td>
                             </tr>
                         }
-                    }
-                </tbody>
-            </table>
+                        else
+                        {
+                            @foreach (var pedido in PedidosPaginados)
+                            {
+                                <tr>
+                                    <td>@pedido.Codigo</td>
+                                    <td>@pedido.Cliente</td>
+                                    <td>@pedido.Correo</td>
+                                    <td>@pedido.FechaPedido.ToString("dd/MM/yyyy")</td>
+                                    <td>S/ @pedido.Total.ToString("F2")</td>
+                                    <td>
+                                        <span class="admin-status @pedido.ClaseEstado">
+                                            @MostrarEstado(pedido)
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="admin-order-actions">
+                                            <a href="/admin/pedidos/detalle/@pedido.Id"
+                                               class="admin-detail-button">
+                                                <i class="bi bi-eye"></i>
+                                                Ver
+                                            </a>
+
+                                            <button type="button"
+                                                    class="admin-cancel-order-button"
+                                                    @onclick="() => AbrirModalCancelacion(pedido)">
+                                                <i class="bi bi-x-circle"></i>
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            }
         </section>
 
         <footer class="admin-pagination">
@@ -182,11 +200,11 @@
             {
                 <h2>No se puede cancelar el pedido</h2>
                 <p>
-                    El pedido <strong>@pedidoCancelacion.Id</strong> no se puede cancelar porque ya est&aacute;
-                    <strong>@pedidoCancelacion.EstadoEnvio.ToLowerInvariant()</strong>.
+                    El pedido <strong>@pedidoCancelacion.Codigo</strong> no se puede cancelar porque ya esta
+                    <strong>@MostrarEstado(pedidoCancelacion).ToLowerInvariant()</strong>.
                     @if (RequiereReembolso(pedidoCancelacion))
                     {
-                        <span>Adem&aacute;s, har&aacute; falta gestionar el refund o reembolso del pago.</span>
+                        <span>Ademas, hara falta gestionar el refund o reembolso del pago.</span>
                     }
                 </p>
 
@@ -200,7 +218,7 @@
             {
                 <h2>Pedido ya cancelado</h2>
                 <p>
-                    El pedido <strong>@pedidoCancelacion.Id</strong> ya se encuentra marcado como cancelado.
+                    El pedido <strong>@pedidoCancelacion.Codigo</strong> ya se encuentra marcado como cancelado.
                 </p>
 
                 <div class="admin-order-warning-actions single">
@@ -213,11 +231,11 @@
             {
                 <h2>&iquest;Cancelar pedido?</h2>
                 <p>
-                    El pedido <strong>@pedidoCancelacion.Id</strong> cambiar&aacute; su estado a
+                    El pedido <strong>@pedidoCancelacion.Codigo</strong> cambiara su estado a
                     <strong>Cancelado</strong>. &iquest;Deseas continuar?
                     @if (RequiereReembolso(pedidoCancelacion))
                     {
-                        <span>Este pedido ya fue pagado, por lo que har&aacute; falta gestionar el refund o reembolso.</span>
+                        <span>Este pedido ya fue pagado, por lo que hara falta gestionar el refund o reembolso.</span>
                     }
                 </p>
 
@@ -226,7 +244,7 @@
                         No
                     </button>
                     <button type="button" class="admin-order-warning-confirm" @onclick="ConfirmarCancelacionPedido">
-                        S&iacute;
+                        Si
                     </button>
                 </div>
             }
@@ -241,9 +259,11 @@
     private DateTime? fechaInicio;
     private DateTime? fechaFin;
 
-    private PedidoAdmin? pedidoCancelacion;
+    private PedidoAdminDto? pedidoCancelacion;
     private ModoCancelacion modoCancelacion = ModoCancelacion.Confirmar;
     private bool mostrarModalCancelacion = false;
+    private bool cargandoPedidos = true;
+    private string? mensajeError;
 
     private int paginaActual = 1;
     private const int PedidosPorPagina = 5;
@@ -251,27 +271,42 @@
     private string? FechaInicioMaxima => fechaFin?.ToString("yyyy-MM-dd");
     private string? FechaFinMinima => fechaInicio?.ToString("yyyy-MM-dd");
 
-    private List<PedidoAdmin> pedidos = new()
-    {
-        new PedidoAdmin("KIL-202610081", "Cliente", "cliente@correo.com", new DateTime(2026, 5, 30), 159.80m, "En preparación", "warning"),
-        new PedidoAdmin("KIL-202605002", "Maria Lopez", "maria.lopez@correo.com", new DateTime(2026, 5, 25), 178.20m, "Entregado", "active"),
-        new PedidoAdmin("KIL-202604115", "Ana Torres", "ana.torres@correo.com", new DateTime(2026, 5, 10), 120.00m, "Pagado", "info"),
-        new PedidoAdmin("KIL-202604086", "Luis Perez", "luis.perez@correo.com", new DateTime(2026, 4, 28), 89.90m, "Enviado", "info"),
-        new PedidoAdmin("KIL-202604033", "Camila Rios", "camila.rios@correo.com", new DateTime(2026, 4, 18), 245.70m, "Pendiente", "warning"),
-        new PedidoAdmin("KIL-202603021", "Sofia Castro", "sofia.castro@correo.com", new DateTime(2026, 3, 9), 52.90m, "Cancelado", "danger"),
-        new PedidoAdmin("KIL-202602014", "Valeria Diaz", "valeria.diaz@correo.com", new DateTime(2026, 2, 14), 302.40m, "Entregado", "active")
-    };
+    private List<PedidoAdminDto> pedidos = new();
 
-    private List<PedidoAdmin> PedidosFiltrados =>
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarPedidos();
+    }
+
+    private async Task CargarPedidos()
+    {
+        cargandoPedidos = true;
+        mensajeError = null;
+
+        try
+        {
+            pedidos = await PedidoService.ObtenerTodosAsync();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"No se pudieron cargar los pedidos. {ex.Message}";
+        }
+        finally
+        {
+            cargandoPedidos = false;
+        }
+    }
+
+    private List<PedidoAdminDto> PedidosFiltrados =>
         pedidos
             .Where(CoincideBusqueda)
             .Where(CoincideEstado)
             .Where(CoincideFechaInicio)
             .Where(CoincideFechaFin)
-            .OrderByDescending(p => p.Fecha)
+            .OrderByDescending(p => p.FechaPedido)
             .ToList();
 
-    private List<PedidoAdmin> PedidosPaginados =>
+    private List<PedidoAdminDto> PedidosPaginados =>
         PedidosFiltrados
             .Skip((paginaActual - 1) * PedidosPorPagina)
             .Take(PedidosPorPagina)
@@ -280,32 +315,33 @@
     private int TotalPaginas =>
         Math.Max(1, (int)Math.Ceiling(PedidosFiltrados.Count / (double)PedidosPorPagina));
 
-    private bool CoincideBusqueda(PedidoAdmin pedido)
+    private bool CoincideBusqueda(PedidoAdminDto pedido)
     {
         if (string.IsNullOrWhiteSpace(busqueda))
         {
             return true;
         }
 
-        return pedido.Id.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
+        return pedido.Codigo.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
+               pedido.Id.ToString().Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
                pedido.Cliente.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
                pedido.Correo.Contains(busqueda, StringComparison.OrdinalIgnoreCase);
     }
 
-    private bool CoincideEstado(PedidoAdmin pedido)
+    private bool CoincideEstado(PedidoAdminDto pedido)
     {
         return estadoSeleccionado == "Cualquier estado" ||
-               pedido.EstadoEnvio == estadoSeleccionado;
+               pedido.EstadoTexto == estadoSeleccionado;
     }
 
-    private bool CoincideFechaInicio(PedidoAdmin pedido)
+    private bool CoincideFechaInicio(PedidoAdminDto pedido)
     {
-        return fechaInicio is null || pedido.Fecha.Date >= fechaInicio.Value.Date;
+        return fechaInicio is null || pedido.FechaPedido.Date >= fechaInicio.Value.Date;
     }
 
-    private bool CoincideFechaFin(PedidoAdmin pedido)
+    private bool CoincideFechaFin(PedidoAdminDto pedido)
     {
-        return fechaFin is null || pedido.Fecha.Date <= fechaFin.Value.Date;
+        return fechaFin is null || pedido.FechaPedido.Date <= fechaFin.Value.Date;
     }
 
     private void LimpiarFiltros()
@@ -338,13 +374,13 @@
         }
     }
 
-    private void AbrirModalCancelacion(PedidoAdmin pedido)
+    private void AbrirModalCancelacion(PedidoAdminDto pedido)
     {
         pedidoCancelacion = pedido;
-        modoCancelacion = pedido.EstadoEnvio switch
+        modoCancelacion = pedido.Estado.ToUpperInvariant() switch
         {
-            "Enviado" or "Entregado" => ModoCancelacion.Bloqueado,
-            "Cancelado" => ModoCancelacion.YaCancelado,
+            "ENVIADO" or "ENTREGADO" => ModoCancelacion.Bloqueado,
+            "CANCELADO" => ModoCancelacion.YaCancelado,
             _ => ModoCancelacion.Confirmar
         };
         mostrarModalCancelacion = true;
@@ -356,21 +392,38 @@
         pedidoCancelacion = null;
     }
 
-    private void ConfirmarCancelacionPedido()
+    private async Task ConfirmarCancelacionPedido()
     {
         if (pedidoCancelacion is null)
         {
             return;
         }
 
-        pedidoCancelacion.EstadoEnvio = "Cancelado";
-        pedidoCancelacion.ClaseEstado = "danger";
-        CerrarModalCancelacion();
+        try
+        {
+            var actualizado = await PedidoService.CancelarAsync(pedidoCancelacion.Id);
+            var index = pedidos.FindIndex(p => p.Id == actualizado.Id);
+            if (index >= 0)
+            {
+                pedidos[index] = actualizado;
+            }
+            CerrarModalCancelacion();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"No se pudo cancelar el pedido. {ex.Message}";
+            CerrarModalCancelacion();
+        }
     }
 
-    private static bool RequiereReembolso(PedidoAdmin pedido)
+    private static bool RequiereReembolso(PedidoAdminDto pedido)
     {
-        return pedido.EstadoEnvio is "Pagado" or "En preparaciÃ³n" or "Enviado" or "Entregado";
+        return pedido.Estado.ToUpperInvariant() is "PAGADO" or "EN_PREPARACION" or "ENVIADO" or "ENTREGADO";
+    }
+
+    private static string MostrarEstado(PedidoAdminDto pedido)
+    {
+        return pedido.EstadoTexto == "En preparacion" ? "En preparaci\u00f3n" : pedido.EstadoTexto;
     }
 
     private enum ModoCancelacion
@@ -378,34 +431,5 @@
         Confirmar,
         Bloqueado,
         YaCancelado
-    }
-
-    private class PedidoAdmin
-    {
-        public PedidoAdmin(
-            string id,
-            string cliente,
-            string correo,
-            DateTime fecha,
-            decimal total,
-            string estadoEnvio,
-            string claseEstado)
-        {
-            Id = id;
-            Cliente = cliente;
-            Correo = correo;
-            Fecha = fecha;
-            Total = total;
-            EstadoEnvio = estadoEnvio;
-            ClaseEstado = claseEstado;
-        }
-
-        public string Id { get; }
-        public string Cliente { get; }
-        public string Correo { get; }
-        public DateTime Fecha { get; }
-        public decimal Total { get; }
-        public string EstadoEnvio { get; set; }
-        public string ClaseEstado { get; set; }
     }
 }

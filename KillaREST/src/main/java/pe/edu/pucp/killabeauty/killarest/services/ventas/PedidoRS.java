@@ -92,6 +92,16 @@ public class PedidoRS {
         }
     }
 
+    @PUT
+    @Path("/{id}/cancelar")
+    public Response cancelar(@PathParam("id") int id) {
+        try {
+            return Response.ok(new PedidoDetalleDTO(pedidoBL.cancel(id))).build();
+        } catch (BusinessLogicException ex) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
+        }
+    }
+
     @DELETE
     @Path("/{id}")
     public Response eliminar(@PathParam("id") int id) {
