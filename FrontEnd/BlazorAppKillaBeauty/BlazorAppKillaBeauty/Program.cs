@@ -28,6 +28,7 @@ builder.Services.AddScoped<CategoriaService>();
 builder.Services.AddScoped<PaisService>();
 builder.Services.AddScoped<PedidoService>();
 builder.Services.AddScoped<EscalaPrecioService>();
+builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddHttpClient("KillaApi", client =>
 {
     var baseUrl = builder.Configuration["KillaApi:BaseUrl"]
