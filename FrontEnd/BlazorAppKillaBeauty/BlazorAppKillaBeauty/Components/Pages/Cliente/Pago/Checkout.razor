@@ -627,7 +627,7 @@
 
         await PedidoService.CrearAsync(pedido);
 
-        //await CartService.VaciarCarritoAsync(AuthService.UsuarioId.Value);
+        await CartService.VaciarCarritoAsync(AuthService.UsuarioId.Value);
 
         Navigation.NavigateTo("/order-confirmed");
     }

@@ -36,8 +36,16 @@ public class DetalleCarritoRS {
                                        @PathParam("cantidad") int cantidad) {
         try {
             DetalleCarrito detalle = detalleBL.load(id);
+
+            if (detalle == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity(new ErrorDTO("Detalle de carrito no encontrado."))
+                        .build();
+            }
+
             detalle.setCantidad(cantidad);
             return Response.ok(detalleBL.update(detalle)).build();
+
         } catch (BusinessLogicException ex) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(new ErrorDTO(ex.getMessage()))
@@ -50,8 +58,16 @@ public class DetalleCarritoRS {
     public Response eliminar(@PathParam("id") int id) {
         try {
             DetalleCarrito detalle = detalleBL.load(id);
+
+            if (detalle == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity(new ErrorDTO("Detalle de carrito no encontrado."))
+                        .build();
+            }
+
             detalleBL.remove(detalle);
             return Response.noContent().build();
+
         } catch (BusinessLogicException ex) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(new ErrorDTO(ex.getMessage()))

@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using BlazorAppKillaBeauty.ClienteREST.Models;
+using BlazorAppKillaBeauty.ClienteREST.ServicesAct;
 
 namespace BlazorAppKillaBeauty.Services
 {
@@ -19,13 +20,70 @@ namespace BlazorAppKillaBeauty.Services
 
         public int CantidadTotal => Productos.Sum(p => p.Cantidad);
 
-        public decimal Total =>Productos.Sum(p => p.Cantidad * (decimal)p.Producto.PrecioBase);
+        private readonly EscalaPrecioService escalaPrecioService;
+        private Dictionary<int, List<EscalaPrecio>> escalasPorProducto = new();
+
+        private async Task<List<EscalaPrecio>> ObtenerEscalasAsync(int idProducto)
+        {
+            if (!escalasPorProducto.ContainsKey(idProducto))
+            {
+                escalasPorProducto[idProducto] =
+                    await escalaPrecioService.ListarPorProductoAsync(idProducto);
+            }
+
+            return escalasPorProducto[idProducto];
+        }
+
+        public async Task<decimal> ObtenerPrecioUnitarioAsync(CartItem item)
+        {
+            var escalas = await ObtenerEscalasAsync(item.Producto.Id);
+
+            var escalaActual = escalas
+                .Where(e => item.Cantidad >= e.CantidadMinima)
+                .OrderByDescending(e => e.CantidadMinima)
+                .FirstOrDefault();
+
+            return escalaActual?.PrecioUnitario ?? item.Producto.PrecioBase;
+        }
+
+        public async Task<decimal> ObtenerSubtotalAsync(CartItem item)
+        {
+            var precio = await ObtenerPrecioUnitarioAsync(item);
+            return precio * item.Cantidad;
+        }
+
+        public decimal Total { get; private set; } = 0;
 
         public decimal DescuentoTotal { get; private set; } = 0;
 
-        public CartService(IHttpClientFactory httpClientFactory)
+        public async Task RecalcularTotalesAsync()
+        {
+            Total = 0;
+            DescuentoTotal = 0;
+
+            foreach (var item in Productos)
+            {
+                if (item.Producto == null)
+                    continue;
+
+                var precioBase = item.Producto.PrecioBase;
+                var precioEscala = await ObtenerPrecioUnitarioAsync(item);
+
+                Total += precioEscala * item.Cantidad;
+
+                if (precioEscala < precioBase)
+                {
+                    DescuentoTotal += (precioBase - precioEscala) * item.Cantidad;
+                }
+            }
+        }
+
+        public CartService(
+            IHttpClientFactory httpClientFactory,
+            EscalaPrecioService escalaPrecioService)
         {
             http = httpClientFactory.CreateClient("KillaApi");
+            this.escalaPrecioService = escalaPrecioService;
         }
 
         public async Task CargarCarritoAsync(int idUsuario)
@@ -36,6 +94,8 @@ namespace BlazorAppKillaBeauty.Services
                 .FirstOrDefault(c => c.Estado == "ACTIVO");
 
             Productos = carritoActual?.DetalleCarritoList ?? new();
+
+            await RecalcularTotalesAsync();
         }
 
         public async Task<Carrito?> ObtenerPorIdAsync(int id)
@@ -69,11 +129,12 @@ namespace BlazorAppKillaBeauty.Services
 
         public async Task VaciarCarritoAsync(int idUsuario)
         {
-            var carritos = await GetAsync<List<Carrito>>($"carrito/usuario/{idUsuario}");
-            var carritoActual = carritos?.FirstOrDefault();
+            var detalles = Productos.ToList();
 
-            if (carritoActual != null)
-                await EliminarAsync(carritoActual.Id);
+            foreach (var detalle in detalles)
+            {
+                await EliminarDetalleAsync(detalle.Id);
+            }
 
             Productos.Clear();
         }
@@ -137,6 +198,8 @@ namespace BlazorAppKillaBeauty.Services
                     Cantidad = cantidad
                 });
             }
+
+            _ = RecalcularTotalesAsync();
         }
 
         private async Task<Carrito> ObtenerOCrearCarritoUsuarioAsync(int idUsuario)
@@ -202,6 +265,50 @@ namespace BlazorAppKillaBeauty.Services
                 cantidad);
         }
 
+        public record InfoEscalaCarrito(
+            decimal PrecioUnitario,
+            decimal Ahorro,
+            string Etiqueta,
+            string SiguienteEscala
+        );
+
+        public async Task<InfoEscalaCarrito> ObtenerInfoEscalaAsync(CartItem item)
+        {
+            var escalas = await ObtenerEscalasAsync(item.Producto.Id);
+
+            var escalaActual = escalas
+                .Where(e => item.Cantidad >= e.CantidadMinima)
+                .OrderByDescending(e => e.CantidadMinima)
+                .FirstOrDefault();
+
+            var siguienteEscala = escalas
+                .Where(e => e.CantidadMinima > item.Cantidad)
+                .OrderBy(e => e.CantidadMinima)
+                .FirstOrDefault();
+
+            var precio = escalaActual?.PrecioUnitario ?? item.Producto.PrecioBase;
+            var ahorro = (item.Producto.PrecioBase - precio) * item.Cantidad;
+
+            var etiqueta = NombreEscala(escalaActual?.CantidadMinima ?? 1);
+
+            var siguiente = siguienteEscala == null
+                ? ""
+                : $"Agrega {siguienteEscala.CantidadMinima - item.Cantidad} más para {NombreEscala(siguienteEscala.CantidadMinima)}";
+
+            return new InfoEscalaCarrito(precio, ahorro, etiqueta, siguiente);
+        }
+
+        private string NombreEscala(int cantidad)
+        {
+            return cantidad switch
+            {
+                1 => "Unidad",
+                6 => "Media docena",
+                24 => "Cajón",
+                _ => $"{cantidad}+ unidades"
+            };
+        }
+
         public async Task MigrarCarritoLocalAUsuarioAsync(int idUsuario)
         {
             var productosLocales = Productos
@@ -247,6 +354,7 @@ namespace BlazorAppKillaBeauty.Services
             await EnsureSuccessAsync(response);
 
             detalle.Cantidad = nuevaCantidad;
+            await RecalcularTotalesAsync();
         }
 
         public async Task DisminuirCantidadAsync(int detalleId)
@@ -265,6 +373,7 @@ namespace BlazorAppKillaBeauty.Services
             await EnsureSuccessAsync(response);
 
             detalle.Cantidad = nuevaCantidad;
+            await RecalcularTotalesAsync();
         }
 
         public async Task EliminarDetalleAsync(int detalleId)
@@ -276,6 +385,42 @@ namespace BlazorAppKillaBeauty.Services
 
             if (detalle != null)
                 Productos.Remove(detalle);
+
+            await RecalcularTotalesAsync();
+        }
+
+        public async Task EliminarProductoLocalAsync(int idProducto)
+        {
+            var detalle = Productos.FirstOrDefault(d => d.Producto?.Id == idProducto);
+
+            if (detalle != null)
+                Productos.Remove(detalle);
+
+            await RecalcularTotalesAsync();
+        }
+
+        public async Task AumentarCantidadProductoLocalAsync(int idProducto)
+        {
+            var detalle = Productos.FirstOrDefault(d => d.Producto?.Id == idProducto);
+
+            if (detalle == null)
+                return;
+
+            detalle.Cantidad++;
+
+            await RecalcularTotalesAsync();
+        }
+
+        public async Task DisminuirCantidadProductoLocalAsync(int idProducto)
+        {
+            var detalle = Productos.FirstOrDefault(d => d.Producto?.Id == idProducto);
+
+            if (detalle == null || detalle.Cantidad <= 1)
+                return;
+
+            detalle.Cantidad--;
+
+            await RecalcularTotalesAsync();
         }
     }
 }

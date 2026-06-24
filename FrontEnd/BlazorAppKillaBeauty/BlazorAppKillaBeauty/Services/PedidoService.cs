@@ -31,6 +31,14 @@ namespace BlazorAppKillaBeauty.Services
             return await GetAsync<Pedido>($"pedido/{id}");
         }
 
+        public async Task<PedidoAdminDto> CancelarAsync(int id)
+        {
+            using var response = await http.PutAsync($"pedido/{id}/cancelar", null);
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<PedidoAdminDto>(jsonOptions)
+                   ?? throw new InvalidOperationException("No se recibio el pedido cancelado.");
+        }
+
         public async Task<Pedido> CrearAsync(Pedido pedido)
         {
             using var response = await http.PostAsJsonAsync("pedido", pedido, jsonOptions);
@@ -47,6 +55,16 @@ namespace BlazorAppKillaBeauty.Services
 
             return await response.Content.ReadFromJsonAsync<Pedido>(jsonOptions)
                    ?? pedido;
+        }
+
+        public async Task<List<PedidoAdminDto>> ObtenerTodosAsync()
+        {
+            return await GetAsync<List<PedidoAdminDto>>("pedido") ?? new List<PedidoAdminDto>();
+        }
+
+        public async Task<PedidoAdminDto?> ObtenerPorIdAsyncAdminDto(int id)
+        {
+            return await GetAsync<PedidoAdminDto>($"pedido/{id}");
         }
 
         public async Task EliminarAsync(int id)
@@ -78,6 +96,122 @@ namespace BlazorAppKillaBeauty.Services
                 string.IsNullOrWhiteSpace(body)
                     ? $"Error REST {(int)response.StatusCode} {response.ReasonPhrase}"
                     : body);
+        }
+
+        public class PedidoAdminDto
+        {
+            [JsonPropertyName("id")]
+            public int Id { get; set; }
+
+            [JsonPropertyName("fecha")]
+            public string Fecha { get; set; } = "";
+
+            [JsonPropertyName("estado")]
+            public string Estado { get; set; } = "PENDIENTE";
+
+            [JsonPropertyName("subtotal")]
+            public decimal Subtotal { get; set; }
+
+            [JsonPropertyName("igv")]
+            public decimal Igv { get; set; }
+
+            [JsonPropertyName("total")]
+            public decimal Total { get; set; }
+
+            [JsonPropertyName("clienteId")]
+            public int ClienteId { get; set; }
+
+            [JsonPropertyName("cliente")]
+            public string Cliente { get; set; } = "";
+
+            [JsonPropertyName("correo")]
+            public string Correo { get; set; } = "";
+
+            [JsonPropertyName("contacto")]
+            public string Contacto { get; set; } = "";
+
+            [JsonPropertyName("direccionId")]
+            public int DireccionId { get; set; }
+
+            [JsonPropertyName("direccion")]
+            public string Direccion { get; set; } = "";
+
+            [JsonPropertyName("referencia")]
+            public string Referencia { get; set; } = "";
+
+            [JsonPropertyName("distrito")]
+            public string Distrito { get; set; } = "";
+
+            [JsonPropertyName("provincia")]
+            public string Provincia { get; set; } = "";
+
+            [JsonPropertyName("departamento")]
+            public string Departamento { get; set; } = "";
+
+            [JsonPropertyName("cuponId")]
+            public int? CuponId { get; set; }
+
+            [JsonPropertyName("productos")]
+            public List<DetallePedidoAdminDto> Productos { get; set; } = new();
+
+            [JsonIgnore]
+            public DateTime FechaPedido =>
+                DateTime.TryParse(Fecha, out var fecha) ? fecha : DateTime.MinValue;
+
+            [JsonIgnore]
+            public string Codigo => $"PED-{Id:000000}";
+
+            [JsonIgnore]
+            public bool Cancelado => Estado.Equals("CANCELADO", StringComparison.OrdinalIgnoreCase);
+
+            [JsonIgnore]
+            public string EstadoTexto => Estado.ToUpperInvariant() switch
+            {
+                "PENDIENTE" => "Pendiente",
+                "PAGADO" => "Pagado",
+                "EN_PREPARACION" => "En preparacion",
+                "ENVIADO" => "Enviado",
+                "ENTREGADO" => "Entregado",
+                "CANCELADO" => "Cancelado",
+                _ => Estado
+            };
+
+            [JsonIgnore]
+            public string ClaseEstado => Estado.ToUpperInvariant() switch
+            {
+                "PENDIENTE" => "warning",
+                "PAGADO" => "info",
+                "EN_PREPARACION" => "warning",
+                "ENVIADO" => "info",
+                "ENTREGADO" => "active",
+                "CANCELADO" => "danger",
+                _ => "info"
+            };
+
+            [JsonIgnore]
+            public string Ubicacion => string.Join(", ", new[] { Distrito, Provincia, Departamento }
+                .Where(valor => !string.IsNullOrWhiteSpace(valor)));
+        }
+
+        public class DetallePedidoAdminDto
+        {
+            [JsonPropertyName("productoId")]
+            public int ProductoId { get; set; }
+
+            [JsonPropertyName("nombreProducto")]
+            public string NombreProducto { get; set; } = "";
+
+            [JsonPropertyName("marca")]
+            public string Marca { get; set; } = "";
+
+            [JsonPropertyName("cantidad")]
+            public int Cantidad { get; set; }
+
+            [JsonPropertyName("precioUnitario")]
+            public decimal PrecioUnitario { get; set; }
+
+            [JsonPropertyName("subtotal")]
+            public decimal Subtotal { get; set; }
         }
     }
 }

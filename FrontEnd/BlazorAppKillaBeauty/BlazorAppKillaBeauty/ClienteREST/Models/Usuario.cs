@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BlazorAppKillaBeauty.ClienteREST.Models
 {
@@ -7,19 +8,33 @@ namespace BlazorAppKillaBeauty.ClienteREST.Models
         [JsonPropertyName("id")]
         public int Id { get; set; }
 
-        [JsonPropertyName("nombre")]
-        public string Nombre { get; set; } = "";
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        public string Nombre { get; set; }
 
-        [JsonPropertyName("apellido")]
-        public string Apellido { get; set; } = "";
+        [Required(ErrorMessage = "El apellido paterno es obligatorio")]
+        public string ApellidoPaterno { get; set; }
 
-        [JsonPropertyName("correo")]
-        public string Correo { get; set; } = "";
+        public string ApellidoMaterno { get; set; }
 
-        [JsonPropertyName("telefono")]
-        public string Telefono { get; set; } = "";
+        [Required(ErrorMessage = "El correo es obligatorio")]
+        [EmailAddress(ErrorMessage = "El formato del correo no es válido")]
+        public string CorreoElectronico { get; set; }
 
-        [JsonPropertyName("activo")]
+        [Required(ErrorMessage = "La contraseña es obligatoria")]
+        [MinLength(6, ErrorMessage = "La contraseña debe tener al menos 6 caracteres")]
+        public string Contrasena { get; set; }
+
+        [Required(ErrorMessage = "La fecha de nacimiento es obligatoria")]
+        public DateOnly? FechaNacimiento { get; set; }
+
+        [RegularExpression("^[0-9]+$", ErrorMessage = "El celular solo debe contener números")]
+        public string Telefono { get; set; }
+
+        [Required(ErrorMessage = "El DNI es obligatorio")]
+        [StringLength(8, MinimumLength = 8, ErrorMessage = "El DNI debe tener 8 dígitos")]
+        [RegularExpression("^[0-9]+$", ErrorMessage = "El DNI solo debe contener números")]
+        public string Dni { get; set; }
+
         public bool Activo { get; set; }
     }
 }
