@@ -1,6 +1,10 @@
 ﻿@page "/cart"
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
+@using BlazorAppKillaBeauty.ClienteREST.Models
+@using Microsoft.AspNetCore.Components
+@using static BlazorAppKillaBeauty.Services.CartService;
+
 @inject AuthService AuthService
 @inject NavigationManager Navigation
 @inject CartService CartService
@@ -37,55 +41,74 @@
 
                 <h1>Carrito de Compras</h1>
 
-                @foreach (var producto in CartService.Productos)
+                @foreach (var detalle in CartService.Productos)
                 {
+                    var producto = detalle.Producto;
+
                     <div class="cart-item">
 
-                        <img src="@producto.Imagen"
-                             alt="@producto.Nombre"
+                        <img src="@(producto?.Imagen ?? "/Images/product-placeholder.png")"
+                             alt="@(producto?.Nombre ?? "Producto")"
                              class="cart-item-img" />
 
                         <div class="cart-item-info">
-                            <h3>@producto.Nombre</h3>
+                            <h3>@(producto?.Nombre ?? $"Producto #{producto?.Id}")</h3>
 
-                            <div class="discount-line">
-                                <span class="cart-tag">
-                                    @producto.TipoCompra
-                                </span>
+                            @if (producto != null && infoEscalas.TryGetValue(producto.Id, out var info))
+                            {
+                                <div class="discount-line">
+                                    <span class="cart-tag">@info.Etiqueta</span>
 
-                                @if (producto.PrecioUnitario < producto.PrecioOriginal)
-                                {
-                                    <span class="saving-text">
-                                        ↝ Ahorro: S/ @((producto.PrecioOriginal - producto.PrecioUnitario).ToString("0.00"))
-                                    </span>
-                                }
-                            </div>
+                                    @if (info.Ahorro > 0)
+                                    {
+                                        <span class="saving-text">
+                                            ↝ Ahorro: S/ @info.Ahorro.ToString("0.00")
+                                        </span>
+                                    }
 
-                            <p class="unit-price">
-                                Precio unitario:
-                                S/ @producto.PrecioUnitario.ToString("0.00")
+                                    @if (!string.IsNullOrWhiteSpace(info.SiguienteEscala))
+                                    {
+                                        <span class="next-discount">@info.SiguienteEscala</span>
+                                    }
+                                </div>
 
-                                @if (producto.PrecioUnitario < producto.PrecioOriginal)
-                                {
-                                    <span class="old-price">
-                                        S/ @producto.PrecioOriginal.ToString("0.00")
-                                    </span>
+                                <p class="unit-price">
+                                    Precio unitario:
+                                    S/ @info.PrecioUnitario.ToString("0.00")
 
-                                    <span class="off-text">
-                                        (@producto.PorcentajeDescuento% OFF)
-                                    </span>
-                                }
-                            </p>
+                                    @if (producto != null && info.PrecioUnitario < producto.PrecioBase)
+                                    {
+                                        <span class="old-price">
+                                            S/ @producto.PrecioBase.ToString("0.00")
+                                        </span>
+                                    }
+                                </p>
+                            }
                         </div>
 
                         <div class="cart-actions">
-                            <button @onclick="() => CartService.DisminuirCantidad(producto.Nombre)">
+                            <button @onclick="async () =>
+                                    {
+                                        if (detalle.Id == 0)
+                                            await CartService.DisminuirCantidadProductoLocalAsync(producto!.Id);
+                                        else
+                                            await CartService.DisminuirCantidadAsync(detalle.Id);
+                                            
+                                        await ActualizarInfoEscalas();
+                                    }">
                                 -
                             </button>
 
-                            <span>@producto.Cantidad</span>
+                            <span>@detalle.Cantidad</span>
 
-                            <button @onclick="() => CartService.AumentarCantidad(producto.Nombre)">
+                            <button @onclick="async () =>
+                                    {
+                                        if (detalle.Id == 0)
+                                            await CartService.AumentarCantidadProductoLocalAsync(producto!.Id);
+                                        else
+                                            await CartService.AumentarCantidadAsync(detalle.Id);
+                                        await ActualizarInfoEscalas();
+                                    }">
                                 +
                             </button>
                         </div>
@@ -93,12 +116,22 @@
                         <div class="cart-subtotal">
                             <small>Subtotal</small>
                             <strong>
-                                S/ @producto.Subtotal.ToString("0.00")
+                                S/ @((producto != null && infoEscalas.TryGetValue(producto.Id, out var infoSub)
+                                    ? infoSub.PrecioUnitario * detalle.Cantidad
+                                    : detalle.Cantidad * (producto?.PrecioBase ?? 0)).ToString("0.00"))
                             </strong>
                         </div>
 
                         <button class="delete-btn"
-                                @onclick="() => CartService.EliminarProducto(producto.Nombre)">
+                                @onclick="async () =>
+                                        {
+                                            if (detalle.Id == 0)
+                                                await CartService.EliminarProductoLocalAsync(producto!.Id);
+                                            else
+                                                await CartService.EliminarDetalleAsync(detalle.Id);
+
+                                            await ActualizarInfoEscalas();
+                                        }">
                             <i class="bi bi-trash"></i>
                         </button>
 
@@ -112,14 +145,14 @@
 
                 <div class="summary-row">
                     <span>Subtotal productos</span>
-                    <strong>S/ @CartService.Total.ToString("0.00")</strong>
+                    <strong>S/ @((CartService.Total + CartService.DescuentoTotal).ToString("0.00"))</strong>
                 </div>
 
                 @if (CartService.DescuentoTotal > 0)
                 {
                     <div class="summary-row discount">
-                        <span>Descuento por volumen</span>
-                        <strong>S/ @CartService.DescuentoTotal.ToString("0.00")</strong>
+                        <span>Descuento por escala</span>
+                        <strong>-S/ @CartService.DescuentoTotal.ToString("0.00")</strong>
                     </div>
                 }
 
@@ -158,9 +191,6 @@
 @code {
     private int CantidadCarrito => CartService.CantidadTotal;
 
-    private IReadOnlyList<CartItem> productosCarrito =>
-        CartService.Productos;
-
     private decimal Total => CartService.Total;
 
     private string mensajeError = "";
@@ -173,5 +203,28 @@
     private void IrLogin()
     {
         Navigation.NavigateTo("/login?returnUrl=/cart");
+    }
+
+    private Dictionary<int, InfoEscalaCarrito> infoEscalas = new();
+
+    private async Task ActualizarInfoEscalas()
+    {
+        infoEscalas.Clear();
+
+        foreach (var item in CartService.Productos)
+        {
+            if (item.Producto != null)
+            {
+                infoEscalas[item.Producto.Id] =
+                    await CartService.ObtenerInfoEscalaAsync(item);
+            }
+        }
+
+        await CartService.RecalcularTotalesAsync();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ActualizarInfoEscalas();
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BlazorAppKillaBeauty.ClienteREST.Models
 {
     public class Usuario
     {
+        [JsonPropertyName("id")]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "El nombre es obligatorio")]

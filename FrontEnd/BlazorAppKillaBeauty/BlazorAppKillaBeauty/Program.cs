@@ -20,12 +20,14 @@ builder.Services.AddScoped(sp => new HttpClient
 
 // SERVICE
 builder.Services.AddSingleton<AuthService>();
-builder.Services.AddSingleton<CartService>();
+builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<CuponService>();
 builder.Services.AddScoped<CampanaService>();
 builder.Services.AddScoped<MarcaService>();
 builder.Services.AddScoped<CategoriaService>();
 builder.Services.AddScoped<PaisService>();
+builder.Services.AddScoped<PedidoService>();
+builder.Services.AddScoped<EscalaPrecioService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddHttpClient("KillaApi", client =>
 {
@@ -41,7 +43,6 @@ builder.Services.AddScoped<HttpClientUtils>();
 builder.Services.AddSingleton<AddressService>();
 builder.Services.AddScoped<ProductoService>();
 builder.Services.AddScoped<CourierService>();
-builder.Services.AddScoped<PedidoService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

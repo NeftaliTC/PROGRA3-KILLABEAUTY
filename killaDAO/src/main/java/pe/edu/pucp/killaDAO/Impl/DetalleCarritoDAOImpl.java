@@ -68,17 +68,56 @@ public class DetalleCarritoDAOImpl implements DetalleCarritoDAO {
         }
     }
 
+    private DetalleCarrito mapRowConProducto(ResultSet rs) throws SQLException {
+        DetalleCarrito d = new DetalleCarrito();
+
+        d.setId(rs.getInt("id_detalle_carrito"));
+        d.setCantidad(rs.getInt("cantidad"));
+
+        Producto p = new Producto();
+        p.setId(rs.getInt("id_producto"));
+        p.setNombre(rs.getString("nombre"));
+        p.setPrecioBase(rs.getDouble("precio_base"));
+
+        d.setProducto(p);
+
+        CarritoDeCompras carrito = new CarritoDeCompras();
+        carrito.setId(rs.getInt("id_carrito"));
+        d.setCarritoDeCompras(carrito);
+
+        return d;
+    }
+
     @Override
     public List<DetalleCarrito> listByCarritoId(int idCarrito) throws SQLException {
         List<DetalleCarrito> lista = new ArrayList<>();
-        String sql = "SELECT id_detalle_carrito, cantidad, id_producto, id_carrito FROM DetalleCarrito WHERE id_carrito = ?";
+
+        String sql = """
+        SELECT
+            dc.id_detalle_carrito,
+            dc.cantidad,
+            dc.id_carrito,
+            p.id_producto,
+            p.nombre,
+            p.precio_base
+        FROM DetalleCarrito dc
+        INNER JOIN Producto p
+            ON dc.id_producto = p.id_producto
+        WHERE dc.id_carrito = ?
+    """;
+
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
+
             ps.setInt(1, idCarrito);
+
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) lista.add(mapRow(rs));
+                while (rs.next()) {
+                    lista.add(mapRowConProducto(rs));
+                }
             }
         }
+
         return lista;
     }
 

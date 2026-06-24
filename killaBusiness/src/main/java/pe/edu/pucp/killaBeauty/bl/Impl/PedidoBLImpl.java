@@ -3,26 +3,10 @@ package pe.edu.pucp.killaBeauty.bl.Impl;
 import pe.edu.pucp.dbManager.TransactionContext;
 import pe.edu.pucp.killaBeauty.bl.PedidoBL;
 import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
-import pe.edu.pucp.killaBeauty.killaModelo.DetallePedido;
-import pe.edu.pucp.killaBeauty.killaModelo.Direccion;
-import pe.edu.pucp.killaBeauty.killaModelo.EstadoPedido;
-import pe.edu.pucp.killaBeauty.killaModelo.Marca;
-import pe.edu.pucp.killaBeauty.killaModelo.Pedido;
-import pe.edu.pucp.killaBeauty.killaModelo.Producto;
-import pe.edu.pucp.killaBeauty.killaModelo.Usuario;
+import pe.edu.pucp.killaBeauty.killaModelo.*;
 import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Cupon;
-import pe.edu.pucp.killaDAO.DetallePedidoDAO;
-import pe.edu.pucp.killaDAO.DireccionDAO;
-import pe.edu.pucp.killaDAO.Impl.DetallePedidoDAOImpl;
-import pe.edu.pucp.killaDAO.Impl.DireccionDAOImpl;
-import pe.edu.pucp.killaDAO.Impl.MarcaDAOImpl;
-import pe.edu.pucp.killaDAO.Impl.PedidoDAOImpl;
-import pe.edu.pucp.killaDAO.Impl.ProductoDAOImpl;
-import pe.edu.pucp.killaDAO.Impl.UsuarioDAOImpl;
-import pe.edu.pucp.killaDAO.MarcaDAO;
-import pe.edu.pucp.killaDAO.PedidoDAO;
-import pe.edu.pucp.killaDAO.ProductoDAO;
-import pe.edu.pucp.killaDAO.UsuarioDAO;
+import pe.edu.pucp.killaDAO.*;
+import pe.edu.pucp.killaDAO.Impl.*;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -48,7 +32,7 @@ public class PedidoBLImpl implements PedidoBL {
             TransactionContext.getConnection();
             Pedido guardado = pedidoDAO.save(pedido);
             TransactionContext.commit();
-            return completarPedido(guardado);
+            return guardado;
         } catch (SQLException e) {
             TransactionContext.rollback();
             throw new BusinessLogicException(e);
@@ -122,7 +106,7 @@ public class PedidoBLImpl implements PedidoBL {
             TransactionContext.getConnection();
             Pedido actualizado = pedidoDAO.update(pedido);
             TransactionContext.commit();
-            return completarPedido(actualizado);
+            return actualizado;
         } catch (SQLException e) {
             TransactionContext.rollback();
             throw new BusinessLogicException(e);
@@ -149,7 +133,7 @@ public class PedidoBLImpl implements PedidoBL {
     @Override
     public Pedido load(Integer id) throws BusinessLogicException {
         try {
-            return completarPedido(pedidoDAO.load(id));
+            return pedidoDAO.load(id);
         } catch (SQLException e) {
             throw new BusinessLogicException(e);
         }
@@ -158,18 +142,30 @@ public class PedidoBLImpl implements PedidoBL {
     @Override
     public List<Pedido> listAll() throws BusinessLogicException {
         try {
-            return completarPedidos(pedidoDAO.listAll());
+            return pedidoDAO.listAll();
         } catch (SQLException e) {
             throw new BusinessLogicException(e);
         }
     }
 
     private void validarPedido(Pedido pedido) throws BusinessLogicException {
-        if (pedido == null) throw new BusinessLogicException("El pedido no puede ser nulo.");
-        if (pedido.getCliente() == null || pedido.getCliente().getId() <= 0) throw new BusinessLogicException("El pedido debe tener un cliente valido.");
-        if (pedido.getDireccionEnvio() == null || pedido.getDireccionEnvio().getId() <= 0) throw new BusinessLogicException("El pedido debe tener una direccion de envio valida.");
-        if (pedido.getDetalles() == null || pedido.getDetalles().isEmpty()) throw new BusinessLogicException("El pedido debe tener al menos un detalle.");
-        for (DetallePedido detalle : pedido.getDetalles()) validarDetalle(detalle);
+        if (pedido == null)
+            throw new BusinessLogicException("El pedido no puede ser nulo.");
+
+        if (pedido.getCliente() == null || pedido.getCliente().getId() <= 0)
+            throw new BusinessLogicException("El pedido debe tener un cliente valido.");
+
+        // Temporalmente no validar dirección
+        if (pedido.getDireccionEnvio() != null &&
+                pedido.getDireccionEnvio().getId() <= 0) {
+            throw new BusinessLogicException("El pedido debe tener una direccion de envio valida.");
+        }
+
+        if (pedido.getDetalles() == null || pedido.getDetalles().isEmpty())
+            throw new BusinessLogicException("El pedido debe tener al menos un detalle.");
+
+        for (DetallePedido detalle : pedido.getDetalles())
+            validarDetalle(detalle);
     }
 
     private void validarDetalle(DetallePedido detalle) throws BusinessLogicException {

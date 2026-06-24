@@ -1,6 +1,6 @@
 ﻿@page "/register"
 @rendermode InteractiveServer
-@using ClienteREST.Models; 
+@using ClienteREST.Models;
 @using ClienteREST.ServicesAct
 
 @inject UsuarioService UsuarioService
@@ -75,9 +75,9 @@
                 <label>Contraseña</label>
                 <div style="position: relative; display: flex; align-items: center;">
                     <InputText @bind-Value="user.Contrasena" type="@(mostrarContrasena ? "text" : "password")" placeholder="Crea una contraseña" style="width: 100%; padding-right: 40px;" />
-                    <button type="button" 
-                        @onclick="TogglePassword" 
-                        style="position: absolute; right: 10px; background: none; border: none; cursor: pointer; font-size: 1.2rem;">
+                    <button type="button"
+                            @onclick="TogglePassword"
+                            style="position: absolute; right: 10px; background: none; border: none; cursor: pointer; font-size: 1.2rem;">
                         <i class="@(mostrarContrasena ? "bi bi-eye" : "bi bi-eye-slash")"></i>
                     </button>
                 </div>
@@ -141,9 +141,9 @@
             {
                 // Tu lógica de popup implementada aquí
                 mostrarMensaje = true;
-                StateHasChanged(); 
+                StateHasChanged();
 
-                await Task.Delay(700); 
+                await Task.Delay(700);
 
                 NavigationManager.NavigateTo("/login");
             }

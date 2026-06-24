@@ -79,7 +79,7 @@
                                 <td>@courier.Correo</td>
                                 <td>@courier.Telefono</td>
                                 <td>
-                                    @if (courier.Activo)
+                                    @if (courier.EsAsignado)
                                     {
                                         <span class="admin-status active">Asignado</span>
                                     }
@@ -90,11 +90,7 @@
                                 </td>
                                 <td style="text-align: right;">
                                     <div style="display: inline-flex; gap: 8px; align-items: center;">
-                                        <button class="admin-providers-btn-edit" @onclick="() => AbrirEditar(courier)">
-                                            <i class="bi bi-pencil-square"></i> Editar
-                                        </button>
-
-                                        @if (courier.Activo)
+                                        @if (courier.EsAsignado)
                                         {
                                             <span class="admin-providers-txt-active">
                                                 <i class="bi bi-check-circle-fill"></i> Actual
@@ -106,6 +102,14 @@
                                                 Asignar
                                             </button>
                                         }
+
+                                        <button class="admin-providers-btn-edit" @onclick="() => AbrirEditar(courier)">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </button>
+
+                                        <button class="admin-providers-btn-delete" @onclick="() => AbrirConfirmacionEliminar(courier)">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -151,6 +155,13 @@
                     <input type="text" @bind-value="modeloFormulario.Telefono" required placeholder="Ej. 01-234-5678" />
                 </div>
 
+                @if (!string.IsNullOrEmpty(mensajeErrorModal))
+                {
+                    <div style="background: #ffe0e0; color: #a12828; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem;">
+                        <i class="bi bi-exclamation-triangle-fill"></i> @mensajeErrorModal
+                    </div>
+                }
+
                 <div class="admin-modal-actions" style="margin-top: 28px; justify-content: flex-end;">
                     <button type="button" class="admin-modal-btn-cancel" @onclick="CerrarFormulario">Cancelar</button>
                     <button type="submit" class="admin-primary-action" style="box-shadow: none; min-height: 42px;">
@@ -172,7 +183,7 @@
             <h2>¿Cambiar proveedor logístico?</h2>
             
             <p class="admin-modal-text">
-                El proveedor <strong style="color: #2f252a;">@courierActual?.Nombre</strong> dejará de estar asignado.
+                El proveedor <strong style="color: #2f252a;">@courierAsignadoAnterior</strong> dejará de estar asignado.
                 A partir de ahora, <strong style="color: var(--rose);">@courierSeleccionado.Nombre</strong> se encargará de manera exclusiva de los envíos.
             </p>
             
@@ -184,19 +195,45 @@
     </div>
 }
 
+@if (mostrarModalEliminar && courierAEliminar != null)
+{
+    <div class="admin-modal-overlay">
+        <div class="admin-modal-card">
+            <h2>¿Eliminar proveedor?</h2>
+            <p>¿Estás seguro de que deseas eliminar a <strong>@courierAEliminar.Nombre</strong>? Esta acción no se puede deshacer.</p>
+            
+            @if (!string.IsNullOrEmpty(mensajeErrorModal))
+            {
+                <div style="color: red; margin-bottom: 10px;">@mensajeErrorModal</div>
+            }
+
+            <div class="admin-modal-actions">
+                <button class="admin-modal-btn-cancel" @onclick="CerrarModalEliminar">Cancelar</button>
+                <button class="admin-modal-btn-confirm" @onclick="ConfirmarEliminacion">Eliminar</button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private string busqueda = "";
     private string? mensajeError;
+    private string? mensajeErrorModal;
     private bool mostrarModalAsignar = false;
     private bool mostrarFormulario = false;
     private bool esEdicion = false;
     private bool cargandoCouriers = true;
 
     private Courier? courierSeleccionado;
+    private Courier? courierADesasignar;
+    private string? courierAsignadoAnterior;
     private Courier modeloFormulario = new();
     private List<Courier> couriers = new();
 
-    private Courier? courierActual => couriers.FirstOrDefault(c => c.Activo);
+    private bool mostrarModalEliminar = false;
+    private Courier? courierAEliminar;
+
+    private Courier? courierActual => couriers.FirstOrDefault(c => c.EsAsignado);
 
     private List<Courier> CouriersFiltrados => couriers
         .Where(c => string.IsNullOrWhiteSpace(busqueda) ||
@@ -240,6 +277,7 @@
 
     private void AbrirEditar(Courier courier)
     {
+        mensajeErrorModal = null;
         esEdicion = true;
         mensajeError = null;
         modeloFormulario = new Courier
@@ -279,18 +317,21 @@
                 couriers.Add(creado);
             }
 
-            mensajeError = null;
+            mensajeErrorModal = null;
             CerrarFormulario();
         }
         catch (Exception ex)
         {
-            mensajeError = $"No se pudo guardar el proveedor logistico: {ex.Message}";
+            mensajeErrorModal = ex.Message;
         }
     }
 
     private void AbrirConfirmacion(Courier courier)
     {
+        mensajeErrorModal = null;
         courierSeleccionado = courier;
+        courierADesasignar = couriers.FirstOrDefault(c => c.EsAsignado);
+        courierAsignadoAnterior = courierADesasignar?.Nombre;
         mostrarModalAsignar = true;
     }
 
@@ -304,20 +345,63 @@
     {
         if (courierSeleccionado == null)
         {
-            CerrarModalAsignar();
             return;
         }
 
         try
         {
-            courierSeleccionado.Activo = true;
+            // Desasignamos al anterior usando la variable que guardamos
+            if (courierADesasignar != null && courierADesasignar.Id != courierSeleccionado.Id)
+            {
+                courierADesasignar.EsAsignado = false;
+                await CourierService.ActualizarAsync(courierADesasignar);
+            }
+
+            // Asignamos al nuevo
+            courierSeleccionado.EsAsignado = true;
             await CourierService.ActualizarAsync(courierSeleccionado);
+
+            // Recargamos todo y limpiamos
             await CargarCouriersAsync();
             CerrarModalAsignar();
+            courierADesasignar = null;
         }
         catch (Exception ex)
         {
-            mensajeError = $"No se pudo asignar el courier activo: {ex.Message}";
+            mensajeError = ex.Message;
+        }
+        finally
+        {
+            courierSeleccionado = null;
+        }
+    }
+
+    private void AbrirConfirmacionEliminar(Courier courier)
+    {
+        courierAEliminar = courier;
+        mensajeErrorModal = null; // Limpiamos errores previos
+        mostrarModalEliminar = true;
+    }
+
+    private void CerrarModalEliminar()
+    {
+        mostrarModalEliminar = false;
+        courierAEliminar = null;
+    }
+
+    private async Task ConfirmarEliminacion()
+    {
+        if (courierAEliminar == null) return;
+
+        try
+        {
+            await CourierService.EliminarAsync(courierAEliminar.Id);
+            await CargarCouriersAsync();
+            CerrarModalEliminar();
+        }
+        catch (Exception ex)
+        {
+            mensajeErrorModal = ex.Message; // Mostrará el error dentro del modal
         }
     }
 }

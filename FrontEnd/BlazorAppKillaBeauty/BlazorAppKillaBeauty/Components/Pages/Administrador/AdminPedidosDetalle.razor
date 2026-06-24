@@ -1,5 +1,6 @@
 @page "/admin/pedidos/detalle/{Codigo}"
 @rendermode InteractiveServer
+@using static BlazorAppKillaBeauty.Services.PedidoService;
 @inject NavigationManager Navigation
 @inject PedidoService PedidoService
 
@@ -205,7 +206,7 @@
                 return;
             }
 
-            pedido = await PedidoService.ObtenerPorIdAsync(id);
+            pedido = await PedidoService.ObtenerPorIdAsyncAdminDto(id);
         }
         catch (Exception ex)
         {

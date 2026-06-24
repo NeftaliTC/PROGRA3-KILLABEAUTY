@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
-using BlazorAppKillaBeauty.ClienteREST.Models;
-namespace BlazorAppKillaBeauty.Services
+
+namespace BlazorAppKillaBeauty.ClienteREST.Models
 {
     public class Producto
     {
@@ -10,14 +10,17 @@ namespace BlazorAppKillaBeauty.Services
         [JsonPropertyName("nombre")]
         public string Nombre { get; set; } = "";
 
-        [JsonPropertyName("precioMinimo")]
-        public decimal PrecioMinimo { get; set; }
+        [JsonPropertyName("precioBase")]
+        public decimal PrecioBase { get; set; }
 
-        [JsonPropertyName("precioMaximo")]
-        public decimal PrecioMaximo { get; set; }
+        [JsonPropertyName("imagenes")]
+        public List<ImagenProducto> Imagenes { get; set; } = new();
 
-        [JsonPropertyName("imagen")]
-        public string Imagen { get; set; } = "Images/Logo.png";
+        [JsonIgnore]
+        public string ImagenPrincipal =>
+            Imagenes.FirstOrDefault(i => i.Principal)?.Url
+            ?? Imagenes.FirstOrDefault()?.Url
+            ?? "/Images/product-placeholder.png";
 
         [JsonPropertyName("categoria")]
         public string Categoria { get; set; } = "";

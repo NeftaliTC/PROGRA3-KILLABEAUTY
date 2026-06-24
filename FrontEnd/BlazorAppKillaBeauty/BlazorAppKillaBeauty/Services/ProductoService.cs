@@ -19,9 +19,17 @@ namespace BlazorAppKillaBeauty.Services
             http = httpClientFactory.CreateClient("KillaApi");
         }
 
+        private List<Producto>? catalogoCache;
+
         public async Task<List<Producto>> ObtenerCatalogoAsync()
         {
-            return await GetAsync<List<Producto>>("productos/catalogo") ?? new List<Producto>();
+            if (catalogoCache != null)
+                return catalogoCache;
+
+            catalogoCache = await http.GetFromJsonAsync<List<Producto>>("productos/catalogo")
+                           ?? new List<Producto>();
+
+            return catalogoCache;
         }
 
         public async Task<List<Producto>> ObtenerPopularesAsync()

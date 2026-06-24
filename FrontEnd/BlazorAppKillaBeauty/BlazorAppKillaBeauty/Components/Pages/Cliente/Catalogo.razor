@@ -10,6 +10,7 @@
 @inject ProductoService ProductoService
 @inject CartService CartService
 @inject NavigationManager Navigation
+@inject AuthService AuthService
 
 <Navbar CantidadCarrito="@CartService.CantidadTotal" />
 
@@ -17,39 +18,39 @@
 
     
 
-        <div class="catalog-breadcrumb">
+    <div class="catalog-breadcrumb">
 
-            <NavLink href="/" class="breadcrumb-link">
-                Home
-            </NavLink>
+        <NavLink href="/" class="breadcrumb-link">
+            Home
+        </NavLink>
 
+        <span class="breadcrumb-separator">&gt;</span>
+
+        <NavLink href="/catalogo" class="breadcrumb-link">
+            Catálogo
+        </NavLink>
+
+        @if (categoriaSeleccionada != "Todas")
+        {
             <span class="breadcrumb-separator">&gt;</span>
 
-            <NavLink href="/catalogo" class="breadcrumb-link">
-                Catálogo
+            <NavLink href="@($"/catalogo/{ConvertirParaUrl(categoriaSeleccionada)}")"
+                     class="breadcrumb-link">
+                @categoriaSeleccionada
             </NavLink>
+        }
 
-            @if (categoriaSeleccionada != "Todas")
-            {
-                <span class="breadcrumb-separator">&gt;</span>
+        @if (!string.IsNullOrEmpty(subcategoriaSeleccionada))
+        {
+            <span class="breadcrumb-separator">&gt;</span>
 
-                <NavLink href="@($"/catalogo/{ConvertirParaUrl(categoriaSeleccionada)}")"
-                         class="breadcrumb-link">
-                    @categoriaSeleccionada
-                </NavLink>
-            }
+            <NavLink href="@($"/catalogo/{ConvertirParaUrl(categoriaSeleccionada)}/{ConvertirParaUrl(subcategoriaSeleccionada)}")"
+                     class="breadcrumb-current">
+                @subcategoriaSeleccionada
+            </NavLink>
+        }
 
-            @if (!string.IsNullOrEmpty(subcategoriaSeleccionada))
-            {
-                <span class="breadcrumb-separator">&gt;</span>
-
-                <NavLink href="@($"/catalogo/{ConvertirParaUrl(categoriaSeleccionada)}/{ConvertirParaUrl(subcategoriaSeleccionada)}")"
-                         class="breadcrumb-current">
-                    @subcategoriaSeleccionada
-                </NavLink>
-            }
-
-        </div>
+    </div>
 
    
 
@@ -142,41 +143,41 @@
             {
                 <div class="catalog-products">
 
-                @foreach (var producto in ProductosPaginados)
-                {
-                    <div class="catalog-product-card"
-                        @onclick="@(() => IrADetalleProducto(producto))">
-                        <div class="catalog-product-image-area">
-                            <img class="catalog-product-img"
-                                 src="@producto.Imagen"
-                                 alt="@producto.Nombre" />
+                    @foreach (var producto in ProductosPaginados)
+                    {
+                        <div class="catalog-product-card"
+                             @onclick="@(() => IrADetalleProducto(producto))">
+                            <div class="catalog-product-image-area">
+                                <img class="catalog-product-img"
+                                     src="@producto.ImagenPrincipal"
+                                     alt="@producto.Nombre" />
+                            </div>
+
+                            <div class="catalog-product-info">
+
+                                <p class="catalog-brand">
+                                    @producto.Marca
+                                </p>
+
+                                <h3 class="catalog-product-title">
+                                    @producto.Nombre
+                                </h3>
+
+                                <p class="catalog-price">
+                                    @MostrarPrecio(producto)
+                                </p>
+
+                                <button class="catalog-add-btn"
+                                        @onclick:stopPropagation="true"
+                                        @onclick="() => AgregarCarrito(producto)">
+                                    <i class="bi bi-bag"></i>
+                                    Añadir
+                                </button>
+
+                            </div>
+
                         </div>
-
-                        <div class="catalog-product-info">
-
-                            <p class="catalog-brand">
-                                @producto.Marca
-                            </p>
-
-                            <h3 class="catalog-product-title">
-                                @producto.Nombre
-                            </h3>
-
-                            <p class="catalog-price">
-                                @MostrarPrecio(producto)
-                            </p>
-
-                            <button class="catalog-add-btn"
-                                    @onclick:stopPropagation="true"
-                                    @onclick="() => AgregarCarrito(producto)">
-                                <i class="bi bi-bag"></i>
-                                Añadir
-                            </button>
-
-                        </div>
-
-                    </div>
-                }
+                    }
 
                 </div>
             }
@@ -340,22 +341,19 @@
             return new List<int> { 1, -1, paginaActual, -1, TotalPaginas };
         }
     }
-
-    private bool FiltroCategoria(Producto producto)
-    {
-        return categoriaSeleccionada == "Todas"
-            || producto.Categoria == categoriaSeleccionada;
+    private bool FiltroCategoria(Producto producto) 
+    { 
+        return categoriaSeleccionada == "Todas" || producto.Categoria == categoriaSeleccionada; 
     }
 
-    private bool FiltroSubcategoria(Producto producto)
-    {
-        return string.IsNullOrEmpty(subcategoriaSeleccionada)
-            || producto.Subcategoria == subcategoriaSeleccionada;
+    private bool FiltroSubcategoria(Producto producto) 
+    { 
+        return string.IsNullOrEmpty(subcategoriaSeleccionada) || producto.Subcategoria == subcategoriaSeleccionada; 
     }
 
     private bool FiltroPrecio(Producto producto)
     {
-        return producto.PrecioMinimo <= precioMaximo;
+        return producto.PrecioBase <= precioMaximo;
     }
 
     private bool FiltroMarca(Producto producto)
@@ -426,23 +424,17 @@
     }
     private string MostrarPrecio(Producto producto)
     {
-        if (producto.PrecioMinimo == producto.PrecioMaximo)
-        {
-            return $"S/ {producto.PrecioMinimo:0.00}";
-        }
-
-        return $"S/ {producto.PrecioMinimo:0.00} - {producto.PrecioMaximo:0.00}";
+        return $"S/ {producto.PrecioBase:0.00}";
     }
 
-    private void AgregarCarrito(Producto producto)
+    private async Task AgregarCarrito(Producto producto)
     {
-        CartService.AgregarProducto(
-            producto.Id,
-            producto.Nombre,
-            producto.PrecioMinimo,
-            producto.Imagen
-        );
+        if (!AuthService.UsuarioId.HasValue)
+            return;
+
+        await CartService.AgregarProductoAsync(producto, AuthService.UsuarioId.Value, 1);
     }
+
     private void IrADetalleProducto(Producto producto)
     {
         Navigation.NavigateTo($"/usuario-producto/{producto.Id}");
@@ -484,6 +476,8 @@
         return texto.Replace("-", " ");
     }
 }
+
+
 
 
 
