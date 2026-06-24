@@ -3,6 +3,7 @@ public class AuthService
     public bool EstaLogueado { get; private set; }
     public int? UsuarioId { get; private set; }
     public string NombreUsuario { get; private set; } = "";
+    public string CorreoElectronico { get; private set; } = "";
     public string Rol { get; private set; } = "";
 
     //public void LoginCliente(string nombre, int usuarioId = 2)
@@ -28,11 +29,12 @@ public class AuthService
     //    NombreUsuario = nombre;
     //    Rol = "SuperAdmin";
     //}
-    public void Login(string nombre, int usuarioId, string rol)
+    public void Login(string nombre, int usuarioId, string rol, string correoElectronico)
     {
         EstaLogueado = true;
         UsuarioId = usuarioId;
         NombreUsuario = nombre;
+        CorreoElectronico = correoElectronico;
         Rol = rol ?? "Cliente";  // si llega null se le asigna cliente 
     }
     public void Logout()
@@ -40,6 +42,7 @@ public class AuthService
         EstaLogueado = false;
         UsuarioId = null;
         NombreUsuario = "";
+        CorreoElectronico = "";
         Rol = "";
     }
 }

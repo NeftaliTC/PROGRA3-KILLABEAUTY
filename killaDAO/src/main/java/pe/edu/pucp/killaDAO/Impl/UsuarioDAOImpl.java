@@ -30,8 +30,8 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         String sql = """
                 INSERT INTO Usuario
                 (nombre, apellido_paterno, apellido_materno, correo_electronico, fecha_nacimiento,
-                 fecha_inscripcion, contrasena, telefono, activo, id_tipo_usuario, ultimo_acceso, dni)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 genero, fecha_inscripcion, contrasena, telefono, activo, id_tipo_usuario, ultimo_acceso, dni)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -49,14 +49,14 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         String sql = """
                 UPDATE Usuario
                 SET nombre = ?, apellido_paterno = ?, apellido_materno = ?, correo_electronico = ?,
-                    fecha_nacimiento = ?, fecha_inscripcion = ?, contrasena = ?, telefono = ?,
+                    fecha_nacimiento = ?, genero = ?, fecha_inscripcion = ?, contrasena = ?, telefono = ?,
                     activo = ?, id_tipo_usuario = ?, ultimo_acceso = ?, dni = ?
                 WHERE id_usuario = ?
                 """;
         try (Connection cn = DBManager.getInstance().getConnection();
-             PreparedStatement ps = cn.prepareStatement(sql)) {
+            PreparedStatement ps = cn.prepareStatement(sql)) {
             setUsuarioParams(ps, u);
-            ps.setInt(13, u.getId());
+            ps.setInt(14, u.getId());
             ps.executeUpdate();
         }
         return u;
@@ -107,14 +107,15 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         ps.setString(3, u.getApellidoMaterno());
         ps.setString(4, u.getCorreoElectronico());
         ps.setObject( 5, u.getFechaNacimiento());
-        setTimestamp(ps, 6, u.getFechaDeInscripcion());
-        ps.setString(7, u.getContrasena());
-        ps.setString(8, u.getTelefono());
-        ps.setBoolean(9, Boolean.TRUE.equals(u.getActivo()));
-        if (u.getTipoUsuario() != null) ps.setInt(10, u.getTipoUsuario().getId());
-        else ps.setNull(10, Types.INTEGER);
-        setTimestamp(ps, 11, u.getUltimoAcceso());
-        ps.setString(12, u.getDni());
+        ps.setString(6, normalizarGenero(u.getGenero()));
+        setTimestamp(ps, 7, u.getFechaDeInscripcion());
+        ps.setString(8, u.getContrasena());
+        ps.setString(9, u.getTelefono());
+        ps.setBoolean(10, Boolean.TRUE.equals(u.getActivo()));
+        if (u.getTipoUsuario() != null) ps.setInt(11, u.getTipoUsuario().getId());
+        else ps.setNull(11, Types.INTEGER);
+        setTimestamp(ps, 12, u.getUltimoAcceso());
+        ps.setString(13, u.getDni());
     }
 
     private Usuario mapRow(ResultSet rs) throws SQLException {
@@ -125,6 +126,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         u.setApellidoMaterno(rs.getString("apellido_materno"));
         u.setCorreoElectronico(rs.getString("correo_electronico"));
         u.setFechaNacimiento(rs.getObject("fecha_nacimiento", LocalDate.class));
+        u.setGenero(rs.getString("genero"));
         u.setFechaDeInscripcion(rs.getTimestamp("fecha_inscripcion"));
         u.setContrasena(rs.getString("contrasena"));
         u.setTelefono(rs.getString("telefono"));
@@ -143,5 +145,12 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     private void setTimestamp(PreparedStatement ps, int index, java.util.Date value) throws SQLException {
         if (value == null) ps.setNull(index, Types.TIMESTAMP);
         else ps.setTimestamp(index, new Timestamp(value.getTime()));
+    }
+
+    private String normalizarGenero(String genero) {
+        if (genero == null || genero.isBlank() || genero.equalsIgnoreCase("Selecciona")) {
+            return null;
+        }
+        return genero;
     }
 }

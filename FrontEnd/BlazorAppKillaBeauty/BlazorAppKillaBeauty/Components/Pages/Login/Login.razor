@@ -121,7 +121,11 @@
             if (usuarioLogueado != null)
             {
                
-                AuthService.Login(usuarioLogueado.Nombre, usuarioLogueado.Id, usuarioLogueado.TipoUsuario);
+                AuthService.Login(
+                    usuarioLogueado.Nombre,
+                    usuarioLogueado.Id,
+                    usuarioLogueado.TipoUsuario,
+                    usuarioLogueado.CorreoElectronico);
                 string rolReal = usuarioLogueado.TipoUsuario?.Trim().ToUpper() ?? "";
                 if (rolReal == "TRABAJADOR" || rolReal == "ADMINISTRADOR")
                 {
