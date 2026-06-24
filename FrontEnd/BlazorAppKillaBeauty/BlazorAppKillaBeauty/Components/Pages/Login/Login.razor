@@ -123,14 +123,14 @@
                
                 AuthService.Login(usuarioLogueado.Nombre, usuarioLogueado.Id, usuarioLogueado.TipoUsuario);
                 string rolReal = usuarioLogueado.TipoUsuario?.Trim().ToUpper() ?? "";
-                if (rolReal == "VENDEDOR" || rolReal == "ADMINISTRADOR")
+                if (rolReal == "TRABAJADOR" || rolReal == "ADMINISTRADOR")
                 {
-                    // Si es personal de la tienda, lo mandamos a tu panel
+                    
                     NavigationManager.NavigateTo("/admin");
                 }
                 else
                 {
-                    // Si es cliente normal, lo mandamos a la tienda
+                    
                     NavigationManager.NavigateTo("/");
                 }
                
