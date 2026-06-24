@@ -122,7 +122,8 @@
             {
                 // Si el backend devuelve el usuario, el login fue un éxito.
                 // Aquí más adelante guardaremos el usuario en el estado global o local storage
-                AuthService.LoginCliente(usuarioLogueado.Nombre, usuarioLogueado.Id);
+                
+                AuthService.Login(usuarioLogueado.Nombre, usuarioLogueado.Id, usuarioLogueado.TipoUsuario);
                 NavigationManager.NavigateTo("/"); // Redirigir al Home
             }
         }
