@@ -54,7 +54,7 @@
                         <div class="cart-item-info">
                             <h3>@(producto?.Nombre ?? $"Producto #{producto?.Id}")</h3>
 
-                            @if (infoEscalas.TryGetValue(detalle.Id, out var info))
+                            @if (producto != null && infoEscalas.TryGetValue(producto.Id, out var info))
                             {
                                 <div class="discount-line">
                                     <span class="cart-tag">@info.Etiqueta</span>
@@ -116,7 +116,7 @@
                         <div class="cart-subtotal">
                             <small>Subtotal</small>
                             <strong>
-                                S/ @((infoEscalas.TryGetValue(detalle.Id, out var infoSub)
+                                S/ @((producto != null && infoEscalas.TryGetValue(producto.Id, out var infoSub)
                                     ? infoSub.PrecioUnitario * detalle.Cantidad
                                     : detalle.Cantidad * (producto?.PrecioBase ?? 0)).ToString("0.00"))
                             </strong>
@@ -213,7 +213,11 @@
 
         foreach (var item in CartService.Productos)
         {
-            infoEscalas[item.Id] = await CartService.ObtenerInfoEscalaAsync(item);
+            if (item.Producto != null)
+            {
+                infoEscalas[item.Producto.Id] =
+                    await CartService.ObtenerInfoEscalaAsync(item);
+            }
         }
 
         await CartService.RecalcularTotalesAsync();

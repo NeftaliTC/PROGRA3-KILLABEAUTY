@@ -127,7 +127,7 @@ namespace BlazorAppKillaBeauty.Services
             await EnsureSuccessAsync(response);
         }
 
-        public async Task VaciarCarritoAsync(int idUsuario)
+        /*public async Task VaciarCarritoAsync(int idUsuario)
         {
             var detalles = Productos.ToList();
 
@@ -137,6 +137,29 @@ namespace BlazorAppKillaBeauty.Services
             }
 
             Productos.Clear();
+        }*/
+
+        public async Task VaciarCarritoAsync(int idUsuario)
+        {
+            var detalles = Productos.ToList();
+
+            foreach (var detalle in detalles)
+            {
+                if (detalle.Id > 0)
+                {
+                    try
+                    {
+                        await EliminarDetalleAsync(detalle.Id);
+                    }
+                    catch
+                    {
+                        // Si ya no existe en BD, lo ignoramos
+                    }
+                }
+            }
+
+            Productos.Clear();
+            await RecalcularTotalesAsync();
         }
 
         private async Task<T?> GetAsync<T>(string url)
