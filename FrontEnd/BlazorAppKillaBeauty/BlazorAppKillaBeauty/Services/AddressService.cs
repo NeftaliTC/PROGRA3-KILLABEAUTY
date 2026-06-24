@@ -10,7 +10,7 @@ namespace BlazorAppKillaBeauty.Services
         private readonly JsonSerializerOptions jsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // Aquí está la magia
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // Aquï¿½ estï¿½ la magia
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
@@ -112,6 +112,24 @@ namespace BlazorAppKillaBeauty.Services
             }
 
             var body = await response.Content.ReadAsStringAsync();
+
+            if (!string.IsNullOrWhiteSpace(body))
+            {
+                try
+                {
+                    // Intentamos deserializar el JSON para sacar solo el texto de "message"
+                    using var doc = JsonDocument.Parse(body);
+                    if (doc.RootElement.TryGetProperty("message", out var messageProp))
+                    {
+                        throw new InvalidOperationException(messageProp.GetString());
+                    }
+                }
+                catch (JsonException)
+                {
+                    // Si por alguna razï¿½n no es un JSON vï¿½lido, dejamos el comportamiento por defecto
+                }
+            }
+
             throw new InvalidOperationException(
                 string.IsNullOrWhiteSpace(body)
                     ? $"Error REST {(int)response.StatusCode} {response.ReasonPhrase}"

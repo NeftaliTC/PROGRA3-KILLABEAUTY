@@ -8,7 +8,7 @@
 <div class="addresses-content">
     <div class="section-header">
         <h2>Mis direcciones</h2>
-        <button class="btn-new-address" @onclick="() => AbrirModal()">+ Nueva dirección</button>
+        <button class="btn-new-address-button" @onclick="() => AbrirModal()">+ Nueva dirección</button>
     </div>
     <span class="description-text">Administra tus direcciones de entrega</span>
 
@@ -95,19 +95,15 @@
             <div class="profile-form-grid" style="grid-template-columns: 1fr 1fr;">
                 <div class="form-input-group">
                     <label>Departamento</label>
-                    <div class="select-wrapper">
-                        <select class="form-control" value="Lima" disabled>
-                            <option value="Lima">Lima</option>
-                        </select>
-                    </div>
+                    <select class="form-control" value="Lima" disabled>
+                        <option value="Lima">Lima</option>
+                    </select>
                 </div>
                 <div class="form-input-group">
                     <label>Provincia</label>
-                    <div class="select-wrapper">
-                        <select class="form-control" value="Lima" disabled>
-                            <option value="Lima">Lima</option>
-                        </select>
-                    </div>
+                    <select class="form-control" value="Lima" disabled>
+                        <option value="Lima">Lima</option>
+                    </select>
                 </div>
             </div>
 
@@ -319,11 +315,30 @@
         try
         {
             saveError = "";
+            // Apagamos todas las estrellas de prederminado visualmente en la pantalla de inmediato
+            foreach (var a in AddressService.UserAddresses)
+            {
+                a.IsDefault = (a.Id == addr.Id);
+            }
+
+            // Creamos una copia ordenada temporal
+            var listaOrdenada = AddressService.UserAddresses
+                .OrderByDescending(a => a.IsDefault)
+                .ThenBy(a => a.Id)
+                .ToList();
+
+            // Limpiamos la lista original y le metemos los elementos ya ordenados
+            AddressService.UserAddresses.Clear();
+            AddressService.UserAddresses.AddRange(listaOrdenada);
+
+            StateHasChanged(); // mostrar rapidamente el cambio
             await AddressService.MarcarPredeterminadaAsync(addr, UsuarioId);
         }
         catch (Exception ex)
         {
             saveError = $"No se pudo predeterminar la dirección: {ex.Message}";
+            // volvemos a traer los datos reales despues del fallo
+            await AddressService.CargarPorUsuarioAsync(UsuarioId);
         }
     }
 }

@@ -6,6 +6,7 @@ import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
 import pe.edu.pucp.killaBeauty.killaModelo.Direccion;
 import pe.edu.pucp.killaDAO.DireccionDAO;
 import pe.edu.pucp.killaDAO.Impl.DireccionDAOImpl;
+import pe.edu.pucp.killaBeauty.bl.utils.FormatHelper;
 
 import java.util.List;
 
@@ -17,7 +18,20 @@ public class DireccionBLImpl implements DireccionBL {
     public Direccion create(Direccion d) throws BusinessLogicException {
         try {
             TransactionContext.getConnection();
+
+            // Capitalizar Alias y Detalle de Dirección
+            d.setAlias(FormatHelper.capitalizarTexto(d.getAlias()));
+            d.setDireccionDetalle(FormatHelper.capitalizarTexto(d.getDireccionDetalle()));
+            if (d.getReferencia() != null) d.setReferencia(FormatHelper.capitalizarTexto(d.getReferencia()));
+
+            // No permitir nombres (alias) repetidos para el mismo usuario
             List<Direccion> lista = direccionDAO.listarPorUsuario(d.getUsuario().getId());
+            for (Direccion existente : lista) {
+                if (existente.getAlias().equalsIgnoreCase(d.getAlias())) {
+                    throw new BusinessLogicException("Ya tienes una dirección registrada con el alias '" + d.getAlias() + "'.");
+                }
+            }
+
             if(lista.isEmpty()){
                 // Si es la primera, se marca como predeterminada automáticamente
                 d.setEsPredeterminada(true);
@@ -40,6 +54,20 @@ public class DireccionBLImpl implements DireccionBL {
     public Direccion update(Direccion d) throws BusinessLogicException {
         try {
             TransactionContext.getConnection();
+
+            // CAPITALIZACIÓN: Solo lo necesario
+            d.setAlias(FormatHelper.capitalizarTexto(d.getAlias()));
+            d.setDireccionDetalle(FormatHelper.capitalizarTexto(d.getDireccionDetalle()));
+            if (d.getReferencia() != null) d.setReferencia(FormatHelper.capitalizarTexto(d.getReferencia()));
+
+            // VALIDACIÓN: No duplicados en edición (excluyendo su propio ID)
+            List<Direccion> lista = direccionDAO.listarPorUsuario(d.getUsuario().getId());
+            for (Direccion existente : lista) {
+                if (existente.getAlias().equalsIgnoreCase(d.getAlias()) && existente.getId() != d.getId()) {
+                    throw new BusinessLogicException("Ya tienes otra dirección registrada con el alias '" + d.getAlias() + "'.");
+                }
+            }
+
             // Si el usuario marca esta como predeterminada, limpiamos las anteriores
             if (d.getEsPredeterminada()) {
                 direccionDAO.resetearPredeterminadas(d.getUsuario().getId());
