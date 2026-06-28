@@ -10,4 +10,5 @@ public interface PagoBL {
     Pago update(Pago pago) throws BusinessLogicException;
     Pago load(Integer id) throws BusinessLogicException;
     List<Pago> listAll() throws BusinessLogicException;
+    Pago obtenerPorIdPedido(Integer idPedido) throws BusinessLogicException;
 }

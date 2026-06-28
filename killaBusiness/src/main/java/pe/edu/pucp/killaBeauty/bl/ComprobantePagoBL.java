@@ -9,4 +9,5 @@ public interface ComprobantePagoBL {
     ComprobantePago create(ComprobantePago c) throws BusinessLogicException;
     ComprobantePago load(Integer id) throws BusinessLogicException;
     List<ComprobantePago> listAll() throws BusinessLogicException;
+    ComprobantePago obtenerPorIdPago(Integer idPago) throws BusinessLogicException;
 }

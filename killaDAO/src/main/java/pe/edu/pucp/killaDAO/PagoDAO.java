@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface PagoDAO extends BaseDAO<Pago, Integer> {
     List<Pago> listAll() throws SQLException;
+    Pago buscarPorIdPedido(Integer idPedido) throws SQLException;
 }

@@ -27,6 +27,22 @@ public class PagoDAOImpl implements PagoDAO {
     }
 
     @Override
+    public Pago buscarPorIdPedido(Integer idPedido) throws SQLException {
+        String sql = """
+                SELECT id_pago, monto_pagado, fecha_hora_pago, estado, id_pedido, id_metodo_pago 
+                FROM Pago WHERE id_pedido = ?
+                """;
+        try (Connection con = DBManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idPedido);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        }
+        return null;
+    }
+
+    @Override
     public Pago load(Integer id) throws SQLException {
         String sql = """
                 SELECT id_pago, monto_pagado, fecha_hora_pago, estado, id_pedido, id_metodo_pago 

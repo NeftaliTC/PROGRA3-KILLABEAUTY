@@ -13,7 +13,6 @@
     import pe.edu.pucp.killaBeauty.killaModelo.Resena;
     import pe.edu.pucp.killaBeauty.killaModelo.Usuario;
     import pe.edu.pucp.killabeauty.killarest.dto.CambiarContrasenaDTO;
-    import org.mindrot.jbcrypt.BCrypt;
 
     import java.util.List;
 
@@ -65,20 +64,9 @@
         @POST
         public Response insertarUsuario(Usuario usuario) {
             try {
-                // 1. Extraemos la contraseña en texto plano que envió Blazor
-                String passwordPlano = usuario.getContrasena();
-
-                // 2. Generamos el hash con BCrypt
-                String passwordHasheado = BCrypt.hashpw(passwordPlano, BCrypt.gensalt());
-
-                // 3. Reemplazamos la contraseña plana por el hash en el objeto
-                usuario.setContrasena(passwordHasheado);
-
-                // 4. Guardamos en la base de datos de forma segura
                 Usuario usuarioCreado = usuarioBL.create(usuario);
                 return Response.status(Response.Status.CREATED).entity(usuarioCreado).build();
             } catch (BusinessLogicException e) {
-                // Devuelve 400 Bad Request con tu mensaje ("El correo electrónico ya se...")
                 return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
             } catch (Exception e) {
                 // Errores de servidor (500)
@@ -90,21 +78,21 @@
         @Path("{id}/perfil")
         public Response actualizarPerfil(@PathParam("id") int id, Usuario datosPerfil) {
             try {
-                Usuario usuarioActual = usuarioBL.load(id);
-                if (usuarioActual == null) {
-                    return Response.status(Response.Status.NOT_FOUND).build();
+                if (datosPerfil == null) {
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .entity("Datos del perfil vacíos o inválidos.")
+                            .build();
                 }
-
-                usuarioActual.setNombre(datosPerfil.getNombre());
-                usuarioActual.setApellidoPaterno(datosPerfil.getApellidoPaterno());
-                usuarioActual.setApellidoMaterno(datosPerfil.getApellidoMaterno());
-                usuarioActual.setFechaNacimiento(datosPerfil.getFechaNacimiento());
-                usuarioActual.setGenero(datosPerfil.getGenero());
-                usuarioActual.setTelefono(datosPerfil.getTelefono());
-
-                Usuario usuarioActualizado = usuarioBL.update(usuarioActual);
+                Usuario usuarioActualizado = usuarioBL.update(datosPerfil);
                 return Response.ok(usuarioActualizado).build();
-            } catch (Exception e) {
+            }catch (BusinessLogicException e) {
+                if (e.getMessage().contains("no existe")) {
+                    return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+                }
+                return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+
+            }
+            catch (Exception e) {
                 return Response.serverError().entity(e.getMessage()).build();
             }
         }
@@ -113,35 +101,16 @@
         @Path("{id}/password")
         public Response cambiarContrasena(@PathParam("id") int id, CambiarContrasenaDTO request) {
             try {
-                Usuario usuarioActual = usuarioBL.load(id);
-                if (usuarioActual == null) {
-                    return Response.status(Response.Status.NOT_FOUND).build();
+                if (request == null){
+                    return Response.status(Response.Status.BAD_REQUEST).build();
                 }
-
-                if (request == null ||
-                        request.getContrasenaActual() == null ||
-                        request.getNuevaContrasena() == null ||
-                        request.getNuevaContrasena().length() < 6) {
-                    return Response.status(Response.Status.BAD_REQUEST)
-                            .entity("La nueva contraseña debe tener al menos 6 caracteres.")
-                            .build();
-                }
-
-                boolean contrasenaValida = BCrypt.checkpw(
-                        request.getContrasenaActual(),
-                        usuarioActual.getContrasena()
-                );
-
-                if (!contrasenaValida) {
-                    return Response.status(Response.Status.UNAUTHORIZED)
-                            .entity("Contraseña actual incorrecta.")
-                            .build();
-                }
-
-                usuarioActual.setContrasena(BCrypt.hashpw(request.getNuevaContrasena(), BCrypt.gensalt()));
-                Usuario usuarioActualizado = usuarioBL.update(usuarioActual);
+                Usuario usuarioActualizado = usuarioBL.cambiarContrasena(id, request.getContrasenaActual(), request.getNuevaContrasena());
                 return Response.ok(usuarioActualizado).build();
-            } catch (Exception e) {
+            } catch (BusinessLogicException e) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(e.getMessage())
+                        .build();
+            }catch (Exception e) {
                 return Response.serverError().entity(e.getMessage()).build();
             }
         }
@@ -150,6 +119,7 @@
         @Path("{id}")
         public Response actualizarUsuario(@PathParam("id") int id, Usuario usuario) {
             try {
+                // para datos donde no se necesita volver a pedir la contraseña
                 usuario.setId(id);
                 Usuario usuarioActualizado = usuarioBL.update(usuario);
                 return Response.ok(usuarioActualizado).build();
@@ -174,28 +144,22 @@
         @Path("/login")
         public Response login(Usuario credenciales) {
             try {
-                // 1. Buscas al usuario en la BD usando su correo o nombre de usuario
-                Usuario usuarioBD = usuarioBL.loadByEmail(credenciales.getCorreoElectronico());
-
-                // Si el usuario no existe
-                if (usuarioBD == null) {
-                    return Response.status(Response.Status.UNAUTHORIZED)
-                            .entity("Correo o contraseña incorrectos").build();
+                // Validación de nulidad defensiva en la entrada HTTP
+                if (credenciales == null || credenciales.getCorreoElectronico() == null || credenciales.getContrasena() == null) {
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .entity("Debe ingresar el correo y la contraseña.")
+                            .build();
                 }
+                Usuario usuarioLogueado = usuarioBL.autenticar(credenciales);
 
-                // 2. Verificas la contraseña con BCrypt
-                // Parámetro 1: La clave plana que tecleó el usuario ahora
-                // Parámetro 2: El hash ilegible que sacaste de la BD
-                boolean credencialesValidas = BCrypt.checkpw(credenciales.getContrasena(), usuarioBD.getContrasena());
+                return Response.ok(usuarioLogueado).build();
 
-                if (credencialesValidas) {
-                    // ¡Login exitoso!
-                    return Response.ok(usuarioBD).build();
-                } else {
-                    // Contraseña incorrecta
-                    return Response.status(Response.Status.UNAUTHORIZED)
-                            .entity("Correo o contraseña incorrectos").build();
-                }
+            } catch (BusinessLogicException e) {
+                //  Si la BL rechaza las credenciales respondemos con un HTTP 401
+                return Response.status(Response.Status.UNAUTHORIZED)
+                        .entity(e.getMessage())
+                        .build();
+
 
             } catch (Exception ex) {
                 return Response.serverError().entity(ex.getMessage()).build();

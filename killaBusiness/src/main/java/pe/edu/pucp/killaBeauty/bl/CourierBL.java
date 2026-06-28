@@ -11,4 +11,5 @@ public interface CourierBL {
     Courier load(Integer id) throws BusinessLogicException;
     List<Courier> listAll() throws BusinessLogicException;
     void remove(Courier courier) throws BusinessLogicException;
+    Courier buscarAsignado() throws BusinessLogicException;
 }

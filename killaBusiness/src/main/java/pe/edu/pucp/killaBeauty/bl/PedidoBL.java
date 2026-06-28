@@ -1,8 +1,7 @@
 package pe.edu.pucp.killaBeauty.bl;
 
 import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
-import pe.edu.pucp.killaBeauty.killaModelo.DetallePedido;
-import pe.edu.pucp.killaBeauty.killaModelo.Pedido;
+import pe.edu.pucp.killaBeauty.killaModelo.*;
 
 import java.util.List;
 
@@ -14,4 +13,6 @@ public interface PedidoBL {
     void remove(Pedido p) throws BusinessLogicException;
     Pedido load(Integer id) throws BusinessLogicException;
     List<Pedido> listAll() throws BusinessLogicException;
+    List<Pedido> listByCliente(Integer idCliente) throws BusinessLogicException;
+    void actualizarTotal(Integer idPedido, double nuevoTotal) throws BusinessLogicException;
 }
