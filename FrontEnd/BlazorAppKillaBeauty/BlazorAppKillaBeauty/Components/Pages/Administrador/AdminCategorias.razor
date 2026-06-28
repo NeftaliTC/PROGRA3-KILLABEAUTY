@@ -76,7 +76,7 @@
                             ContainerClass="table-responsive"
                             TableClass="admin-table admin-orders-table"
                             HeaderClass=""
-                            EmptyMessage="No se encontraron categorias.">
+                            EmptyMessage="No se encontraron categorías.">
                 <TableHeader>
                     <tr>
                         <th style="padding-left: 2rem !important;">ID</th>
@@ -157,7 +157,7 @@
                                     {
                                         <div class="cat-sub-empty">
                                             <i class="bi bi-folder2-open"></i>
-                                            <span>No hay subcategorías registradas para esta categoria.</span>
+                                            <span>No hay subcategorías registradas para esta categoría.</span>
                                         </div>
                                     }
                                     else
@@ -206,7 +206,7 @@
             <header class="admin-cat-modal-header">
                 <h2>
                     <i class="bi @(esModoEdicionCat ? "bi-pencil-square" : "bi-plus-lg")"></i>
-                    @(esModoEdicionCat ? "Editar categori­a" : "Nueva categori­a")
+                    @(esModoEdicionCat ? "Editar categori­a" : "Nueva categorí­a")
                 </h2>
                 <button type="button" class="admin-cat-modal-close" @onclick="CerrarModalCategoria">
                     <i class="bi bi-x-lg"></i>
@@ -223,7 +223,7 @@
 
             <div class="admin-cat-modal-body">
                 <div class="scales-form-field">
-                    <label>Nombre de la categori­a <span class="req">*</span></label>
+                    <label>Nombre de la categorí­a <span class="req">*</span></label>
                     <input type="text"
                            placeholder="Ej: Skincare, Maquillaje, Cabello..."
                            @bind="formCat.Nombre" />
@@ -249,7 +249,7 @@
                     Cancelar
                 </button>
                 <button type="button" class="btn-scale-save" @onclick="GuardarCategoria">
-                    @(esModoEdicionCat ? "Guardar cambios" : "Crear categori­a")
+                    @(esModoEdicionCat ? "Guardar cambios" : "Crear categoría")
                 </button>
             </footer>
         </div>
@@ -483,7 +483,7 @@
         }
         catch (Exception ex)
         {
-            mensajeError = $"No se pudieron cargar las categorias: {ex.Message}";
+            mensajeError = $"No se pudieron cargar las categorías: {ex.Message}";
             categorias = new();
             categoriasFiltradas = new();
             ActualizarPaginaCategorias();
@@ -576,7 +576,7 @@
     {
         if (string.IsNullOrWhiteSpace(formCat.Nombre))
         {
-            errorModalCat = "La descripcion de la categoria es obligatoria.";
+            errorModalCat = "La descripcion de la categoría es obligatoria.";
             return;
         }
 
@@ -610,7 +610,7 @@
                     Descripcion = nombre,
                     Activo = true
                 });
-                mensajeExito = $"Categoria \"{nombre}\" creada correctamente.";
+                mensajeExito = $"Categoría \"{nombre}\" creada correctamente.";
             }
 
             CerrarModalCategoria();
@@ -618,7 +618,7 @@
         }
         catch (Exception ex)
         {
-            errorModalCat = $"No se pudo guardar la categoria: {ex.Message}";
+            errorModalCat = $"No se pudo guardar la categoría: {ex.Message}";
         }
     }
 
@@ -666,7 +666,7 @@
 
         if (existe)
         {
-            errorModalSub = "Ya existe una subcategoría con esa descripcion en esta categoria.";
+            errorModalSub = "Ya existe una subcategoría con esa descripcion en esta categoría.";
             return;
         }
 
@@ -681,7 +681,7 @@
                     Activo = formSub.Activo,
                     Categoria = new Categoria { Id = categoriaPadreSeleccionada.Id }
                 });
-                mensajeExito = $"Subcategoria \"{nombre}\" actualizada.";
+                mensajeExito = $"Subcategoría \"{nombre}\" actualizada.";
             }
             else
             {
@@ -722,13 +722,13 @@
                     Activo = !categoriaToggle.Activo
                 });
                 mensajeExito = !categoriaToggle.Activo
-                    ? $"Categoria \"{categoriaToggle.Nombre}\" activada."
-                    : $"Categoria \"{categoriaToggle.Nombre}\" desactivada.";
+                    ? $"Categoría \"{categoriaToggle.Nombre}\" activada."
+                    : $"Categoría \"{categoriaToggle.Nombre}\" desactivada.";
                 await CargarCategoriasAsync();
             }
             catch (Exception ex)
             {
-                mensajeError = $"No se pudo cambiar el estado de la categoria: {ex.Message}";
+                mensajeError = $"No se pudo cambiar el estado de la categoría: {ex.Message}";
             }
         }
         mostrarModalToggle = false;
