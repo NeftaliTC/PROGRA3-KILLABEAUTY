@@ -94,8 +94,17 @@
             }
             else
             {
-                <table class="admin-table admin-orders-table">
-                    <thead>
+                <PaginatedTable TItem="PedidoAdminDto"
+                                Page="paginaPedidos"
+                                OnChanged="OnPageChanged"
+                                ColSpan="7"
+                                InitialPageSize="5"
+                                PageSizeOptions="opcionesPaginaPedidos"
+                                ContainerClass="table-responsive"
+                                TableClass="admin-table admin-orders-table"
+                                HeaderClass=""
+                                EmptyMessage="No se encontraron pedidos con esos filtros.">
+                    <TableHeader>
                         <tr>
                             <th>Pedido</th>
                             <th>Cliente</th>
@@ -105,88 +114,40 @@
                             <th>Estado de envio</th>
                             <th>Acciones</th>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (PedidosPaginados.Count == 0)
-                        {
-                            <tr>
-                                <td colspan="7">
-                                    <div class="admin-empty-orders">
-                                        <i class="bi bi-inbox"></i>
-                                        <span>No se encontraron pedidos con esos filtros.</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                        else
-                        {
-                            @foreach (var pedido in PedidosPaginados)
-                            {
-                                <tr>
-                                    <td>@pedido.Codigo</td>
-                                    <td>@pedido.Cliente</td>
-                                    <td>@pedido.Correo</td>
-                                    <td>@pedido.FechaPedido.ToString("dd/MM/yyyy")</td>
-                                    <td>S/ @pedido.Total.ToString("F2")</td>
-                                    <td>
-                                        <span class="admin-status @pedido.ClaseEstado">
-                                            @MostrarEstado(pedido)
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="admin-order-actions">
-                                            <a href="/admin/pedidos/detalle/@pedido.Id"
-                                               class="admin-detail-button">
-                                                <i class="bi bi-eye"></i>
-                                                Ver
-                                            </a>
+                    </TableHeader>
+                    <RowTemplate Context="pedido">
+                        <tr>
+                            <td>@pedido.Codigo</td>
+                            <td>@pedido.Cliente</td>
+                            <td>@pedido.Correo</td>
+                            <td>@pedido.FechaPedido.ToString("dd/MM/yyyy")</td>
+                            <td>S/ @pedido.Total.ToString("F2")</td>
+                            <td>
+                                <span class="admin-status @pedido.ClaseEstado">
+                                    @MostrarEstado(pedido)
+                                </span>
+                            </td>
+                            <td>
+                                <div class="admin-order-actions">
+                                    <a href="/admin/pedidos/detalle/@pedido.Id"
+                                       class="admin-detail-button">
+                                        <i class="bi bi-eye"></i>
+                                        Ver
+                                    </a>
 
-                                            <button type="button"
-                                                    class="admin-cancel-order-button"
-                                                    @onclick="() => AbrirModalCancelacion(pedido)">
-                                                <i class="bi bi-x-circle"></i>
-                                                Cancelar
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
+                                    <button type="button"
+                                            class="admin-cancel-order-button"
+                                            @onclick="() => AbrirModalCancelacion(pedido)">
+                                        <i class="bi bi-x-circle"></i>
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </RowTemplate>
+                </PaginatedTable>
             }
         </section>
-
-        <footer class="admin-pagination">
-            <span>
-                Pagina @paginaActual de @TotalPaginas
-            </span>
-
-            <div class="admin-pagination-buttons">
-                <button type="button"
-                        disabled="@(paginaActual == 1)"
-                        @onclick="PaginaAnterior">
-                    <i class="bi bi-chevron-left"></i>
-                </button>
-
-                @for (var pagina = 1; pagina <= TotalPaginas; pagina++)
-                {
-                    var numeroPagina = pagina;
-
-                    <button type="button"
-                            class="@(paginaActual == numeroPagina ? "active" : "")"
-                            @onclick="() => CambiarPagina(numeroPagina)">
-                        @numeroPagina
-                    </button>
-                }
-
-                <button type="button"
-                        disabled="@(paginaActual == TotalPaginas)"
-                        @onclick="PaginaSiguiente">
-                    <i class="bi bi-chevron-right"></i>
-                </button>
-            </div>
-        </footer>
 
     </section>
 </main>
@@ -256,11 +217,33 @@
 }
 
 @code {
-    private string busqueda = "";
-    private string estadoSeleccionado = "Cualquier estado";
+    private string _busqueda = "";
+    private string busqueda
+    {
+        get => _busqueda;
+        set { _busqueda = value; ResetearPaginacion(); }
+    }
 
-    private DateTime? fechaInicio;
-    private DateTime? fechaFin;
+    private string _estadoSeleccionado = "Cualquier estado";
+    private string estadoSeleccionado
+    {
+        get => _estadoSeleccionado;
+        set { _estadoSeleccionado = value; ResetearPaginacion(); }
+    }
+
+    private DateTime? _fechaInicio;
+    private DateTime? fechaInicio
+    {
+        get => _fechaInicio;
+        set { _fechaInicio = value; ResetearPaginacion(); }
+    }
+
+    private DateTime? _fechaFin;
+    private DateTime? fechaFin
+    {
+        get => _fechaFin;
+        set { _fechaFin = value; ResetearPaginacion(); }
+    }
 
     private PedidoAdminDto? pedidoCancelacion;
     private ModoCancelacion modoCancelacion = ModoCancelacion.Confirmar;
@@ -268,8 +251,9 @@
     private bool cargandoPedidos = true;
     private string? mensajeError;
 
-    private int paginaActual = 1;
-    private const int PedidosPorPagina = 5;
+    private readonly int[] opcionesPaginaPedidos = new[] { 5, 10, 25, 50, 100 };
+    private PageQuery queryActual = new(1, 5);
+    private TablePage<PedidoAdminDto> paginaPedidos = new();
 
     private string? FechaInicioMaxima => fechaFin?.ToString("yyyy-MM-dd");
     private string? FechaFinMinima => fechaInicio?.ToString("yyyy-MM-dd");
@@ -289,10 +273,12 @@
         try
         {
             pedidos = await PedidoService.ObtenerTodosAsync();
+            ActualizarPaginaPedidos();
         }
         catch (Exception ex)
         {
             mensajeError = $"No se pudieron cargar los pedidos. {ex.Message}";
+            ActualizarPaginaPedidos();
         }
         finally
         {
@@ -308,15 +294,6 @@
             .Where(CoincideFechaFin)
             .OrderByDescending(p => p.FechaPedido)
             .ToList();
-
-    private List<PedidoAdminDto> PedidosPaginados =>
-        PedidosFiltrados
-            .Skip((paginaActual - 1) * PedidosPorPagina)
-            .Take(PedidosPorPagina)
-            .ToList();
-
-    private int TotalPaginas =>
-        Math.Max(1, (int)Math.Ceiling(PedidosFiltrados.Count / (double)PedidosPorPagina));
 
     private bool CoincideBusqueda(PedidoAdminDto pedido)
     {
@@ -353,28 +330,32 @@
         estadoSeleccionado = "Cualquier estado";
         fechaInicio = null;
         fechaFin = null;
-        paginaActual = 1;
+        ResetearPaginacion();
     }
 
-    private void CambiarPagina(int pagina)
+    private void OnPageChanged(PageQuery query)
     {
-        paginaActual = pagina;
+        queryActual = query;
+        ActualizarPaginaPedidos();
     }
 
-    private void PaginaAnterior()
+    private void ResetearPaginacion()
     {
-        if (paginaActual > 1)
+        queryActual = new PageQuery(1, queryActual.PageSize);
+        ActualizarPaginaPedidos();
+    }
+
+    private void ActualizarPaginaPedidos()
+    {
+        var filtrados = PedidosFiltrados;
+        paginaPedidos = new TablePage<PedidoAdminDto>
         {
-            paginaActual--;
-        }
-    }
-
-    private void PaginaSiguiente()
-    {
-        if (paginaActual < TotalPaginas)
-        {
-            paginaActual++;
-        }
+            Items = filtrados
+                .Skip((queryActual.Page - 1) * queryActual.PageSize)
+                .Take(queryActual.PageSize)
+                .ToList(),
+            TotalRecords = filtrados.Count
+        };
     }
 
     private void AbrirModalCancelacion(PedidoAdminDto pedido)
@@ -410,6 +391,7 @@
             {
                 pedidos[index] = actualizado;
             }
+            ActualizarPaginaPedidos();
             CerrarModalCancelacion();
         }
         catch (Exception ex)

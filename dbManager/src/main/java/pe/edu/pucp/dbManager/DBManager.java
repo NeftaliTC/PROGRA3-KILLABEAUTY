@@ -18,8 +18,13 @@ public class DBManager {
 
 
     private DBManager() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException("No se encontro el driver MySQL en el classpath", ex);
+        }
 
-        // clase q se diseño para leer archivo .properties como el de db.properties
+        // clase q se diseÃ±o para leer archivo .properties como el de db.properties
 
         properties = new Properties();
         try {

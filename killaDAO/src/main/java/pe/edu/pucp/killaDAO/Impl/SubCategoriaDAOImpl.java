@@ -1,8 +1,8 @@
 package pe.edu.pucp.killaDAO.Impl;
 
 import pe.edu.pucp.dbManager.DBManager;
-import pe.edu.pucp.killaBeauty.killaModelo.Categoria;
 import pe.edu.pucp.killaBeauty.killaModelo.Subcategoria;
+import pe.edu.pucp.killaDAO.CategoriaDAO;
 import pe.edu.pucp.killaDAO.SubCategoriaDAO;
 
 import java.sql.*;
@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SubCategoriaDAOImpl implements SubCategoriaDAO {
+
+    private CategoriaDAO categoriaDAO = new CategoriaDAOImpl();
 
     @Override
     public List<Subcategoria> listAll() throws SQLException {
@@ -67,7 +69,7 @@ public class SubCategoriaDAOImpl implements SubCategoriaDAO {
                 if (keys.next()) s.setId(keys.getInt(1));
             }
         }
-        return s;
+        return load(s.getId());
     }
 
     @Override
@@ -81,7 +83,7 @@ public class SubCategoriaDAOImpl implements SubCategoriaDAO {
             ps.setInt(4, s.getId());
             ps.executeUpdate();
         }
-        return s;
+        return load(s.getId());
     }
 
     @Override
@@ -101,10 +103,7 @@ public class SubCategoriaDAOImpl implements SubCategoriaDAO {
         s.setId(rs.getInt("id_subcategoria"));
         s.setDescripcion(rs.getString("descripcion"));
         s.setActivo(rs.getBoolean("activo"));
-
-        Categoria c = new Categoria();
-        c.setId(rs.getInt("id_categoria"));
-        s.setCategoria(c);
+        s.setCategoria(categoriaDAO.load(rs.getInt("id_categoria")));
         return s;
     }
 }

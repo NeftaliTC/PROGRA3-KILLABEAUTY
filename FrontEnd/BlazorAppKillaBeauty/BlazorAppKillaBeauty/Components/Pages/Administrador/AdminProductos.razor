@@ -1,4 +1,4 @@
-@page "/admin/productos"
+﻿@page "/admin/productos"
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
 @inject NavigationManager Navigation
@@ -32,7 +32,7 @@
             </article>
 
             <article class="admin-products-kpi-card kpi-warning">
-                <span>Stock crítico</span>
+                <span>Stock crí­tico</span>
                 <strong>@StockCritico</strong>
                 <p>menos de 10 unidades</p>
             </article>
@@ -75,9 +75,9 @@
 
             <div class="admin-products-filter-row">
                 <div class="admin-status-filter">
-                    <span>Categoría</span>
+                    <span>Categorí­a</span>
                     <select @bind="categoriaSeleccionada">
-                        <option value="Todas las categorías">Todas las categorías</option>
+                        <option value="Todas las categorí­as">Todas las categorí­as</option>
                         @foreach (var c in CategoriasDisponibles)
                         {
                             <option value="@c">@c</option>
@@ -113,12 +113,21 @@
         </section>
 
         <section class="admin-table-card admin-products-table-card">
-            <table class="admin-table admin-products-table">
-                <thead>
+            <PaginatedTable TItem="ProductoAdmin"
+                            Page="paginaProductos"
+                            OnChanged="OnPageChanged"
+                            ColSpan="9"
+                            InitialPageSize="6"
+                            PageSizeOptions="opcionesPaginaProductos"
+                            ContainerClass="table-responsive"
+                            TableClass="admin-table admin-products-table"
+                            HeaderClass=""
+                            EmptyMessage="No se encontraron productos con esos filtros.">
+                <TableHeader>
                     <tr>
-                        <th>Código</th>
+                        <th>Codigo</th>
                         <th>Nombre</th>
-                        <th>Categoría</th>
+                        <th>Categoria</th>
                         <th>Marca</th>
                         <th>Precio base</th>
                         <th>Stock</th>
@@ -126,99 +135,56 @@
                         <th>Promo</th>
                         <th style="text-align:right;">Acciones</th>
                     </tr>
-                </thead>
-                <tbody>
-                    @if (ProductosPaginados.Count == 0)
-                    {
-                        <tr>
-                            <td colspan="9">
-                                <div class="admin-empty-orders">
-                                    <i class="bi bi-inbox"></i>
-                                    <span>No se encontraron productos con esos filtros.</span>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                    else
-                    {
-                        @foreach (var p in ProductosPaginados)
-                        {
-                            <tr style="@(p.Activo ? "" : "opacity: 0.82;")">
-                                <td>@p.Codigo</td>
-                                <td class="admin-products-name">@p.Nombre</td>
-                                <td>@p.Categoria</td>
-                                <td>@p.Marca</td>
-                                <td>S/. @p.PrecioBase.ToString("F2")</td>
-                                <td>
-                                    <span class="admin-products-pill @GetStockClass(p)">
-                                        @p.Stock unid.
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="admin-products-pill @GetEstadoClass(p)">
-                                        @GetEstadoTexto(p)
-                                    </span>
-                                </td>
-                                <td>
-                                    @if (p.EnPromocion)
-                                    {
-                                        <span class="admin-products-pill pill-promo">Sí</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="admin-products-dash">—</span>
-                                    }
-                                </td>
-                                <td style="text-align:right;">
-                                    <div class="admin-products-actions">
-                                        <button type="button" class="admin-products-btn" @onclick="() => IrADetalleProducto(p.Id)">
-                                            <i class="bi bi-eye"></i> Ver
-                                        </button>
+                </TableHeader>
+                <RowTemplate Context="p">
+                    <tr style="@(p.Activo ? "" : "opacity: 0.82;")">
+                        <td>@p.Codigo</td>
+                        <td class="admin-products-name">@p.Nombre</td>
+                        <td>@p.Categoria</td>
+                        <td>@p.Marca</td>
+                        <td>S/. @p.PrecioBase.ToString("F2")</td>
+                        <td>
+                            <span class="admin-products-pill @GetStockClass(p)">
+                                @p.Stock unid.
+                            </span>
+                        </td>
+                        <td>
+                            <span class="admin-products-pill @GetEstadoClass(p)">
+                                @GetEstadoTexto(p)
+                            </span>
+                        </td>
+                        <td>
+                            @if (p.EnPromocion)
+                            {
+                                <span class="admin-products-pill pill-promo">Si</span>
+                            }
+                            else
+                            {
+                                <span class="admin-products-dash">-</span>
+                            }
+                        </td>
+                        <td style="text-align:right;">
+                            <div class="admin-products-actions">
+                                <button type="button" class="admin-products-btn" @onclick="() => IrADetalleProducto(p.Id)">
+                                    <i class="bi bi-eye"></i> Ver
+                                </button>
 
-                                        <button type="button" class="admin-products-btn" @onclick="() => AbrirEditar(p)">
-                                            <i class="bi bi-pencil-square"></i> Editar
-                                        </button>
+                                <button type="button" class="admin-products-btn" @onclick="() => AbrirEditar(p)">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </button>
 
-                                        @if (!p.Activo)
-                                        {
-                                            <button type="button" class="admin-products-btn btn-reactivar" @onclick="() => AbrirReactivar(p)">
-                                                <i class="bi bi-arrow-counterclockwise"></i> Reactivar
-                                            </button>
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
+                                @if (!p.Activo)
+                                {
+                                    <button type="button" class="admin-products-btn btn-reactivar" @onclick="() => AbrirReactivar(p)">
+                                        <i class="bi bi-arrow-counterclockwise"></i> Reactivar
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                </RowTemplate>
+            </PaginatedTable>
         </section>
-
-        <footer class="admin-pagination admin-products-pagination">
-            <span>
-                Mostrando @RangoMostrado de @ProductosFiltrados.Count productos
-            </span>
-
-            <div class="admin-pagination-buttons">
-                <button type="button" disabled="@(paginaActual == 1)" @onclick="PaginaAnterior">
-                    <i class="bi bi-chevron-left"></i>
-                </button>
-
-                @for (var pagina = 1; pagina <= TotalPaginas; pagina++)
-                {
-                    var numeroPagina = pagina;
-                    <button type="button"
-                            class="@(paginaActual == numeroPagina ? "active" : "")"
-                            @onclick="() => CambiarPagina(numeroPagina)">
-                        @numeroPagina
-                    </button>
-                }
-
-                <button type="button" disabled="@(paginaActual == TotalPaginas)" @onclick="PaginaSiguiente">
-                    <i class="bi bi-chevron-right"></i>
-                </button>
-            </div>
-        </footer>
 
     </section>
 </main>
@@ -239,12 +205,12 @@
                 <div class="admin-products-modal-body">
                     <div><strong>Código:</strong> @productoSeleccionado.Codigo</div>
                     <div><strong>Nombre:</strong> @productoSeleccionado.Nombre</div>
-                    <div><strong>Categoría:</strong> @productoSeleccionado.Categoria</div>
+                    <div><strong>Categorí­a:</strong> @productoSeleccionado.Categoria</div>
                     <div><strong>Marca:</strong> @productoSeleccionado.Marca</div>
                     <div><strong>Precio:</strong> S/. @productoSeleccionado.PrecioBase.ToString("F2")</div>
                     <div><strong>Stock:</strong> @productoSeleccionado.Stock unid.</div>
                     <div><strong>Estado:</strong> @GetEstadoTexto(productoSeleccionado)</div>
-                    <div><strong>Promo:</strong> @(productoSeleccionado.EnPromocion ? "Sí" : "No")</div>
+                    <div><strong>Promo:</strong> @(productoSeleccionado.EnPromocion ? "Sí­" : "No")</div>
                 </div>
 
                 <div class="admin-modal-actions" style="justify-content:flex-end; margin-top: 22px;">
@@ -265,7 +231,7 @@
                     </div>
 
                     <div class="admin-form-group">
-                        <label>Categoría</label>
+                        <label>Categorí­a</label>
                         <input type="text" @bind-value="modeloFormulario.Categoria" required />
                     </div>
 
@@ -288,7 +254,7 @@
                         <label>En promoción</label>
                         <select @bind="modeloFormulario.EnPromocion">
                             <option value="false">No</option>
-                            <option value="true">Sí</option>
+                            <option value="true">Sí­</option>
                         </select>
                     </div>
 
@@ -311,7 +277,7 @@
             else if (modoModal == ModoModal.Reactivar)
             {
                 <p class="admin-modal-text" style="text-align:left;">
-                    ¿Deseas reactivar el producto <strong>@productoSeleccionado.Nombre</strong>?
+                    Â¿Deseas reactivar el producto <strong>@productoSeleccionado.Nombre</strong>?
                 </p>
 
                 <div class="admin-modal-actions" style="justify-content:flex-end;">
@@ -333,32 +299,33 @@
     private string busqueda
     {
         get => _busqueda;
-        set { _busqueda = value; paginaActual = 1; }
+        set { _busqueda = value; ResetearPaginacion(); }
     }
 
-    private string _categoriaSeleccionada = "Todas las categorías";
+    private string _categoriaSeleccionada = "Todas las categorí­as";
     private string categoriaSeleccionada
     {
         get => _categoriaSeleccionada;
-        set { _categoriaSeleccionada = value; paginaActual = 1; }
+        set { _categoriaSeleccionada = value; ResetearPaginacion(); }
     }
 
     private string _marcaSeleccionada = "Todas las marcas";
     private string marcaSeleccionada
     {
         get => _marcaSeleccionada;
-        set { _marcaSeleccionada = value; paginaActual = 1; }
+        set { _marcaSeleccionada = value; ResetearPaginacion(); }
     }
 
     private string _estadoSeleccionado = "Todos los estados";
     private string estadoSeleccionado
     {
         get => _estadoSeleccionado;
-        set { _estadoSeleccionado = value; paginaActual = 1; }
+        set { _estadoSeleccionado = value; ResetearPaginacion(); }
     }
 
-    private int paginaActual = 1;
-    private const int ProductosPorPagina = 6;
+    private readonly int[] opcionesPaginaProductos = new[] { 6, 10, 25, 50, 100 };
+    private PageQuery queryActual = new(1, 6);
+    private TablePage<ProductoAdmin> paginaProductos = new();
 
     private bool mostrarModal = false;
     private ProductoAdmin? productoSeleccionado;
@@ -368,17 +335,7 @@
 
     private enum ModoModal { Ver, Crear, Editar, Reactivar }
 
-    private List<ProductoAdmin> productos = new()
-    {
-        new ProductoAdmin { Codigo = "KB-001", Nombre = "Sérum vitamina C 30 ml", Categoria = "Skincare", Marca = "The Ordinary", PrecioBase = 45.00m, Stock = 38, EnPromocion = true,  Activo = true  },
-        new ProductoAdmin { Codigo = "KB-002", Nombre = "Base fluida larga duración", Categoria = "Maquillaje", Marca = "Maybelline",  PrecioBase = 62.00m, Stock = 0,  EnPromocion = false, Activo = true  },
-        new ProductoAdmin { Codigo = "KB-003", Nombre = "Mascarilla capilar nutritiva", Categoria = "Cabello",    Marca = "Pantene",     PrecioBase = 28.00m, Stock = 7,  EnPromocion = false, Activo = false },
-        new ProductoAdmin { Codigo = "KB-004", Nombre = "Delineador líquido negro", Categoria = "Maquillaje", Marca = "NYX",          PrecioBase = 35.00m, Stock = 21, EnPromocion = true,  Activo = true  },
-        new ProductoAdmin { Codigo = "KB-005", Nombre = "Crema hidratante diaria", Categoria = "Skincare", Marca = "CeraVe", PrecioBase = 59.90m, Stock = 9, EnPromocion = false, Activo = true },
-        new ProductoAdmin { Codigo = "KB-006", Nombre = "Protector solar SPF50", Categoria = "Skincare", Marca = "La Roche-Posay", PrecioBase = 79.00m, Stock = 12, EnPromocion = true, Activo = true },
-        new ProductoAdmin { Codigo = "KB-007", Nombre = "Shampoo anti-frizz", Categoria = "Cabello", Marca = "Tresemmé", PrecioBase = 22.50m, Stock = 3, EnPromocion = false, Activo = true },
-        new ProductoAdmin { Codigo = "KB-008", Nombre = "Labial mate", Categoria = "Maquillaje", Marca = "MAC", PrecioBase = 89.00m, Stock = 15, EnPromocion = true, Activo = true }
-    };
+    private List<ProductoAdmin> productos = new();
 
     private class ProductoAdmin
     {
@@ -410,10 +367,13 @@
         {
             var productosApi = await ProductoService.ObtenerTodosApiAsync();
             productos = productosApi.Select(MapearProductoAdmin).ToList();
+            ActualizarPaginaProductos();
         }
         catch (Exception ex)
         {
+            productos = new();
             mensajeError = $"No se pudieron cargar los productos: {ex.Message}";
+            ActualizarPaginaProductos();
         }
         finally
         {
@@ -428,9 +388,9 @@
             Id = producto.Id,
             Codigo = $"KB-{producto.Id:000}",
             Nombre = producto.Nombre,
-            Categoria = producto.Subcategoria?.Categoria?.Descripcion ?? "",
-            Subcategoria = producto.Subcategoria?.Descripcion ?? "",
-            Marca = producto.Marca?.Descripcion ?? "",
+            Categoria = TextoCatalogo(producto.Subcategoria?.Categoria?.Descripcion, "Sin categoria"),
+            Subcategoria = TextoCatalogo(producto.Subcategoria?.Descripcion, "Sin subcategoria"),
+            Marca = TextoCatalogo(producto.Marca?.Descripcion, "Sin marca"),
             MarcaId = producto.Marca?.Id ?? 0,
             SubcategoriaId = producto.Subcategoria?.Id ?? 0,
             PrecioBase = producto.PrecioBase,
@@ -438,6 +398,11 @@
             EnPromocion = producto.Promocion,
             Activo = producto.Activo && producto.Disponible
         };
+    }
+
+    private static string TextoCatalogo(string? valor, string textoPorDefecto)
+    {
+        return string.IsNullOrWhiteSpace(valor) ? textoPorDefecto : valor.Trim();
     }
 
     // KPIs
@@ -461,26 +426,6 @@
             .OrderBy(p => p.Codigo)
             .ToList();
 
-    private List<ProductoAdmin> ProductosPaginados =>
-        ProductosFiltrados
-            .Skip((paginaActual - 1) * ProductosPorPagina)
-            .Take(ProductosPorPagina)
-            .ToList();
-
-    private int TotalPaginas =>
-        Math.Max(1, (int)Math.Ceiling(ProductosFiltrados.Count / (double)ProductosPorPagina));
-
-    private string RangoMostrado
-    {
-        get
-        {
-            if (ProductosFiltrados.Count == 0) return "0-0";
-            var inicio = ((paginaActual - 1) * ProductosPorPagina) + 1;
-            var fin = Math.Min(paginaActual * ProductosPorPagina, ProductosFiltrados.Count);
-            return $"{inicio}-{fin}";
-        }
-    }
-
     private bool CoincideBusqueda(ProductoAdmin p)
     {
         if (string.IsNullOrWhiteSpace(busqueda)) return true;
@@ -492,7 +437,7 @@
     }
 
     private bool CoincideCategoria(ProductoAdmin p) =>
-        categoriaSeleccionada == "Todas las categorías" || p.Categoria == categoriaSeleccionada;
+        categoriaSeleccionada == "Todas las categorí­as" || p.Categoria == categoriaSeleccionada;
 
     private bool CoincideMarca(ProductoAdmin p) =>
         marcaSeleccionada == "Todas las marcas" || p.Marca == marcaSeleccionada;
@@ -516,19 +461,32 @@
         categoriaSeleccionada = "Todas las categorías";
         marcaSeleccionada = "Todas las marcas";
         estadoSeleccionado = "Todos los estados";
-        paginaActual = 1;
+        ResetearPaginacion();
     }
 
-    private void CambiarPagina(int pagina) => paginaActual = pagina;
-
-    private void PaginaAnterior()
+    private void OnPageChanged(PageQuery query)
     {
-        if (paginaActual > 1) paginaActual--;
+        queryActual = query;
+        ActualizarPaginaProductos();
     }
 
-    private void PaginaSiguiente()
+    private void ResetearPaginacion()
     {
-        if (paginaActual < TotalPaginas) paginaActual++;
+        queryActual = new PageQuery(1, queryActual.PageSize);
+        ActualizarPaginaProductos();
+    }
+
+    private void ActualizarPaginaProductos()
+    {
+        var filtrados = ProductosFiltrados;
+        paginaProductos = new TablePage<ProductoAdmin>
+        {
+            Items = filtrados
+                .Skip((queryActual.Page - 1) * queryActual.PageSize)
+                .Take(queryActual.PageSize)
+                .ToList(),
+            TotalRecords = filtrados.Count
+        };
     }
 
     private void AbrirCrear()
@@ -663,7 +621,7 @@
         }
 
         mensajeError = null;
-        paginaActual = 1;
+        ResetearPaginacion();
         CerrarModal();
     }
 
@@ -689,6 +647,7 @@
             {
                 productos[index] = MapearProductoAdmin(actualizado);
             }
+            ActualizarPaginaProductos();
         }
         CerrarModal();
     }
