@@ -252,14 +252,14 @@
 
         <div class="summary-row">
             <span>Subtotal</span>
-            <strong>S/ @CartService.Total.ToString("0.00")</strong>
+            <strong>S/ @((CartService.Total + CartService.DescuentoTotal).ToString("0.00"))</strong>
         </div>
 
         @if (CartService.DescuentoTotal > 0)
         {
             <div class="summary-row discount">
                 <span>Descuento por volumen</span>
-                <strong>S/ @CartService.DescuentoTotal.ToString("0.00")</strong>
+                <strong>- S/ @CartService.DescuentoTotal.ToString("0.00")</strong>
             </div>
         }
 
@@ -660,9 +660,7 @@
 
     private async Task ConfirmarPedido()
     {
-        if (!ValidarTodo())
-            return;
-
+        if (!ValidarTodo()) return;
         if (!AuthService.UsuarioId.HasValue)
         {
             Navigation.NavigateTo("/login?returnUrl=/checkout");
@@ -673,11 +671,9 @@
         errorValidacionCompra = "";
         StateHasChanged();
 
-        await Task.Delay(2500); // Simula demora de validación
+        await Task.Delay(2500);
 
         bool compraValidada = random.Next(1, 101) <= 90;
-        // 90% aprobada, 10% rechazada
-
         if (!compraValidada)
         {
             validandoCompra = false;
@@ -685,38 +681,39 @@
             return;
         }
 
-        var pedido = new Pedido
+        // Construir items con precio con escala
+        var items = new List<PedidoService.PedidoCheckoutDto.ItemCarritoDto>();
+        foreach (var item in CartService.Productos.Where(i => i.Producto != null))
         {
-            Fecha = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-            Estado = "REGISTRADO",
-            Subtotal = (double)CartService.Total,
-            Total = (double)TotalFinal,
-
-            Cliente = new Usuario
+            var precio = await CartService.ObtenerPrecioUnitarioAsync(item);
+            items.Add(new PedidoService.PedidoCheckoutDto.ItemCarritoDto
             {
-                Id = AuthService.UsuarioId.Value
-            },
+                ProductoId = item.Producto!.Id,
+                Cantidad = item.Cantidad,
+                PrecioAplicado = precio
+            });
+        }
 
-            Detalles = CartService.Productos
-                .Where(item => item.Producto != null)
-                .Select(item => new DetallePedido
-                {
-                    Cantidad = item.Cantidad,
-                    PrecioAplicado = (double)item.Producto!.PrecioBase,
-                    Producto = new ProductoRef
-                    {
-                        Id = item.Producto.Id
-                    }
-                })
-                .ToList()
+        var request = new PedidoService.PedidoCheckoutDto
+        {
+            UsuarioId = AuthService.UsuarioId.Value,
+            DireccionId = direccionSeleccionada?.Id ?? 0,
+            CuponId = cuponAplicado?.Id,
+            CostoEnvio = costoEnvio,
+            DescuentoCupon = descuentoCupon,
+            MetodoPago = metodoPago,
+            TipoComprobante = tipoComprobante,
+            Dni = dni,
+            Ruc = ruc,
+            RazonSocial = razonSocial,
+            DireccionFiscal = direccionFiscal,
+            Items = items
         };
 
-        await PedidoService.CrearAsync(pedido);
-
+        await PedidoService.CheckoutAsync(request);
         await CartService.VaciarCarritoAsync(AuthService.UsuarioId.Value);
 
         validandoCompra = false;
-
         Navigation.NavigateTo("/order-confirmed");
     }
 

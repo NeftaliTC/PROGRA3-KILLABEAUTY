@@ -104,6 +104,65 @@ namespace BlazorAppKillaBeauty.Services
                     : body);
         }
 
+        public async Task<PedidoAdminDto> CheckoutAsync(PedidoCheckoutDto request)
+        {
+            using var response = await http.PostAsJsonAsync("pedido/checkout", request, jsonOptions);
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<PedidoAdminDto>(jsonOptions)
+                   ?? throw new InvalidOperationException("No se recibio respuesta del checkout.");
+        }
+
+        public class PedidoCheckoutDto
+        {
+            [JsonPropertyName("usuarioId")]
+            public int UsuarioId { get; set; }
+
+            [JsonPropertyName("direccionId")]
+            public int DireccionId { get; set; }
+
+            [JsonPropertyName("cuponId")]
+            public int? CuponId { get; set; }
+
+            [JsonPropertyName("costoEnvio")]
+            public decimal CostoEnvio { get; set; }
+
+            [JsonPropertyName("descuentoCupon")]
+            public decimal DescuentoCupon { get; set; }
+
+            [JsonPropertyName("metodoPago")]
+            public string MetodoPago { get; set; } = "";
+
+            [JsonPropertyName("tipoComprobante")]
+            public string TipoComprobante { get; set; } = "";
+
+            [JsonPropertyName("dni")]
+            public string Dni { get; set; } = "";
+
+            [JsonPropertyName("ruc")]
+            public string Ruc { get; set; } = "";
+
+            [JsonPropertyName("razonSocial")]
+            public string RazonSocial { get; set; } = "";
+
+            [JsonPropertyName("direccionFiscal")]
+            public string DireccionFiscal { get; set; } = "";
+
+            [JsonPropertyName("items")]
+            public List<ItemCarritoDto> Items { get; set; } = new();
+
+            public class ItemCarritoDto
+            {
+                [JsonPropertyName("productoId")]
+                public int ProductoId { get; set; }
+
+                [JsonPropertyName("cantidad")]
+                public int Cantidad { get; set; }
+
+                [JsonPropertyName("precioAplicado")]
+                public decimal PrecioAplicado { get; set; }
+            }
+        }
+
         public class PedidoAdminDto
         {
             [JsonPropertyName("id")]
@@ -243,10 +302,10 @@ namespace BlazorAppKillaBeauty.Services
             [JsonPropertyName("cantidad")]
             public int Cantidad { get; set; }
 
-            [JsonPropertyName("precioUnitario")]
+            [JsonPropertyName("precioUnitarioOrig")]
             public decimal PrecioUnitario { get; set; }
 
-            [JsonPropertyName("precioUnitarioDescuento")]
+            [JsonPropertyName("precioUnitarioDesc")]
             public decimal PrecioUnitarioDescuento { get; set; }
 
             [JsonPropertyName("ahorroVolumen")]

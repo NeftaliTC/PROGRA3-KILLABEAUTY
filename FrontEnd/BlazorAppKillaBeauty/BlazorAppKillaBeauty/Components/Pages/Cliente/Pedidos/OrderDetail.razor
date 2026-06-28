@@ -134,11 +134,11 @@
                     <div class="summary-rows">
                         <div class="summary-line">
                             <span>Subtotal</span>
-                            <span>S/ @((pedidoActual.Total - pedidoActual.DescuentoCupon - pedidoActual.CostoEnvio).ToString("F2"))</span>
+                            <span>S/ @((pedidoActual.Total + pedidoActual.DescuentoCupon - pedidoActual.CostoEnvio).ToString("F2"))</span>
                         </div>
                         <div class="summary-line">
                             <span>Envío</span>
-                            <span>S/ @pedidoActual.CostoEnvio.ToString("F2")</span>
+                            <span>@(pedidoActual.CostoEnvio > 0 ? "S/ " + pedidoActual.CostoEnvio.ToString("F2") : "Gratis")</span>
                         </div>
                         @if (pedidoActual.DescuentoCupon > 0)
                         {
@@ -181,25 +181,32 @@
                 <div class="detail-card shipping-card">
                     <h2>Método de entrega</h2>
                     <div class="info-icon-block">
-                        <i class="bi bi-box-seam icon-pink"></i>
+                        <i class="bi @(!string.IsNullOrEmpty(pedidoActual.NumeroSeguimiento) ? "bi-box-seam" : "bi-bag") icon-pink"></i>
                         <div class="block-text">
-                            <h3>Envío a domicilio</h3>
-                            <p class="courier-highlight">Operado por Olva Courier</p>
                             @if (!string.IsNullOrEmpty(pedidoActual.NumeroSeguimiento))
                             {
+                                <h3>Envío a domicilio</h3>
+                                @if (!string.IsNullOrEmpty(pedidoActual.Courier))
+                                {
+                                    <p class="courier-highlight">Operado por @pedidoActual.Courier</p>
+                                }
                                 <div class="tracking-container">
                                     <span class="tracking-label">N° de Seguimiento:</span>
                                     <strong class="tracking-number">@pedidoActual.NumeroSeguimiento</strong>
-                                    <a href="https://www.olvacourier.com/" target="_blank" class="tracking-link">
-                                        Rastrear en la web del courier
-                                    </a>
                                 </div>
+                                <p>@pedidoActual.Direccion</p>
+                                <p>@pedidoActual.Ubicacion</p>
+                                @if (!string.IsNullOrEmpty(pedidoActual.Referencia))
+                                {
+                                    <p class="reference-text">Ref: @pedidoActual.Referencia</p>
+                                }
                             }
-                            <p>@pedidoActual.Direccion</p>
-                            @*<p>@pedidoActual.DireccionLinea2</p>*@
-                            @if (!string.IsNullOrEmpty(pedidoActual.Referencia))
+                            else
                             {
-                                <p class="reference-text">Ref: @pedidoActual.Referencia</p>
+                                <h3>Recojo en tienda</h3>
+                                <p>Killa Beauty Store</p>
+                                <p>Av. Javier Prado Este 4200, San Borja, Lima</p>
+                                <p class="reference-text">Ref: Frente al Centro Comercial La Rambla</p>
                             }
                         </div>
                     </div>
@@ -209,9 +216,10 @@
                 <div class="detail-card payment-card">
                     <h2>Medio de pago</h2>
                     <div class="info-icon-block">
-                        <i class="bi bi-credit-card-2-front icon-pink"></i>
+                        <i class="bi @(pedidoActual.MetodoPago == "TARJETA" ? "bi-credit-card-2-front" : "bi-phone") icon-pink"></i>
                         <div class="block-text">
-                            <h3>@pedidoActual.MetodoPago</h3>
+                            <h3>@(pedidoActual.MetodoPago == "TARJETA" ? "Tarjeta de Crédito/Débito" : pedidoActual.MetodoPago == "YAPE" ? "Yape / Plin" : pedidoActual.MetodoPago)</h3>
+                            <p>Pago procesado correctamente</p>
                         </div>
                     </div>
                 </div>
@@ -237,6 +245,7 @@
     {
         int currentStepWeight = estadoBackend.ToUpperInvariant() switch
         {
+            "PENDIENTE" => 1,
             "PAGADO" => 1,
             "EN_PREPARACION" => 2,
             "ENVIADO" => 3,
