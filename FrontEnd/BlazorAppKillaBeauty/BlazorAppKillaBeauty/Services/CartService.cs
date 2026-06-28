@@ -194,7 +194,8 @@ namespace BlazorAppKillaBeauty.Services
                 Id = producto.Id,
                 Nombre = producto.Nombre,
                 Imagen = producto.ImagenPrincipal,
-                PrecioBase = producto.PrecioBase
+                PrecioBase = producto.PrecioBase,
+                Stock = producto.Stock 
             };
         }
 

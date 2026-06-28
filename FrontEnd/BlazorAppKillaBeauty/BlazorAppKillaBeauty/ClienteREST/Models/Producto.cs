@@ -36,6 +36,10 @@ namespace BlazorAppKillaBeauty.ClienteREST.Models
 
         [JsonPropertyName("esPopular")]
         public bool EsPopular { get; set; }
+
+        [JsonPropertyName("stock")]
+        public int Stock { get; set; }
+
     }
 
     public class ProductoApi

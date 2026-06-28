@@ -86,9 +86,15 @@
                             }
                         </div>
 
+                        
                         <div class="cart-actions">
                             <button @onclick="async () =>
                                     {
+                                        if (producto != null && erroresStock.ContainsKey(producto.Id))
+                                        {
+                                            erroresStock.Remove(producto.Id);
+                                        }
+                                        
                                         if (detalle.Id == 0)
                                             await CartService.DisminuirCantidadProductoLocalAsync(producto!.Id);
                                         else
@@ -101,17 +107,21 @@
 
                             <span>@detalle.Cantidad</span>
 
-                            <button @onclick="async () =>
-                                    {
-                                        if (detalle.Id == 0)
-                                            await CartService.AumentarCantidadProductoLocalAsync(producto!.Id);
-                                        else
-                                            await CartService.AumentarCantidadAsync(detalle.Id);
-                                        await ActualizarInfoEscalas();
-                                    }">
+                            <button @onclick="async () => AumentarCantidad(detalle)">
                                 +
                             </button>
+
+                                 @*  mensaje de error de stock debajo *@
+                                 @if (producto != null && erroresStock.ContainsKey(producto.Id))
+                                    {
+                                    <div style="color: #d84b6b; font-size: 0.85em; margin-top: 8px; font-weight: 500;">
+                                        <i class="bi bi-exclamation-triangle"></i> @erroresStock[producto.Id]
+                                     </div>
+                                    }
                         </div>
+
+                   
+
 
                         <div class="cart-subtotal">
                             <small>Subtotal</small>
@@ -195,6 +205,8 @@
 
     private string mensajeError = "";
 
+    private Dictionary<int, string> erroresStock = new Dictionary<int, string>();
+
     private void ProcederPago()
     {
         Navigation.NavigateTo("/checkout");
@@ -227,4 +239,28 @@
     {
         await ActualizarInfoEscalas();
     }
+
+    private async Task AumentarCantidad(CartItem detalle)
+    {
+        var producto = detalle.Producto;
+
+        if (producto == null)
+            return;
+
+        if (detalle.Cantidad + 1 > producto.Stock)
+        {
+            erroresStock[producto.Id] = "Solo quedan " + producto.Stock + " unidades disponibles.";
+            return;
+        }
+
+        erroresStock.Remove(producto.Id);
+
+        if (detalle.Id == 0)
+            await CartService.AumentarCantidadProductoLocalAsync(producto.Id);
+        else
+            await CartService.AumentarCantidadAsync(detalle.Id);
+
+        await ActualizarInfoEscalas();
+    }
+
 }
