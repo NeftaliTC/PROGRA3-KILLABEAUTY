@@ -12,4 +12,6 @@ public interface UsuarioBL {
     Usuario load(int id) throws BusinessLogicException;
     Usuario loadByEmail(String email) throws BusinessLogicException;
     List<Usuario> listByTipoUsuario(int idTipoUsuario) throws BusinessLogicException;
+    Usuario cambiarContrasena(int id, String contrasenaActual, String nuevaContrasena)throws BusinessLogicException;
+    Usuario autenticar(Usuario usuario) throws BusinessLogicException;
 }
