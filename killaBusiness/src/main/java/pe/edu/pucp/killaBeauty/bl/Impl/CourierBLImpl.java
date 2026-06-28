@@ -8,6 +8,7 @@ import pe.edu.pucp.killaDAO.CourierDAO;
 import pe.edu.pucp.killaDAO.Impl.CourierDAOImpl;
 import pe.edu.pucp.killaBeauty.bl.utils.FormatHelper;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class CourierBLImpl implements CourierBL {
@@ -114,6 +115,15 @@ public class CourierBLImpl implements CourierBL {
             throw new BusinessLogicException("Error al eliminar: " + e.getMessage());
         } finally {
             TransactionContext.close();
+        }
+    }
+
+    @Override
+    public Courier buscarAsignado() throws BusinessLogicException {
+        try {
+            return courierDAO.buscarAsignado();
+        } catch (SQLException e) {
+            throw new BusinessLogicException(e);
         }
     }
 }

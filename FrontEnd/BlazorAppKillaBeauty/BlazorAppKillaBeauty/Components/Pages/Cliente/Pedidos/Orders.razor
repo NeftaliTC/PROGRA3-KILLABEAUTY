@@ -2,6 +2,8 @@
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
 @inject CartService CartService
+@inject PedidoService PedidoService
+@inject AuthService AuthService
 
 <Navbar CantidadCarrito="@CartService.CantidadTotal" />
 
@@ -11,7 +13,13 @@
         <p>@pedidos.Count pedido(s) realizado(s)</p>
     </section>
 
-    @if (pedidos.Count == 0)
+    @if (cargando)
+    {
+        <div class="loading-state">
+            <p>Cargando tus pedidos...</p>
+        </div>
+    }
+    else if (pedidos.Count == 0)
     {
         <div class="empty-state-card">
             <i class="bi bi-box"></i>
@@ -26,17 +34,22 @@
             {
                 <div class="order-card">
                     <div class="card-header">
-                        <span class="date">@p.Fecha</span>
-                        <span class="status-badge @p.ClaseEstado">@p.Estado</span>
+                        <span class="date">@FormatearFecha(p.Fecha)</span>
+                        <span class="status-badge @GetStatusClass(p.Estado)">@GetStatusTexto(p.Estado)</span>
                     </div>
                     
-                    <h3>Pedido @p.Id</h3>
+                    <h3>Pedido KIL-@p.Id.ToString("D8")</h3>
                     
                     <div class="product-preview">
                         @* Mostramos máximo 3 imágenes *@
                         @foreach (var prod in p.Productos.Take(3))
                         {
-                            <img src="@prod.Imagen" alt="Producto" class="thumb" />
+                            @*<img src="@prod.Imagen" alt="Producto" class="thumb" />*@
+                            <div class="thumb-placeholder">
+
+                                <i class="bi bi-image"></i>
+
+                            </div>
                         }
     
                         @* Si hay más de 3, mostramos el contador +N *@
@@ -48,8 +61,8 @@
 
                     <div class="order-footer">
                         <div class="order-info-group">
-                            <span class="item-count">@p.TotalArticulos artículo(s)</span>
-                            <span class="total-price">S/ @p.TotalPrecio.ToString("F2")</span>
+                            <span class="item-count">@p.Productos.Count artículo(s)</span>
+                            <span class="total-price">S/ @p.Total.ToString("F2")</span>
                         </div>
     
                         <a href="/orders/order-detail/@p.Id" class="btn-outline-order-detail">Ver detalle ></a>
@@ -61,69 +74,46 @@
 </div>
 
 @code {
+    private List<PedidoService.PedidoAdminDto> pedidos = new();
 
-    private string GetStatusClass(string activo) => activo switch
-    {
-        "Entregado" => "status-green",
-        "En camino" => "status-purple",
-        "En preparación" => "status-orange",
-        "Pedido confirmado" => "status-yellow",
-        _ => "status-default"
-    };
-    
-    public class Pedido
-    {
-        public string Id { get; set; }
-        public string Fecha { get; set; }
-        public string Estado { get; set; }
-        public string ClaseEstado { get; set; }
-        public int TotalArticulos { get; set; }
-        public List<Producto> Productos { get; set; } = new();
-        public decimal TotalPrecio { get; set; }
-    }
+    private bool cargando = true;
 
-    public class Producto
+    protected override async Task OnInitializedAsync()
     {
-        public string Imagen { get; set; }
-    }
-    
-    private List<Pedido> pedidos = new()
-    {
-        new Pedido {
-            Id = "KIL-202610081",
-            Fecha = "01 de junio del 2026",
-            Estado = "En preparación",
-            ClaseEstado = "status-orange",
-            TotalArticulos = 7, // 1 Sérum + 6 Cremas
-            TotalPrecio = 459.30m, // (89.90 + (59.90*6)) - 60.00 ahorro
-            Productos = new List<Producto> {
-                new(){Imagen="Images/Serum.jpg"},
-                new(){Imagen="Images/Cerave.jpg"}
-            }
-        },
-        new Pedido {
-            Id = "KIL-202605002",
-            Fecha = "25 de mayo del 2026",
-            Estado = "En camino",
-            ClaseEstado = "status-purple",
-            TotalArticulos = 2,
-            TotalPrecio = 73.20m, // (40.00 + 38.20) - 15.00 de descuento
-            Productos = new List<Producto> {
-                new(){Imagen="Images/LabialPeripera.jpg"},
-                new(){Imagen="Images/Mascara.jpg"}
-            }
-        },
-        new Pedido {
-            Id = "KIL-202626589",
-            Fecha = "05 de mayo del 2026",
-            Estado = "Entregado",
-            ClaseEstado = "status-green",
-            TotalArticulos = 2,
-            TotalPrecio = 132.00m,
-            Productos = new List<Producto> {
-                new(){Imagen="Images/Serum.jpg"}
-            }
+        if (AuthService.EstaLogueado && AuthService.UsuarioId.HasValue)
+        {
+            pedidos = await PedidoService.ObtenerPorClienteAsync(AuthService.UsuarioId.Value);
         }
-        
+        cargando = false;
+    }
+
+    private string GetStatusClass(string estado) => estado.ToUpperInvariant() switch
+    {
+        "PENDIENTE" => "status-gray",
+        "PAGADO" => "status-gray",
+        "EN_PREPARACION" => "status-yellow",
+        "ENVIADO" => "status-purple",
+        "ENTREGADO" => "status-green",
+        "CANCELADO" => "status-red",
+        _ => "status-gray"
     };
+
+    private string GetStatusTexto(string estado) => estado.ToUpperInvariant() switch
+    {
+        "PENDIENTE" => "Confirmado",
+        "PAGADO" => "Confirmado",
+        "EN_PREPARACION" => "En preparación",
+        "ENVIADO" => "En camino",
+        "ENTREGADO" => "Entregado",
+        "CANCELADO" => "Cancelado",
+        _ => estado
+    };
+
+    private string FormatearFecha(string fecha)
+    {
+        if (DateTime.TryParse(fecha, out var dt))
+            return dt.ToString("dd 'de' MMMM 'del' yyyy",
+                new System.Globalization.CultureInfo("es-PE"));
+        return fecha;
+    }
 }

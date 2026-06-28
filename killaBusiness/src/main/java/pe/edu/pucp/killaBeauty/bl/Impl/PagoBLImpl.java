@@ -52,6 +52,16 @@ public class PagoBLImpl implements PagoBL {
         }
     }
 
+    @Override
+    public Pago obtenerPorIdPedido(Integer idPedido) throws BusinessLogicException{
+        try {
+            return pagoDAO.buscarPorIdPedido(idPedido);
+        } catch (Exception ex) {
+            System.err.println("Error al obtener pago: " + ex.getMessage());
+            return null;
+        }
+    }
+
     private void validarPago(Pago pago) throws BusinessLogicException {
         if (pago == null) throw new BusinessLogicException("El pago no puede ser nulo.");
         if (pago.getMontoPagado() <= 0) throw new BusinessLogicException("El monto pagado debe ser mayor a cero.");

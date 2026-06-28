@@ -11,4 +11,5 @@ public interface EnvioBL {
     void cancel(Envio e) throws BusinessLogicException;
     Envio load(Integer id) throws BusinessLogicException;
     List<Envio> listAll() throws BusinessLogicException;
+    Envio obtenerPorIdPedido(Integer idPedido) throws BusinessLogicException;
 }

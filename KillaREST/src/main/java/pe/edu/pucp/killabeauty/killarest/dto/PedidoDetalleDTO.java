@@ -1,6 +1,8 @@
 package pe.edu.pucp.killabeauty.killarest.dto;
 
-import pe.edu.pucp.killaBeauty.killaModelo.Pedido;
+import pe.edu.pucp.killaBeauty.killaModelo.*;
+import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.TipoDescuento;
+
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,9 +25,19 @@ public class PedidoDetalleDTO {
     private String provincia;
     private String departamento;
     private Integer cuponId;
+    private double descuentoCupon;
+    private String numeroSeguimiento;
+    private double costoEnvio;
+    private String courier;
+    private String metodoPago;
+    private String tipoComprobante;
+    private String serieComprobante;
+    private String numeroCorrelativo;
+    private String documentoIdentidad;
+    private String razonSocial;
     private List<DetalleItemDTO> productos;
 
-    public PedidoDetalleDTO(Pedido p) {
+    public PedidoDetalleDTO(Pedido p, Envio envio, Pago pago, ComprobantePago comprobante) {
         this.id = p.getId();
         this.fecha = p.getFechaPedido() != null
                 ? new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(p.getFechaPedido())
@@ -40,8 +52,6 @@ public class PedidoDetalleDTO {
             this.cliente = nombreCompleto(p);
             this.correo = p.getCliente().getCorreoElectronico();
             this.contacto = p.getCliente().getTelefono();
-        } else {
-            this.cliente = "Sin cliente";
         }
 
         if (p.getDireccionEnvio() != null) {
@@ -55,12 +65,47 @@ public class PedidoDetalleDTO {
 
         if (p.getCupon() != null && p.getCupon().getId() > 0) {
             this.cuponId = p.getCupon().getId();
+            if (p.getCupon().getTipoDescuento() == TipoDescuento.PORCENTAJE) {
+                double dscto = p.getSubtotal() * p.getCupon().getValorDescuento() / 100;
+                // Respeta el maximo si existe
+                if (p.getCupon().getMontoMaximoDescuento() != null && dscto > p.getCupon().getMontoMaximoDescuento()) {
+                    dscto = p.getCupon().getMontoMaximoDescuento();
+                }
+                this.descuentoCupon = dscto;
+            } else {
+                this.descuentoCupon = p.getCupon().getValorDescuento();
+            }
         }
 
-        if (p.getDetalles() != null) {
+        if (p.getDetalles() != null)
             this.productos = p.getDetalles().stream()
                     .map(DetalleItemDTO::new)
                     .collect(Collectors.toList());
+
+        // Envio
+        if (envio != null) {
+            this.numeroSeguimiento = envio.getNumeroSeguimiento();
+            this.costoEnvio = envio.getCostoEnvio();
+            this.courier = envio.getCourier() != null ? envio.getCourier().getNombre() : "";
+        }
+
+        // Pago
+        if (pago != null)
+            this.metodoPago = pago.getMetodoPago() != null ? pago.getMetodoPago().getNombre() : "";
+
+        // Comprobante
+        if (comprobante != null) {
+            this.tipoComprobante = comprobante.getTipoComprobante() != null
+                    ? comprobante.getTipoComprobante().getnombre() : "";
+            this.serieComprobante = comprobante.getSerie();
+            this.numeroCorrelativo = comprobante.getNumeroCorrelativo();
+
+            if (comprobante instanceof Boleta) {
+                this.documentoIdentidad = ((Boleta) comprobante).getDni();
+            } else if (comprobante instanceof Factura) {
+                this.documentoIdentidad = ((Factura) comprobante).getRuc();
+                this.razonSocial = ((Factura) comprobante).getRazonSocial();
+            }
         }
     }
 
@@ -113,6 +158,26 @@ public class PedidoDetalleDTO {
     public void setDepartamento(String departamento) { this.departamento = departamento; }
     public Integer getCuponId() { return cuponId; }
     public void setCuponId(Integer cuponId) { this.cuponId = cuponId; }
+    public double getDescuentoCupon() { return descuentoCupon; }
+    public void setDescuentoCupon(double descuentoCupon) { this.descuentoCupon = descuentoCupon; }
+    public String getNumeroSeguimiento() { return numeroSeguimiento; }
+    public void setNumeroSeguimiento(String numeroSeguimiento) { this.numeroSeguimiento = numeroSeguimiento; }
+    public double getCostoEnvio() { return costoEnvio; }
+    public void setCostoEnvio(double costoEnvio) { this.costoEnvio = costoEnvio; }
+    public String getCourier() { return courier; }
+    public void setCourier(String courier) { this.courier = courier; }
+    public String getMetodoPago() { return metodoPago; }
+    public void setMetodoPago(String metodoPago) { this.metodoPago = metodoPago; }
+    public String getTipoComprobante() { return tipoComprobante; }
+    public void setTipoComprobante(String tipoComprobante) { this.tipoComprobante = tipoComprobante; }
+    public String getSerieComprobante() { return serieComprobante; }
+    public void setSerieComprobante(String serieComprobante) { this.serieComprobante = serieComprobante; }
+    public String getNumeroCorrelativo() { return numeroCorrelativo; }
+    public void setNumeroCorrelativo(String numeroCorrelativo) { this.numeroCorrelativo = numeroCorrelativo; }
+    public String getDocumentoIdentidad() { return documentoIdentidad; }
+    public void setDocumentoIdentidad(String documentoIdentidad) { this.documentoIdentidad = documentoIdentidad; }
+    public String getRazonSocial() { return razonSocial; }
+    public void setRazonSocial(String razonSocial) { this.razonSocial = razonSocial; }
     public List<DetalleItemDTO> getProductos() { return productos; }
     public void setProductos(List<DetalleItemDTO> productos) { this.productos = productos; }
 }

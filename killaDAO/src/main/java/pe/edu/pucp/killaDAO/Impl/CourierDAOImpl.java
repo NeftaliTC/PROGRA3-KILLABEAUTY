@@ -145,4 +145,15 @@ public class CourierDAOImpl implements CourierDAO {
         }
         return false;
     }
+
+    @Override
+    public Courier buscarAsignado() throws SQLException {
+        String sql = "SELECT id_courier, nombre, ruc, telefono, activo, correo, es_asignado FROM Courier WHERE es_asignado = 1 AND activo = 1";
+        try (Connection con = DBManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return mapearCourier(rs);
+        }
+        return null;
+    }
 }

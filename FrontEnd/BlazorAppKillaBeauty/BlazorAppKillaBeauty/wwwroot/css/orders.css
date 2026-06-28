@@ -80,6 +80,21 @@
     color: #1e7e34;
 }
 
+.status-yellow {
+    background: #ffe69c;
+    color: #6d4c00;
+}
+
+.status-gray {
+    background: #ced4da;
+    color: #2b2d2f;
+}
+
+.status-red {
+    background: #f1aeb5;
+    color: #58151c;
+}
+
 .status-purple {
     background: #e1d5f7;
     color: #4b2c8a;

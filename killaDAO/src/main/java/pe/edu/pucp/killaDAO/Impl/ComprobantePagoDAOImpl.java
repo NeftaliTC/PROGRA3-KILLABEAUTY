@@ -30,6 +30,59 @@ public class ComprobantePagoDAOImpl implements ComprobantePagoDAO {
     }
 
     @Override
+    public ComprobantePago buscarPorIdPago(Integer idPago) throws SQLException {
+        String sql = """
+            SELECT cp.id_comprobante, cp.fecha_emision, cp.serie, cp.numero_correlativo,
+                   cp.id_pago, cp.id_tipo_comprobante,
+                   b.dni,
+                   f.ruc, f.razon_social, f.direccion_fiscal
+            FROM ComprobantePago cp
+            LEFT JOIN Boleta b ON cp.id_comprobante = b.id_comprobante
+            LEFT JOIN Factura f ON cp.id_comprobante = f.id_comprobante
+            WHERE cp.id_pago = ?
+            """;
+        try (Connection con = DBManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idPago);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String dni = rs.getString("dni");
+                    String ruc = rs.getString("ruc");
+
+                    if (dni != null) {
+                        Boleta b = new Boleta();
+                        b.setIdComprobante(rs.getInt("id_comprobante"));
+                        b.setFechaEmision(rs.getTimestamp("fecha_emision"));
+                        b.setSerie(rs.getString("serie"));
+                        b.setNumeroCorrelativo(rs.getString("numero_correlativo"));
+                        b.setTipoComprobante(TipoComprobante.getById(rs.getInt("id_tipo_comprobante")));
+                        Pago pago = new Pago();
+                        pago.setIdPago(rs.getInt("id_pago"));
+                        b.setPago(pago);
+                        b.setDni(dni);
+                        return b;
+                    } else if (ruc != null) {
+                        Factura f = new Factura();
+                        f.setIdComprobante(rs.getInt("id_comprobante"));
+                        f.setFechaEmision(rs.getTimestamp("fecha_emision"));
+                        f.setSerie(rs.getString("serie"));
+                        f.setNumeroCorrelativo(rs.getString("numero_correlativo"));
+                        f.setTipoComprobante(TipoComprobante.getById(rs.getInt("id_tipo_comprobante")));
+                        Pago pago = new Pago();
+                        pago.setIdPago(rs.getInt("id_pago"));
+                        f.setPago(pago);
+                        f.setRuc(ruc);
+                        f.setRazonSocial(rs.getString("razon_social"));
+                        f.setDireccionFiscal(rs.getString("direccion_fiscal"));
+                        return f;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
     public ComprobantePago load(Integer id) throws SQLException {
         String sql = """
                 SELECT id_comprobante, fecha_emision, serie, numero_correlativo, id_pago, id_tipo_comprobante 

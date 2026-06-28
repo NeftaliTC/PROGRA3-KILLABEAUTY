@@ -20,6 +20,9 @@ public class PedidoBLImpl implements PedidoBL {
     private UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
     private DireccionDAO direccionDAO = new DireccionDAOImpl();
     private MarcaDAO marcaDAO = new MarcaDAOImpl();
+    private EnvioDAO envioDAO = new EnvioDAOImpl();
+    private PagoDAO pagoDAO = new PagoDAOImpl();
+    private ComprobantePagoDAO comprobanteDAO = new ComprobantePagoDAOImpl();
 
     @Override
     public Pedido create(Pedido pedido) throws BusinessLogicException {
@@ -44,7 +47,6 @@ public class PedidoBLImpl implements PedidoBL {
     @Override
     public Pedido createFromCart(Integer idCliente, Integer idDireccion, Integer idCupon, List<DetallePedido> detalles) throws BusinessLogicException {
         if (idCliente == null || idCliente <= 0) throw new BusinessLogicException("Debe indicar un cliente valido.");
-        if (idDireccion == null || idDireccion <= 0) throw new BusinessLogicException("Debe indicar una direccion de envio valida.");
         if (detalles == null || detalles.isEmpty()) throw new BusinessLogicException("El carrito no tiene productos para registrar.");
 
         Pedido pedido = new Pedido();
@@ -53,9 +55,11 @@ public class PedidoBLImpl implements PedidoBL {
         cliente.setId(idCliente);
         pedido.setCliente(cliente);
 
-        Direccion direccion = new Direccion();
-        direccion.setId(idDireccion);
-        pedido.setDireccionEnvio(direccion);
+        if (idDireccion != null && idDireccion > 0) {
+            Direccion direccion = new Direccion();
+            direccion.setId(idDireccion);
+            pedido.setDireccionEnvio(direccion);
+        }
 
         if (idCupon != null && idCupon > 0) {
             Cupon cupon = new Cupon();
@@ -142,9 +146,34 @@ public class PedidoBLImpl implements PedidoBL {
     @Override
     public List<Pedido> listAll() throws BusinessLogicException {
         try {
-            return completarPedidos(pedidoDAO.listAll());
+            return pedidoDAO.listAll();
         } catch (SQLException e) {
             throw new BusinessLogicException(e);
+        }
+    }
+
+    @Override
+    public List<Pedido> listByCliente(Integer idCliente) throws BusinessLogicException {
+        if (idCliente == null || idCliente <= 0)
+            throw new BusinessLogicException("Debe indicar un cliente valido.");
+        try {
+            return pedidoDAO.listByCliente(idCliente);
+        } catch (SQLException e) {
+            throw new BusinessLogicException(e);
+        }
+    }
+
+    @Override
+    public void actualizarTotal(Integer idPedido, double nuevoTotal) throws BusinessLogicException {
+        try {
+            TransactionContext.getConnection();
+            pedidoDAO.updateTotal(idPedido, nuevoTotal);
+            TransactionContext.commit();
+        } catch (SQLException e) {
+            TransactionContext.rollback();
+            throw new BusinessLogicException(e);
+        } finally {
+            TransactionContext.close();
         }
     }
 
@@ -192,7 +221,9 @@ public class PedidoBLImpl implements PedidoBL {
             DetallePedido detalle = new DetallePedido();
             detalle.setProducto(producto);
             detalle.setCantidad(item.getCantidad());
-            detalle.setPrecioAplicado(producto.getPrecioBase());
+            detalle.setPrecioAplicado(item.getPrecioAplicado() > 0
+                    ? item.getPrecioAplicado()
+                    : producto.getPrecioBase());
             detallesPreparados.add(detalle);
         }
 
@@ -216,13 +247,6 @@ public class PedidoBLImpl implements PedidoBL {
         if (producto.getStock() != null && producto.getStock() < cantidad) {
             throw new BusinessLogicException("No hay stock suficiente para " + producto.getNombre() + ".");
         }
-    }
-
-    private List<Pedido> completarPedidos(List<Pedido> pedidos) throws SQLException {
-        for (Pedido pedido : pedidos) {
-            completarPedido(pedido);
-        }
-        return pedidos;
     }
 
     private Pedido completarPedido(Pedido pedido) throws SQLException {
@@ -299,10 +323,11 @@ public class PedidoBLImpl implements PedidoBL {
     }
 
     private void recalcularTotales(Pedido pedido) {
-        double subtotal = 0.0;
-        for (DetallePedido detalle : pedido.getDetalles()) subtotal += detalle.calcularSubtotal();
-        pedido.setSubtotal(subtotal);
-        pedido.setIgv(subtotal * 0.18);
-        pedido.setTotal(pedido.getSubtotal() + pedido.getIgv());
+        double totalProductos = 0.0;
+        for (DetallePedido detalle : pedido.getDetalles())
+            totalProductos += detalle.calcularSubtotal();
+        pedido.setTotal(totalProductos);
+        pedido.setIgv(totalProductos * 0.18 / 1.18);
+        pedido.setSubtotal(totalProductos / 1.18);
     }
 }
