@@ -20,7 +20,6 @@ builder.Services.AddScoped(sp => new HttpClient
 
 // SERVICE
 builder.Services.AddSingleton<AuthService>();
-builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<CuponService>();
 builder.Services.AddScoped<CampanaService>();
 builder.Services.AddScoped<MarcaService>();
@@ -31,6 +30,7 @@ builder.Services.AddScoped<EscalaPrecioService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<UsuarioPerfilService>();
 builder.Services.AddScoped<UsuarioPasswordService>();
+builder.Services.AddScoped<CartService>();
 builder.Services.AddHttpClient("KillaApi", client =>
 {
     var baseUrl = builder.Configuration["KillaApi:BaseUrl"]
