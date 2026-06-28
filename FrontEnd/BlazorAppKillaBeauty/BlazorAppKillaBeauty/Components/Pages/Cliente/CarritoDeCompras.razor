@@ -1,13 +1,14 @@
 ﻿@page "/cart"
 @rendermode InteractiveServer
-@using BlazorAppKillaBeauty.Services
 @using BlazorAppKillaBeauty.ClienteREST.Models
 @using Microsoft.AspNetCore.Components
-@using static BlazorAppKillaBeauty.Services.CartService;
-
+@using static BlazorAppKillaBeauty.ClienteREST.ServicesAct.CartService
+@using BlazorAppKillaBeauty.ClienteREST.ServicesAct
 @inject AuthService AuthService
-@inject NavigationManager Navigation
 @inject CartService CartService
+@inject NavigationManager Navigation
+
+
 
 <Navbar CantidadCarrito="@CantidadCarrito" />
 
@@ -86,7 +87,7 @@
                             }
                         </div>
 
-                        
+                <div class="cart-quantity-wrapper" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 150px;">
                         <div class="cart-actions">
                             <button @onclick="async () =>
                                     {
@@ -110,8 +111,7 @@
                             <button @onclick="async () => AumentarCantidad(detalle)">
                                 +
                             </button>
-
-                                 @*  mensaje de error de stock debajo *@
+                              @*  mensaje de error de stock debajo *@
                                  @if (producto != null && erroresStock.ContainsKey(producto.Id))
                                     {
                                     <div style="color: #d84b6b; font-size: 0.85em; margin-top: 8px; font-weight: 500;">
@@ -119,6 +119,8 @@
                                      </div>
                                     }
                         </div>
+                      
+                </div>
 
                    
 
@@ -217,7 +219,7 @@
         Navigation.NavigateTo("/login?returnUrl=/cart");
     }
 
-    private Dictionary<int, InfoEscalaCarrito> infoEscalas = new();
+    private Dictionary<int,InfoEscalaCarrito> infoEscalas = new();
 
     private async Task ActualizarInfoEscalas()
     {

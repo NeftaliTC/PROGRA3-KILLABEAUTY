@@ -1,10 +1,10 @@
-﻿using System.Net.Http.Json;
+﻿using BlazorAppKillaBeauty.ClienteREST.Models;
+using BlazorAppKillaBeauty.Components.Pages.Cliente;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using BlazorAppKillaBeauty.ClienteREST.Models;
-using BlazorAppKillaBeauty.ClienteREST.ServicesAct;
 
-namespace BlazorAppKillaBeauty.Services
+namespace BlazorAppKillaBeauty.ClienteREST.ServicesAct
 {
     public class CartService
     {
@@ -55,6 +55,8 @@ namespace BlazorAppKillaBeauty.Services
         public decimal Total { get; private set; } = 0;
 
         public decimal DescuentoTotal { get; private set; } = 0;
+        public event Action? OnChange;
+        private void NotifyStateChanged() => OnChange?.Invoke();
 
         public async Task RecalcularTotalesAsync()
         {
@@ -97,6 +99,7 @@ namespace BlazorAppKillaBeauty.Services
 
             await ConsolidarProductosDuplicadosAsync();
             await RecalcularTotalesAsync();
+            NotifyStateChanged();
         }
 
         public async Task<Carrito?> ObtenerPorIdAsync(int id)
@@ -457,6 +460,8 @@ namespace BlazorAppKillaBeauty.Services
 
             await EnsureSuccessAsync(response);
         }
+
+
 
         private async Task ConsolidarProductosDuplicadosAsync()
         {
