@@ -47,7 +47,6 @@ public class PedidoBLImpl implements PedidoBL {
     @Override
     public Pedido createFromCart(Integer idCliente, Integer idDireccion, Integer idCupon, List<DetallePedido> detalles) throws BusinessLogicException {
         if (idCliente == null || idCliente <= 0) throw new BusinessLogicException("Debe indicar un cliente valido.");
-        if (idDireccion == null || idDireccion <= 0) throw new BusinessLogicException("Debe indicar una direccion de envio valida.");
         if (detalles == null || detalles.isEmpty()) throw new BusinessLogicException("El carrito no tiene productos para registrar.");
 
         Pedido pedido = new Pedido();
@@ -56,9 +55,11 @@ public class PedidoBLImpl implements PedidoBL {
         cliente.setId(idCliente);
         pedido.setCliente(cliente);
 
-        Direccion direccion = new Direccion();
-        direccion.setId(idDireccion);
-        pedido.setDireccionEnvio(direccion);
+        if (idDireccion != null && idDireccion > 0) {
+            Direccion direccion = new Direccion();
+            direccion.setId(idDireccion);
+            pedido.setDireccionEnvio(direccion);
+        }
 
         if (idCupon != null && idCupon > 0) {
             Cupon cupon = new Cupon();
@@ -162,6 +163,20 @@ public class PedidoBLImpl implements PedidoBL {
         }
     }
 
+    @Override
+    public void actualizarTotal(Integer idPedido, double nuevoTotal) throws BusinessLogicException {
+        try {
+            TransactionContext.getConnection();
+            pedidoDAO.updateTotal(idPedido, nuevoTotal);
+            TransactionContext.commit();
+        } catch (SQLException e) {
+            TransactionContext.rollback();
+            throw new BusinessLogicException(e);
+        } finally {
+            TransactionContext.close();
+        }
+    }
+
     private void validarPedido(Pedido pedido) throws BusinessLogicException {
         if (pedido == null)
             throw new BusinessLogicException("El pedido no puede ser nulo.");
@@ -206,7 +221,9 @@ public class PedidoBLImpl implements PedidoBL {
             DetallePedido detalle = new DetallePedido();
             detalle.setProducto(producto);
             detalle.setCantidad(item.getCantidad());
-            detalle.setPrecioAplicado(producto.getPrecioBase());
+            detalle.setPrecioAplicado(item.getPrecioAplicado() > 0
+                    ? item.getPrecioAplicado()
+                    : producto.getPrecioBase());
             detallesPreparados.add(detalle);
         }
 
@@ -306,10 +323,11 @@ public class PedidoBLImpl implements PedidoBL {
     }
 
     private void recalcularTotales(Pedido pedido) {
-        double total = 0.0;
-        for (DetallePedido detalle : pedido.getDetalles()) total += detalle.calcularSubtotal();
-        pedido.setTotal(total);
-        pedido.setIgv(total * 0.18);
-        pedido.setSubtotal(total - pedido.getIgv());
+        double totalProductos = 0.0;
+        for (DetallePedido detalle : pedido.getDetalles())
+            totalProductos += detalle.calcularSubtotal();
+        pedido.setTotal(totalProductos);
+        pedido.setIgv(totalProductos * 0.18 / 1.18);
+        pedido.setSubtotal(totalProductos / 1.18);
     }
 }

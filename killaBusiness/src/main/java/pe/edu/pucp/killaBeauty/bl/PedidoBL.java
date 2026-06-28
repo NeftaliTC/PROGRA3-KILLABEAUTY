@@ -14,4 +14,5 @@ public interface PedidoBL {
     Pedido load(Integer id) throws BusinessLogicException;
     List<Pedido> listAll() throws BusinessLogicException;
     List<Pedido> listByCliente(Integer idCliente) throws BusinessLogicException;
+    void actualizarTotal(Integer idPedido, double nuevoTotal) throws BusinessLogicException;
 }
