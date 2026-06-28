@@ -99,7 +99,7 @@ public class DetalleCarritoDAOImpl implements DetalleCarritoDAO {
             dc.id_carrito,
             p.id_producto,
             p.nombre,
-            p.precio_base
+            p.precio_base,
             p.stock
         FROM DetalleCarrito dc
         INNER JOIN Producto p
