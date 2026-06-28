@@ -109,17 +109,32 @@
             }
             <h4>PRECIO</h4>
 
-            <div class="single-price-range">
-                <input class="price-slider"
-                       type="range"
-                       min="0"
-                       max="500"
-                       @bind="precioMaximo"
-                       @bind:after="ResetearPagina" />
+            <div class="price-inputs">
+                <label class="price-input-group">
+                    <span>Mínimo</span>
+                    <input class="price-input"
+                           type="number"
+                           min="0"
+                           max="@precioMaximoDisponible"
+                           step="1"
+                           value="@precioMinimo"
+                           @onchange="CambiarPrecioMinimo" />
+                </label>
+
+                <label class="price-input-group">
+                    <span>Máximo</span>
+                    <input class="price-input"
+                           type="number"
+                           min="0"
+                           max="@precioMaximoDisponible"
+                           step="1"
+                           value="@precioMaximo"
+                           @onchange="CambiarPrecioMaximo" />
+                </label>
             </div>
 
             <div class="price-range">
-                <span>S/ 0</span>
+                <span>S/ @precioMinimo</span>
                 <span>S/ @precioMaximo</span>
             </div>
 
@@ -240,7 +255,9 @@
     private string categoriaSeleccionada = "Todas";
     private string subcategoriaSeleccionada = "";
 
+    private decimal precioMinimo = 0;
     private decimal precioMaximo = 500;
+    private decimal precioMaximoDisponible = 500;
     private bool cargandoProductos = true;
     private string? errorProductos;
 
@@ -258,6 +275,7 @@
         try
         {
             productos = await ProductoService.ObtenerCatalogoAsync();
+            ConfigurarRangoPrecioInicial();
             categoriasFiltro = (await ProductoService.ObtenerCategoriasAsync())
                 .Where(c => c.Activo)
                 .OrderBy(c => c.Descripcion)
@@ -353,7 +371,7 @@
 
     private bool FiltroPrecio(Producto producto)
     {
-        return producto.PrecioBase <= precioMaximo;
+        return producto.PrecioBase >= precioMinimo && producto.PrecioBase <= precioMaximo;
     }
 
     private bool FiltroMarca(Producto producto)
@@ -464,6 +482,68 @@
     private void ResetearPagina()
     {
         paginaActual = 1;
+    }
+
+    private void ConfigurarRangoPrecioInicial()
+    {
+        var precioMasAlto = productos.Any()
+            ? Math.Ceiling(productos.Max(p => p.PrecioBase))
+            : 500;
+
+        if (precioMasAlto < 1)
+        {
+            precioMasAlto = 500;
+        }
+
+        precioMaximoDisponible = RedondearPrecioMaximo(precioMasAlto);
+        precioMinimo = 0;
+        precioMaximo = precioMaximoDisponible;
+    }
+
+    private decimal RedondearPrecioMaximo(decimal precio)
+    {
+        var incremento = precio switch
+        {
+            <= 100 => 10,
+            <= 500 => 50,
+            <= 1000 => 100,
+            _ => 500
+        };
+
+        return Math.Ceiling(precio / incremento) * incremento;
+    }
+
+    private void CambiarPrecioMinimo(ChangeEventArgs e)
+    {
+        precioMinimo = LeerPrecio(e.Value, precioMinimo);
+        precioMinimo = Math.Clamp(precioMinimo, 0, precioMaximoDisponible);
+
+        if (precioMinimo > precioMaximo)
+        {
+            precioMaximo = precioMinimo;
+        }
+
+        ResetearPagina();
+    }
+
+    private void CambiarPrecioMaximo(ChangeEventArgs e)
+    {
+        precioMaximo = LeerPrecio(e.Value, precioMaximo);
+        precioMaximo = Math.Clamp(precioMaximo, 0, precioMaximoDisponible);
+
+        if (precioMaximo < precioMinimo)
+        {
+            precioMinimo = precioMaximo;
+        }
+
+        ResetearPagina();
+    }
+
+    private decimal LeerPrecio(object? valor, decimal precioActual)
+    {
+        return decimal.TryParse(valor?.ToString(), out var precio)
+            ? precio
+            : precioActual;
     }
 
     private string ConvertirParaUrl(string texto)
