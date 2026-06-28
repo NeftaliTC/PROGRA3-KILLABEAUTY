@@ -68,4 +68,14 @@ public class EnvioBLImpl implements EnvioBL {
             throw new BusinessLogicException("Error al listar los envíos: " + e.getMessage());
         }
     }
+
+    @Override
+    public Envio obtenerPorIdPedido(Integer idPedido) throws BusinessLogicException{
+        try {
+            return envioDAO.buscarPorIdPedido(idPedido);
+        } catch (Exception ex) {
+            System.err.println("Error al obtener envío: " + ex.getMessage());
+            return null;
+        }
+    }
 }

@@ -54,13 +54,19 @@
 
    
 
-    <div class="catalog-layout">
+    <button class="btn-filter-toggle" @onclick="ToggleFiltrosMobile">
+        <i class="bi bi-funnel"></i> Filtrar productos
+    </button>
 
-        <aside class="filters-card filters-card-large">
-            <h2>Filtros</h2>
+    <div class="catalog-layout">
+        
+        <aside class="filters-card filters-card-large @(mostrarFiltrosMobile ? "show" : "")">
+            <div class="mobile-header">
+                <h2>Filtros</h2>
+                <button class="close-filter-btn" @onclick="ToggleFiltrosMobile">×</button>
+            </div>
 
             <h4>CATEGORÍAS</h4>
-
             <button class="filter-option @(categoriaSeleccionada == "Todas" ? "active" : "")"
                     @onclick='() => SeleccionarCategoria("Todas")'>
                 Todas las categorías
@@ -69,19 +75,10 @@
             @foreach (var categoria in categoriasFiltro)
             {
                 var expandida = categoriasExpandidas.Contains(categoria.Descripcion);
-
                 <button class="filter-option filter-category-row @(categoriaSeleccionada == categoria.Descripcion ? "active-text" : "")"
                         @onclick="() => ToggleCategoria(categoria.Descripcion)">
                     <span>@categoria.Descripcion</span>
-
-                    @if (expandida)
-                    {
-                        <i class="bi bi-chevron-up"></i>
-                    }
-                    else
-                    {
-                        <i class="bi bi-chevron-down"></i>
-                    }
+                    <i class="bi @(expandida ? "bi-chevron-up" : "bi-chevron-down")"></i>
                 </button>
 
                 @if (expandida)
@@ -97,131 +94,51 @@
             }
 
             <h4>TOP MARCAS</h4>
-
             @foreach (var marca in marcasFiltro)
             {
                 <label class="filter-row">
-                    <input type="checkbox"
-                           checked="@marcasSeleccionadas.Contains(marca.Descripcion)"
+                    <input type="checkbox" checked="@marcasSeleccionadas.Contains(marca.Descripcion)"
                            @onchange="e => CambiarMarca(marca.Descripcion, e)" />
                     @marca.Descripcion
                 </label>
             }
+
             <h4>PRECIO</h4>
-
             <div class="single-price-range">
-                <input class="price-slider"
-                       type="range"
-                       min="0"
-                       max="500"
-                       @bind="precioMaximo"
-                       @bind:after="ResetearPagina" />
+                <input class="price-slider" type="range" min="0" max="500" @bind="precioMaximo" @bind:after="ResetearPagina" />
             </div>
-
             <div class="price-range">
                 <span>S/ 0</span>
                 <span>S/ @precioMaximo</span>
             </div>
-
         </aside>
 
         <div class="catalog-content">
-
             @if (cargandoProductos)
             {
-                <div class="catalog-products">
-                    <p>Cargando productos desde KillaREST...</p>
-                </div>
-            }
-            else if (!string.IsNullOrWhiteSpace(errorProductos))
-            {
-                <div class="catalog-products">
-                    <p>@errorProductos</p>
-                </div>
+                <div class="catalog-products"><p>Cargando productos...</p></div>
             }
             else
             {
                 <div class="catalog-products">
-
                     @foreach (var producto in ProductosPaginados)
                     {
-                        <div class="catalog-product-card"
-                             @onclick="@(() => IrADetalleProducto(producto))">
-                            <div class="catalog-product-image-area">
-                                <img class="catalog-product-img"
-                                     src="@producto.ImagenPrincipal"
-                                     alt="@producto.Nombre" />
-                            </div>
-
+                        <div class="catalog-product-card" @onclick="@(() => IrADetalleProducto(producto))">
+                            <div class="catalog-product-image-area"><img class="catalog-product-img" src="@producto.ImagenPrincipal" alt="@producto.Nombre" /></div>
                             <div class="catalog-product-info">
-
-                                <p class="catalog-brand">
-                                    @producto.Marca
-                                </p>
-
-                                <h3 class="catalog-product-title">
-                                    @producto.Nombre
-                                </h3>
-
-                                <p class="catalog-price">
-                                    @MostrarPrecio(producto)
-                                </p>
-
-                                <button class="catalog-add-btn"
-                                        @onclick:stopPropagation="true"
-                                        @onclick="() => AgregarCarrito(producto)">
-                                    <i class="bi bi-bag"></i>
-                                    Añadir
+                                <p class="catalog-brand">@producto.Marca</p>
+                                <h3 class="catalog-product-title">@producto.Nombre</h3>
+                                <p class="catalog-price">S/ @producto.PrecioBase.ToString("0.00")</p>
+                                <button class="catalog-add-btn" @onclick:stopPropagation="true" @onclick="() => AgregarCarrito(producto)">
+                                    <i class="bi bi-bag"></i> Añadir
                                 </button>
-
                             </div>
-
                         </div>
                     }
-
                 </div>
             }
-
-            @if (TotalPaginas > 1)
-            {
-                <div class="catalog-pagination">
-
-                    <span class="pagination-label">Páginas:</span>
-
-                    <button class="pagination-arrow"
-                            disabled="@(paginaActual == 1)"
-                            @onclick="PaginaAnterior">
-                        &lt;
-                    </button>
-
-                    @foreach (var numeroPagina in PaginasVisibles)
-                    {
-                        if (numeroPagina == -1)
-                        {
-                            <span class="pagination-dots">...</span>
-                        }
-                        else
-                        {
-                            <button class="pagination-number @(paginaActual == numeroPagina ? "active" : "")"
-                                    @onclick="() => CambiarPagina(numeroPagina)">
-                                @numeroPagina
-                            </button>
-                        }
-                    }
-
-                    <button class="pagination-arrow"
-                            disabled="@(paginaActual == TotalPaginas)"
-                            @onclick="PaginaSiguiente">
-                        &gt;
-                    </button>
-
-                </div>
-            }
-
         </div>
-
     </div>
-
 </section>
 
 @code {
@@ -231,6 +148,7 @@
     [Parameter]
     public string? SubcategoriaUrl { get; set; }
 
+    private bool mostrarFiltrosMobile = false;
     private int paginaActual = 1;
     private int productosPorPagina = 12;
 
@@ -249,6 +167,8 @@
     private List<Marca> marcasFiltro = new();
     private HashSet<string> marcasSeleccionadas = new(StringComparer.OrdinalIgnoreCase);
     private HashSet<string> categoriasExpandidas = new(StringComparer.OrdinalIgnoreCase);
+
+    private void ToggleFiltrosMobile() => mostrarFiltrosMobile = !mostrarFiltrosMobile;
 
     protected override async Task OnParametersSetAsync()
     {

@@ -67,6 +67,12 @@ namespace BlazorAppKillaBeauty.Services
             return await GetAsync<PedidoAdminDto>($"pedido/{id}");
         }
 
+        public async Task<List<PedidoAdminDto>> ObtenerPorClienteAsync(int idCliente)
+        {
+            return await GetAsync<List<PedidoAdminDto>>($"pedido/cliente/{idCliente}")
+                   ?? new List<PedidoAdminDto>();
+        }
+
         public async Task EliminarAsync(int id)
         {
             using var response = await http.DeleteAsync($"pedido/{id}");
@@ -151,6 +157,36 @@ namespace BlazorAppKillaBeauty.Services
             [JsonPropertyName("cuponId")]
             public int? CuponId { get; set; }
 
+            [JsonPropertyName("numeroSeguimiento")]
+            public string NumeroSeguimiento { get; set; } = "";
+
+            [JsonPropertyName("costoEnvio")]
+            public decimal CostoEnvio { get; set; }
+
+            [JsonPropertyName("courier")]
+            public string Courier { get; set; } = "";
+
+            [JsonPropertyName("metodoPago")]
+            public string MetodoPago { get; set; } = "";
+
+            [JsonPropertyName("tipoComprobante")]
+            public string TipoComprobante { get; set; } = "";
+
+            [JsonPropertyName("serieComprobante")]
+            public string SerieComprobante { get; set; } = "";
+
+            [JsonPropertyName("numeroCorrelativo")]
+            public string NumeroCorrelativo { get; set; } = "";
+
+            [JsonPropertyName("descuentoCupon")]
+            public decimal DescuentoCupon { get; set; }
+
+            [JsonPropertyName("documentoIdentidad")]
+            public string DocumentoIdentidad { get; set; } = "";
+
+            [JsonPropertyName("razonSocial")]
+            public string RazonSocial { get; set; } = "";
+
             [JsonPropertyName("productos")]
             public List<DetallePedidoAdminDto> Productos { get; set; } = new();
 
@@ -159,7 +195,7 @@ namespace BlazorAppKillaBeauty.Services
                 DateTime.TryParse(Fecha, out var fecha) ? fecha : DateTime.MinValue;
 
             [JsonIgnore]
-            public string Codigo => $"PED-{Id:000000}";
+            public string Codigo => $"KIL-{Id:000000}";
 
             [JsonIgnore]
             public bool Cancelado => Estado.Equals("CANCELADO", StringComparison.OrdinalIgnoreCase);
@@ -209,6 +245,12 @@ namespace BlazorAppKillaBeauty.Services
 
             [JsonPropertyName("precioUnitario")]
             public decimal PrecioUnitario { get; set; }
+
+            [JsonPropertyName("precioUnitarioDescuento")]
+            public decimal PrecioUnitarioDescuento { get; set; }
+
+            [JsonPropertyName("ahorroVolumen")]
+            public decimal AhorroVolumen { get; set; }
 
             [JsonPropertyName("subtotal")]
             public decimal Subtotal { get; set; }

@@ -28,6 +28,46 @@ public class EnvioDAOImpl implements EnvioDAO {
         return lista;
     }
 
+    private Envio mapRowConCourier(ResultSet rs) throws SQLException {
+        Envio e = new Envio();
+        e.setId(rs.getInt("id_envio"));
+        e.setDescripcion(rs.getString("descripcion"));
+        e.setCostoEnvio(rs.getDouble("costo_envio"));
+        e.setFechaEnvio(rs.getTimestamp("fecha_envio"));
+        e.setNumeroSeguimiento(rs.getString("numero_seguimiento"));
+        e.setEstadoEnvio(EstadoEnvio.fromId(rs.getInt("id_estado_envio")));
+
+        Pedido p = new Pedido();
+        p.setId(rs.getInt("id_pedido"));
+        e.setPedido(p);
+
+        Courier c = new Courier();
+        c.setId(rs.getInt("id_courier"));
+        c.setNombre(rs.getString("nombre_courier"));
+        e.setCourier(c);
+        return e;
+    }
+
+    @Override
+    public Envio buscarPorIdPedido(Integer idPedido) throws SQLException {
+        String sql = """
+            SELECT e.id_envio, e.descripcion, e.costo_envio, e.fecha_envio, e.id_pedido,
+                   e.id_estado_envio, e.numero_seguimiento,
+                   c.id_courier, c.nombre AS nombre_courier
+            FROM Envio e
+            LEFT JOIN Courier c ON e.id_courier = c.id_courier
+            WHERE e.id_pedido = ?
+            """;
+        try (Connection con = DBManager.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idPedido);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRowConCourier(rs);
+            }
+        }
+        return null;
+    }
+
     @Override
     public Envio load(Integer id) throws SQLException {
         String sql = """

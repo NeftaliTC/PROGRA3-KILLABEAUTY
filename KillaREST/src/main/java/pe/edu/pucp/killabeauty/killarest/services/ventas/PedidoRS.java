@@ -3,16 +3,21 @@ package pe.edu.pucp.killabeauty.killarest.services.ventas;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import pe.edu.pucp.killaBeauty.bl.ComprobantePagoBL;
+import pe.edu.pucp.killaBeauty.bl.EnvioBL;
+import pe.edu.pucp.killaBeauty.bl.Impl.ComprobantePagoBLImpl;
+import pe.edu.pucp.killaBeauty.bl.Impl.EnvioBLImpl;
+import pe.edu.pucp.killaBeauty.bl.Impl.PagoBLImpl;
 import pe.edu.pucp.killaBeauty.bl.Impl.PedidoBLImpl;
+import pe.edu.pucp.killaBeauty.bl.PagoBL;
 import pe.edu.pucp.killaBeauty.bl.PedidoBL;
 import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
-import pe.edu.pucp.killaBeauty.killaModelo.DetallePedido;
-import pe.edu.pucp.killaBeauty.killaModelo.Pedido;
-import pe.edu.pucp.killaBeauty.killaModelo.Producto;
+import pe.edu.pucp.killaBeauty.killaModelo.*;
 import pe.edu.pucp.killabeauty.killarest.dto.ErrorDTO;
 import pe.edu.pucp.killabeauty.killarest.dto.PedidoCheckoutDTO;
 import pe.edu.pucp.killabeauty.killarest.dto.PedidoDetalleDTO;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +27,26 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 public class PedidoRS {
     private final PedidoBL pedidoBL = new PedidoBLImpl();
+    private final EnvioBL envioBL = new EnvioBLImpl();
+    private final PagoBL pagoBL = new PagoBLImpl();
+    private final ComprobantePagoBL comprobanteBL = new ComprobantePagoBLImpl();
+
+    // Construye el DTO completo buscando envio, pago y comprobante del pedido
+    private PedidoDetalleDTO construirDTO(Pedido p) throws BusinessLogicException {
+        try {
+            Envio envio = envioBL.obtenerPorIdPedido(p.getId());
+
+            Pago pago = pagoBL.obtenerPorIdPedido(p.getId());
+
+            ComprobantePago comprobante = null;
+            if (pago != null)
+                comprobante = comprobanteBL.obtenerPorIdPago(pago.getIdPago());
+
+            return new PedidoDetalleDTO(p, envio, pago, comprobante);
+        } catch (Exception ex) {
+            throw new BusinessLogicException(ex.getMessage());
+        }
+    }
 
     @POST
     @Path("/checkout")
@@ -39,7 +64,7 @@ public class PedidoRS {
             );
 
             return Response.status(Response.Status.CREATED)
-                    .entity(new PedidoDetalleDTO(pedido))
+                    .entity(construirDTO(pedido))
                     .build();
         } catch (BusinessLogicException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
@@ -60,9 +85,8 @@ public class PedidoRS {
     @GET
     public Response listar() {
         try {
-            List<PedidoDetalleDTO> lista = pedidoBL.listAll().stream()
-                    .map(PedidoDetalleDTO::new)
-                    .collect(Collectors.toList());
+            List<PedidoDetalleDTO> lista = new ArrayList<>();
+            for (Pedido p : pedidoBL.listAll()) lista.add(construirDTO(p));
             return Response.ok(lista).build();
         } catch (BusinessLogicException ex) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ErrorDTO(ex.getMessage())).build();
@@ -74,8 +98,20 @@ public class PedidoRS {
     public Response obtenerPorId(@PathParam("id") int id) {
         try {
             Pedido p = pedidoBL.load(id);
-            return (p != null) ? Response.ok(new PedidoDetalleDTO(p)).build()
+            return (p != null) ? Response.ok(construirDTO(p)).build()
                     : Response.status(Response.Status.NOT_FOUND).build();
+        } catch (BusinessLogicException ex) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ErrorDTO(ex.getMessage())).build();
+        }
+    }
+
+    @GET
+    @Path("/cliente/{idCliente}")
+    public Response listarPorCliente(@PathParam("idCliente") int idCliente) {
+        try {
+            List<PedidoDetalleDTO> lista = new ArrayList<>();
+            for (Pedido p : pedidoBL.listByCliente(idCliente)) lista.add(construirDTO(p));
+            return Response.ok(lista).build();
         } catch (BusinessLogicException ex) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ErrorDTO(ex.getMessage())).build();
         }
@@ -96,7 +132,7 @@ public class PedidoRS {
     @Path("/{id}/cancelar")
     public Response cancelar(@PathParam("id") int id) {
         try {
-            return Response.ok(new PedidoDetalleDTO(pedidoBL.cancel(id))).build();
+            return Response.ok(construirDTO(pedidoBL.cancel(id))).build();
         } catch (BusinessLogicException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
         }

@@ -47,4 +47,14 @@ public class ComprobantePagoBLImpl implements ComprobantePagoBL {
             throw new BusinessLogicException("Error al listar los comprobantes: " + e.getMessage());
         }
     }
+
+    @Override
+    public ComprobantePago obtenerPorIdPago(Integer idPago) throws BusinessLogicException{
+        try {
+            return comprobanteDAO.buscarPorIdPago(idPago);
+        } catch (Exception ex) {
+            System.err.println("Error al obtener comprobante: " + ex.getMessage());
+            return null;
+        }
+    }
 }

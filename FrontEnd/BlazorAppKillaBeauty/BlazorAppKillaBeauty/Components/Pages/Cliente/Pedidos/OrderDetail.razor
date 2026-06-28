@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
 @inject CartService CartService
+@inject PedidoService PedidoService
 @inject NavigationManager Navigation
 
 <Navbar CantidadCarrito="@CartService.CantidadTotal" />
@@ -23,13 +24,11 @@
         @* Encabezado principal del Pedido *@
         <div class="order-header-main">
             <div class="header-titles">
-                <h1>Pedido @pedidoActual.Id</h1>
-                <p class="order-date">Realizado el @pedidoActual.Fecha</p>
+                <h1>Pedido KIL-@pedidoActual.Id.ToString("D8")</h1>
+                <p class="order-date">Realizado el @FormatearFecha(pedidoActual.Fecha)</p>
             </div>
-            <span class="status-badge-detail @pedidoActual.ClaseEstado">
-                @(pedidoActual.Estado == "PAGADO" ? "Confirmado" :
-                  pedidoActual.Estado == "EN_PREPARACION" ? "En preparación" :
-                  pedidoActual.Estado == "ENVIADO" ? "En camino" : "Entregado")
+            <span class="status-badge-detail @GetStatusClass(pedidoActual.Estado)">
+                @GetStatusTexto(pedidoActual.Estado)
             </span>
         </div>
 
@@ -72,14 +71,18 @@
                         @foreach (var item in pedidoActual.Productos)
                         {
                             <div class="product-row-item">
-                                <img src="@item.Imagen" alt="@item.Nombre" class="product-thumbnail" />
+                                @*<img src="@item.Imagen" alt="@item.Nombre" class="product-thumbnail" />*@
+                                <div class="product-thumbnail-placeholder">
+                                    <i class="bi bi-image"></i>
+                                </div>
+
                                 <div class="product-main-details">
-                                    <span class="product-title">@item.Nombre</span>
+                                    <span class="product-title">@item.NombreProducto</span>
                                     <span class="product-brand">@item.Marca</span>
                                     <span class="product-qty-badge">@item.Cantidad unidad@(item.Cantidad > 1 ? "es" : "")</span>
     
                                     <div class="price-container">
-                                        @if (item.PrecioUnitario > item.PrecioUnitarioDesc)
+                                        @if (item.PrecioUnitario > item.PrecioUnitarioDescuento)
                                         {
                                             @* Precio original tachado *@
                                             <span class="product-unit-price" style="text-decoration: line-through; color: #888; margin-right: 8px;">
@@ -88,7 +91,7 @@
                                         }
                                         @* Precio con descuento (o normal) *@
                                         <span class="product-unit-price" style="font-weight: bold; color: #d63384;">
-                                            S/ @item.PrecioUnitarioDesc.ToString("F2")
+                                            S/ @item.PrecioUnitarioDescuento.ToString("F2")
                                         </span>
                                     </div>
 
@@ -102,11 +105,11 @@
                                 <div class="product-actions-column">
                                     <button type="button"
                                             class="btn-review-outline"
-                                            @onclick="() => IrAReview(pedidoActual.Id, item.Nombre)">
+                                            @onclick="() => IrAReview(pedidoActual.Id.ToString(), item.NombreProducto)">
                                         <i class="bi bi-star"></i> Reseñar
                                     </button>
                                     <div class="subtotal-label">
-                                        Subtotal: S/ @((item.PrecioUnitarioDesc * item.Cantidad).ToString("F2"))
+                                        Subtotal: S/ @((item.PrecioUnitarioDescuento * item.Cantidad).ToString("F2"))
                                     </div>
                                 </div>
                             </div>
@@ -131,11 +134,11 @@
                     <div class="summary-rows">
                         <div class="summary-line">
                             <span>Subtotal</span>
-                            <span>S/ @pedidoActual.Subtotal.ToString("F2")</span>
+                            <span>S/ @((pedidoActual.Total - pedidoActual.DescuentoCupon - pedidoActual.CostoEnvio).ToString("F2"))</span>
                         </div>
                         <div class="summary-line">
                             <span>Envío</span>
-                            <span>S/ @pedidoActual.Envio.ToString("F2")</span>
+                            <span>S/ @pedidoActual.CostoEnvio.ToString("F2")</span>
                         </div>
                         @if (pedidoActual.DescuentoCupon > 0)
                         {
@@ -152,13 +155,13 @@
                     </div>
                 </div>
 
-                @* Tarjeta 4: Comprobante de Pago - Nueva sección *@
+                @* Tarjeta 4: Comprobante de Pago *@
                 <div class="detail-card invoice-card">
                     <h2>Comprobante Electrónico</h2>
                     <div class="invoice-details-box">
                         <div class="invoice-meta">
                             <p class="invoice-type"><strong>Tipo:</strong> @pedidoActual.TipoComprobante</p>
-                            @if (pedidoActual.TipoComprobante == "Factura")
+                            @if (pedidoActual.TipoComprobante.Contains("Factura"))
                             {
                                 <p><strong>RUC:</strong> @pedidoActual.DocumentoIdentidad</p>
                                 <p><strong>Razón Social:</strong> @pedidoActual.RazonSocial</p>
@@ -192,8 +195,8 @@
                                     </a>
                                 </div>
                             }
-                            <p>@pedidoActual.DireccionLinea1</p>
-                            <p>@pedidoActual.DireccionLinea2</p>
+                            <p>@pedidoActual.Direccion</p>
+                            @*<p>@pedidoActual.DireccionLinea2</p>*@
                             @if (!string.IsNullOrEmpty(pedidoActual.Referencia))
                             {
                                 <p class="reference-text">Ref: @pedidoActual.Referencia</p>
@@ -209,7 +212,6 @@
                         <i class="bi bi-credit-card-2-front icon-pink"></i>
                         <div class="block-text">
                             <h3>@pedidoActual.MetodoPago</h3>
-                            <p>@pedidoActual.DetalleMetodoPago</p>
                         </div>
                     </div>
                 </div>
@@ -221,16 +223,19 @@
 
 @code {
     [Parameter] public string? OrderId { get; set; }
-    private PedidoDetalle? pedidoActual;
+    private PedidoService.PedidoAdminDto? pedidoActual;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        pedidoActual = ObtenerCatalogoDetallesMock().FirstOrDefault(p => p.Id == OrderId);
+        if (int.TryParse(OrderId, out int id))
+        {
+            pedidoActual = await PedidoService.ObtenerPorIdAsyncAdminDto(id);
+        }
     }
 
     private string GetTrackingStepClass(string estadoBackend, int stepNumber)
     {
-        int currentStepWeight = estadoBackend switch
+        int currentStepWeight = estadoBackend.ToUpperInvariant() switch
         {
             "PAGADO" => 1,
             "EN_PREPARACION" => 2,
@@ -244,116 +249,44 @@
         return "";
     }
 
-    public class PedidoDetalle
-    {
-        public string? Id { get; set; }
-        public string? Fecha { get; set; }
-        public string? Estado { get; set; } // Lee directamente los enums: PAGADO, EN_PREPARACION, ENVIADO, ENTREGADO
-        public string? ClaseEstado { get; set; }
-        public decimal Subtotal { get; set; }
-        public decimal Envio { get; set; }
-        public string? NumeroSeguimiento { get; set; }
-        public decimal DescuentoCupon { get; set; }
-        public decimal Total => (Subtotal + Envio) - DescuentoCupon;
-        public int TotalArticulos => Productos.Sum(p => p.Cantidad);
-        
-        public string? TipoComprobante { get; set; } // "Boleta" o "Factura"
-        public string? DocumentoIdentidad { get; set; }
-        public string? RazonSocial { get; set; }
-        public string? DireccionLinea1 { get; set; }
-        public string? DireccionLinea2 { get; set; }
-        public string? Referencia { get; set; }
-
-        public string? MetodoPago { get; set; }
-        public string? DetalleMetodoPago { get; set; }
-
-        public List<ProductoDetalle> Productos { get; set; } = new();
-    }
-
-    public class ProductoDetalle
-    {
-        public string? Nombre { get; set; }
-        public string? Marca { get; set; }
-        public string? Imagen { get; set; }
-        public int Cantidad { get; set; }
-        public decimal PrecioUnitarioDesc {get; set; }
-        public decimal PrecioUnitario { get; set; }
-        public decimal AhorroVolumen { get; set; }
-
-        public ProductoDetalle(string descripcion, string marca, string imagen, int cantidad, decimal precioUnitDesc, decimal precioUnitOrig)
-        {
-            Nombre = descripcion;
-            Marca = marca;
-            Imagen = imagen;
-            Cantidad = cantidad;
-            PrecioUnitarioDesc = precioUnitDesc;
-            PrecioUnitario = precioUnitOrig;
-            AhorroVolumen = (precioUnitOrig - precioUnitDesc) * cantidad;
-        }
-    }
     private void IrAReview(string? orderId, string? itemNombre)
     {
-        if (string.IsNullOrWhiteSpace(orderId) || string.IsNullOrWhiteSpace(itemNombre))
-            return;
-
-        var nombreUrl = ConvertirParaUrl(itemNombre);
-        Navigation.NavigateTo($"/review/{orderId}/{nombreUrl}");
+        if (string.IsNullOrWhiteSpace(orderId) || string.IsNullOrWhiteSpace(itemNombre)) return;
+        Navigation.NavigateTo($"/review/{orderId}/{ConvertirParaUrl(itemNombre)}");
     }
 
     private string ConvertirParaUrl(string texto)
     {
-        return texto
-            .Trim()
-            .Replace(" ", "-")
-            .Replace("/", "-");
+        return texto.Trim().Replace(" ", "-").Replace("/", "-");
     }
 
-    // Datos de prueba
-    public static List<PedidoDetalle> ObtenerCatalogoDetallesMock() => new()
+    private string FormatearFecha(string fecha)
     {
-        new PedidoDetalle {
-            Id = "KIL-202610081",
-            Fecha = "01 de junio del 2026",
-            Estado = "EN_PREPARACION",
-            ClaseEstado = "status-orange",
-            Subtotal = 449.30m, NumeroSeguimiento="00217262" , Envio = 10.00m, DescuentoCupon = 0.00m,
-            TipoComprobante = "Boleta", DocumentoIdentidad = "72145896",
-            DireccionLinea1 = "Av. Arequipa 1234", DireccionLinea2 = "Miraflores, Lima",
-            Referencia = "Frente al parque Kennedy",
-            MetodoPago = "Tarjeta de crédito", DetalleMetodoPago = "Visa ****0789",
-            Productos = new List<ProductoDetalle> {
-                new("Sérum Vitamina C Gold Kiwi", "Essence", "Images/Serum.jpg", 1, 89.90m, 89.90m),
-                new("Crema Hidratante Facial CeraVe", "CeraVe", "Images/Cerave.jpg", 6, 59.90m, 69.90m)
-            }
-        },
-        new PedidoDetalle {
-            Id = "KIL-202605002",
-            Fecha = "25 de mayo del 2026",
-            Estado = "ENVIADO",
-            ClaseEstado = "status-purple",
-            Subtotal = 78.20m, NumeroSeguimiento="00264788", Envio = 10.00m, DescuentoCupon = 15.00m,
-            TipoComprobante = "Factura", DocumentoIdentidad = "20601234567", RazonSocial = "Killa Beauty S.A.C.",
-            DireccionLinea1 = "Calle Las Orquídeas 456", DireccionLinea2 = "San Isidro, Lima",
-            Referencia = "A dos cuadras de la estación",
-            MetodoPago = "Yape", DetalleMetodoPago = "9******81",
-            Productos = new List<ProductoDetalle> {
-                new("Labial Matte Ink Mood PERIPERA", "Peripera", "Images/LabialPeripera.jpg", 1, 40.00m, 40.00m),
-                new("Máscara Essence Prince False Lash Effect", "Maybelline", "Images/Mascara.jpg", 1, 38.20m, 38.20m)
-            }
-        },
-        new PedidoDetalle {
-            Id = "KIL-202626589",
-            Fecha = "05 de mayo del 2026",
-            Estado = "ENTREGADO",
-            ClaseEstado = "status-green",
-            Subtotal = 120.00m, NumeroSeguimiento="00365271", Envio = 12.00m, DescuentoCupon = 0.00m,
-            TipoComprobante = "Boleta", DocumentoIdentidad = "45127896",
-            DireccionLinea1 = "Av. Javier Prado 2500", DireccionLinea2 = "San Borja, Lima",
-            Referencia = "Cerca a la Rambla",
-            MetodoPago = "Tarjeta de crédito", DetalleMetodoPago = "Mastercard ****4412",
-            Productos = new List<ProductoDetalle> {
-                new("Sérum Vitamina C Gold Kiwi", "Essence", "Images/Serum.jpg", 2, 60.00m, 60.00m)
-            }
-        }
+        if (DateTime.TryParse(fecha, out var dt))
+            return dt.ToString("dd 'de' MMMM 'del' yyyy",
+                new System.Globalization.CultureInfo("es-PE"));
+        return fecha;
+    }
+
+    private string GetStatusClass(string estado) => estado.ToUpperInvariant() switch
+    {
+        "PENDIENTE" => "status-gray",
+        "PAGADO" => "status-gray",
+        "EN_PREPARACION" => "status-yellow",
+        "ENVIADO" => "status-purple",
+        "ENTREGADO" => "status-green",
+        "CANCELADO" => "status-red",
+        _ => "status-gray"
+    };
+
+    private string GetStatusTexto(string estado) => estado.ToUpperInvariant() switch
+    {
+        "PENDIENTE" => "Confirmado",
+        "PAGADO" => "Confirmado",
+        "EN_PREPARACION" => "En preparación",
+        "ENVIADO" => "En camino",
+        "ENTREGADO" => "Entregado",
+        "CANCELADO" => "Cancelado",
+        _ => estado
     };
 }

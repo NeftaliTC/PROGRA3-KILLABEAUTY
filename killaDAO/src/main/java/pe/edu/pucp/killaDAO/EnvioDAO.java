@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface EnvioDAO extends BaseDAO <Envio, Integer> {
     List<Envio> listAll() throws SQLException;
+    Envio buscarPorIdPedido(Integer idPedido) throws SQLException;
 }

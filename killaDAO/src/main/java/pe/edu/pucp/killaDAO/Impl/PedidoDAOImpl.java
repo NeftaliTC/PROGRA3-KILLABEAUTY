@@ -2,11 +2,7 @@ package pe.edu.pucp.killaDAO.Impl;
 
 import pe.edu.pucp.dbManager.DBManager;
 import pe.edu.pucp.dbManager.TransactionContext;
-import pe.edu.pucp.killaBeauty.killaModelo.Direccion;
-import pe.edu.pucp.killaBeauty.killaModelo.EstadoPedido;
-import pe.edu.pucp.killaBeauty.killaModelo.Pedido;
-import pe.edu.pucp.killaBeauty.killaModelo.Usuario;
-import pe.edu.pucp.killaBeauty.killaModelo.DetallePedido;
+import pe.edu.pucp.killaBeauty.killaModelo.*;
 import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Cupon;
 import pe.edu.pucp.killaDAO.PedidoDAO;
 
@@ -20,15 +16,116 @@ public class PedidoDAOImpl implements PedidoDAO {
     public List<Pedido> listAll() throws SQLException {
         List<Pedido> pedidos = new ArrayList<>();
         String sql = """
-                SELECT id_pedido, id_usuario, id_direccion, id_cupon, fecha_pedido,
-                       subtotal, igv, total, id_estado_pedido
-                FROM Pedido
-                """;
+            SELECT p.id_pedido, p.fecha_pedido, p.subtotal, p.igv, p.total,
+                   p.id_estado_pedido, p.id_cupon,
+                   u.id_usuario, u.nombre, u.apellido_paterno, u.apellido_materno, u.correo_electronico, u.telefono,
+                   d.id_direccion, d.direccion_detalle, d.referencia, d.distrito, d.provincia, d.departamento,
+                   dp.id_detalle_pedido, dp.cantidad, dp.precio_unitario_aplicado,
+                   pr.id_producto, pr.nombre AS nombre_producto, pr.precio_base,
+                   m.id_marca, m.descripcion AS nombre_marca
+            FROM Pedido p
+            LEFT JOIN Usuario u ON p.id_usuario = u.id_usuario
+            LEFT JOIN Direccion d ON p.id_direccion = d.id_direccion
+            LEFT JOIN DetallePedido dp ON p.id_pedido = dp.id_pedido
+            LEFT JOIN Producto pr ON dp.id_producto = pr.id_producto
+            LEFT JOIN Marca m ON pr.id_marca = m.id_marca
+            ORDER BY p.id_pedido DESC
+            """;
 
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) pedidos.add(mapRow(rs));
+
+            Pedido actual = null;
+            while (rs.next()) {
+                int idPedido = rs.getInt("id_pedido");
+
+                if (actual == null || actual.getId() != idPedido) {
+                    actual = mapRow(rs);
+                    pedidos.add(actual);
+                }
+
+                int idDetalle = rs.getInt("id_detalle_pedido");
+                if (!rs.wasNull()) {
+                    DetallePedido det = new DetallePedido();
+                    det.setCantidad(rs.getInt("cantidad"));
+                    det.setPrecioAplicado(rs.getDouble("precio_unitario_aplicado"));
+
+                    Producto pr = new Producto();
+                    pr.setId(rs.getInt("id_producto"));
+                    pr.setNombre(rs.getString("nombre_producto"));
+                    pr.setPrecioBase(rs.getDouble("precio_base"));
+
+                    Marca m = new Marca();
+                    m.setId(rs.getInt("id_marca"));
+                    m.setDescripcion(rs.getString("nombre_marca"));
+                    pr.setMarca(m);
+
+                    det.setProducto(pr);
+                    if (actual.getDetalles() == null) actual.setDetalles(new ArrayList<>());
+                    actual.getDetalles().add(det);
+                }
+            }
+        }
+        return pedidos;
+    }
+
+    @Override
+    public List<Pedido> listByCliente(Integer idCliente) throws SQLException {
+        List<Pedido> pedidos = new ArrayList<>();
+        String sql = """
+            SELECT p.id_pedido, p.fecha_pedido, p.subtotal, p.igv, p.total,
+                   p.id_estado_pedido, p.id_cupon,
+                   u.id_usuario, u.nombre, u.apellido_paterno, u.apellido_materno, u.correo_electronico, u.telefono,
+                   d.id_direccion, d.direccion_detalle, d.referencia, d.distrito, d.provincia, d.departamento,
+                   dp.id_detalle_pedido, dp.cantidad, dp.precio_unitario_aplicado,
+                   pr.id_producto, pr.nombre AS nombre_producto, pr.precio_base,
+                   m.id_marca, m.descripcion AS nombre_marca
+            FROM Pedido p
+            LEFT JOIN Usuario u ON p.id_usuario = u.id_usuario
+            LEFT JOIN Direccion d ON p.id_direccion = d.id_direccion
+            LEFT JOIN DetallePedido dp ON p.id_pedido = dp.id_pedido
+            LEFT JOIN Producto pr ON dp.id_producto = pr.id_producto
+            LEFT JOIN Marca m ON pr.id_marca = m.id_marca
+            WHERE p.id_usuario = ?
+            ORDER BY p.id_pedido DESC
+            """;
+
+        try (Connection cn = DBManager.getInstance().getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, idCliente);
+            try (ResultSet rs = ps.executeQuery()) {
+                Pedido actual = null;
+                while (rs.next()) {
+                    int idPedido = rs.getInt("id_pedido");
+
+                    if (actual == null || actual.getId() != idPedido) {
+                        actual = mapRow(rs);
+                        pedidos.add(actual);
+                    }
+
+                    int idDetalle = rs.getInt("id_detalle_pedido");
+                    if (!rs.wasNull()) {
+                        DetallePedido det = new DetallePedido();
+                        det.setCantidad(rs.getInt("cantidad"));
+                        det.setPrecioAplicado(rs.getDouble("precio_unitario_aplicado"));
+
+                        Producto pr = new Producto();
+                        pr.setId(rs.getInt("id_producto"));
+                        pr.setNombre(rs.getString("nombre_producto"));
+                        pr.setPrecioBase(rs.getDouble("precio_base"));
+
+                        Marca m = new Marca();
+                        m.setId(rs.getInt("id_marca"));
+                        m.setDescripcion(rs.getString("nombre_marca"));
+                        pr.setMarca(m);
+
+                        det.setProducto(pr);
+                        if (actual.getDetalles() == null) actual.setDetalles(new ArrayList<>());
+                        actual.getDetalles().add(det);
+                    }
+                }
+            }
         }
         return pedidos;
     }
@@ -36,11 +133,13 @@ public class PedidoDAOImpl implements PedidoDAO {
     @Override
     public Pedido load(Integer id) throws SQLException {
         String sql = """
-                SELECT id_pedido, id_usuario, id_direccion, id_cupon, fecha_pedido,
-                       subtotal, igv, total, id_estado_pedido
-                FROM Pedido
-                WHERE id_pedido = ?
-                """;
+            SELECT p.id_pedido, p.id_usuario, p.id_direccion, p.id_cupon, p.fecha_pedido,
+                   p.subtotal, p.igv, p.total, p.id_estado_pedido,
+                   u.nombre, u.apellido_paterno, u.apellido_materno, u.correo_electronico, u.telefono
+            FROM Pedido p
+            LEFT JOIN Usuario u ON p.id_usuario = u.id_usuario
+            WHERE p.id_pedido = ?
+            """;
 
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
@@ -160,20 +259,34 @@ public class PedidoDAOImpl implements PedidoDAO {
         p.setTotal(rs.getDouble("total"));
         p.setEstadoPedido(EstadoPedido.fromId(rs.getInt("id_estado_pedido")));
 
-        Usuario u = new Usuario();
-        u.setId(rs.getInt("id_usuario"));
-        p.setCliente(u);
-
-        Direccion d = new Direccion();
-        d.setId(rs.getInt("id_direccion"));
-        p.setDireccionEnvio(d);
-
         int idCupon = rs.getInt("id_cupon");
         if (!rs.wasNull()) {
             Cupon c = new Cupon();
             c.setId(idCupon);
             p.setCupon(c);
         }
+
+        Usuario u = new Usuario();
+        u.setId(rs.getInt("id_usuario"));
+        u.setNombre(rs.getString("nombre"));
+        u.setApellidoPaterno(rs.getString("apellido_paterno"));
+        u.setApellidoMaterno(rs.getString("apellido_materno"));
+        u.setCorreoElectronico(rs.getString("correo_electronico"));
+        u.setTelefono(rs.getString("telefono"));
+        p.setCliente(u);
+
+        int idDir = rs.getInt("id_direccion");
+        if (!rs.wasNull()) {
+            Direccion d = new Direccion();
+            d.setId(idDir);
+            d.setDireccionDetalle(rs.getString("direccion_detalle"));
+            d.setReferencia(rs.getString("referencia"));
+            d.setDistrito(rs.getString("distrito"));
+            d.setProvincia(rs.getString("provincia"));
+            d.setDepartamento(rs.getString("departamento"));
+            p.setDireccionEnvio(d);
+        }
+
         return p;
     }
 
@@ -194,5 +307,4 @@ public class PedidoDAOImpl implements PedidoDAO {
         if (value == null) ps.setTimestamp(index, new Timestamp(System.currentTimeMillis()));
         else ps.setTimestamp(index, new Timestamp(value.getTime()));
     }
-
 }

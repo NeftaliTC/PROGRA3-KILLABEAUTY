@@ -20,6 +20,9 @@ public class PedidoBLImpl implements PedidoBL {
     private UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
     private DireccionDAO direccionDAO = new DireccionDAOImpl();
     private MarcaDAO marcaDAO = new MarcaDAOImpl();
+    private EnvioDAO envioDAO = new EnvioDAOImpl();
+    private PagoDAO pagoDAO = new PagoDAOImpl();
+    private ComprobantePagoDAO comprobanteDAO = new ComprobantePagoDAOImpl();
 
     @Override
     public Pedido create(Pedido pedido) throws BusinessLogicException {
@@ -142,7 +145,18 @@ public class PedidoBLImpl implements PedidoBL {
     @Override
     public List<Pedido> listAll() throws BusinessLogicException {
         try {
-            return completarPedidos(pedidoDAO.listAll());
+            return pedidoDAO.listAll();
+        } catch (SQLException e) {
+            throw new BusinessLogicException(e);
+        }
+    }
+
+    @Override
+    public List<Pedido> listByCliente(Integer idCliente) throws BusinessLogicException {
+        if (idCliente == null || idCliente <= 0)
+            throw new BusinessLogicException("Debe indicar un cliente valido.");
+        try {
+            return pedidoDAO.listByCliente(idCliente);
         } catch (SQLException e) {
             throw new BusinessLogicException(e);
         }
@@ -216,13 +230,6 @@ public class PedidoBLImpl implements PedidoBL {
         if (producto.getStock() != null && producto.getStock() < cantidad) {
             throw new BusinessLogicException("No hay stock suficiente para " + producto.getNombre() + ".");
         }
-    }
-
-    private List<Pedido> completarPedidos(List<Pedido> pedidos) throws SQLException {
-        for (Pedido pedido : pedidos) {
-            completarPedido(pedido);
-        }
-        return pedidos;
     }
 
     private Pedido completarPedido(Pedido pedido) throws SQLException {
@@ -299,10 +306,10 @@ public class PedidoBLImpl implements PedidoBL {
     }
 
     private void recalcularTotales(Pedido pedido) {
-        double subtotal = 0.0;
-        for (DetallePedido detalle : pedido.getDetalles()) subtotal += detalle.calcularSubtotal();
-        pedido.setSubtotal(subtotal);
-        pedido.setIgv(subtotal * 0.18);
-        pedido.setTotal(pedido.getSubtotal() + pedido.getIgv());
+        double total = 0.0;
+        for (DetallePedido detalle : pedido.getDetalles()) total += detalle.calcularSubtotal();
+        pedido.setTotal(total);
+        pedido.setIgv(total * 0.18);
+        pedido.setSubtotal(total - pedido.getIgv());
     }
 }
