@@ -125,7 +125,7 @@
                     usuarioLogueado.Nombre,
                     usuarioLogueado.Id,
                     usuarioLogueado.TipoUsuario,
-                    usuarioLogueado.CorreoElectronico);
+                                    usuarioLogueado.CorreoElectronico, usuarioLogueado.Dni);
                 string rolReal = usuarioLogueado.TipoUsuario?.Trim().ToUpper() ?? "";
                 if (rolReal == "TRABAJADOR" || rolReal == "ADMINISTRADOR")
                 {

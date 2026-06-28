@@ -103,7 +103,8 @@
 
             <div class="coupon-row">
                 <input placeholder="Ingresa tu código de cupón"
-                       @bind="cupon" />
+                       value="@cupon"
+                       @oninput="ActualizarCupon" />
 
                 <button class="coupon-button"
                         disabled="@string.IsNullOrWhiteSpace(cupon)"
@@ -160,9 +161,10 @@
             {
                 <div class="checkout-field">
                     <label>DNI</label>
-                    <input placeholder="Ingresa tu DNI"
+                    <input placeholder="DNI del usuario"
+                           value="@dni"
                            maxlength="8"
-                           @bind="dni" />
+                           readonly />
                 </div>
             }
 
@@ -171,8 +173,15 @@
                 <div class="checkout-field">
                     <label>RUC</label>
                     <input placeholder="Ingresa el RUC de tu empresa"
+                           value="@ruc"
                            maxlength="11"
-                           @bind="ruc" />
+                           @oninput="FiltrarRuc"
+                           onkeydown="return event.key >= '0' && event.key <= '9'
+                    || event.key === 'Backspace'
+                    || event.key === 'Delete'
+                    || event.key === 'Tab'
+                    || event.key === 'ArrowLeft'
+                    || event.key === 'ArrowRight'" />
                 </div>
 
                 <div class="checkout-field">
@@ -294,8 +303,10 @@
             <strong>S/ @TotalFinal.ToString("0.00")</strong>
         </div>
 
-        <button class="confirm-button" @onclick="ConfirmarPedido">
-            Confirmar pedido
+        <button class="confirm-button"
+                @onclick="ConfirmarPedido"
+                disabled="@validandoCompra">
+            @(validandoCompra ? "Validando..." : "Confirmar pedido")
         </button>
     </div>
 
@@ -317,7 +328,16 @@
 
                 <div class="form-group">
                     <label>Teléfono</label>
-                    <input @bind="nuevaDireccion.Telefono" maxlength="9" placeholder="987654321" />
+                    <input value="@nuevaDireccion.Telefono"
+                           maxlength="9"
+                           placeholder="987654321"
+                           @oninput="FiltrarTelefono"
+                           onkeydown="return event.key >= '0' && event.key <= '9'
+                    || event.key === 'Backspace'
+                    || event.key === 'Delete'
+                    || event.key === 'Tab'
+                    || event.key === 'ArrowLeft'
+                    || event.key === 'ArrowRight'" />
                 </div>
             </div>
 
@@ -369,6 +389,31 @@
     </div>
 }
 
+@if (validandoCompra)
+{
+    <div class="modal-overlay">
+        <div class="validating-modal">
+            <div class="spinner-border text-danger" role="status"></div>
+            <h2>Validando compra...</h2>
+            <p>Estamos verificando tu pago. Por favor espera.</p>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errorValidacionCompra))
+{
+    <div class="modal-overlay">
+        <div class="validating-modal">
+            <i class="bi bi-x-circle text-danger fs-1"></i>
+            <h2>Compra no validada</h2>
+            <p>@errorValidacionCompra</p>
+            <button class="btn-save" @onclick="() => errorValidacionCompra = string.Empty">
+                Intentar nuevamente
+            </button>
+        </div>
+    </div>
+}
+
 @code {
     private string metodoEntrega = "";
     private string metodoPago = "";
@@ -383,11 +428,16 @@
     {
         if (AuthService.UsuarioId.HasValue)
         {
-            // Carga las direcciones del servidor hacia el servicio
+            if (!AuthService.EstaLogueado || !AuthService.UsuarioId.HasValue)
+            {
+                Navigation.NavigateTo("/login?returnUrl=/checkout", replace: true);
+                return;
+            }
+
             await AddressService.CargarPorUsuarioAsync(AuthService.UsuarioId.Value);
-        
-            // Una vez cargadas, busca la predeterminada
             direccionSeleccionada = AddressService.ObtenerPredeterminada();
+
+            dni = AuthService.Dni ?? "";
         }
     }
 
@@ -537,6 +587,9 @@
     private string razonSocial = "";
     private string direccionFiscal = "";
     private string errorComprobante = "";
+    private bool validandoCompra = false;
+    private string errorValidacionCompra = "";
+    private readonly Random random = new();
 
     private void SeleccionarComprobante(string tipo)
     {
@@ -616,6 +669,22 @@
             return;
         }
 
+        validandoCompra = true;
+        errorValidacionCompra = "";
+        StateHasChanged();
+
+        await Task.Delay(2500); // Simula demora de validación
+
+        bool compraValidada = random.Next(1, 101) <= 90;
+        // 90% aprobada, 10% rechazada
+
+        if (!compraValidada)
+        {
+            validandoCompra = false;
+            errorValidacionCompra = "No se pudo validar el pago. Intenta nuevamente o usa otro método.";
+            return;
+        }
+
         var pedido = new Pedido
         {
             Fecha = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
@@ -629,24 +698,54 @@
             },
 
             Detalles = CartService.Productos
-        .Where(item => item.Producto != null)
-        .Select(item => new DetallePedido
-        {
-            Cantidad = item.Cantidad,
-            PrecioAplicado = (double)item.Producto!.PrecioBase,
-            Producto = new ProductoRef
-            {
-                Id = item.Producto.Id
-            }
-        })
-        .ToList()
+                .Where(item => item.Producto != null)
+                .Select(item => new DetallePedido
+                {
+                    Cantidad = item.Cantidad,
+                    PrecioAplicado = (double)item.Producto!.PrecioBase,
+                    Producto = new ProductoRef
+                    {
+                        Id = item.Producto.Id
+                    }
+                })
+                .ToList()
         };
 
         await PedidoService.CrearAsync(pedido);
 
         await CartService.VaciarCarritoAsync(AuthService.UsuarioId.Value);
 
+        validandoCompra = false;
+
         Navigation.NavigateTo("/order-confirmed");
+    }
+
+    private void FiltrarDni(ChangeEventArgs e)
+    {
+        dni = SoloNumeros(e.Value?.ToString(), 8);
+    }
+
+    private void FiltrarRuc(ChangeEventArgs e)
+    {
+        ruc = SoloNumeros(e.Value?.ToString(), 11);
+    }
+
+    private string SoloNumeros(string? texto, int maximo)
+    {
+        return new string((texto ?? "")
+            .Where(char.IsDigit)
+            .Take(maximo)
+            .ToArray());
+    }
+
+    private void FiltrarTelefono(ChangeEventArgs e)
+    {
+        nuevaDireccion.Telefono = SoloNumeros(e.Value?.ToString(), 9);
+    }
+
+    private void ActualizarCupon(ChangeEventArgs e)
+    {
+        cupon = e.Value?.ToString() ?? "";
     }
 
     private decimal TotalFinal =>
