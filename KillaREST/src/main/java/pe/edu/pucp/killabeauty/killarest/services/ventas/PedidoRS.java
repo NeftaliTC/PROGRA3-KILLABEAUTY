@@ -3,14 +3,8 @@ package pe.edu.pucp.killabeauty.killarest.services.ventas;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import pe.edu.pucp.killaBeauty.bl.ComprobantePagoBL;
-import pe.edu.pucp.killaBeauty.bl.EnvioBL;
-import pe.edu.pucp.killaBeauty.bl.Impl.ComprobantePagoBLImpl;
-import pe.edu.pucp.killaBeauty.bl.Impl.EnvioBLImpl;
-import pe.edu.pucp.killaBeauty.bl.Impl.PagoBLImpl;
-import pe.edu.pucp.killaBeauty.bl.Impl.PedidoBLImpl;
-import pe.edu.pucp.killaBeauty.bl.PagoBL;
-import pe.edu.pucp.killaBeauty.bl.PedidoBL;
+import pe.edu.pucp.killaBeauty.bl.*;
+import pe.edu.pucp.killaBeauty.bl.Impl.*;
 import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
 import pe.edu.pucp.killaBeauty.killaModelo.*;
 import pe.edu.pucp.killabeauty.killarest.dto.ErrorDTO;
@@ -28,6 +22,7 @@ import java.util.stream.Collectors;
 public class PedidoRS {
     private final PedidoBL pedidoBL = new PedidoBLImpl();
     private final EnvioBL envioBL = new EnvioBLImpl();
+    private final CourierBL courierBL = new CourierBLImpl();
     private final PagoBL pagoBL = new PagoBLImpl();
     private final ComprobantePagoBL comprobanteBL = new ComprobantePagoBLImpl();
 
@@ -56,12 +51,45 @@ public class PedidoRS {
                 throw new BusinessLogicException("La solicitud de checkout no puede ser nula.");
             }
 
+            //Crear pedido
             Pedido pedido = pedidoBL.createFromCart(
                     request.getUsuarioId(),
                     request.getDireccionId(),
                     request.getCuponId(),
                     mapDetallesCarrito(request.getItems())
             );
+
+            //Crear pago
+            Pago pago = new Pago();
+            pago.setPedido(pedido);
+            pago.setMontoPagado(pedido.getTotal() + request.getCostoEnvio() - request.getDescuentoCupon());
+            pago.setFechaHoraPago(new java.util.Date());
+            pago.setEstado(true);
+            pago.setMetodoPago(resolverMetodoPago(request.getMetodoPago()));
+            pago = pagoBL.create(pago);
+
+            // Actualizar total del pedido con el monto real pagado
+            pedidoBL.actualizarTotal(pedido.getId(), pago.getMontoPagado());
+            pedido.setTotal(pago.getMontoPagado());
+
+            //Crear Envio si hay direccion seleccionada
+            if (request.getDireccionId() != null && request.getDireccionId() > 0) {
+                Courier courier = courierBL.buscarAsignado();
+                if (courier != null) {
+                    Envio envio = new Envio();
+                    envio.setPedido(pedido);
+                    envio.setCourier(courier);
+                    envio.setCostoEnvio(request.getCostoEnvio());
+                    envio.setEstadoEnvio(EstadoEnvio.PENDIENTE);
+                    envio.setNumeroSeguimiento(generarNumeroSeguimiento(pedido.getId()));
+                    envioBL.create(envio);
+                }
+            }
+
+            //Crear comprobante
+            ComprobantePago comprobante = crearComprobante(request, pago);
+            if (comprobante != null)
+                comprobanteBL.create(comprobante);
 
             return Response.status(Response.Status.CREATED)
                     .entity(construirDTO(pedido))
@@ -153,9 +181,7 @@ public class PedidoRS {
 
     private List<DetallePedido> mapDetallesCarrito(List<PedidoCheckoutDTO.ItemCarritoDTO> items) {
         List<DetallePedido> detalles = new ArrayList<>();
-        if (items == null) {
-            return detalles;
-        }
+        if (items == null) return detalles;
 
         for (PedidoCheckoutDTO.ItemCarritoDTO item : items) {
             DetallePedido detalle = new DetallePedido();
@@ -163,9 +189,50 @@ public class PedidoRS {
             producto.setId(item != null && item.getProductoId() != null ? item.getProductoId() : 0);
             detalle.setProducto(producto);
             detalle.setCantidad(item != null && item.getCantidad() != null ? item.getCantidad() : 0);
+            detalle.setPrecioAplicado(item != null ? item.getPrecioAplicado() : 0);
             detalles.add(detalle);
         }
-
         return detalles;
+    }
+
+    private MetodoPago resolverMetodoPago(String metodoPago) {
+        if (metodoPago == null) return MetodoPago.TARJETA;
+        return switch (metodoPago.toUpperCase()) {
+            case "YAPE_PLIN" -> MetodoPago.YAPE;
+            case "TARJETA" -> MetodoPago.TARJETA;
+            default -> MetodoPago.TARJETA;
+        };
+    }
+
+    private String generarNumeroSeguimiento(int idPedido) {
+        return String.format("KIL-%d-%06d",
+                java.time.LocalDate.now().getYear(), idPedido);
+    }
+
+    private ComprobantePago crearComprobante(PedidoCheckoutDTO request, Pago pago) {
+        if (request.getTipoComprobante() == null) return null;
+
+        if (request.getTipoComprobante().equalsIgnoreCase("BOLETA")) {
+            Boleta b = new Boleta();
+            b.setPago(pago);
+            b.setFechaEmision(new java.util.Date());
+            b.setSerie("B001");
+            b.setNumeroCorrelativo(String.format("%08d", pago.getIdPago()));
+            b.setTipoComprobante(TipoComprobante.getById(1));
+            b.setDni(request.getDni());
+            return b;
+        } else if (request.getTipoComprobante().equalsIgnoreCase("FACTURA")) {
+            Factura f = new Factura();
+            f.setPago(pago);
+            f.setFechaEmision(new java.util.Date());
+            f.setSerie("F001");
+            f.setNumeroCorrelativo(String.format("%08d", pago.getIdPago()));
+            f.setTipoComprobante(TipoComprobante.getById(2));
+            f.setRuc(request.getRuc());
+            f.setRazonSocial(request.getRazonSocial());
+            f.setDireccionFiscal(request.getDireccionFiscal());
+            return f;
+        }
+        return null;
     }
 }

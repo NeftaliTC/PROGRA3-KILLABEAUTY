@@ -1,9 +1,8 @@
 package pe.edu.pucp.killabeauty.killarest.dto;
 
-import pe.edu.pucp.killaBeauty.killaModelo.ComprobantePago;
-import pe.edu.pucp.killaBeauty.killaModelo.Envio;
-import pe.edu.pucp.killaBeauty.killaModelo.Pago;
-import pe.edu.pucp.killaBeauty.killaModelo.Pedido;
+import pe.edu.pucp.killaBeauty.killaModelo.*;
+import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.TipoDescuento;
+
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +25,7 @@ public class PedidoDetalleDTO {
     private String provincia;
     private String departamento;
     private Integer cuponId;
+    private double descuentoCupon;
     private String numeroSeguimiento;
     private double costoEnvio;
     private String courier;
@@ -33,6 +33,8 @@ public class PedidoDetalleDTO {
     private String tipoComprobante;
     private String serieComprobante;
     private String numeroCorrelativo;
+    private String documentoIdentidad;
+    private String razonSocial;
     private List<DetalleItemDTO> productos;
 
     public PedidoDetalleDTO(Pedido p, Envio envio, Pago pago, ComprobantePago comprobante) {
@@ -61,8 +63,19 @@ public class PedidoDetalleDTO {
             this.departamento = p.getDireccionEnvio().getDepartamento();
         }
 
-        if (p.getCupon() != null && p.getCupon().getId() > 0)
+        if (p.getCupon() != null && p.getCupon().getId() > 0) {
             this.cuponId = p.getCupon().getId();
+            if (p.getCupon().getTipoDescuento() == TipoDescuento.PORCENTAJE) {
+                double dscto = p.getSubtotal() * p.getCupon().getValorDescuento() / 100;
+                // Respeta el maximo si existe
+                if (p.getCupon().getMontoMaximoDescuento() != null && dscto > p.getCupon().getMontoMaximoDescuento()) {
+                    dscto = p.getCupon().getMontoMaximoDescuento();
+                }
+                this.descuentoCupon = dscto;
+            } else {
+                this.descuentoCupon = p.getCupon().getValorDescuento();
+            }
+        }
 
         if (p.getDetalles() != null)
             this.productos = p.getDetalles().stream()
@@ -86,6 +99,13 @@ public class PedidoDetalleDTO {
                     ? comprobante.getTipoComprobante().getnombre() : "";
             this.serieComprobante = comprobante.getSerie();
             this.numeroCorrelativo = comprobante.getNumeroCorrelativo();
+
+            if (comprobante instanceof Boleta) {
+                this.documentoIdentidad = ((Boleta) comprobante).getDni();
+            } else if (comprobante instanceof Factura) {
+                this.documentoIdentidad = ((Factura) comprobante).getRuc();
+                this.razonSocial = ((Factura) comprobante).getRazonSocial();
+            }
         }
     }
 
@@ -138,6 +158,8 @@ public class PedidoDetalleDTO {
     public void setDepartamento(String departamento) { this.departamento = departamento; }
     public Integer getCuponId() { return cuponId; }
     public void setCuponId(Integer cuponId) { this.cuponId = cuponId; }
+    public double getDescuentoCupon() { return descuentoCupon; }
+    public void setDescuentoCupon(double descuentoCupon) { this.descuentoCupon = descuentoCupon; }
     public String getNumeroSeguimiento() { return numeroSeguimiento; }
     public void setNumeroSeguimiento(String numeroSeguimiento) { this.numeroSeguimiento = numeroSeguimiento; }
     public double getCostoEnvio() { return costoEnvio; }
@@ -152,6 +174,10 @@ public class PedidoDetalleDTO {
     public void setSerieComprobante(String serieComprobante) { this.serieComprobante = serieComprobante; }
     public String getNumeroCorrelativo() { return numeroCorrelativo; }
     public void setNumeroCorrelativo(String numeroCorrelativo) { this.numeroCorrelativo = numeroCorrelativo; }
+    public String getDocumentoIdentidad() { return documentoIdentidad; }
+    public void setDocumentoIdentidad(String documentoIdentidad) { this.documentoIdentidad = documentoIdentidad; }
+    public String getRazonSocial() { return razonSocial; }
+    public void setRazonSocial(String razonSocial) { this.razonSocial = razonSocial; }
     public List<DetalleItemDTO> getProductos() { return productos; }
     public void setProductos(List<DetalleItemDTO> productos) { this.productos = productos; }
 }
