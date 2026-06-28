@@ -4,6 +4,7 @@ import pe.edu.pucp.dbManager.DBManager;
 import pe.edu.pucp.dbManager.TransactionContext;
 import pe.edu.pucp.killaBeauty.killaModelo.*;
 import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.Cupon;
+import pe.edu.pucp.killaBeauty.killaModelo.Promocionales.TipoDescuento;
 import pe.edu.pucp.killaDAO.PedidoDAO;
 
 import java.sql.*;
@@ -16,19 +17,21 @@ public class PedidoDAOImpl implements PedidoDAO {
     public List<Pedido> listAll() throws SQLException {
         List<Pedido> pedidos = new ArrayList<>();
         String sql = """
-            SELECT p.id_pedido, p.fecha_pedido, p.subtotal, p.igv, p.total,
+                SELECT p.id_pedido, p.fecha_pedido, p.subtotal, p.igv, p.total,
                    p.id_estado_pedido, p.id_cupon,
                    u.id_usuario, u.nombre, u.apellido_paterno, u.apellido_materno, u.correo_electronico, u.telefono,
                    d.id_direccion, d.direccion_detalle, d.referencia, d.distrito, d.provincia, d.departamento,
                    dp.id_detalle_pedido, dp.cantidad, dp.precio_unitario_aplicado,
                    pr.id_producto, pr.nombre AS nombre_producto, pr.precio_base,
-                   m.id_marca, m.descripcion AS nombre_marca
+                   m.id_marca, m.descripcion AS nombre_marca,
+                   c.valor_descuento, c.id_tipo_descuento, c.monto_maximo_descuento
             FROM Pedido p
             LEFT JOIN Usuario u ON p.id_usuario = u.id_usuario
             LEFT JOIN Direccion d ON p.id_direccion = d.id_direccion
             LEFT JOIN DetallePedido dp ON p.id_pedido = dp.id_pedido
             LEFT JOIN Producto pr ON dp.id_producto = pr.id_producto
             LEFT JOIN Marca m ON pr.id_marca = m.id_marca
+            LEFT JOIN Cupon c ON p.id_cupon = c.id_cupon
             ORDER BY p.id_pedido DESC
             """;
 
@@ -80,13 +83,15 @@ public class PedidoDAOImpl implements PedidoDAO {
                    d.id_direccion, d.direccion_detalle, d.referencia, d.distrito, d.provincia, d.departamento,
                    dp.id_detalle_pedido, dp.cantidad, dp.precio_unitario_aplicado,
                    pr.id_producto, pr.nombre AS nombre_producto, pr.precio_base,
-                   m.id_marca, m.descripcion AS nombre_marca
+                   m.id_marca, m.descripcion AS nombre_marca,
+                   c.valor_descuento, c.id_tipo_descuento, c.monto_maximo_descuento
             FROM Pedido p
             LEFT JOIN Usuario u ON p.id_usuario = u.id_usuario
             LEFT JOIN Direccion d ON p.id_direccion = d.id_direccion
             LEFT JOIN DetallePedido dp ON p.id_pedido = dp.id_pedido
             LEFT JOIN Producto pr ON dp.id_producto = pr.id_producto
             LEFT JOIN Marca m ON pr.id_marca = m.id_marca
+            LEFT JOIN Cupon c ON p.id_cupon = c.id_cupon
             WHERE p.id_usuario = ?
             ORDER BY p.id_pedido DESC
             """;
@@ -135,9 +140,13 @@ public class PedidoDAOImpl implements PedidoDAO {
         String sql = """
             SELECT p.id_pedido, p.id_usuario, p.id_direccion, p.id_cupon, p.fecha_pedido,
                    p.subtotal, p.igv, p.total, p.id_estado_pedido,
-                   u.nombre, u.apellido_paterno, u.apellido_materno, u.correo_electronico, u.telefono
+                   u.nombre, u.apellido_paterno, u.apellido_materno, u.correo_electronico, u.telefono,
+                   d.direccion_detalle, d.referencia, d.distrito, d.provincia, d.departamento,
+                   c.valor_descuento, c.id_tipo_descuento, c.monto_maximo_descuento
             FROM Pedido p
             LEFT JOIN Usuario u ON p.id_usuario = u.id_usuario
+            LEFT JOIN Direccion d ON p.id_direccion = d.id_direccion
+            LEFT JOIN Cupon c ON p.id_cupon = c.id_cupon
             WHERE p.id_pedido = ?
             """;
 
@@ -145,9 +154,7 @@ public class PedidoDAOImpl implements PedidoDAO {
              PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return mapRow(rs);
-                }
+                if (rs.next()) return mapRow(rs);
             }
         }
         return null;
@@ -261,9 +268,15 @@ public class PedidoDAOImpl implements PedidoDAO {
 
         int idCupon = rs.getInt("id_cupon");
         if (!rs.wasNull()) {
-            Cupon c = new Cupon();
-            c.setId(idCupon);
-            p.setCupon(c);
+            Cupon cupon = new Cupon();
+            cupon.setId(idCupon);
+            cupon.setValorDescuento(rs.getDouble("valor_descuento"));
+            double montoMax = rs.getDouble("monto_maximo_descuento");
+            cupon.setMontoMaximoDescuento(rs.wasNull() ? null : montoMax);
+            int idTipo = rs.getInt("id_tipo_descuento");
+            if (idTipo == 1) cupon.setTipoDescuento(TipoDescuento.PORCENTAJE);
+            else if (idTipo == 2) cupon.setTipoDescuento(TipoDescuento.MONTO_FIJO);
+            p.setCupon(cupon);
         }
 
         Usuario u = new Usuario();
@@ -286,7 +299,6 @@ public class PedidoDAOImpl implements PedidoDAO {
             d.setDepartamento(rs.getString("departamento"));
             p.setDireccionEnvio(d);
         }
-
         return p;
     }
 
@@ -306,5 +318,16 @@ public class PedidoDAOImpl implements PedidoDAO {
     private void setTimestamp(PreparedStatement ps, int index, java.util.Date value) throws SQLException {
         if (value == null) ps.setTimestamp(index, new Timestamp(System.currentTimeMillis()));
         else ps.setTimestamp(index, new Timestamp(value.getTime()));
+    }
+
+    @Override
+    public void updateTotal(Integer idPedido, double nuevoTotal) throws SQLException {
+        String sql = "UPDATE Pedido SET total = ? WHERE id_pedido = ?";
+        Connection cn = TransactionContext.getConnection();
+        try (PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setDouble(1, nuevoTotal);
+            ps.setInt(2, idPedido);
+            ps.executeUpdate();
+        }
     }
 }
