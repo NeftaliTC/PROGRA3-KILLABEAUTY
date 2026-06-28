@@ -95,6 +95,7 @@ namespace BlazorAppKillaBeauty.Services
 
             Productos = carritoActual?.DetalleCarritoList ?? new();
 
+            await ConsolidarProductosDuplicadosAsync();
             await RecalcularTotalesAsync();
         }
 
@@ -282,10 +283,19 @@ namespace BlazorAppKillaBeauty.Services
         {
             var carrito = await ObtenerOCrearCarritoUsuarioAsync(idUsuario);
 
-            await AgregarDetalleCarritoAsync(
-                idProducto,
-                carrito.Id,
-                cantidad);
+            var detalleExistente = carrito.DetalleCarritoList
+                .FirstOrDefault(d => d.Producto?.Id == idProducto);
+
+            if (detalleExistente != null)
+            {
+                await ActualizarCantidadDetalleAsync(
+                    detalleExistente.Id,
+                    detalleExistente.Cantidad + cantidad);
+
+                return;
+            }
+
+            await AgregarDetalleCarritoAsync(idProducto, carrito.Id, cantidad);
         }
 
         public record InfoEscalaCarrito(
@@ -370,11 +380,7 @@ namespace BlazorAppKillaBeauty.Services
 
             var nuevaCantidad = detalle.Cantidad + 1;
 
-            using var response = await http.PutAsync(
-                $"detalle-carrito/{detalleId}/cantidad/{nuevaCantidad}",
-                null);
-
-            await EnsureSuccessAsync(response);
+            await ActualizarCantidadDetalleAsync(detalleId, nuevaCantidad);
 
             detalle.Cantidad = nuevaCantidad;
             await RecalcularTotalesAsync();
@@ -389,11 +395,7 @@ namespace BlazorAppKillaBeauty.Services
 
             var nuevaCantidad = detalle.Cantidad - 1;
 
-            using var response = await http.PutAsync(
-                $"detalle-carrito/{detalleId}/cantidad/{nuevaCantidad}",
-                null);
-
-            await EnsureSuccessAsync(response);
+            await ActualizarCantidadDetalleAsync(detalleId, nuevaCantidad);
 
             detalle.Cantidad = nuevaCantidad;
             await RecalcularTotalesAsync();
@@ -444,6 +446,45 @@ namespace BlazorAppKillaBeauty.Services
             detalle.Cantidad--;
 
             await RecalcularTotalesAsync();
+        }
+
+        private async Task ActualizarCantidadDetalleAsync(int detalleId, int cantidad)
+        {
+            using var response = await http.PutAsync(
+                $"detalle-carrito/{detalleId}/cantidad/{cantidad}",
+                null);
+
+            await EnsureSuccessAsync(response);
+        }
+
+        private async Task ConsolidarProductosDuplicadosAsync()
+        {
+            var gruposDuplicados = Productos
+                .Where(d => d.Id > 0 && d.Producto != null)
+                .GroupBy(d => d.Producto!.Id)
+                .Where(g => g.Count() > 1)
+                .ToList();
+
+            foreach (var grupo in gruposDuplicados)
+            {
+                var detalles = grupo
+                    .OrderBy(d => d.Id)
+                    .ToList();
+
+                var detallePrincipal = detalles.First();
+                var cantidadTotal = detalles.Sum(d => d.Cantidad);
+
+                await ActualizarCantidadDetalleAsync(detallePrincipal.Id, cantidadTotal);
+                detallePrincipal.Cantidad = cantidadTotal;
+
+                foreach (var detalleDuplicado in detalles.Skip(1))
+                {
+                    using var response = await http.DeleteAsync($"detalle-carrito/{detalleDuplicado.Id}");
+                    await EnsureSuccessAsync(response);
+
+                    Productos.Remove(detalleDuplicado);
+                }
+            }
         }
     }
 }

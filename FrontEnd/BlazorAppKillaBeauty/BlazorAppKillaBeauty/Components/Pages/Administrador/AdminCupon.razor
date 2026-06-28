@@ -74,8 +74,17 @@
 
 
         <section class="admin-table-card admin-orders-table-card">
-            <table class="admin-table admin-orders-table">
-                <thead>
+            <PaginatedTable TItem="Cupon"
+                            Page="paginaCupones"
+                            OnChanged="OnPageChanged"
+                            ColSpan="7"
+                            InitialPageSize="6"
+                            PageSizeOptions="opcionesPagina"
+                            ContainerClass="table-responsive"
+                            TableClass="admin-table admin-orders-table"
+                            HeaderClass=""
+                            EmptyMessage="No se encontraron cupones.">
+                <TableHeader>
                     <tr>
                         <th style="padding-left: 2rem !important;">ID</th>
                         <th>CODIGO</th>
@@ -85,62 +94,37 @@
                         <th class="text-center">ESTADO</th>
                         <th class="text-end" style="padding-right: 2rem !important;">ACCIONES</th>
                     </tr>
-                </thead>
-                <tbody>
-      
-                    @foreach (var c in cuponesPaginados)
-                    {
-                        <tr>
-                            <td style="padding-left: 2rem !important; color: #777;">@c.Id.ToString("D5")</td>
-                            <td class="td-codigo">@c.Codigo</td>
-                            <td style="font-weight: 700;">@(c.EsPorcentaje ? $"{c.ValorDescuento}%" : $"S/ {c.ValorDescuento}")</td>
-                            <td>@(c.FechaInicio?.ToString("dd/MM/yyyy") ?? "-")</td>
-                            <td>@(c.FechaFin?.ToString("dd/MM/yyyy") ?? "-")</td>
-                            <td class="text-center">
-                                @if (ObtenerEstado(c) == "Disponible")
-                                {
-                                    <span class="badge-disponible">Disponible</span>
-                                }
-                                else if (ObtenerEstado(c) == "Inactivo")
-                                {
-
-                                    <span class="badge-inactivo">Inactivo</span>
-                                }
-                                else
-                                {
-
-                                    <span class="badge-vencido">Vencido</span>
-                                }
-                            </td>
-                            <td class="text-end" style="padding-right: 2rem !important;">
-                                <button class="btn-accion" title="Ver" @onclick="() => VerDetalle(c)"><i class="bi bi-eye"></i></button>
-                                <button class="btn-accion" title="Editar" @onclick='() => NavManager.NavigateTo($"/admin/cupones/editar/{c.Id}")'><i class="bi bi-pencil"></i></button>
-                                <button class="btn-accion btn-borrar" title="Eliminar" @onclick="() => EliminarCupon(c.Id)"><i class="bi bi-trash"></i></button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                </TableHeader>
+                <RowTemplate Context="c">
+                    <tr>
+                        <td style="padding-left: 2rem !important; color: #777;">@c.Id.ToString("D5")</td>
+                        <td class="td-codigo">@c.Codigo</td>
+                        <td style="font-weight: 700;">@(c.EsPorcentaje ? $"{c.ValorDescuento}%" : $"S/ {c.ValorDescuento}")</td>
+                        <td>@(c.FechaInicio?.ToString("dd/MM/yyyy") ?? "-")</td>
+                        <td>@(c.FechaFin?.ToString("dd/MM/yyyy") ?? "-")</td>
+                        <td class="text-center">
+                            @if (ObtenerEstado(c) == "Disponible")
+                            {
+                                <span class="badge-disponible">Disponible</span>
+                            }
+                            else if (ObtenerEstado(c) == "Inactivo")
+                            {
+                                <span class="badge-inactivo">Inactivo</span>
+                            }
+                            else
+                            {
+                                <span class="badge-vencido">Vencido</span>
+                            }
+                        </td>
+                        <td class="text-end" style="padding-right: 2rem !important;">
+                            <button class="btn-accion" title="Ver" @onclick="() => VerDetalle(c)"><i class="bi bi-eye"></i></button>
+                            <button class="btn-accion" title="Editar" @onclick='() => NavManager.NavigateTo($"/admin/cupones/editar/{c.Id}")'><i class="bi bi-pencil"></i></button>
+                            <button class="btn-accion btn-borrar" title="Eliminar" @onclick="() => EliminarCupon(c.Id)"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                </RowTemplate>
+            </PaginatedTable>
         </section>
-
-    
-        @if (totalPaginas > 1)
-        {
-            <footer class="admin-pagination">
-                <span style="font-weight: 600; color: #777;">
-                    Mostrando @(((paginaActual - 1) * itemsPorPagina) + 1) @(Math.Min(paginaActual * itemsPorPagina, cuponesFiltrados.Count)) de @cuponesFiltrados.Count resultados
-                </span>
-                <div class="admin-pagination-buttons d-flex gap-2">
-                    <button class="btn btn-light rounded-circle" style="width:35px; height:35px; border: 1px solid #ddd;" disabled="@(paginaActual == 1)" @onclick="() => CambiarPagina(paginaActual - 1)"> </button>
-                    @for (int p = 1; p <= totalPaginas; p++)
-                    {
-                        int pg = p;
-                        <button class="btn rounded-circle fw-bold" style="width:35px; height:35px; @(paginaActual == pg ? "background-color: #f5a3b7; color: white; border:none;" : "background-color: transparent; color: #555; border: 1px solid #ddd;")" @onclick="() => CambiarPagina(pg)">@pg</button>
-                    }
-                    <button class="btn btn-light rounded-circle" style="width:35px; height:35px; border: 1px solid #ddd;" disabled="@(paginaActual == totalPaginas)" @onclick="() => CambiarPagina(paginaActual + 1)"> </button>
-                </div>
-            </footer>
-        }
 
     </section>
 </main>
@@ -405,13 +389,12 @@
     private DateTime? filtroDesde = null;
     private DateTime? filtroHasta = null;
 
-    private int paginaActual = 1;
-    private int itemsPorPagina = 6;
+    private readonly int[] opcionesPagina = new[] { 6, 10, 25, 50, 100 };
+    private PageQuery queryActual = new(1, 6);
+    private TablePage<Cupon> paginaCupones = new();
 
     private bool datosCargados = false;
     private List<Cupon> cuponesFiltrados = new();
-    private IEnumerable<Cupon> cuponesPaginados => cuponesFiltrados.Skip((paginaActual - 1) * itemsPorPagina).Take(itemsPorPagina);
-    private int totalPaginas => (int)Math.Ceiling((double)cuponesFiltrados.Count / itemsPorPagina);
 
     protected override async Task OnParametersSetAsync()
     {
@@ -442,6 +425,7 @@
             campanasDisponibles = new List<Campana>();
             campanasTodas = new List<Campana>();
             cuponesFiltrados = new List<Cupon>();
+            ActualizarPaginaCupones();
         }
     }
 
@@ -549,7 +533,7 @@
             q = q.Where(c => c.FechaFin <= filtroHasta);
 
         cuponesFiltrados = q.OrderByDescending(c => c.Id).ToList();
-        paginaActual = 1;
+        ResetearPaginacion();
     }
 
     private void LimpiarFiltros()
@@ -561,7 +545,29 @@
         AplicarFiltros();
     }
 
-    private void CambiarPagina(int pagina) => paginaActual = pagina;
+    private void OnPageChanged(PageQuery query)
+    {
+        queryActual = query;
+        ActualizarPaginaCupones();
+    }
+
+    private void ResetearPaginacion()
+    {
+        queryActual = new PageQuery(1, queryActual.PageSize);
+        ActualizarPaginaCupones();
+    }
+
+    private void ActualizarPaginaCupones()
+    {
+        paginaCupones = new TablePage<Cupon>
+        {
+            Items = cuponesFiltrados
+                .Skip((queryActual.Page - 1) * queryActual.PageSize)
+                .Take(queryActual.PageSize)
+                .ToList(),
+            TotalRecords = cuponesFiltrados.Count
+        };
+    }
 
     private string ObtenerEstado(Cupon c)
     {

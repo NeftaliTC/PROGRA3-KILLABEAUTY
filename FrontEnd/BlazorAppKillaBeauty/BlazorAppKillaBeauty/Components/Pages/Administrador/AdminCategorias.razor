@@ -1,4 +1,4 @@
-﻿@page "/admin/categorias"
+@page "/admin/categorias"
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
 @using BlazorAppKillaBeauty.ClienteREST.Models
@@ -34,7 +34,7 @@
         {
             <div class="admin-cat-alert-success">
                 <span><i class="bi bi-check-circle-fill"></i> @mensajeExito</span>
-                <button type="button" @onclick="() => mensajeExito = null">âœ•</button>
+                <button type="button" @onclick="() => mensajeExito = null"></button>
             </div>
         }
 
@@ -66,166 +66,133 @@
             </div>
         </section>
 
-        <!-- TABLA DE CATEGORiAS -->
         <section class="admin-table-card admin-orders-table-card">
-            <table class="admin-table admin-orders-table cat-main-table">
-                <thead>
+            <PaginatedTable TItem="CategoriaItem"
+                            Page="paginaCategorias"
+                            OnChanged="OnPageChanged"
+                            ColSpan="5"
+                            InitialPageSize="6"
+                            PageSizeOptions="opcionesPagina"
+                            ContainerClass="table-responsive"
+                            TableClass="admin-table admin-orders-table"
+                            HeaderClass=""
+                            EmptyMessage="No se encontraron categorías.">
+                <TableHeader>
                     <tr>
-                        <th style="padding-left: 2rem !important; width: 60px;">ID</th>
-                        <th>NOMBRE DE CATEGORÍA</th>
+                        <th style="padding-left: 2rem !important;">ID</th>
+                        <th>NOMBRE</th>
                         <th class="text-center">SUBCATEGORÍAS</th>
                         <th class="text-center">ESTADO</th>
                         <th class="text-end" style="padding-right: 2rem !important;">ACCIONES</th>
                     </tr>
-                </thead>
-                <tbody>
-                    @if (!categoriasFiltradas.Any())
+                </TableHeader>
+                <RowTemplate Context="cat">
+                    <tr class="@(!cat.Activo ? "cat-row-inactive" : "")">
+                        <td style="padding-left: 2rem !important; color: #777;">
+                            @cat.Id.ToString("D5")
+                        </td>
+                        <td>
+                            <div class="cat-name-cell">
+                                <div class="cat-icon-badge">
+                                    <i class="bi bi-tag-fill"></i>
+                                </div>
+                                <strong>@cat.Nombre</strong>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <button class="cat-sub-pill" @onclick="() => ToggleExpandir(cat.Id)">
+                                <i class="bi bi-grid-3x3-gap"></i>
+                                @cat.Subcategorias.Count subcategorias
+                                <i class="bi @(expandidas.Contains(cat.Id) ? "bi-chevron-up" : "bi-chevron-down")"></i>
+                            </button>
+                        </td>
+                        <td class="text-center">
+                            @if (cat.Activo)
+                            {
+                                <span class="admin-status success">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="admin-status danger">Inactivo</span>
+                            }
+                        </td>
+                        <td class="text-end" style="padding-right: 2rem !important;">
+                            <div class="d-flex justify-content-end gap-2">
+                                <button class="btn-action-icon edit"
+                                        title="Agregar subcategoría"
+                                        @onclick="() => AbrirNuevaSubcategoria(cat)">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                <button class="btn-action-icon edit"
+                                        title="Editar"
+                                        @onclick="() => AbrirEditarCategoria(cat)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn-action-icon delete"
+                                        title="@(cat.Activo ? "Desactivar" : "Activar")"
+                                        @onclick="() => AbrirToggleEstado(cat)">
+                                    <i class="bi @(cat.Activo ? "bi-slash-circle" : "bi-arrow-counterclockwise")"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    @if (expandidas.Contains(cat.Id))
                     {
-                        <tr>
-                            <td colspan="5">
-                                <div class="admin-empty-orders">
-                                    <i class="bi bi-inbox"></i>
-                                    <span>No se encontraron categorí­as.</span>
+                        <tr class="cat-sub-expanded-row">
+                            <td colspan="5" style="padding: 0;">
+                                <div class="cat-sub-panel">
+                                    <div class="cat-sub-panel-header">
+                                        <span>
+                                            <i class="bi bi-diagram-3"></i>
+                                            Subcategorías de <strong>@cat.Nombre</strong>
+                                        </span>
+                                        <button class="cat-sub-add-btn"
+                                                @onclick="() => AbrirNuevaSubcategoria(cat)">
+                                            <i class="bi bi-plus-circle"></i> Agregar subcategoría
+                                        </button>
+                                    </div>
+
+                                    @if (!cat.Subcategorias.Any())
+                                    {
+                                        <div class="cat-sub-empty">
+                                            <i class="bi bi-folder2-open"></i>
+                                            <span>No hay subcategorías registradas para esta categoría.</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="cat-sub-grid">
+                                            @foreach (var sub in cat.Subcategorias)
+                                            {
+                                                <div class="cat-sub-card @(!sub.Activo ? "cat-sub-card-inactive" : "")">
+                                                    <div class="cat-sub-card-body">
+                                                        <div class="cat-sub-dot @(sub.Activo ? "dot-active" : "dot-inactive")"></div>
+                                                        <span class="cat-sub-name">@sub.Nombre</span>
+                                                    </div>
+                                                    <div class="cat-sub-card-actions">
+                                                        <button class="cat-sub-icon-btn"
+                                                                title="Editar"
+                                                                @onclick="() => AbrirEditarSubcategoria(sub, cat)">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button class="cat-sub-icon-btn cat-sub-icon-danger"
+                                                                title="@(sub.Activo ? "Desactivar" : "Activar")"
+                                                                @onclick="() => AbrirToggleEstadoSub(sub)">
+                                                            <i class="bi @(sub.Activo ? "bi-slash-circle" : "bi-arrow-counterclockwise")"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
                                 </div>
                             </td>
                         </tr>
                     }
-                    else
-                    {
-                        @foreach (var cat in categoriasPaginadas)
-                        {
-                            <tr class="@(!cat.Activo ? "cat-row-inactive" : "")">
-                                <td style="padding-left: 2rem !important; color: #777;">
-                                    @cat.Id.ToString("D5")
-                                </td>
-                                <td>
-                                    <div class="cat-name-cell">
-                                        <div class="cat-icon-badge">
-                                            <i class="bi bi-tag-fill"></i>
-                                        </div>
-                                        <strong>@cat.Nombre</strong>
-                                    </div>
-                                </td>
-                                <td class="text-center">
-                                    <button class="cat-sub-pill" @onclick="() => ToggleExpandir(cat.Id)">
-                                        <i class="bi bi-grid-3x3-gap"></i>
-                                        @cat.Subcategorias.Count subcategori­as
-                                        <i class="bi @(expandidas.Contains(cat.Id) ? "bi-chevron-up" : "bi-chevron-down")"></i>
-                                    </button>
-                                </td>
-                                <td class="text-center">
-                                    @if (cat.Activo)
-                                    {
-                                        <span class="admin-status success">Activo</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="admin-status danger">Inactivo</span>
-                                    }
-                                </td>
-                                <td class="text-end" style="padding-right: 2rem !important;">
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <button class="btn-action-icon edit"
-                                                title="Agregar subcategori­a"
-                                                @onclick="() => AbrirNuevaSubcategoria(cat)">
-                                            <i class="bi bi-plus"></i>
-                                        </button>
-                                        <button class="btn-action-icon edit"
-                                                title="Editar"
-                                                @onclick="() => AbrirEditarCategoria(cat)">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn-action-icon delete"
-                                                title="@(cat.Activo ? "Desactivar" : "Activar")"
-                                                @onclick="() => AbrirToggleEstado(cat)">
-                                            <i class="bi @(cat.Activo ? "bi-slash-circle" : "bi-arrow-counterclockwise")"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- FILA EXPANDIBLE: Subcategori­as -->
-                            @if (expandidas.Contains(cat.Id))
-                            {
-                                <tr class="cat-sub-expanded-row">
-                                    <td colspan="5" style="padding: 0;">
-                                        <div class="cat-sub-panel">
-                                            <div class="cat-sub-panel-header">
-                                                <span>
-                                                    <i class="bi bi-diagram-3"></i>
-                                                    Subcategori­as de <strong>@cat.Nombre</strong>
-                                                </span>
-                                                <button class="cat-sub-add-btn"
-                                                        @onclick="() => AbrirNuevaSubcategoria(cat)">
-                                                    <i class="bi bi-plus-circle"></i> Agregar subcategori­a
-                                                </button>
-                                            </div>
-
-                                            @if (!cat.Subcategorias.Any())
-                                            {
-                                                <div class="cat-sub-empty">
-                                                    <i class="bi bi-folder2-open"></i>
-                                                    <span>No hay subcategori­as registradas para esta categori­a.</span>
-                                                </div>
-                                            }
-                                            else
-                                            {
-                                                <div class="cat-sub-grid">
-                                                    @foreach (var sub in cat.Subcategorias)
-                                                    {
-                                                        <div class="cat-sub-card @(!sub.Activo ? "cat-sub-card-inactive" : "")">
-                                                            <div class="cat-sub-card-body">
-                                                                <div class="cat-sub-dot @(sub.Activo ? "dot-active" : "dot-inactive")"></div>
-                                                                <span class="cat-sub-name">@sub.Nombre</span>
-                                                            </div>
-                                                            <div class="cat-sub-card-actions">
-                                                                <button class="cat-sub-icon-btn"
-                                                                        title="Editar"
-                                                                        @onclick="() => AbrirEditarSubcategoria(sub, cat)">
-                                                                    <i class="bi bi-pencil"></i>
-                                                                </button>
-                                                                <button class="cat-sub-icon-btn cat-sub-icon-danger"
-                                                                        title="@(sub.Activo ? "Desactivar" : "Activar")"
-                                                                        @onclick="() => AbrirToggleEstadoSub(sub)">
-                                                                    <i class="bi @(sub.Activo ? "bi-slash-circle" : "bi-arrow-counterclockwise")"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    }
-                                                </div>
-                                            }
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    }
-                </tbody>
-            </table>
+                </RowTemplate>
+            </PaginatedTable>
         </section>
-
-        <!-- PAGINACION -->
-        @if (totalPaginas > 1)
-        {
-            <footer class="admin-pagination">
-                <span style="font-weight: 600; color: #777;">
-                    Mostrando @(((paginaActual - 1) * itemsPorPagina) + 1)-@(Math.Min(paginaActual * itemsPorPagina, categoriasFiltradas.Count)) de @categoriasFiltradas.Count resultados
-                </span>
-                <div class="admin-pagination-buttons">
-                    <button disabled="@(paginaActual == 1)" @onclick="() => CambiarPagina(paginaActual - 1)">
-                        <i class="bi bi-chevron-left"></i>
-                    </button>
-                    @for (int i = 1; i <= totalPaginas; i++)
-                    {
-                        int pag = i;
-                        <button class="@(paginaActual == pag ? "active" : "")" @onclick="() => CambiarPagina(pag)">@pag</button>
-                    }
-                    <button disabled="@(paginaActual == totalPaginas)" @onclick="() => CambiarPagina(paginaActual + 1)">
-                        <i class="bi bi-chevron-right"></i>
-                    </button>
-                </div>
-            </footer>
-        }
 
     </section>
 </main>
@@ -239,7 +206,7 @@
             <header class="admin-cat-modal-header">
                 <h2>
                     <i class="bi @(esModoEdicionCat ? "bi-pencil-square" : "bi-plus-lg")"></i>
-                    @(esModoEdicionCat ? "Editar categori­a" : "Nueva categori­a")
+                    @(esModoEdicionCat ? "Editar categori­a" : "Nueva categorí­a")
                 </h2>
                 <button type="button" class="admin-cat-modal-close" @onclick="CerrarModalCategoria">
                     <i class="bi bi-x-lg"></i>
@@ -256,7 +223,7 @@
 
             <div class="admin-cat-modal-body">
                 <div class="scales-form-field">
-                    <label>Nombre de la categori­a <span class="req">*</span></label>
+                    <label>Nombre de la categorí­a <span class="req">*</span></label>
                     <input type="text"
                            placeholder="Ej: Skincare, Maquillaje, Cabello..."
                            @bind="formCat.Nombre" />
@@ -282,7 +249,7 @@
                     Cancelar
                 </button>
                 <button type="button" class="btn-scale-save" @onclick="GuardarCategoria">
-                    @(esModoEdicionCat ? "Guardar cambios" : "Crear categori­a")
+                    @(esModoEdicionCat ? "Guardar cambios" : "Crear categoría")
                 </button>
             </footer>
         </div>
@@ -298,7 +265,7 @@
             <header class="admin-cat-modal-header">
                 <h2>
                     <i class="bi @(esModoEdicionSub ? "bi-pencil-square" : "bi-plus-lg")"></i>
-                    @(esModoEdicionSub ? "Editar subcategori­a" : "Nueva subcategori­a")
+                    @(esModoEdicionSub ? "Editar subcategorí­a" : "Nueva subcategorí­a")
                 </h2>
                 <button type="button" class="admin-cat-modal-close" @onclick="CerrarModalSubcategoria">
                     <i class="bi bi-x-lg"></i>
@@ -320,7 +287,7 @@
                 </div>
 
                 <div class="scales-form-field">
-                    <label>Nombre de la subcategori­a <span class="req">*</span></label>
+                    <label>Nombre de la subcategoría <span class="req">*</span></label>
                     <input type="text"
                            placeholder="Ej: Serums, Labios, Shampoo..."
                            @bind="formSub.Nombre" />
@@ -346,7 +313,7 @@
                     Cancelar
                 </button>
                 <button type="button" class="btn-scale-save" @onclick="GuardarSubcategoria">
-                    @(esModoEdicionSub ? "Guardar cambios" : "Crear subcategori­a")
+                    @(esModoEdicionSub ? "Guardar cambios" : "Crear subcategoría")
                 </button>
             </footer>
         </div>
@@ -366,7 +333,7 @@
             <p class="admin-modal-text">
                 @if (categoriaToggle.Activo)
                 {
-                    <span>La categori­a <strong>@categoriaToggle.Nombre</strong> y sus subcategori­as activas dejari¡n de mostrarse en el cati¡logo.</span>
+                    <span>La categori­a <strong>@categoriaToggle.Nombre</strong> y sus subcategorías activas dejari¡n de mostrarse en el cati¡logo.</span>
                 }
                 else
                 {
@@ -393,15 +360,15 @@
             <div class="admin-modal-icon">
                 <i class="bi bi-exclamation-triangle-fill"></i>
             </div>
-            <h2>@(subcategoriaToggle.Activo ? "Â¿Desactivar subcategori­a?" : "Â¿Activar subcategori­a?")</h2>
+            <h2>@(subcategoriaToggle.Activo ? "¿Desactivar subcategorí­a?" : "¿Activar subcategorí­a?")</h2>
             <p class="admin-modal-text">
                 @if (subcategoriaToggle.Activo)
                 {
-                    <span>La subcategori­a <strong>@subcategoriaToggle.Nombre</strong> dejari¡ de estar disponible.</span>
+                    <span>La subcategorí­a <strong>@subcategoriaToggle.Nombre</strong> dejari¡ de estar disponible.</span>
                 }
                 else
                 {
-                    <span>La subcategori­a <strong>@subcategoriaToggle.Nombre</strong> volveri¡ a estar disponible.</span>
+                    <span>La subcategoría <strong>@subcategoriaToggle.Nombre</strong> volveri¡ a estar disponible.</span>
                 }
             </p>
             <div class="admin-modal-actions">
@@ -450,8 +417,9 @@
     private string filtroBusqueda = "";
     private string filtroEstado = "Todos";
 
-    private int paginaActual = 1;
-    private int itemsPorPagina = 6;
+    private readonly int[] opcionesPagina = new[] { 6, 10, 25, 50, 100 };
+    private PageQuery queryActual = new(1, 6);
+    private TablePage<CategoriaItem> paginaCategorias = new();
 
     private HashSet<int> expandidas = new();
 
@@ -476,12 +444,6 @@
 
     private List<CategoriaItem> categorias = new();
     private List<CategoriaItem> categoriasFiltradas = new();
-
-    private IEnumerable<CategoriaItem> categoriasPaginadas =>
-        categoriasFiltradas.Skip((paginaActual - 1) * itemsPorPagina).Take(itemsPorPagina);
-
-    private int totalPaginas =>
-        (int)Math.Ceiling((double)categoriasFiltradas.Count / itemsPorPagina);
 
     protected override async Task OnInitializedAsync()
     {
@@ -521,9 +483,10 @@
         }
         catch (Exception ex)
         {
-            mensajeError = $"No se pudieron cargar las categorias: {ex.Message}";
+            mensajeError = $"No se pudieron cargar las categorías: {ex.Message}";
             categorias = new();
             categoriasFiltradas = new();
+            ActualizarPaginaCategorias();
         }
     }
 
@@ -545,7 +508,7 @@
             q = q.Where(c => !c.Activo);
 
         categoriasFiltradas = q.OrderBy(c => c.Nombre).ToList();
-        paginaActual = 1;
+        ResetearPaginacion();
     }
 
     private void LimpiarFiltros()
@@ -555,7 +518,29 @@
         AplicarFiltros();
     }
 
-    private void CambiarPagina(int pagina) => paginaActual = pagina;
+    private void OnPageChanged(PageQuery query)
+    {
+        queryActual = query;
+        ActualizarPaginaCategorias();
+    }
+
+    private void ResetearPaginacion()
+    {
+        queryActual = new PageQuery(1, queryActual.PageSize);
+        ActualizarPaginaCategorias();
+    }
+
+    private void ActualizarPaginaCategorias()
+    {
+        paginaCategorias = new TablePage<CategoriaItem>
+        {
+            Items = categoriasFiltradas
+                .Skip((queryActual.Page - 1) * queryActual.PageSize)
+                .Take(queryActual.PageSize)
+                .ToList(),
+            TotalRecords = categoriasFiltradas.Count
+        };
+    }
 
     private void ToggleExpandir(int id)
     {
@@ -591,7 +576,7 @@
     {
         if (string.IsNullOrWhiteSpace(formCat.Nombre))
         {
-            errorModalCat = "La descripcion de la categoria es obligatoria.";
+            errorModalCat = "La descripcion de la categoría es obligatoria.";
             return;
         }
 
@@ -625,7 +610,7 @@
                     Descripcion = nombre,
                     Activo = true
                 });
-                mensajeExito = $"Categoria \"{nombre}\" creada correctamente.";
+                mensajeExito = $"Categoría \"{nombre}\" creada correctamente.";
             }
 
             CerrarModalCategoria();
@@ -633,7 +618,7 @@
         }
         catch (Exception ex)
         {
-            errorModalCat = $"No se pudo guardar la categoria: {ex.Message}";
+            errorModalCat = $"No se pudo guardar la categoría: {ex.Message}";
         }
     }
 
@@ -668,7 +653,7 @@
     {
         if (string.IsNullOrWhiteSpace(formSub.Nombre))
         {
-            errorModalSub = "La descripcion de la subcategoria es obligatoria.";
+            errorModalSub = "La descripcion de la subcategoría es obligatoria.";
             return;
         }
 
@@ -681,7 +666,7 @@
 
         if (existe)
         {
-            errorModalSub = "Ya existe una subcategoria con esa descripcion en esta categoria.";
+            errorModalSub = "Ya existe una subcategoría con esa descripcion en esta categoría.";
             return;
         }
 
@@ -696,7 +681,7 @@
                     Activo = formSub.Activo,
                     Categoria = new Categoria { Id = categoriaPadreSeleccionada.Id }
                 });
-                mensajeExito = $"Subcategoria \"{nombre}\" actualizada.";
+                mensajeExito = $"Subcategoría \"{nombre}\" actualizada.";
             }
             else
             {
@@ -706,7 +691,7 @@
                     Activo = true,
                     Categoria = new Categoria { Id = categoriaPadreSeleccionada.Id }
                 });
-                mensajeExito = $"Subcategoria \"{nombre}\" agregada a \"{categoriaPadreSeleccionada.Nombre}\".";
+                mensajeExito = $"Subcategoría \"{nombre}\" agregada a \"{categoriaPadreSeleccionada.Nombre}\".";
             }
 
             CerrarModalSubcategoria();
@@ -714,7 +699,7 @@
         }
         catch (Exception ex)
         {
-            errorModalSub = $"No se pudo guardar la subcategoria: {ex.Message}";
+            errorModalSub = $"No se pudo guardar la subcategoría: {ex.Message}";
         }
     }
 
@@ -737,13 +722,13 @@
                     Activo = !categoriaToggle.Activo
                 });
                 mensajeExito = !categoriaToggle.Activo
-                    ? $"Categoria \"{categoriaToggle.Nombre}\" activada."
-                    : $"Categoria \"{categoriaToggle.Nombre}\" desactivada.";
+                    ? $"Categoría \"{categoriaToggle.Nombre}\" activada."
+                    : $"Categoría \"{categoriaToggle.Nombre}\" desactivada.";
                 await CargarCategoriasAsync();
             }
             catch (Exception ex)
             {
-                mensajeError = $"No se pudo cambiar el estado de la categoria: {ex.Message}";
+                mensajeError = $"No se pudo cambiar el estado de la categoría: {ex.Message}";
             }
         }
         mostrarModalToggle = false;
@@ -770,13 +755,13 @@
                     Categoria = new Categoria { Id = subcategoriaToggle.CategoriaId }
                 });
                 mensajeExito = !subcategoriaToggle.Activo
-                    ? $"Subcategoria \"{subcategoriaToggle.Nombre}\" activada."
-                    : $"Subcategoria \"{subcategoriaToggle.Nombre}\" desactivada.";
+                    ? $"Subcategoría \"{subcategoriaToggle.Nombre}\" activada."
+                    : $"Subcategoría \"{subcategoriaToggle.Nombre}\" desactivada.";
                 await CargarCategoriasAsync();
             }
             catch (Exception ex)
             {
-                mensajeError = $"No se pudo cambiar el estado de la subcategoria: {ex.Message}";
+                mensajeError = $"No se pudo cambiar el estado de la subcategoría: {ex.Message}";
             }
         }
         mostrarModalToggleSub = false;
