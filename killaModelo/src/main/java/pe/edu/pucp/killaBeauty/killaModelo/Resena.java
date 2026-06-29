@@ -16,12 +16,12 @@ public class Resena {
 
 
 
-    public int getIdResena() {
+    public int getId() {
         return id;
     }
 
-    public void setIdResena(int idResena) {
-        this.id = idResena;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitulo() { return titulo; }
