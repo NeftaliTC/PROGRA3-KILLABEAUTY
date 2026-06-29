@@ -11,11 +11,8 @@
     <AdminNavbar />
 
     <section class="admin-content admin-employees-content">
-        
-        @* 🛡️ CONTROL DE ACCESO PERIMETRAL *@
         @if (!AuthService.EstaLogueado || AuthService.Rol != "ADMINISTRADOR")
         {
-            
             <div class="access-denied-container">
                 <div class="access-denied-icon">
                     <i class="bi bi-shield-slash-fill"></i>
@@ -32,7 +29,6 @@
         }
         else
         {
-            @* 💻 VISTA PRINCIPAL (SOLO PARA SUPERADMIN) *@
             <div class="admin-breadcrumb">
                 <span>SuperAdministrador</span>
                 <i class="bi bi-chevron-right"></i>
@@ -121,7 +117,7 @@
                                     <td>
                                         <span class="badge-role @(emp.TipoUsuario == "ADMINISTRADOR" ? "role-super" : "role-admin")">
                                             <i class="@(emp.TipoUsuario == "ADMINISTRADOR" ? "bi bi-crown-fill" : "bi bi-person-badge-fill")"></i>
-                                            @emp.TipoUsuario
+                                            @(emp.TipoUsuario == "VENDEDOR" ? "Trabajador" : emp.TipoUsuario)
                                         </span>
                                     </td>
                                     <td>
@@ -163,8 +159,6 @@
         }
     </section>
 </main>
-tbody
-@* 📑 MODAL DE CREACIÓN / EDICIÓN *@
 
 @if (mostrarFormulario)
 {
@@ -191,7 +185,12 @@ tbody
                     </div>
                 </div>
             }
-
+            @if (!string.IsNullOrEmpty(mensajeErrorModal))
+            {
+                <div class="admin-alert-error" style="margin-top: 12px;">
+                    <span><i class="bi bi-exclamation-circle-fill"></i> @mensajeErrorModal</span>
+                </div>
+            }
             @* PASO 2: Datos y Selector (Aparece si encontramos al cliente o estamos editando) *@
             @if (clienteEncontrado || esEdicion)
             {
@@ -205,8 +204,7 @@ tbody
                     <label style="font-weight: bold; display: block; margin-bottom: 5px;">Asignar Nuevo Rol</label>
                     <select @bind="modeloFormulario.TipoUsuario" class="admin-form-select">
                         <option value="ADMINISTRADOR">Administrador</option>
-                        <option value="VENDEDOR">Vendedor</option>
-                        <option value="SUPERADMIN">SuperAdministrador</option>
+                        <option value="VENDEDOR">Trabajador</option>
                     </select>
                 </div>
 
@@ -227,71 +225,10 @@ tbody
     </div>
 }
 
-@* @if (mostrarFormulario)
-{
-    <div class="admin-modal-overlay">
-        <div class="admin-modal-card" style="text-align: left; max-width: 550px;">
-            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="margin: 0; font-size: 1.4rem; color: #4a1525; font-weight: 700;">
-                    @(esEdicion ? "Modificar Ficha de Empleado" : "Registrar Nuevo Colaborador")
-                </h2>
-                <button type="button" @onclick="CerrarFormulario" class="btn-close-modal">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </header>
-
-            <EditForm Model="modeloFormulario" OnValidSubmit="GuardarEmpleado">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                    <div class="admin-form-group">
-                        <label>DNI (8 dígitos)</label>
-                        <input type="text" @bind-value="modeloFormulario.Dni" required maxlength="8" disabled="@esEdicion" placeholder="Ej. 74561234" />
-                    </div>
-
-                    <div class="admin-form-group">
-                        <label>Rol de Acceso</label>
-                        <select @bind="modeloFormulario.TipoUsuario" class="admin-form-select" required>
-                            <option value="Trabajador">Administrador</option>
-                            <option value="Administrador">SuperAdmin (Acceso Total)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px;">
-                    <div class="admin-form-group">
-                        <label>Nombres</label>
-                        <input type="text" @bind-value="modeloFormulario.Nombre" required placeholder="Ej. Cielo" />
-                    </div>
-
-                    <div class="admin-form-group">
-                        <label>Apellido Paterno</label>
-                        <input type="text" @bind-value="modeloFormulario.ApellidoPaterno" required placeholder="Ej. Ramos" />
-                    </div>
-                </div>
-
-                <div class="admin-form-group" style="margin-top: 12px;">
-                    <label>Correo Institucional</label>
-                    <input type="email" @bind-value="modeloFormulario.CorreoElectronico" required placeholder="Ej. cramos@killabeauty.pe" />
-                </div>
-
-                <div class="admin-form-group" style="margin-top: 12px;">
-                    <label>Teléfono Celular</label>
-                    <input type="text" @bind-value="modeloFormulario.Telefono" required placeholder="Ej. 987654321" />
-                </div>
-
-                <div class="admin-modal-actions" style="margin-top: 28px; justify-content: flex-end;">
-                    <button type="button" class="admin-modal-btn-cancel" @onclick="CerrarFormulario">Cancelar</button>
-                    <button type="submit" class="admin-primary-action" style="box-shadow: none; min-height: 42px;">
-                        <i class="bi bi-hdd-fill"></i> Preservar Datos
-                    </button>
-                </div>
-            </EditForm>
-        </div>
-    </div>
-} *@
-
 @code {
     private string busqueda = "";
     private string? mensajeError;
+    private string? mensajeErrorModal;
     private bool mostrarFormulario = false;
     private bool esEdicion = false;
     private bool cargando = true;
@@ -321,11 +258,7 @@ tbody
         cargando = true;
         try
         {
-            
-            
-
             var superAdmins = await UsuarioService.ListarPorTipoUsuarioAsync(1);
-            // var admins = await UsuarioService.ListarPorTipoUsuarioAsync(2);
             var trabajadores = await UsuarioService.ListarPorTipoUsuarioAsync(3);
 
             listaEmpleados = superAdmins
@@ -346,6 +279,7 @@ tbody
     {
         esEdicion = false;
         mensajeError = null;
+        mensajeErrorModal = null;
 
         // Reiniciamos las variables del buscador cada vez que abrimos el modal
         emailBusqueda = "";
@@ -355,15 +289,14 @@ tbody
         mostrarFormulario = true;
     }
 
-    // --- NUEVO MÉTODO PARA BUSCAR AL CLIENTE ---
     private async Task BuscarCliente()
     {
-        mensajeError = null;
+        mensajeErrorModal = null;
         clienteEncontrado = false;
 
         if (string.IsNullOrWhiteSpace(emailBusqueda))
         {
-            mensajeError = "Por favor, ingresa un correo para buscar.";
+            mensajeErrorModal = "Por favor, ingresa un correo para buscar.";
             return;
         }
 
@@ -380,12 +313,12 @@ tbody
             }
             else
             {
-                mensajeError = "No se encontró ningún cliente registrado con ese correo.";
+                mensajeErrorModal = "No se encontró ningún cliente registrado con ese correo.";
             }
         }
         catch (Exception ex)
         {
-            mensajeError = "Error al buscar el correo: " + ex.Message;
+            mensajeErrorModal = "Error al buscar el correo: " + ex.Message;
         }
     }
 
@@ -393,6 +326,7 @@ tbody
     {
         esEdicion = true;
         mensajeError = null;
+        mensajeErrorModal = null;
         modeloFormulario = new Usuario
         {
             Id = emp.Id,
@@ -408,40 +342,40 @@ tbody
         };
         mostrarFormulario = true;
     }
-
     private void CerrarFormulario()
     {
         mostrarFormulario = false;
     }
-
-    // CORRECCIÓN: Ahora es asíncrono y se simplificó la lógica
     private async Task GuardarEmpleado()
     {
         mensajeError = null;
-
+        mensajeErrorModal = null; 
         try
         {
-            // Validamos que el modelo ya tenga los datos de un usuario real (que su ID no sea 0)
+            // Validamos que el modelo ya tenga los datos de un usuario real
             if (modeloFormulario.Id == 0)
             {
-                mensajeError = "Debes buscar y seleccionar un cliente válido primero.";
+                mensajeErrorModal = "Debes buscar y seleccionar un cliente válido primero.";
                 return;
             }
+            
 
-            // Al ascender un cliente o editar un trabajador, siempre usamos Actualizar (PUT)
             await UsuarioService.ActualizarUsuarioAsync(modeloFormulario.Id, modeloFormulario);
-
-            // CORRECCIÓN: Agregamos el await que faltaba
             await CargarEmpleados();
+
+            // mostrarFormulario = false;
+            // clienteEncontrado = false;
+            // emailBusqueda = "";
+            // modeloFormulario = new Usuario();
             CerrarFormulario();
+            StateHasChanged();  
+    
         }
         catch (Exception ex)
         {
-            mensajeError = ex.Message;
+            mensajeErrorModal = ex.Message;
         }
     }
-
-    // CORRECCIÓN: Faltaba el 'async Task' en la firma porque usas 'await' adentro
     private async Task CambiarEstadoEmpleado(Usuario emp)
     {
         if (emp.Id == AuthService.UsuarioId)
@@ -463,3 +397,4 @@ tbody
         }
     }
 }
+
