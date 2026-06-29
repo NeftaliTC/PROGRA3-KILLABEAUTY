@@ -119,6 +119,8 @@ public class PedidoBLImpl implements PedidoBL {
     public void remove(Pedido pedido) throws BusinessLogicException {
         if (pedido == null || pedido.getId() <= 0) throw new BusinessLogicException("Debe indicar un pedido valido.");
         try {
+            Pedido p = pedidoDAO.load(pedido.getId());
+            if (p == null) throw new BusinessLogicException("El pedido no existe.");
             TransactionContext.getConnection();
             pedidoDAO.remove(pedido);
             TransactionContext.commit();

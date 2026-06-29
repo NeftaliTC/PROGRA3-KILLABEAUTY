@@ -28,21 +28,21 @@ public class PedidoRS {
     public Response registrarDesdeCheckout(PedidoCheckoutDTO request) {
         try {
             if (request == null) {
-                throw new BusinessLogicException("La solicitud de checkout no puede ser nula.");
+                return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO("La solicitud de checkout no puede ser nula.")).build();
             }
-
             Pedido pedido = pedidoBL.createFromCart(
                     request.getUsuarioId(),
                     request.getDireccionId(),
                     request.getCuponId(),
                     mapDetallesCarrito(request.getItems())
             );
-
             return Response.status(Response.Status.CREATED)
                     .entity(new PedidoDetalleDTO(pedido))
                     .build();
         } catch (BusinessLogicException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
+        }catch (Exception ex) {
+            return Response.serverError().entity(new ErrorDTO(ex.getMessage())).build();
         }
     }
 
@@ -54,6 +54,8 @@ public class PedidoRS {
                     .build();
         } catch (BusinessLogicException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
+        }catch (Exception ex) {
+            return Response.serverError().entity(new ErrorDTO(ex.getMessage())).build();
         }
     }
 
@@ -65,7 +67,9 @@ public class PedidoRS {
                     .collect(Collectors.toList());
             return Response.ok(lista).build();
         } catch (BusinessLogicException ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ErrorDTO(ex.getMessage())).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
+        }catch (Exception ex) {
+            return Response.serverError().entity(new ErrorDTO(ex.getMessage())).build();
         }
     }
 
@@ -77,7 +81,9 @@ public class PedidoRS {
             return (p != null) ? Response.ok(new PedidoDetalleDTO(p)).build()
                     : Response.status(Response.Status.NOT_FOUND).build();
         } catch (BusinessLogicException ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ErrorDTO(ex.getMessage())).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
+        }catch (Exception ex) {
+            return Response.serverError().entity(new ErrorDTO(ex.getMessage())).build();
         }
     }
 
@@ -89,6 +95,8 @@ public class PedidoRS {
             return Response.ok(pedidoBL.update(pedido)).build();
         } catch (BusinessLogicException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
+        }catch (Exception ex) {
+            return Response.serverError().entity(new ErrorDTO(ex.getMessage())).build();
         }
     }
 
@@ -99,6 +107,8 @@ public class PedidoRS {
             return Response.ok(new PedidoDetalleDTO(pedidoBL.cancel(id))).build();
         } catch (BusinessLogicException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
+        }catch (Exception ex) {
+            return Response.serverError().entity(new ErrorDTO(ex.getMessage())).build();
         }
     }
 
@@ -106,12 +116,14 @@ public class PedidoRS {
     @Path("/{id}")
     public Response eliminar(@PathParam("id") int id) {
         try {
-            Pedido p = pedidoBL.load(id);
-            if (p == null) return Response.status(Response.Status.NOT_FOUND).build();
+            Pedido p = new Pedido();
+            p.setId(id);
             pedidoBL.remove(p);
             return Response.noContent().build();
         } catch (BusinessLogicException ex) {
             return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
+        }catch (Exception ex) {
+            return Response.serverError().entity(new ErrorDTO(ex.getMessage())).build();
         }
     }
 
