@@ -240,9 +240,11 @@ public class PedidoRS {
         if (request == null) {
             throw new BusinessLogicException("La solicitud de checkout no puede ser nula.");
         }
+        //El checkout siempre necesita saber qué usuario está comprando. no puede ser nulo
         if (request.getUsuarioId() == null || request.getUsuarioId() <= 0) {
             throw new BusinessLogicException("El usuario del checkout debe ser valido.");
         }
+        // si no es nulo debe ser válido (puede ser nulo)
         if (request.getDireccionId() != null && request.getDireccionId() < 0) {
             throw new BusinessLogicException("La direccion seleccionada debe ser valida.");
         }
