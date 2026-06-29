@@ -11,11 +11,8 @@ public class CloudinaryService {
     private final Cloudinary cloudinary;
 
     public CloudinaryService() {
-        cloudinary = new Cloudinary(ObjectUtils.asMap(
-                "cloud_name", "TU_CLOUD_NAME",
-                "api_key", "TU_API_KEY",
-                "api_secret", "TU_API_SECRET"
-        ));
+        cloudinary = new Cloudinary("cloudinary://963741142899685:bVLYTEjhAjH-8-HEgF7I524v_Ig@dlkbckbdm");
+        cloudinary.config.secure = true;
     }
 
     public String subirImagen(File archivo) throws Exception {

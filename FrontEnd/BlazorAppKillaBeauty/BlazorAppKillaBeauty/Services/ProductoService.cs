@@ -3,6 +3,10 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using BlazorAppKillaBeauty.ClienteREST.Models;
 
+using System.Text;
+using Microsoft.AspNetCore.Components.Forms;
+using System.Net.Http.Headers;
+
 namespace BlazorAppKillaBeauty.Services
 {
     public class ProductoService
@@ -88,11 +92,133 @@ namespace BlazorAppKillaBeauty.Services
             return await response.Content.ReadFromJsonAsync<ProductoApi>(jsonOptions) ?? producto;
         }
 
+        public async Task<ProductoApi> ActualizarConImagenesAsync(
+    ProductoApi producto,
+    List<string> urls)
+        {
+            var dto = new ProductoConImagenesRequest
+            {
+                Producto = ProductoRequest.From(producto),
+                Imagenes = urls.Select((url, index) => new ImagenProductoRequest
+                {
+                    Url = url,
+                    Titulo = $"Imagen producto {index + 1}",
+                    Orden = index + 1,
+                    Principal = false,
+                    Activo = true
+                }).ToList()
+            };
+
+            using var response = await http.PutAsJsonAsync(
+                $"productos/{producto.Id}/con-imagenes", dto, jsonOptions);
+            await EnsureSuccessAsync(response);
+            catalogoCache = null;
+            return await response.Content.ReadFromJsonAsync<ProductoApi>(jsonOptions) ?? producto;
+        }
+
+        private async Task<string> SubirBytesACloudinaryAsync(
+            string nombre, string contentType, byte[] bytes)
+        {
+            Console.WriteLine($"=== SUBIENDO: {nombre} ({bytes.Length} bytes) ===");
+
+            using var client = new HttpClient();
+            using var content = new MultipartFormDataContent();
+
+            content.Add(new StringContent("killa_unsigned"), "upload_preset");
+
+            var fileContent = new ByteArrayContent(bytes);
+            fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse(contentType);
+            content.Add(fileContent, "file", nombre);
+
+            var response = await client.PostAsync(
+                "https://api.cloudinary.com/v1_1/dlkbckbdm/image/upload",
+                content
+            );
+
+            var body = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Cloudinary status: {response.StatusCode}");
+            Console.WriteLine($"Cloudinary body: {body}");
+
+            if (!response.IsSuccessStatusCode)
+                throw new InvalidOperationException(body);
+
+            var data = JsonSerializer.Deserialize<CloudinaryResponse>(body, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+            return data?.SecureUrl ?? "";
+        }
+
         public async Task DarDeBajaAsync(ProductoApi producto)
         {
             producto.Activo = false;
             producto.Disponible = false;
             await ActualizarAsync(producto);
+        }
+
+        private async Task<List<string>> SubirImagenesACloudinaryAsync(IReadOnlyList<IBrowserFile> imagenes)
+        {
+            var urls = new List<string>();
+
+            foreach (var imagen in imagenes)
+            {
+                var url = await SubirImagenACloudinaryAsync(imagen);
+
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    urls.Add(url);
+                }
+            }
+
+            return urls;
+        }
+
+        private async Task<string> SubirImagenACloudinaryAsync(IBrowserFile imagen)
+        {
+            Console.WriteLine("=== INICIANDO SUBIDA ===");
+
+            try
+            {
+                Console.WriteLine($"Archivo: {imagen.Name}, Tipo: {imagen.ContentType}, Tamaño: {imagen.Size}");
+
+                using var ms = new MemoryStream();
+                await imagen.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024).CopyToAsync(ms);
+                Console.WriteLine($"Stream leído: {ms.Length} bytes");
+
+                using var client = new HttpClient();
+                using var content = new MultipartFormDataContent();
+
+                var fileBytes = new ByteArrayContent(ms.ToArray());
+                fileBytes.Headers.ContentType = MediaTypeHeaderValue.Parse(imagen.ContentType);
+                content.Add(fileBytes, "file", imagen.Name);
+                Console.WriteLine("file agregado");
+
+                content.Add(new StringContent("killa_unsigned"), "upload_preset");
+                Console.WriteLine("upload_preset agregado");
+
+                Console.WriteLine("Enviando request a Cloudinary...");
+                var response = await client.PostAsync(
+                    "https://api.cloudinary.com/v1_1/dlkbckbdm/image/upload",
+                    content
+                );
+
+                var body = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Status: {response.StatusCode}");
+                Console.WriteLine($"Body: {body}");
+
+                if (!response.IsSuccessStatusCode)
+                    throw new InvalidOperationException(body);
+
+                var data = JsonSerializer.Deserialize<CloudinaryResponse>(body, jsonOptions);
+                return data?.SecureUrl ?? "";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"=== EXCEPCION: {ex.GetType().Name} ===");
+                Console.WriteLine($"Mensaje: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                throw;
+            }
         }
 
         private async Task<T?> GetAsync<T>(string url)
@@ -116,6 +242,7 @@ namespace BlazorAppKillaBeauty.Services
             }
 
             var body = await response.Content.ReadAsStringAsync();
+
             throw new InvalidOperationException(
                 string.IsNullOrWhiteSpace(body)
                     ? $"Error REST {(int)response.StatusCode} {response.ReasonPhrase}"
@@ -167,10 +294,66 @@ namespace BlazorAppKillaBeauty.Services
             }
         }
 
+        public async Task<ProductoApi> CrearConImagenesAsync(
+    ProductoApi producto,
+    List<string> urls)
+        {
+            var dto = new ProductoConImagenesRequest
+            {
+                Producto = ProductoRequest.From(producto),
+                Imagenes = urls.Select((url, index) => new ImagenProductoRequest
+                {
+                    Url = url,
+                    Titulo = $"Imagen producto {index + 1}",
+                    Orden = index + 1,
+                    Principal = index == 0,
+                    Activo = true
+                }).ToList()
+            };
+
+            using var response = await http.PostAsJsonAsync("productos/con-imagenes", dto, jsonOptions);
+            await EnsureSuccessAsync(response);
+            catalogoCache = null;
+            return await response.Content.ReadFromJsonAsync<ProductoApi>(jsonOptions) ?? producto;
+        }
+
         private class IdRef
         {
             [JsonPropertyName("id")]
             public int Id { get; set; }
+        }
+
+        private class ProductoConImagenesRequest
+        {
+            [JsonPropertyName("producto")]
+            public ProductoRequest Producto { get; set; } = new();
+
+            [JsonPropertyName("imagenes")]
+            public List<ImagenProductoRequest> Imagenes { get; set; } = new();
+        }
+
+        private class ImagenProductoRequest
+        {
+            [JsonPropertyName("url")]
+            public string Url { get; set; } = "";
+
+            [JsonPropertyName("titulo")]
+            public string Titulo { get; set; } = "";
+
+            [JsonPropertyName("orden")]
+            public int Orden { get; set; }
+
+            [JsonPropertyName("principal")]
+            public bool Principal { get; set; }
+
+            [JsonPropertyName("activo")]
+            public bool Activo { get; set; }
+        }
+
+        private class CloudinaryResponse
+        {
+            [JsonPropertyName("secure_url")]
+            public string SecureUrl { get; set; } = "";
         }
     }
 }

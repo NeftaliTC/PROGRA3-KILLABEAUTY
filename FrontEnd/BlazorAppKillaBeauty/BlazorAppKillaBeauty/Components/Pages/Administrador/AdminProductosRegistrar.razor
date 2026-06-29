@@ -3,7 +3,10 @@
 @using BlazorAppKillaBeauty.Services
 @inject NavigationManager Navigation
 @inject ProductoService ProductoService
+@inject IJSRuntime JS
 @using BlazorAppKillaBeauty.ClienteREST.Models
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.Forms;
 
 <PageTitle>Registrar nuevo producto - Killa Beauty</PageTitle>
 
@@ -150,6 +153,30 @@
                         <span class="slider"></span>
                     </label>
                 </div>
+            </div>
+        </section>
+
+        <section class="admin-product-form-card">
+            <div class="admin-form-section-title">
+                <i class="bi bi-image"></i>
+                <h2>Imágenes</h2>
+            </div>
+
+            <div class="admin-form-field">
+                <label>Imágenes del producto</label>
+
+                <button type="button" class="admin-upload-box" @onclick="AbrirWidgetCloudinary">
+                    <i class="bi bi-image"></i>
+                    <span>Seleccionar imágenes</span>
+                    <small>PNG, JPG o JPEG</small>
+                </button>
+
+                @if (urlsImagenesNuevo.Any())
+                {
+                    <small class="admin-file-help">
+                        @urlsImagenesNuevo.Count imagen(es) seleccionada(s)
+                    </small>
+                }
             </div>
         </section>
 
@@ -301,7 +328,7 @@
 
         try
         {
-            await ProductoService.CrearAsync(new ProductoApi
+            var producto = new ProductoApi
             {
                 Nombre = descripcion.Trim(),
                 PrecioBase = precioBase,
@@ -311,7 +338,16 @@
                 Activo = disponible,
                 Marca = new Marca { Id = marcaId },
                 Subcategoria = new Subcategoria { Id = subcategoriaId }
-            });
+            };
+
+            if (urlsImagenesNuevo.Any())
+            {
+                await ProductoService.CrearConImagenesAsync(producto, urlsImagenesNuevo);
+            }
+            else
+            {
+                await ProductoService.CrearAsync(producto);
+            }
 
             mensajeError = null;
             mostrarExito = true;
@@ -322,31 +358,43 @@
         }
     }
 
-
-    private static string LimpiarMensajeError(string mensaje)
-    {
-        if (string.IsNullOrWhiteSpace(mensaje))
-        {
-            return "Error desconocido.";
-        }
-
-        if (mensaje.Contains("foreign key", StringComparison.OrdinalIgnoreCase) ||
-            mensaje.Contains("fk_p_m", StringComparison.OrdinalIgnoreCase))
-        {
-            return "La marca seleccionada no existe en la base de datos. Recarga la pagina y selecciona una marca activa.";
-        }
-
-        if (mensaje.Contains("fk_p_s", StringComparison.OrdinalIgnoreCase))
-        {
-            return "La subcategoria seleccionada no existe en la base de datos. Recarga la pagina y selecciona una subcategoria activa.";
-        }
-
-        return mensaje;
-    }
     private void VolverAProductos()
     {
         mostrarExito = false;
         Navigation.NavigateTo("/admin/productos");
     }
+
+    //imagenes
+    // A esto:
+    private List<string> urlsImagenesNuevo = new();
+
+    private async Task AbrirWidgetCloudinary()
+    {
+        var urls = await JS.InvokeAsync<List<string>>(
+            "subirImagenesCloudinary", "dlkbckbdm", "killa_unsigned", 4);
+
+        foreach (var url in urls)
+            if (!string.IsNullOrWhiteSpace(url))
+                urlsImagenesNuevo.Add(url);
+
+        if (urlsImagenesNuevo.Count > 4)
+            urlsImagenesNuevo = urlsImagenesNuevo.Take(4).ToList();
+
+        StateHasChanged();
+    }
+
+    private string LimpiarMensajeError(string mensaje)
+    {
+        try
+        {
+            var json = JsonSerializer.Deserialize<JsonElement>(mensaje);
+            if (json.TryGetProperty("error", out var error) &&
+                error.TryGetProperty("message", out var msg))
+                return msg.GetString() ?? mensaje;
+        }
+        catch { }
+        return mensaje;
+    }
+
 }
 

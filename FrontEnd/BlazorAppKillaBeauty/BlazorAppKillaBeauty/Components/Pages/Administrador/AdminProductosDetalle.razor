@@ -3,7 +3,9 @@
 @using BlazorAppKillaBeauty.Services
 @inject NavigationManager Navigation
 @inject ProductoService ProductoService
+@inject IJSRuntime JS
 @using BlazorAppKillaBeauty.ClienteREST.Models
+@using Microsoft.AspNetCore.Components.Forms
 
 <PageTitle>Detalle producto - Killa Beauty</PageTitle>
 
@@ -353,6 +355,21 @@
                         <input type="number" placeholder="0" @bind-value="formEditar.Stock" />
                     </div>
 
+                    <div class="admin-product-edit-field">
+                        <label>Imágenes del producto</label>
+                        <button type="button" class="admin-upload-box" @onclick="AbrirWidgetCloudinary">
+                            <i class="bi bi-image"></i>
+                            <span>Seleccionar imágenes</span>
+                            <small>PNG, JPG o JPEG</small>
+                        </button>
+                        @if (urlsImagenesEditar.Any())
+                        {
+                            <small class="admin-file-help">
+                                @urlsImagenesEditar.Count imagen(es) seleccionada(s)
+                            </small>
+                        }
+                    </div>
+
                     <div class="admin-product-edit-switches">
                         <div class="switch-row">
                             <span>Disponible</span>
@@ -480,7 +497,7 @@
             Stock = producto.Stock,
             Disponible = producto.Disponible,
             EnPromocion = producto.Promocion,
-            ImagenUrl = "/Images/Logo.png"
+            ImagenUrl = producto.Imagenes.FirstOrDefault(i => i.Principal)?.Url?? producto.Imagenes.FirstOrDefault()?.Url?? "/Images/Logo.png"
         };
     }
 
@@ -606,6 +623,7 @@
     private void AbrirEditarProducto()
     {
         mensajeErrorEditar = null;
+        urlsImagenesEditar = new();
 
         // Precargar el form con el detalle actual
         formEditar = new ProductoEditForm
@@ -627,6 +645,8 @@
     {
         mostrarModalEditar = false;
     }
+
+    private List<string> urlsImagenesEditar = new();
 
     private async Task GuardarEdicionProducto()
     {
@@ -669,7 +689,7 @@
 
         try
         {
-            productoApi = await ProductoService.ActualizarAsync(new ProductoApi
+            var productoActualizar = new ProductoApi
             {
                 Id = producto.Id,
                 Nombre = formEditar.Nombre.Trim(),
@@ -680,7 +700,11 @@
                 Promocion = formEditar.EnPromocion,
                 Marca = new Marca { Id = producto.MarcaId },
                 Subcategoria = new Subcategoria { Id = producto.SubcategoriaId }
-            });
+            };
+
+            productoApi = urlsImagenesEditar.Any()
+    ? await ProductoService.ActualizarConImagenesAsync(productoActualizar, urlsImagenesEditar)
+    : await ProductoService.ActualizarAsync(productoActualizar);
 
             producto = MapearDetalle(productoApi);
             mensajeErrorEditar = null;
@@ -702,5 +726,32 @@
         public int Stock { get; set; }
         public bool Disponible { get; set; }
         public bool EnPromocion { get; set; }
+    }
+
+    //imagenes:
+
+    private async Task AbrirWidgetCloudinary()
+    {
+        try
+        {
+            var urls = await JS.InvokeAsync<List<string>>(
+                "subirImagenesCloudinary", "dlkbckbdm", "killa_unsigned", 4);
+
+            foreach (var url in urls)
+            {
+                if (!string.IsNullOrWhiteSpace(url))
+                    urlsImagenesEditar.Add(url);
+            }
+
+            // No pasar de 4 en total
+            if (urlsImagenesEditar.Count > 4)
+                urlsImagenesEditar = urlsImagenesEditar.Take(4).ToList();
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            mensajeErrorEditar = $"Error al subir imagen: {ex.Message}";
+        }
     }
 }

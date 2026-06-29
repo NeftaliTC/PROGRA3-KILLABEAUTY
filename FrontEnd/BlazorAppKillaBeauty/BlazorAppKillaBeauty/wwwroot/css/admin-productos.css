@@ -180,8 +180,19 @@
 /* Modal tweaks */
 .admin-products-modal-card {
     text-align: left;
-    max-width: 520px;
+    max-width: 620px;
+    max-height: 85vh;
+    overflow-y: auto;
 }
+
+    .admin-products-modal-card::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .admin-products-modal-card::-webkit-scrollbar-thumb {
+        background: #d9b4bf;
+        border-radius: 10px;
+    }
 
 .admin-products-modal-header {
     display: flex;
@@ -217,6 +228,47 @@
     .admin-products-btn-confirm-success:hover {
         background: #165a2c !important;
     }
+
+/* Upload de imágenes */
+.admin-upload-box {
+    width: 100%;
+    min-height: 65px;
+    border: 2px dashed #eaa6b8;
+    border-radius: 18px;
+    background: #fff7fa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    color: #7a5b66;
+    margin-top: 6px;
+}
+
+    .admin-upload-box:hover {
+        background: #ffeaf1;
+        border-color: #e8607a;
+    }
+
+    .admin-upload-box i {
+        font-size: 26px;
+        color: #e8607a;
+    }
+
+    .admin-upload-box span {
+        font-weight: 800;
+    }
+
+    .admin-upload-box small,
+    .admin-file-help {
+        font-size: 13px;
+        color: #8a6b75;
+    }
+
+.admin-upload-input {
+    display: none;
+}
 
 /* Responsive */
 @media (max-width: 1050px) {

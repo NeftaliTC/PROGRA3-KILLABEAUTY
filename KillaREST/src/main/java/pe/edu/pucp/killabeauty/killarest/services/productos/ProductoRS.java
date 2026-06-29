@@ -15,22 +15,11 @@ import pe.edu.pucp.killaBeauty.bl.ResenaBL;
 import pe.edu.pucp.killaBeauty.killaModelo.Resena;
 import pe.edu.pucp.killabeauty.killarest.dto.ErrorDTO;
 import pe.edu.pucp.killabeauty.killarest.dto.ProductoCatalogoDTO;
+import pe.edu.pucp.killabeauty.killarest.dto.ProductoConImagenes;
 import pe.edu.pucp.killaBeauty.bl.Impl.ProductoBLImpl;
 import pe.edu.pucp.killaBeauty.bl.ProductoBL;
 import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
 import pe.edu.pucp.killaBeauty.killaModelo.Producto;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataParam;
-
-import pe.edu.pucp.killaBeauty.killaModelo.ImagenProducto;
-
-import java.io.File;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 
 import java.util.List;
 
@@ -40,7 +29,6 @@ import java.util.List;
 public class ProductoRS {
     private final ProductoBL productoBL = new ProductoBLImpl();
     private final ResenaBL resenaBL = new ResenaBLImpl();
-    private final CloudinaryService cloudinaryService = new CloudinaryService();
     @GET
     @Path("/test")
     public String test() {
@@ -163,49 +151,43 @@ public class ProductoRS {
         }
     }
 
-    @POST
-    @Path("/con-imagenes")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @PUT
+    @Path("/{id}/con-imagenes")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response registrarConImagenes(
-            @FormDataParam("producto") String productoJson,
-            @FormDataParam("imagenes") List<FormDataBodyPart> imagenesPartes
+    public Response actualizarConImagenes(
+            @PathParam("id") int id,
+            ProductoConImagenes dto
     ) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            Producto producto = mapper.readValue(productoJson, Producto.class);
+            Producto producto = dto.getProducto();
+            producto.setId(id);
 
-            List<ImagenProducto> imagenes = new ArrayList<>();
+            Producto actualizado = productoBL.updateConImagenes(
+                    producto,
+                    dto.getImagenes()
+            );
 
-            if (imagenesPartes != null) {
-                int orden = 1;
+            return Response.ok(actualizado).build();
 
-                for (FormDataBodyPart parte : imagenesPartes) {
-                    InputStream inputStream = parte.getEntityAs(InputStream.class);
+        } catch (BusinessLogicException ex) {
+            return badRequest(ex);
+        } catch (Exception ex) {
+            return serverError(ex);
+        }
+    }
 
-                    File archivoTemporal = File.createTempFile("producto_", ".jpg");
-                    Files.copy(inputStream, archivoTemporal.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
-                    String url = cloudinaryService.subirImagen(archivoTemporal);
-
-                    ImagenProducto img = new ImagenProducto();
-                    img.setUrl(url);
-                    img.setTitulo("Imagen producto " + orden);
-                    img.setOrden(orden);
-                    img.setPrincipal(orden == 1);
-                    img.setActivo(true);
-
-                    imagenes.add(img);
-
-                    archivoTemporal.delete();
-                    orden++;
-                }
-            }
-
-            Producto creado = productoBL.createConImagenes(producto, imagenes);
-
+    @POST
+    @Path("/con-imagenes")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response registrarConImagenes(ProductoConImagenes dto) {
+        try {
+            Producto creado = productoBL.createConImagenes(
+                    dto.getProducto(),
+                    dto.getImagenes()
+            );
             return Response.status(Response.Status.CREATED).entity(creado).build();
-
         } catch (BusinessLogicException ex) {
             return badRequest(ex);
         } catch (Exception ex) {

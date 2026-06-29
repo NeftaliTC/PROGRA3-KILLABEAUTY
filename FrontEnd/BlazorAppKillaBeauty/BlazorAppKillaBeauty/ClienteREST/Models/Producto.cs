@@ -66,6 +66,18 @@ namespace BlazorAppKillaBeauty.ClienteREST.Models
 
         [JsonPropertyName("activo")]
         public bool Activo { get; set; } = true;
+
+        [JsonPropertyName("imagenes")]
+        public List<ImagenProductoApi> Imagenes { get; set; } = new();
+    }
+
+    public class ImagenProductoApi
+    {
+        [JsonPropertyName("url")]
+        public string Url { get; set; } = "";
+
+        [JsonPropertyName("principal")]
+        public bool Principal { get; set; }
     }
 
     public class Categoria
