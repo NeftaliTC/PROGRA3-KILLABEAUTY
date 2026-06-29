@@ -410,10 +410,9 @@
     border: 1px solid #ffd1da;
     border-radius: 24px;
     padding: 16px 20px;
-    display: grid;
-    grid-template-columns: 44px 1fr auto;
-    gap: 14px;
+    display: flex;
     align-items: flex-start;
+    gap: 14px;
 }
 
 .resena-avatar {
@@ -426,10 +425,28 @@
     align-items: center;
     justify-content: center;
     font-size: 12px;
+    flex-shrink: 0;
 }
 
-.resena-contenido h4 {
-    margin: 0;
+.resena-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.resena-contenido {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.resena-estrellas {
+    color: #e8b82e;
+    font-size: 13px;
+}
+
+.resena-nombre {
+    font-weight: bold;
     font-size: 16px;
     color: #111;
 }
@@ -440,21 +457,17 @@
     font-size: 12px;
 }
 
-.resena-contenido h5 {
-    margin: 0 0 4px;
-    font-size: 16px;
-    color: #111;
+.resena-titulo {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 8px 0 3px 0;
+    color: #222;
 }
 
 .resena-comentario {
     margin: 0;
-    color: #777;
-    font-size: 13px;
-}
-
-.resena-estrellas {
-    color: #e8b82e;
-    font-size: 13px;
+    font-size: 14px;
+    color: #444;
 }
 
 .producto-sin-resenas {

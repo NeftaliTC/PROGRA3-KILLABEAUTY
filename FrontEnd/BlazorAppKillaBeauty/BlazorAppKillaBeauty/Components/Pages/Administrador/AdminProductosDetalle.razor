@@ -420,13 +420,20 @@
 
             resenas = (await ProductoService.ObtenerResenasAsync(id))
                 .Select((r, index) => new ResenaDetalle(
-                    "Cliente Killa",
+                    (r.Cliente != null && !string.IsNullOrWhiteSpace(r.Cliente.Nombre))
+                        ? $"{r.Cliente.Nombre} {r.Cliente.ApellidoPaterno}"
+                        : $"Usuario {r.IdUsuario}",
                     string.IsNullOrWhiteSpace(r.Titulo) ? "Reseña del producto" : r.Titulo,
                     r.Comentario,
                     r.Calificacion,
-                    true,
-                    r.Fecha ?? DateTime.Today,
-                    $"REST-{index + 1}"))
+                    r.Verificado,
+                    r.FechaPublicacion != null
+                        ? DateTime.TryParse(r.FechaPublicacion.Replace("[UTC]", ""),
+                            System.Globalization.CultureInfo.InvariantCulture,
+                            System.Globalization.DateTimeStyles.RoundtripKind,
+                            out var f) ? f : DateTime.Today
+                        : DateTime.Today,
+                    $"KIL-{r.Id:D8}"))
                 .ToList();
         }
         catch (Exception ex)
