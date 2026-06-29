@@ -13,11 +13,10 @@
 @inject NavigationManager Navigation
 @inject AuthService AuthService
 
-<Navbar CantidadCarrito="@CartService.CantidadTotal" />
+<Navbar CantidadCarrito="@CartService.CantidadTotal"
+        TodosLosProductos="@productos" />
 
 <section class="catalog-page">
-
-    
 
     <div class="catalog-breadcrumb">
 
@@ -50,13 +49,19 @@
                 @subcategoriaSeleccionada
             </NavLink>
         }
-
     </div>
 
-   
+    @if (!string.IsNullOrWhiteSpace(Busqueda))
+    {
+        <div class="catalog-search-banner">
+            <span>Resultados para: <strong>"@Busqueda"</strong></span>
+            <button @onclick='() => Navigation.NavigateTo("/catalogo")'>
+                <i class="bi bi-x"></i> Limpiar
+            </button>
+        </div>
+    }
 
     <div class="catalog-layout">
-
         <aside class="filters-card filters-card-large">
             <h2>Filtros</h2>
 
@@ -155,6 +160,22 @@
                     <p>@errorProductos</p>
                 </div>
             }
+            else if (!ProductosFiltrados.Any())
+            {
+                <div class="catalog-no-results-container">
+                    @if (SugerenciaCorreccion != null)
+                    {
+                        <div class="catalog-did-you-mean">
+                            ¿Quisiste decir <button @onclick='() => Navigation.NavigateTo($"/catalogo?q={Uri.EscapeDataString(SugerenciaCorreccion)}")'><strong>@SugerenciaCorreccion</strong></button>?
+                        </div>
+                    }
+                    <div class="catalog-no-results">
+                        <i class="bi bi-search"></i>
+                        <h3>No encontramos resultados para "@Busqueda"</h3>
+                        <p>Intenta con otras palabras o revisa la ortografía.</p>
+                    </div>
+                </div>
+            }
             else
             {
                 <div class="catalog-products">
@@ -247,6 +268,9 @@
     [Parameter]
     public string? SubcategoriaUrl { get; set; }
 
+    [SupplyParameterFromQuery(Name = "q")]
+    public string? Busqueda { get; set; }
+
     private int paginaActual = 1;
     private int productosPorPagina = 12;
 
@@ -324,7 +348,8 @@
 
     private IEnumerable<Producto> ProductosFiltrados =>
         productos.Where(p =>
-            FiltroCategoria(p)
+            FiltroBusqueda(p)
+            &&FiltroCategoria(p)
             && FiltroSubcategoria(p)
             && FiltroPrecio(p)
             && FiltroMarca(p)
@@ -360,6 +385,19 @@
             return new List<int> { 1, -1, paginaActual, -1, TotalPaginas };
         }
     }
+
+    private bool FiltroBusqueda(Producto p)
+    {
+        if (string.IsNullOrWhiteSpace(Busqueda)) return true;
+
+        var texto = $"{p.Nombre} {p.Marca} {p.Categoria} {p.Subcategoria}".ToLower();
+
+        var terminos = Busqueda.Trim().ToLower().Split(' ',
+            StringSplitOptions.RemoveEmptyEntries);
+
+        return terminos.All(t => texto.Contains(t));
+    }
+
     private bool FiltroCategoria(Producto producto) 
     { 
         return categoriaSeleccionada == "Todas" || producto.Categoria == categoriaSeleccionada; 
@@ -379,6 +417,35 @@
     {
         return marcasSeleccionadas.Count == 0 || marcasSeleccionadas.Contains(producto.Marca);
     }
+
+    private string? SugerenciaCorreccion
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(Busqueda)) return null;
+            var termino = Busqueda.Trim().ToLower();
+            return productos
+                .SelectMany(p => new[] { p.Nombre, p.Marca })
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .OrderBy(t => LevenshteinSimple(t.ToLower(), termino))
+                .FirstOrDefault(t => LevenshteinSimple(t.ToLower(), termino) <= 3);
+        }
+    }
+
+    private int LevenshteinSimple(string a, string b)
+    {
+        if (a.Length == 0) return b.Length;
+        if (b.Length == 0) return a.Length;
+        var d = new int[a.Length + 1, b.Length + 1];
+        for (int i = 0; i <= a.Length; i++) d[i, 0] = i;
+        for (int j = 0; j <= b.Length; j++) d[0, j] = j;
+        for (int i = 1; i <= a.Length; i++)
+            for (int j = 1; j <= b.Length; j++)
+                d[i, j] = Math.Min(Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1),
+                    d[i - 1, j - 1] + (a[i - 1] == b[j - 1] ? 0 : 1));
+        return d[a.Length, b.Length];
+    }
+
     private void SeleccionarCategoria(string categoria)
     {
         if (categoria == "Todas")
@@ -557,9 +624,3 @@
         return texto.Replace("-", " ");
     }
 }
-
-
-
-
-
-
