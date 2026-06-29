@@ -48,7 +48,7 @@
 
                     <div class="cart-item">
 
-                        <img src="@(producto?.Imagen ?? "/Images/product-placeholder.png")"
+                        <img src="@(string.IsNullOrEmpty(producto?.Imagen) ? "/Images/Logo.png" : producto.Imagen)"
                              alt="@(producto?.Nombre ?? "Producto")"
                              class="cart-item-img" />
 

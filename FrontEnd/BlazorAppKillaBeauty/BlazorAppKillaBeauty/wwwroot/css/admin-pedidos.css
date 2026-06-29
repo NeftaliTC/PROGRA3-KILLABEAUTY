@@ -535,6 +535,15 @@
     border-bottom: none;
 }
 
+.admin-product-thumbnail {
+    width: 75px;
+    height: 75px;
+    object-fit: contain !important;
+    border-radius: 10px;
+    border: 1px solid #eaeaea;
+    flex-shrink: 0;
+}
+
 .admin-order-product-row img {
     width: 58px;
     height: 58px;

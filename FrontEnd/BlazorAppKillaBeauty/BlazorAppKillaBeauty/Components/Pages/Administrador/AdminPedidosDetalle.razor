@@ -91,7 +91,7 @@
                                     var urlImagen = item.Imagenes?.FirstOrDefault() ?? "/Images/Logo.png";
                                 }
 
-                                <img src="@urlImagen" alt="@item.NombreProducto" class="product-thumbnail" />
+                                <img src="@urlImagen" alt="@item.NombreProducto" class="admin-product-thumbnail" />
                                 <div class="product-info">
                                     <strong>@item.NombreProducto</strong>
                                     <span>@(string.IsNullOrWhiteSpace(item.Marca) ? "Sin marca registrada" : item.Marca)</span>

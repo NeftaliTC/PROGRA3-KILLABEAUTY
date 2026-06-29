@@ -220,7 +220,7 @@
                     <div class="info-icon-block">
                         <i class="bi @(pedidoActual.MetodoPago == "TARJETA" ? "bi-credit-card-2-front" : "bi-phone") icon-pink"></i>
                         <div class="block-text">
-                            <h3>@(pedidoActual.MetodoPago == "TARJETA" ? "Tarjeta de Crédito/Débito" : pedidoActual.MetodoPago == "YAPE" ? "Yape / Plin" : pedidoActual.MetodoPago)</h3>
+                            <h3>@(pedidoActual.MetodoPago == "TARJETA" ? "Tarjeta de Crédito/Débito" : pedidoActual.MetodoPago == "YAPE_PLIN" ? "Yape / Plin" : pedidoActual.MetodoPago)</h3>
                             <p>Pago procesado correctamente</p>
                         </div>
                     </div>
