@@ -9,165 +9,251 @@ import pe.edu.pucp.killaDAO.Impl.UsuarioDAOImpl;
 import pe.edu.pucp.killaDAO.UsuarioDAO;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 public class UsuarioBLImpl implements UsuarioBL {
     private UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
 
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    private static final Pattern DNI_PATTERN = Pattern.compile("^\\d{8}$");
+    private static final Pattern CELULAR_PATTERN = Pattern.compile("^9\\d{8}$");
+    private static final int EDAD_MINIMA = 18;
+    private static final int LONGITUD_MINIMA_CONTRASENA = 6;
+
     @Override
     public Usuario create(Usuario usuario) throws BusinessLogicException {
-
-        if(usuario.getCorreoElectronico() == null || usuario.getCorreoElectronico().isEmpty())
-            throw new BusinessLogicException("El campo correo no puede estar vacío");
-        if (usuario.getFechaNacimiento() == null) {
-            throw new BusinessLogicException("La fecha de nacimiento es obligatoria.");
-        }
+        validarRegistro(usuario);
         try {
             Usuario usuarioExistente = usuarioDAO.loadByEmail(usuario.getCorreoElectronico());
             if (usuarioExistente != null) {
-                throw new BusinessLogicException("El correo electrónico ya se encuentra registrado.");
+                throw new BusinessLogicException("El correo electronico ya se encuentra registrado.");
             }
 
-            String passwordPlano = usuario.getContrasena();
-            String passwordHasheado = BCrypt.hashpw(passwordPlano, BCrypt.gensalt());
+            String passwordHasheado = BCrypt.hashpw(usuario.getContrasena(), BCrypt.gensalt());
             usuario.setContrasena(passwordHasheado);
             usuario.setActivo(true);
             usuario.setTipoUsuario(TipoUsuario.CLIENTE);
             usuario.setFechaDeInscripcion(new java.util.Date());
             return usuarioDAO.save(usuario);
-            // ultimo acceso se actualizará con la fecha actual recién cuando haga su primer Login.
-        } catch(SQLException e) {
-            throw new BusinessLogicException("Error interno: "+ e.getMessage());
-
+        } catch (SQLException e) {
+            throw new BusinessLogicException("Error interno: " + e.getMessage());
         }
     }
 
     @Override
     public Usuario update(Usuario usuario) throws BusinessLogicException {
-
-        // como condicion el usuario ya esta logeado, es decir el usuario ya tiene un id , por eso no se verifica
-        if (usuario.getNombre() == null || usuario.getNombre().trim().isEmpty()) {
-            throw new BusinessLogicException("El nombre es obligatorio.");
-        }
-        if (usuario.getApellidoPaterno() == null || usuario.getApellidoPaterno().trim().isEmpty()) {
-            throw new BusinessLogicException("El apellido paterno es obligatorio.");
-        }
-        if (usuario.getTelefono() != null && !usuario.getTelefono().matches("^[0-9]{9}$")) {
-
-            throw new BusinessLogicException("El teléfono debe contener 9 dígitos numéricos.");
-        }
+        validarPerfil(usuario);
         try {
             Usuario usuarioActual = usuarioDAO.load(usuario.getId());
             if (usuarioActual == null) {
                 throw new BusinessLogicException("El usuario con ID " + usuario.getId() + " no existe en el sistema.");
             }
 
-            usuarioActual.setNombre(usuario.getNombre().trim());
-            usuarioActual.setApellidoPaterno(usuario.getApellidoPaterno().trim());
-            usuarioActual.setApellidoMaterno(usuario.getApellidoMaterno() != null ? usuario.getApellidoMaterno().trim() : null);
+            usuarioActual.setNombre(usuario.getNombre());
+            usuarioActual.setApellidoPaterno(usuario.getApellidoPaterno());
+            usuarioActual.setApellidoMaterno(usuario.getApellidoMaterno());
             usuarioActual.setFechaNacimiento(usuario.getFechaNacimiento());
             usuarioActual.setGenero(usuario.getGenero());
             usuarioActual.setTelefono(usuario.getTelefono());
 
             usuarioDAO.update(usuarioActual);
-
-            // Limpiamos el hash por seguridad antes de enviarlo de vuelta al frontend
             usuarioActual.setContrasena(null);
             return usuarioActual;
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             throw new BusinessLogicException(e);
         }
     }
 
     @Override
     public void remove(Usuario usuario) throws BusinessLogicException {
+        if (usuario == null || usuario.getId() <= 0) {
+            throw new BusinessLogicException("Se requiere un usuario valido para eliminar.");
+        }
         try {
             usuarioDAO.remove(usuario);
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             throw new BusinessLogicException(e);
         }
     }
 
     @Override
     public Usuario load(int id) throws BusinessLogicException {
+        if (id <= 0) {
+            throw new BusinessLogicException("El id del usuario debe ser valido.");
+        }
         try {
             return usuarioDAO.load(id);
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             throw new BusinessLogicException(e);
         }
     }
 
     @Override
     public Usuario loadByEmail(String email) throws BusinessLogicException {
+        String correo = normalizarCorreo(email);
         try {
-            return usuarioDAO.loadByEmail(email);
-        } catch(SQLException e) {
+            return usuarioDAO.loadByEmail(correo);
+        } catch (SQLException e) {
             throw new BusinessLogicException(e);
         }
     }
 
     @Override
     public List<Usuario> listByTipoUsuario(int idTipoUsuario) throws BusinessLogicException {
+        if (idTipoUsuario <= 0) {
+            throw new BusinessLogicException("El tipo de usuario debe ser valido.");
+        }
         try {
             return usuarioDAO.listByTipoUsuario(idTipoUsuario);
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             throw new BusinessLogicException(e);
         }
     }
 
     @Override
     public Usuario cambiarContrasena(int id, String contrasenaActual, String nuevaContrasena) throws BusinessLogicException {
-        if (contrasenaActual == null || contrasenaActual.trim().isEmpty()) {
-            throw new BusinessLogicException("Debe ingresar su contraseña actual.");
+        if (id <= 0) {
+            throw new BusinessLogicException("El usuario debe ser valido.");
         }
-        if (nuevaContrasena == null || nuevaContrasena.length() < 6) {
-            throw new BusinessLogicException("La nueva contraseña debe tener al menos 6 caracteres.");
+        if (contrasenaActual == null || contrasenaActual.trim().isEmpty()) {
+            throw new BusinessLogicException("Debe ingresar su contrasena actual.");
+        }
+        if (nuevaContrasena == null || nuevaContrasena.length() < LONGITUD_MINIMA_CONTRASENA) {
+            throw new BusinessLogicException("La nueva contrasena debe tener al menos 6 caracteres.");
         }
         if (contrasenaActual.equals(nuevaContrasena)) {
-            throw new BusinessLogicException("La nueva contraseña no puede ser igual a la anterior.");
+            throw new BusinessLogicException("La nueva contrasena no puede ser igual a la anterior.");
         }
-        try{
-
+        try {
             Usuario usuarioActual = usuarioDAO.load(id);
             if (usuarioActual == null) {
                 throw new BusinessLogicException("El usuario no existe en el sistema.");
             }
 
-            // Usamos BCrypt para comparar la contraseña ingresada con la de la BD
             boolean contrasenaValida = BCrypt.checkpw(contrasenaActual, usuarioActual.getContrasena());
             if (!contrasenaValida) {
-                throw new BusinessLogicException("La contraseña actual ingresada es incorrecta.");
+                throw new BusinessLogicException("La contrasena actual ingresada es incorrecta.");
             }
 
             String passwordHasheado = BCrypt.hashpw(nuevaContrasena, BCrypt.gensalt());
             usuarioActual.setContrasena(passwordHasheado);
             return usuarioDAO.update(usuarioActual);
-        }catch(SQLException e) {
-            throw new BusinessLogicException("Error interno: "+ e.getMessage());
+        } catch (SQLException e) {
+            throw new BusinessLogicException("Error interno: " + e.getMessage());
         }
     }
 
     @Override
     public Usuario autenticar(Usuario usuario) throws BusinessLogicException {
-
-        if (usuario.getCorreoElectronico() == null || usuario.getContrasena() == null) {
-            throw new BusinessLogicException("El correo y la contraseña son campos obligatorios.");
+        if (usuario == null || usuario.getCorreoElectronico() == null || usuario.getContrasena() == null) {
+            throw new BusinessLogicException("El correo y la contrasena son campos obligatorios.");
         }
+
+        String correo = normalizarCorreo(usuario.getCorreoElectronico());
         try {
-            Usuario usuarioBD = usuarioDAO.loadByEmail(usuario.getCorreoElectronico());
+            Usuario usuarioBD = usuarioDAO.loadByEmail(correo);
             if (usuarioBD == null) {
-                throw new BusinessLogicException("Correo o contraseña incorrectos.");
+                throw new BusinessLogicException("Correo o contrasena incorrectos.");
             }
             boolean contrasenaValida = BCrypt.checkpw(usuario.getContrasena(), usuarioBD.getContrasena());
             if (!contrasenaValida) {
-                throw new BusinessLogicException("Correo o contraseña incorrectos.");
+                throw new BusinessLogicException("Correo o contrasena incorrectos.");
             }
-            // Removemos el hash de la contraseña del objeto antes de retornarlo
             usuarioBD.setContrasena(null);
             return usuarioBD;
-
         } catch (SQLException e) {
             throw new BusinessLogicException("Error interno en el servidor de datos al intentar procesar el ingreso: " + e.getMessage());
         }
+    }
+
+    private void validarRegistro(Usuario usuario) throws BusinessLogicException {
+        validarBaseUsuario(usuario);
+        if (usuario.getContrasena() == null || usuario.getContrasena().length() < LONGITUD_MINIMA_CONTRASENA) {
+            throw new BusinessLogicException("La contrasena debe tener al menos 6 caracteres.");
+        }
+        if (usuario.getDni() == null || !DNI_PATTERN.matcher(usuario.getDni().trim()).matches()) {
+            throw new BusinessLogicException("El DNI debe contener 8 digitos numericos.");
+        }
+        usuario.setDni(usuario.getDni().trim());
+    }
+
+    private void validarPerfil(Usuario usuario) throws BusinessLogicException {
+        validarBaseUsuario(usuario);
+        if (usuario.getId() <= 0) {
+            throw new BusinessLogicException("Se requiere un ID valido para actualizar el usuario.");
+        }
+    }
+
+    private void validarBaseUsuario(Usuario usuario) throws BusinessLogicException {
+        if (usuario == null) {
+            throw new BusinessLogicException("El usuario no puede ser nulo.");
+        }
+        if (esVacio(usuario.getNombre())) {
+            throw new BusinessLogicException("El nombre es obligatorio.");
+        }
+        if (esVacio(usuario.getApellidoPaterno())) {
+            throw new BusinessLogicException("El apellido paterno es obligatorio.");
+        }
+        if (esVacio(usuario.getCorreoElectronico())) {
+            throw new BusinessLogicException("El correo electronico es obligatorio.");
+        }
+
+        String correo = normalizarCorreo(usuario.getCorreoElectronico());
+        if (!EMAIL_PATTERN.matcher(correo).matches()) {
+            throw new BusinessLogicException("El correo electronico no tiene un formato valido.");
+        }
+        usuario.setCorreoElectronico(correo);
+
+        validarFechaNacimiento(usuario.getFechaNacimiento());
+        usuario.setNombre(usuario.getNombre().trim());
+        usuario.setApellidoPaterno(usuario.getApellidoPaterno().trim());
+        usuario.setApellidoMaterno(esVacio(usuario.getApellidoMaterno()) ? null : usuario.getApellidoMaterno().trim());
+        usuario.setTelefono(normalizarCelular(usuario.getTelefono()));
+        usuario.setGenero(normalizarGenero(usuario.getGenero()));
+    }
+
+    private void validarFechaNacimiento(LocalDate fechaNacimiento) throws BusinessLogicException {
+        if (fechaNacimiento == null) {
+            throw new BusinessLogicException("La fecha de nacimiento es obligatoria.");
+        }
+        if (fechaNacimiento.isAfter(LocalDate.now())) {
+            throw new BusinessLogicException("La fecha de nacimiento no puede ser futura.");
+        }
+        if (Period.between(fechaNacimiento, LocalDate.now()).getYears() < EDAD_MINIMA) {
+            throw new BusinessLogicException("El usuario debe ser mayor de edad.");
+        }
+    }
+
+    private String normalizarCorreo(String correo) throws BusinessLogicException {
+        if (esVacio(correo)) {
+            throw new BusinessLogicException("El correo electronico es obligatorio.");
+        }
+        return correo.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String normalizarCelular(String celular) throws BusinessLogicException {
+        if (esVacio(celular)) {
+            return null;
+        }
+        String valor = celular.trim();
+        if (!CELULAR_PATTERN.matcher(valor).matches()) {
+            throw new BusinessLogicException("El celular debe contener 9 digitos y empezar con 9.");
+        }
+        return valor;
+    }
+
+    private String normalizarGenero(String genero) {
+        if (esVacio(genero) || genero.trim().equalsIgnoreCase("Selecciona")) {
+            return null;
+        }
+        return genero.trim();
+    }
+
+    private boolean esVacio(String valor) {
+        return valor == null || valor.trim().isEmpty();
     }
 }

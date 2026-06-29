@@ -14,6 +14,7 @@ import pe.edu.pucp.killabeauty.killarest.dto.PedidoDetalleDTO;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Path("/pedido")
@@ -25,6 +26,8 @@ public class PedidoRS {
     private final CourierBL courierBL = new CourierBLImpl();
     private final PagoBL pagoBL = new PagoBLImpl();
     private final ComprobantePagoBL comprobanteBL = new ComprobantePagoBLImpl();
+    private static final Pattern DNI_PATTERN = Pattern.compile("^\\d{8}$");
+    private static final Pattern RUC_PATTERN = Pattern.compile("^(10|20)\\d{9}$");
 
     // Construye el DTO completo buscando envio, pago y comprobante del pedido
     private PedidoDetalleDTO construirDTO(Pedido p) throws BusinessLogicException {
@@ -47,9 +50,7 @@ public class PedidoRS {
     @Path("/checkout")
     public Response registrarDesdeCheckout(PedidoCheckoutDTO request) {
         try {
-            if (request == null) {
-                throw new BusinessLogicException("La solicitud de checkout no puede ser nula.");
-            }
+            validarCheckout(request);
 
             //Crear pedido
             Pedido pedido = pedidoBL.createFromCart(
@@ -181,15 +182,14 @@ public class PedidoRS {
 
     private List<DetallePedido> mapDetallesCarrito(List<PedidoCheckoutDTO.ItemCarritoDTO> items) {
         List<DetallePedido> detalles = new ArrayList<>();
-        if (items == null) return detalles;
 
         for (PedidoCheckoutDTO.ItemCarritoDTO item : items) {
             DetallePedido detalle = new DetallePedido();
             Producto producto = new Producto();
-            producto.setId(item != null && item.getProductoId() != null ? item.getProductoId() : 0);
+            producto.setId(item.getProductoId());
             detalle.setProducto(producto);
-            detalle.setCantidad(item != null && item.getCantidad() != null ? item.getCantidad() : 0);
-            detalle.setPrecioAplicado(item != null ? item.getPrecioAplicado() : 0);
+            detalle.setCantidad(item.getCantidad());
+            detalle.setPrecioAplicado(item.getPrecioAplicado());
             detalles.add(detalle);
         }
         return detalles;
@@ -198,7 +198,9 @@ public class PedidoRS {
     private MetodoPago resolverMetodoPago(String metodoPago) {
         if (metodoPago == null) return MetodoPago.TARJETA;
         return switch (metodoPago.toUpperCase()) {
-            case "YAPE_PLIN" -> MetodoPago.YAPE;
+            case "YAPE" -> MetodoPago.YAPE;
+            case "PLIN" -> MetodoPago.PLIN;
+            case "TRANSFERENCIA" -> MetodoPago.TRANSFERENCIA;
             case "TARJETA" -> MetodoPago.TARJETA;
             default -> MetodoPago.TARJETA;
         };
@@ -234,5 +236,101 @@ public class PedidoRS {
             return f;
         }
         return null;
+    }
+
+    private void validarCheckout(PedidoCheckoutDTO request) throws BusinessLogicException {
+        if (request == null) {
+            throw new BusinessLogicException("La solicitud de checkout no puede ser nula.");
+        }
+        if (request.getUsuarioId() == null || request.getUsuarioId() <= 0) {
+            throw new BusinessLogicException("El usuario del checkout debe ser valido.");
+        }
+        if (request.getDireccionId() != null && request.getDireccionId() < 0) {
+            throw new BusinessLogicException("La direccion seleccionada debe ser valida.");
+        }
+        if (request.getCuponId() != null && request.getCuponId() <= 0) {
+            throw new BusinessLogicException("El cupon seleccionado debe ser valido.");
+        }
+        if (request.getCostoEnvio() < 0) {
+            throw new BusinessLogicException("El costo de envio no puede ser negativo.");
+        }
+        if (request.getDescuentoCupon() < 0) {
+            throw new BusinessLogicException("El descuento del cupon no puede ser negativo.");
+        }
+        validarItemsCheckout(request.getItems());
+        validarMetodoPago(request);
+        validarComprobanteCheckout(request);
+    }
+
+    private void validarItemsCheckout(List<PedidoCheckoutDTO.ItemCarritoDTO> items) throws BusinessLogicException {
+        if (items == null || items.isEmpty()) {
+            throw new BusinessLogicException("El pedido debe tener al menos un producto.");
+        }
+        for (PedidoCheckoutDTO.ItemCarritoDTO item : items) {
+            if (item == null) {
+                throw new BusinessLogicException("El pedido contiene un item invalido.");
+            }
+            if (item.getProductoId() == null || item.getProductoId() <= 0) {
+                throw new BusinessLogicException("Cada item debe tener un producto valido.");
+            }
+            if (item.getCantidad() == null || item.getCantidad() <= 0) {
+                throw new BusinessLogicException("La cantidad de cada item debe ser mayor a 0.");
+            }
+            if (item.getPrecioAplicado() <= 0) {
+                throw new BusinessLogicException("El precio aplicado de cada item debe ser mayor a 0.");
+            }
+        }
+    }
+
+    private void validarMetodoPago(PedidoCheckoutDTO request) throws BusinessLogicException {
+        if (request.getMetodoPago() == null || request.getMetodoPago().trim().isEmpty()) {
+            request.setMetodoPago("TARJETA");
+            return;
+        }
+
+        String metodoPago = request.getMetodoPago().trim().toUpperCase();
+        if (!metodoPago.equals("TARJETA")
+                && !metodoPago.equals("TRANSFERENCIA")
+                && !metodoPago.equals("YAPE")
+                && !metodoPago.equals("PLIN")) {
+            throw new BusinessLogicException("El metodo de pago seleccionado no es valido.");
+        }
+        request.setMetodoPago(metodoPago);
+    }
+
+    private void validarComprobanteCheckout(PedidoCheckoutDTO request) throws BusinessLogicException {
+        if (request.getTipoComprobante() == null || request.getTipoComprobante().trim().isEmpty()) {
+            request.setTipoComprobante(null);
+            return;
+        }
+
+        String tipoComprobante = request.getTipoComprobante().trim().toUpperCase();
+        request.setTipoComprobante(tipoComprobante);
+
+        if (tipoComprobante.equals("BOLETA")) {
+            if (request.getDni() == null || !DNI_PATTERN.matcher(request.getDni().trim()).matches()) {
+                throw new BusinessLogicException("Para boleta debe ingresar un DNI de 8 digitos.");
+            }
+            request.setDni(request.getDni().trim());
+            return;
+        }
+
+        if (tipoComprobante.equals("FACTURA")) {
+            if (request.getRuc() == null || !RUC_PATTERN.matcher(request.getRuc().trim()).matches()) {
+                throw new BusinessLogicException("Para factura debe ingresar un RUC de 11 digitos que empiece con 10 o 20.");
+            }
+            if (request.getRazonSocial() == null || request.getRazonSocial().trim().isEmpty()) {
+                throw new BusinessLogicException("La razon social es obligatoria para factura.");
+            }
+            if (request.getDireccionFiscal() == null || request.getDireccionFiscal().trim().isEmpty()) {
+                throw new BusinessLogicException("La direccion fiscal es obligatoria para factura.");
+            }
+            request.setRuc(request.getRuc().trim());
+            request.setRazonSocial(request.getRazonSocial().trim());
+            request.setDireccionFiscal(request.getDireccionFiscal().trim());
+            return;
+        }
+
+        throw new BusinessLogicException("El tipo de comprobante debe ser BOLETA o FACTURA.");
     }
 }
