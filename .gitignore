@@ -54,3 +54,4 @@ build/
 # Caché y archivos temporales
 *.cache
 *.metadata
+.codex-build/
