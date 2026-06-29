@@ -83,6 +83,7 @@
                             .entity("Datos del perfil vacíos o inválidos.")
                             .build();
                 }
+                datosPerfil.setId(id);
                 Usuario usuarioActualizado = usuarioBL.update(datosPerfil);
                 return Response.ok(usuarioActualizado).build();
             }catch (BusinessLogicException e) {
