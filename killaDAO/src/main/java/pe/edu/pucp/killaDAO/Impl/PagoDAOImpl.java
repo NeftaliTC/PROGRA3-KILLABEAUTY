@@ -15,8 +15,10 @@ public class PagoDAOImpl implements PagoDAO {
     public List<Pago> listAll() throws SQLException {
         List<Pago> lista = new ArrayList<>();
         String sql = """
-                SELECT id_pago, monto_pagado, fecha_hora_pago, estado, id_pedido, id_metodo_pago 
-                FROM Pago
+                SELECT p.id_pago, p.monto_pagado, p.fecha_hora_pago, p.estado, p.id_pedido,
+                       p.id_metodo_pago, m.nombre AS nombre_metodo
+                FROM Pago p
+                JOIN MetodoPago m ON p.id_metodo_pago = m.id_metodo_pago
                 """;
         try (Connection con = DBManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
@@ -29,8 +31,11 @@ public class PagoDAOImpl implements PagoDAO {
     @Override
     public Pago buscarPorIdPedido(Integer idPedido) throws SQLException {
         String sql = """
-                SELECT id_pago, monto_pagado, fecha_hora_pago, estado, id_pedido, id_metodo_pago 
-                FROM Pago WHERE id_pedido = ?
+                SELECT p.id_pago, p.monto_pagado, p.fecha_hora_pago, p.estado, p.id_pedido,
+                       p.id_metodo_pago, m.nombre AS nombre_metodo
+                FROM Pago p
+                JOIN MetodoPago m ON p.id_metodo_pago = m.id_metodo_pago
+                WHERE p.id_pedido = ?
                 """;
         try (Connection con = DBManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -45,8 +50,11 @@ public class PagoDAOImpl implements PagoDAO {
     @Override
     public Pago load(Integer id) throws SQLException {
         String sql = """
-                SELECT id_pago, monto_pagado, fecha_hora_pago, estado, id_pedido, id_metodo_pago 
-                FROM Pago WHERE id_pago = ?
+                SELECT p.id_pago, p.monto_pagado, p.fecha_hora_pago, p.estado, p.id_pedido,
+                       p.id_metodo_pago, m.nombre AS nombre_metodo
+                FROM Pago p
+                JOIN MetodoPago m ON p.id_metodo_pago = m.id_metodo_pago
+                WHERE p.id_pedido = ?
                 """;
         try (Connection con = DBManager.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -115,7 +123,6 @@ public class PagoDAOImpl implements PagoDAO {
 
         int idMetodo = rs.getInt("id_metodo_pago");
         p.setMetodoPago(MetodoPago.fromId(idMetodo));
-
         return p;
     }
 }

@@ -379,7 +379,7 @@ else
 
 
 
-    private List<string> ImagenesProducto
+    /*private List<string> ImagenesProducto
     {
         get
         {
@@ -402,6 +402,28 @@ else
             {
                 producto.ImagenPrincipal
             };
+        }
+    }*/
+
+    private List<string> ImagenesProducto
+    {
+        get
+        {
+            if (productoApi?.Imagenes != null && productoApi.Imagenes.Any())
+            {
+                return productoApi.Imagenes
+                    .Where(i => !string.IsNullOrWhiteSpace(i.Url))
+                    .OrderBy(i => i.Orden)
+                    .Select(i => i.Url)
+                    .ToList();
+            }
+
+            if (producto != null && !string.IsNullOrWhiteSpace(producto.ImagenPrincipal))
+            {
+                return new List<string> { producto.ImagenPrincipal };
+            }
+
+            return new List<string> { "/Images/Logo.png" };
         }
     }
 
