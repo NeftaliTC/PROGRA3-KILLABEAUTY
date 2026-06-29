@@ -67,8 +67,12 @@ public class CarritoDeComprasBLImpl implements CarritoDeComprasBL {
     public void remove(CarritoDeCompras carrito) throws BusinessLogicException {
         if (carrito == null || carrito.getId() <= 0) throw new BusinessLogicException("Debe indicar un carrito valido.");
         try {
+            CarritoDeCompras carritoExistente = carritoDAO.load(carrito.getId());
+            if (carritoExistente == null) {
+                throw new BusinessLogicException("El carrito no existe.");
+            }
             TransactionContext.getConnection();
-            carritoDAO.remove(carrito);
+            carritoDAO.remove(carritoExistente);
             TransactionContext.commit();
         } catch (SQLException e) {
             TransactionContext.rollback();

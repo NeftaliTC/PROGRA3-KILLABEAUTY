@@ -20,6 +20,9 @@ public class CarritoRS {
     @POST
     public Response registrar(CarritoDeCompras carrito) {
         try {
+            if (carrito == null) {
+                return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO("Datos del carrito incompletos.")).build();
+            }
             return Response.status(Response.Status.CREATED)
                     .entity(carritoBL.create(carrito))
                     .build();
@@ -36,7 +39,9 @@ public class CarritoRS {
             return (carrito != null) ? Response.ok(carrito).build()
                     : Response.status(Response.Status.NOT_FOUND).build();
         } catch (BusinessLogicException ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ErrorDTO(ex.getMessage())).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
+        }catch (Exception ex) {
+            return Response.serverError().entity(new ErrorDTO(ex.getMessage())).build();
         }
     }
 
@@ -48,9 +53,10 @@ public class CarritoRS {
             return Response.ok(carritos).build();
 
         } catch (BusinessLogicException ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(new ErrorDTO(ex.getMessage()))
-                    .build();
+            return Response.status(Response.Status.BAD_REQUEST).
+                    entity(new ErrorDTO(ex.getMessage())).build();
+        }catch (Exception ex) {
+            return Response.serverError().entity(new ErrorDTO(ex.getMessage())).build();
         }
     }
 
@@ -58,6 +64,9 @@ public class CarritoRS {
     @Path("/{id}")
     public Response actualizar(@PathParam("id") int id, CarritoDeCompras carrito) {
         try {
+            if (carrito == null) {
+                return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO("Datos incompletos para actualizar.")).build();
+            }
             carrito.setId(id);
             CarritoDeCompras actualizado = carritoBL.update(carrito);
             return Response.ok(actualizado).build();
@@ -73,14 +82,17 @@ public class CarritoRS {
     @Path("/{id}")
     public Response eliminar(@PathParam("id") int id) {
         try {
-            CarritoDeCompras carrito = carritoBL.load(id);
-            if (carrito == null) return Response.status(Response.Status.NOT_FOUND).build();
+            CarritoDeCompras carrito = new CarritoDeCompras();
+            carrito.setId(id);
             carritoBL.remove(carrito);
             return Response.noContent().build();
         } catch (BusinessLogicException ex) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new ErrorDTO(ex.getMessage()))
-                    .build();
+            if (ex.getMessage().toLowerCase().contains("no existe") || ex.getMessage().toLowerCase().contains("no encontrado")) {
+                return Response.status(Response.Status.NOT_FOUND).entity(new ErrorDTO(ex.getMessage())).build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
+        } catch (Exception ex) {
+            return Response.serverError().entity(new ErrorDTO(ex.getMessage())).build();
         }
     }
 }
