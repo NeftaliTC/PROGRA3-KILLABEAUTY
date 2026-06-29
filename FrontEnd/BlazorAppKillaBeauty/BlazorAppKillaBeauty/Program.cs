@@ -46,7 +46,11 @@ builder.Services.AddHttpClient("KillaApi", client =>
 });
 
 
-builder.Services.AddScoped<HttpClientUtils>();
+builder.Services.AddScoped<HttpClientUtils>(sp =>
+{
+    var factory = sp.GetRequiredService<IHttpClientFactory>();
+    return new HttpClientUtils(factory.CreateClient("KillaApi"));
+});
 builder.Services.AddSingleton<AddressService>();
 builder.Services.AddScoped<ProductoService>();
 builder.Services.AddScoped<CourierService>();
