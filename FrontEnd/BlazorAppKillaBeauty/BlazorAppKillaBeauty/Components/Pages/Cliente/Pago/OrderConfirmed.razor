@@ -47,7 +47,7 @@
             {
                 timer?.Dispose();
                 await InvokeAsync(() =>
-                    Navigation.NavigateTo("/orders"));
+                    Navigation.NavigateTo("/orders", replace: true));
             }
         }, null, 1000, 1000);
     }
