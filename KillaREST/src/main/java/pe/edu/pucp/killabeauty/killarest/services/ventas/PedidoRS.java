@@ -198,9 +198,7 @@ public class PedidoRS {
     private MetodoPago resolverMetodoPago(String metodoPago) {
         if (metodoPago == null) return MetodoPago.TARJETA;
         return switch (metodoPago.toUpperCase()) {
-            case "YAPE" -> MetodoPago.YAPE;
-            case "PLIN" -> MetodoPago.PLIN;
-            case "TRANSFERENCIA" -> MetodoPago.TRANSFERENCIA;
+            case "YAPE_PLIN" -> MetodoPago.YAPE_PLIN;
             case "TARJETA" -> MetodoPago.TARJETA;
             default -> MetodoPago.TARJETA;
         };
@@ -290,9 +288,7 @@ public class PedidoRS {
 
         String metodoPago = request.getMetodoPago().trim().toUpperCase();
         if (!metodoPago.equals("TARJETA")
-                && !metodoPago.equals("TRANSFERENCIA")
-                && !metodoPago.equals("YAPE")
-                && !metodoPago.equals("PLIN")) {
+                && !metodoPago.equals("YAPE_PLIN")) {
             throw new BusinessLogicException("El metodo de pago seleccionado no es valido.");
         }
         request.setMetodoPago(metodoPago);

@@ -105,13 +105,24 @@
             <div class="coupon-row">
                 <input placeholder="Ingresa tu código de cupón"
                        value="@cupon"
+                       disabled="@(cuponAplicado != null)"
                        @oninput="ActualizarCupon" />
 
-                <button class="coupon-button"
-                        disabled="@string.IsNullOrWhiteSpace(cupon)"
-                        @onclick="AplicarCupon">
-                    Aplicar
-                </button>
+                @if (cuponAplicado == null)
+                {
+                    <button class="coupon-button"
+                            disabled="@string.IsNullOrWhiteSpace(cupon)"
+                            @onclick="AplicarCupon">
+                        Aplicar
+                    </button>
+                }
+                else
+                {
+                    <button class="coupon-button coupon-remove"
+                            @onclick="QuitarCupon">
+                        Quitar
+                    </button>
+                }
             </div>
 
             @if (cuponAplicado != null)
@@ -429,6 +440,8 @@
     {
         if (AuthService.UsuarioId.HasValue)
         {
+            validandoCompra = false;
+            errorValidacionCompra = "";
             if (!AuthService.EstaLogueado || !AuthService.UsuarioId.HasValue)
             {
                 Navigation.NavigateTo("/login?returnUrl=/checkout", replace: true);
@@ -716,7 +729,7 @@
         await CartService.VaciarCarritoAsync(AuthService.UsuarioId.Value);
 
         validandoCompra = false;
-        Navigation.NavigateTo("/order-confirmed");
+        Navigation.NavigateTo("/order-confirmed", replace: true);
     }
 
     private void FiltrarDni(ChangeEventArgs e)
@@ -745,6 +758,14 @@
     private void ActualizarCupon(ChangeEventArgs e)
     {
         cupon = e.Value?.ToString() ?? "";
+    }
+
+    private void QuitarCupon()
+    {
+        cupon = "";
+        cuponAplicado = null;
+        descuentoCupon = 0;
+        errorCupon = "";
     }
 
     private decimal TotalFinal =>

@@ -175,15 +175,11 @@ namespace BlazorAppKillaBeauty.Services
 
         private async Task<string> SubirImagenACloudinaryAsync(IBrowserFile imagen)
         {
-            Console.WriteLine("=== INICIANDO SUBIDA ===");
 
             try
             {
-                Console.WriteLine($"Archivo: {imagen.Name}, Tipo: {imagen.ContentType}, Tamaño: {imagen.Size}");
-
                 using var ms = new MemoryStream();
                 await imagen.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024).CopyToAsync(ms);
-                Console.WriteLine($"Stream leído: {ms.Length} bytes");
 
                 using var client = new HttpClient();
                 using var content = new MultipartFormDataContent();
@@ -191,10 +187,8 @@ namespace BlazorAppKillaBeauty.Services
                 var fileBytes = new ByteArrayContent(ms.ToArray());
                 fileBytes.Headers.ContentType = MediaTypeHeaderValue.Parse(imagen.ContentType);
                 content.Add(fileBytes, "file", imagen.Name);
-                Console.WriteLine("file agregado");
 
                 content.Add(new StringContent("killa_unsigned"), "upload_preset");
-                Console.WriteLine("upload_preset agregado");
 
                 Console.WriteLine("Enviando request a Cloudinary...");
                 var response = await client.PostAsync(
@@ -203,8 +197,6 @@ namespace BlazorAppKillaBeauty.Services
                 );
 
                 var body = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Status: {response.StatusCode}");
-                Console.WriteLine($"Body: {body}");
 
                 if (!response.IsSuccessStatusCode)
                     throw new InvalidOperationException(body);
