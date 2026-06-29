@@ -13,7 +13,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("http://localhost:8080/KillaREST-1.0-SNAPSHOT/services/")
+    BaseAddress = new Uri("http://32.199.187.242/:8080/KillaREST-1.0-SNAPSHOT/services/")
 });
 
 
