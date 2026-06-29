@@ -33,7 +33,9 @@ public class DireccionRS {
                     : direccionBL.listarPorUsuario(usuarioId);
             return Response.ok(direcciones).build();
         } catch (BusinessLogicException ex) {
-            return serverError(ex);
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
+        }catch (Exception ex) {
+            return Response.serverError().entity(new ErrorDTO(ex.getMessage())).build();
         }
     }
 
@@ -49,17 +51,25 @@ public class DireccionRS {
             }
             return Response.ok(direccion).build();
         } catch (BusinessLogicException ex) {
-            return serverError(ex);
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
+        }catch (Exception ex) {
+            return Response.serverError().entity(new ErrorDTO(ex.getMessage())).build();
         }
     }
 
     @POST
     public Response registrar(Direccion direccion) {
         try {
+            if (direccion == null) {
+                return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO("Datos de la dirección incompletos.")).build();
+            }
             Direccion creada = direccionBL.create(direccion);
             return Response.status(Response.Status.CREATED).entity(creada).build();
+
         } catch (BusinessLogicException ex) {
-            return badRequest(ex);
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
+        } catch (Exception ex) {
+            return Response.serverError().entity(new ErrorDTO(ex.getMessage())).build();
         }
     }
 
@@ -67,11 +77,17 @@ public class DireccionRS {
     @Path("/{id}")
     public Response actualizar(@PathParam("id") int id, Direccion direccion) {
         try {
+            if (direccion == null) {
+                return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO("Datos incompletos para actualizar.")).build();
+            }
+
             direccion.setId(id);
             Direccion actualizada = direccionBL.update(direccion);
             return Response.ok(actualizada).build();
-        } catch (BusinessLogicException ex) {
-            return badRequest(ex);
+        }catch (BusinessLogicException ex) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
+        } catch (Exception ex) {
+            return Response.serverError().entity(new ErrorDTO(ex.getMessage())).build();
         }
     }
 
@@ -79,16 +95,17 @@ public class DireccionRS {
     @Path("/{id}")
     public Response eliminar(@PathParam("id") int id) {
         try {
-            Direccion direccion = direccionBL.load(id);
-            if (direccion == null) {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity(new ErrorDTO("No existe una direccion con id " + id))
-                        .build();
-            }
+            Direccion direccion = new Direccion();
+            direccion.setId(id);
             direccionBL.remove(direccion);
             return Response.noContent().build();
         } catch (BusinessLogicException ex) {
-            return serverError(ex);
+            if (ex.getMessage().toLowerCase().contains("no existe") || ex.getMessage().toLowerCase().contains("no encontrad")) {
+                return Response.status(Response.Status.NOT_FOUND).entity(new ErrorDTO(ex.getMessage())).build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST).entity(new ErrorDTO(ex.getMessage())).build();
+        } catch (Exception ex) {
+            return Response.serverError().entity(new ErrorDTO(ex.getMessage())).build();
         }
     }
 

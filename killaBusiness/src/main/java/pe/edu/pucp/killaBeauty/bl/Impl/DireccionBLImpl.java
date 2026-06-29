@@ -85,7 +85,11 @@ public class DireccionBLImpl implements DireccionBL {
 
     @Override
     public void remove(Direccion d) throws BusinessLogicException {
+        if (d.getId() <= 0) {
+            throw new BusinessLogicException("Debe indicar un ID de pedido válido.");
+        }
         try {
+            Direccion dir = direccionDAO.load(d.getId());
             TransactionContext.getConnection();
             direccionDAO.remove(d);
             TransactionContext.commit();
