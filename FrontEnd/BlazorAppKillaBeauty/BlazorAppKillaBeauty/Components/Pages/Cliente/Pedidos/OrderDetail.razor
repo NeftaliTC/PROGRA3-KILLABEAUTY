@@ -72,10 +72,11 @@
                         @foreach (var item in pedidoActual.Productos)
                         {
                             <div class="product-row-item">
-                                @*<img src="@item.Imagen" alt="@item.Nombre" class="product-thumbnail" />*@
-                                <div class="product-thumbnail-placeholder">
-                                    <i class="bi bi-image"></i>
-                                </div>
+                                @{
+                                    var urlImagen = item.Imagenes?.FirstOrDefault() ?? "/Images/Logo.png";
+                                }
+
+                                <img src="@urlImagen" alt="@item.NombreProducto" class="product-thumbnail" />
 
                                 <div class="product-main-details">
                                     <span class="product-title">@item.NombreProducto</span>

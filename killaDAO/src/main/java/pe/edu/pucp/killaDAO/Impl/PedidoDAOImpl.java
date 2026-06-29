@@ -24,6 +24,7 @@ public class PedidoDAOImpl implements PedidoDAO {
                    dp.id_detalle_pedido, dp.cantidad, dp.precio_unitario_aplicado,
                    pr.id_producto, pr.nombre AS nombre_producto, pr.precio_base,
                    m.id_marca, m.descripcion AS nombre_marca,
+                   img.id_imagen, img.url, img.principal,
                    c.valor_descuento, c.id_tipo_descuento, c.monto_maximo_descuento
             FROM Pedido p
             LEFT JOIN Usuario u ON p.id_usuario = u.id_usuario
@@ -31,6 +32,7 @@ public class PedidoDAOImpl implements PedidoDAO {
             LEFT JOIN DetallePedido dp ON p.id_pedido = dp.id_pedido
             LEFT JOIN Producto pr ON dp.id_producto = pr.id_producto
             LEFT JOIN Marca m ON pr.id_marca = m.id_marca
+            LEFT JOIN ImagenProducto img ON pr.id_producto = img.id_producto AND img.activo = 1
             LEFT JOIN Cupon c ON p.id_cupon = c.id_cupon
             ORDER BY p.id_pedido DESC
             """;
@@ -64,6 +66,27 @@ public class PedidoDAOImpl implements PedidoDAO {
                     m.setDescripcion(rs.getString("nombre_marca"));
                     pr.setMarca(m);
 
+                    int idImagen = rs.getInt("id_imagen"); // Asegúrate de que el SQL traiga este campo
+                    if (!rs.wasNull()) {
+                        ImagenProducto img = new ImagenProducto();
+                        img.setId(idImagen);
+                        img.setUrl(rs.getString("url"));
+                        img.setPrincipal(rs.getBoolean("principal"));
+
+                        if (pr.getImagenes() == null) {
+                            pr.setImagenes(new ArrayList<>());
+                        }
+
+                        // evitar duplicado si ya hay imagen
+                        boolean existe = false;
+                        for (ImagenProducto i : pr.getImagenes()) {
+                            if (i.getId() == img.getId()) existe = true;
+                        }
+                        if (!existe) {
+                            pr.getImagenes().add(img);
+                        }
+                    }
+
                     det.setProducto(pr);
                     if (actual.getDetalles() == null) actual.setDetalles(new ArrayList<>());
                     actual.getDetalles().add(det);
@@ -84,6 +107,7 @@ public class PedidoDAOImpl implements PedidoDAO {
                    dp.id_detalle_pedido, dp.cantidad, dp.precio_unitario_aplicado,
                    pr.id_producto, pr.nombre AS nombre_producto, pr.precio_base,
                    m.id_marca, m.descripcion AS nombre_marca,
+                   img.id_imagen, img.url, img.principal,
                    c.valor_descuento, c.id_tipo_descuento, c.monto_maximo_descuento
             FROM Pedido p
             LEFT JOIN Usuario u ON p.id_usuario = u.id_usuario
@@ -91,6 +115,7 @@ public class PedidoDAOImpl implements PedidoDAO {
             LEFT JOIN DetallePedido dp ON p.id_pedido = dp.id_pedido
             LEFT JOIN Producto pr ON dp.id_producto = pr.id_producto
             LEFT JOIN Marca m ON pr.id_marca = m.id_marca
+            LEFT JOIN ImagenProducto img ON pr.id_producto = img.id_producto AND img.activo = 1
             LEFT JOIN Cupon c ON p.id_cupon = c.id_cupon
             WHERE p.id_usuario = ?
             ORDER BY p.id_pedido DESC
@@ -124,6 +149,27 @@ public class PedidoDAOImpl implements PedidoDAO {
                         m.setId(rs.getInt("id_marca"));
                         m.setDescripcion(rs.getString("nombre_marca"));
                         pr.setMarca(m);
+
+                        int idImagen = rs.getInt("id_imagen"); // Asegúrate de que el SQL traiga este campo
+                        if (!rs.wasNull()) {
+                            ImagenProducto img = new ImagenProducto();
+                            img.setId(idImagen);
+                            img.setUrl(rs.getString("url"));
+                            img.setPrincipal(rs.getBoolean("principal"));
+
+                            if (pr.getImagenes() == null) {
+                                pr.setImagenes(new ArrayList<>());
+                            }
+
+                            // evitar duplicado si ya hay imagen
+                            boolean existe = false;
+                            for (ImagenProducto i : pr.getImagenes()) {
+                                if (i.getId() == img.getId()) existe = true;
+                            }
+                            if (!existe) {
+                                pr.getImagenes().add(img);
+                            }
+                        }
 
                         det.setProducto(pr);
                         if (actual.getDetalles() == null) actual.setDetalles(new ArrayList<>());

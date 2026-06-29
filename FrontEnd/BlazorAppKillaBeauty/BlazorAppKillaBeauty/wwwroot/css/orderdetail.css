@@ -183,9 +183,10 @@
 .product-thumbnail {
     width: 75px;
     height: 75px;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 10px;
     border: 1px solid #eaeaea;
+    flex-shrink: 0;
 }
 
 .product-main-details {
@@ -235,6 +236,13 @@
     padding: 0 10px;
 }
 
+.product-actions-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 30px;
+}
+
 .btn-review-outline {
     display: inline-flex;
     align-items: center;
@@ -270,6 +278,7 @@
 .subtotal-label {
     font-weight: 600;
     color: #333;
+    white-space: nowrap;
     font-size: 1rem;
 }
 
