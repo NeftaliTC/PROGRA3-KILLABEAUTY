@@ -90,8 +90,11 @@ public class PedidoDetalleDTO {
         }
 
         // Pago
-        if (pago != null)
-            this.metodoPago = pago.getMetodoPago() != null ? pago.getMetodoPago().getNombre() : "";
+        if (pago != null && pago.getMetodoPago() != null) {
+            this.metodoPago = pago.getMetodoPago().getNombre();
+        } else {
+            this.metodoPago = "No registrado";
+        }
 
         // Comprobante
         if (comprobante != null) {

@@ -31,6 +31,7 @@ builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<UsuarioPerfilService>();
 builder.Services.AddScoped<UsuarioPasswordService>();
 builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<UbigeoService>();
 builder.Services.AddHttpClient("KillaApi", client =>
 {
     var baseUrl = builder.Configuration["KillaApi:BaseUrl"]
