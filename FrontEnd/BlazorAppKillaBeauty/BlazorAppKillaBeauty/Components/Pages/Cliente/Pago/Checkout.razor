@@ -8,6 +8,7 @@
 @inject CuponService cuponService
 @inject PedidoService PedidoService
 @inject AuthService AuthService
+@inject UbigeoService UbigeoService
 
 <Navbar CantidadCarrito="@CartService.CantidadTotal" />
 
@@ -361,24 +362,53 @@
             <div class="modal-grid">
                 <div class="form-group">
                     <label>Departamento</label>
-                    <input value="Lima" disabled />
+                    <div class="select-wrapper disabled-select">
+                        @* Para expansión futura: *@
+                        @* <select value="@deptoSeleccionado" @onchange="OnDepartamentoChanged">
+                            <option value="">Seleccione...</option>
+                            @foreach (var depto in departamentos)
+                            {
+                                <option value="@depto">@depto</option>
+                            }
+                        </select> *@
+                        <select value="@deptoSeleccionado" disabled>
+                            <option value="Lima">Lima</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label>Provincia</label>
-                    <input value="Lima Metropolitana" disabled />
+                    <div class="select-wrapper disabled-select">
+                        @* Para expansión futura: *@
+                        @* <select value="@provSeleccionada" @onchange="OnProvinciaChanged" disabled="@string.IsNullOrEmpty(deptoSeleccionado)">
+                            <option value="">Seleccione...</option>
+                            @foreach (var prov in provincias)
+                            {
+                                <option value="@prov">@prov</option>
+                            }
+                        </select> *@
+                        <select value="@provSeleccionada" disabled>
+                            <option value="Lima">Lima</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Distrito</label>
-                <select @bind="nuevaDireccion.Distrito">
-                    <option value="">Seleccione...</option>
-                    @foreach (var d in DistritosLima)
-                    {
-                        <option value="@d">@d</option>
-                    }
-                </select>
+            <div class="modal-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="form-group">
+                    <label>Distrito</label>
+                    <div class="select-wrapper">
+                        <select value="@distritoSeleccionado" @onchange="OnDistritoChanged" disabled="@string.IsNullOrEmpty(provSeleccionada)">
+                            <option value="">Seleccione...</option>
+                            @foreach (var dist in distritos)
+                            {
+                                <option value="@dist">@dist</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div></div>
             </div>
 
             <div class="form-group">
@@ -436,8 +466,25 @@
     private string errorDireccionEntrega = "";
     private string errorPago = "";
 
+    private List<string> departamentos = new();
+    private List<string> provincias = new();
+    private List<string> distritos = new();
+
+    private string deptoSeleccionado = "Lima"; //por el momento a Lima
+    private string provSeleccionada = "Lima";
+    private string distritoSeleccionado = "";
+
     protected override async Task OnInitializedAsync()
     {
+        await UbigeoService.InitializeAsync();
+        departamentos = UbigeoService.GetDepartamentos();
+
+        //Por el alcance actual, luego no sera necesario
+        deptoSeleccionado = "Lima";
+        provSeleccionada = "Lima";
+        provincias = UbigeoService.GetProvincias(deptoSeleccionado);
+        distritos = UbigeoService.GetDistritos(deptoSeleccionado, provSeleccionada);
+
         if (AuthService.UsuarioId.HasValue)
         {
             validandoCompra = false;
@@ -532,22 +579,24 @@
     private string errorDireccion = "";
     private Address nuevaDireccion = new();
 
-    private List<string> DistritosLima = new()
-    {
-        "Ancón", "Ate", "Barranco", "Breña", "Carabayllo",
-        "Cercado de Lima", "Chaclacayo", "Chorrillos",
-        "Cieneguilla", "Comas", "El Agustino",
-        "Independencia", "Jesús María", "La Molina",
-        "La Victoria", "Lince", "Los Olivos",
-        "Miraflores", "San Isidro", "San Borja",
-        "Santiago de Surco", "Surquillo",
-        "Villa El Salvador", "Villa Marí­a del Triunfo"
-    };
-
     private void AbrirModalDireccion()
     {
         errorDireccion = "";
-        nuevaDireccion = new Address { Departamento = "Lima", Provincia = "Lima Metropolitana" };
+
+        //Por el alcance actual, luego no sera necesario
+        deptoSeleccionado = "Lima";
+        provSeleccionada = "Lima";
+        provincias = UbigeoService.GetProvincias(deptoSeleccionado);
+        distritos = UbigeoService.GetDistritos(deptoSeleccionado, provSeleccionada);
+
+        nuevaDireccion = new Address
+        {
+            Departamento = "Lima", //Por el momento Lima
+            Provincia = "Lima",
+            Distrito = ""
+        };
+        
+        distritoSeleccionado = "";
         mostrarModalDireccion = true;
     }
 
@@ -593,6 +642,46 @@
         catch (Exception ex)
         {
             errorDireccion = "Error al guardar en el servidor: " + ex.Message;
+        }
+    }
+
+    private void OnDepartamentoChanged(ChangeEventArgs e)
+    {
+        deptoSeleccionado = e.Value?.ToString() ?? "";
+        provSeleccionada = "";
+        distritoSeleccionado = "";
+
+        provincias = UbigeoService.GetProvincias(deptoSeleccionado);
+        distritos = new();
+
+        nuevaDireccion.Departamento = deptoSeleccionado;
+        nuevaDireccion.Provincia = "";
+        nuevaDireccion.Distrito = "";
+    }
+
+    private void OnProvinciaChanged(ChangeEventArgs e)
+    {
+        provSeleccionada = e.Value?.ToString() ?? "";
+        distritoSeleccionado = "";
+
+        distritos = UbigeoService.GetDistritos(deptoSeleccionado, provSeleccionada);
+
+        nuevaDireccion.Provincia = provSeleccionada;
+        nuevaDireccion.Distrito = "";
+    }
+
+    private void OnDistritoChanged(ChangeEventArgs e)
+    {
+        distritoSeleccionado = e.Value?.ToString() ?? "";
+        var ubigeoCompleto = UbigeoService.GetUbigeoCompleto(deptoSeleccionado, provSeleccionada, distritoSeleccionado);
+
+        if (ubigeoCompleto != null)
+        {
+            nuevaDireccion.Distrito = ubigeoCompleto.Distrito;
+        }
+        else
+        {
+            nuevaDireccion.Distrito = distritoSeleccionado;
         }
     }
 
