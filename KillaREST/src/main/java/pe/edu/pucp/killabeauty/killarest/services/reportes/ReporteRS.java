@@ -22,10 +22,9 @@ public class ReporteRS {
     @Path("/ventas")
     public Response obtenerVentas(@QueryParam("desde") String desde,
                                   @QueryParam("hasta") String hasta,
-                                  @QueryParam("comprobante") String comprobante,
                                   @QueryParam("categoria") String categoria) {
         try {
-            return Response.ok(reporteBL.obtenerReporteVentas(desde, hasta, comprobante, categoria)).build();
+            return Response.ok(reporteBL.obtenerReporteVentas(desde, hasta, categoria)).build();
         } catch (BusinessLogicException ex) {
             return badRequest(ex);
         } catch (Exception ex) {

@@ -22,13 +22,11 @@ namespace BlazorAppKillaBeauty.Services
         public async Task<ReporteVentasDto> ObtenerVentasAsync(
             DateTime desde,
             DateTime hasta,
-            string comprobante,
             string categoria)
         {
             var url = "reportes/ventas"
                       + $"?desde={desde:yyyy-MM-dd}"
                       + $"&hasta={hasta:yyyy-MM-dd}"
-                      + $"&comprobante={Uri.EscapeDataString(comprobante)}"
                       + $"&categoria={Uri.EscapeDataString(categoria)}";
 
             return await GetAsync<ReporteVentasDto>(url) ?? new ReporteVentasDto();

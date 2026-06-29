@@ -25,9 +25,6 @@ namespace BlazorAppKillaBeauty.ClienteREST.Models
 
         [JsonPropertyName("categorias")]
         public List<string> Categorias { get; set; } = new();
-
-        [JsonPropertyName("comprobantes")]
-        public List<string> Comprobantes { get; set; } = new();
     }
 
     public class VentasKpisDto
@@ -112,9 +109,6 @@ namespace BlazorAppKillaBeauty.ClienteREST.Models
 
         [JsonPropertyName("estado")]
         public string Estado { get; set; } = "";
-
-        [JsonPropertyName("tipoComprobante")]
-        public string TipoComprobante { get; set; } = "";
 
         [JsonPropertyName("total")]
         public decimal Total { get; set; }

@@ -22,7 +22,6 @@ public class ReporteDAOImpl implements ReporteDAO {
                 SELECT p.id_pedido, p.fecha_pedido, p.total,
                        ep.nombre AS estado,
                        CONCAT_WS(' ', u.nombre, u.apellido_paterno, u.apellido_materno) AS cliente,
-                       tc.nombre AS tipo_comprobante,
                        pr.id_producto, pr.nombre AS producto, dp.cantidad,
                        dp.precio_unitario_aplicado,
                        m.descripcion AS marca,
@@ -36,9 +35,6 @@ public class ReporteDAOImpl implements ReporteDAO {
                 INNER JOIN Marca m ON pr.id_marca = m.id_marca
                 INNER JOIN Subcategoria s ON pr.id_subcategoria = s.id_subcategoria
                 INNER JOIN Categoria c ON s.id_categoria = c.id_categoria
-                LEFT JOIN Pago pag ON p.id_pedido = pag.id_pedido
-                LEFT JOIN ComprobantePago cp ON pag.id_pago = cp.id_pago
-                LEFT JOIN TipoComprobante tc ON cp.id_tipo_comprobante = tc.id_tipo_comprobante
                 LEFT JOIN ImagenProducto img ON pr.id_producto = img.id_producto
                     AND img.activo = 1 AND img.principal = 1
                 WHERE DATE(p.fecha_pedido) BETWEEN ? AND ?
@@ -93,7 +89,6 @@ public class ReporteDAOImpl implements ReporteDAO {
         row.setFechaPedido(rs.getTimestamp("fecha_pedido").toLocalDateTime());
         row.setEstado(rs.getString("estado"));
         row.setCliente(rs.getString("cliente"));
-        row.setTipoComprobante(rs.getString("tipo_comprobante"));
         row.setTotalPedido(rs.getBigDecimal("total"));
         row.setProductoId(rs.getInt("id_producto"));
         row.setProducto(rs.getString("producto"));

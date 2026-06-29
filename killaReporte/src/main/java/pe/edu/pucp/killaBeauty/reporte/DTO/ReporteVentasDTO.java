@@ -13,7 +13,6 @@ public class ReporteVentasDTO {
     private List<DetalleVentaDTO> detalleVentas = new ArrayList<>();
     private List<VentaDTO> pedidos = new ArrayList<>();
     private List<String> categorias = new ArrayList<>();
-    private List<String> comprobantes = new ArrayList<>();
 
     public VentasKpisDTO getKpis() { return kpis; }
     public void setKpis(VentasKpisDTO kpis) { this.kpis = kpis; }
@@ -31,8 +30,6 @@ public class ReporteVentasDTO {
     public void setPedidos(List<VentaDTO> pedidos) { this.pedidos = pedidos; }
     public List<String> getCategorias() { return categorias; }
     public void setCategorias(List<String> categorias) { this.categorias = categorias; }
-    public List<String> getComprobantes() { return comprobantes; }
-    public void setComprobantes(List<String> comprobantes) { this.comprobantes = comprobantes; }
 
     public static class VentasKpisDTO {
         private BigDecimal ingresos = BigDecimal.ZERO;
@@ -122,7 +119,6 @@ public class ReporteVentasDTO {
         private int pedidoId;
         private String fecha;
         private String cliente;
-        private String tipoComprobante;
         private String producto;
         private String marca;
         private String categoria;
@@ -136,8 +132,6 @@ public class ReporteVentasDTO {
         public void setFecha(String fecha) { this.fecha = fecha; }
         public String getCliente() { return cliente; }
         public void setCliente(String cliente) { this.cliente = cliente; }
-        public String getTipoComprobante() { return tipoComprobante; }
-        public void setTipoComprobante(String tipoComprobante) { this.tipoComprobante = tipoComprobante; }
         public String getProducto() { return producto; }
         public void setProducto(String producto) { this.producto = producto; }
         public String getMarca() { return marca; }
@@ -157,7 +151,6 @@ public class ReporteVentasDTO {
         private String fecha;
         private String cliente;
         private String estado;
-        private String tipoComprobante;
         private BigDecimal total = BigDecimal.ZERO;
         private List<ProductoVentaDTO> productos = new ArrayList<>();
 
@@ -169,8 +162,6 @@ public class ReporteVentasDTO {
         public void setCliente(String cliente) { this.cliente = cliente; }
         public String getEstado() { return estado; }
         public void setEstado(String estado) { this.estado = estado; }
-        public String getTipoComprobante() { return tipoComprobante; }
-        public void setTipoComprobante(String tipoComprobante) { this.tipoComprobante = tipoComprobante; }
         public BigDecimal getTotal() { return total; }
         public void setTotal(BigDecimal total) { this.total = total; }
         public List<ProductoVentaDTO> getProductos() { return productos; }

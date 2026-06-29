@@ -33,7 +33,7 @@ public class ReporteBLImpl implements ReporteBL {
     private final ReporteDAO reporteDAO = new ReporteDAOImpl();
 
     @Override
-    public ReporteVentasDTO obtenerReporteVentas(String desde, String hasta, String comprobante, String categoria)
+    public ReporteVentasDTO obtenerReporteVentas(String desde, String hasta, String categoria)
             throws BusinessLogicException {
         LocalDate fechaDesde = parseFecha(desde, "La fecha de inicio del reporte no es valida.");
         LocalDate fechaHasta = parseFecha(hasta, "La fecha de fin del reporte no es valida.");
@@ -41,7 +41,6 @@ public class ReporteBLImpl implements ReporteBL {
             throw new BusinessLogicException("La fecha de inicio no puede ser posterior a la fecha de fin.");
         }
 
-        String filtroComprobante = normalizarFiltro(comprobante, "Todos", "Todas");
         String filtroCategoria = normalizarFiltro(categoria, "Todos", "Todas");
 
         try {
@@ -51,13 +50,8 @@ public class ReporteBLImpl implements ReporteBL {
 
             ReporteVentasDTO reporte = new ReporteVentasDTO();
             reporte.setCategorias(distintos(filasBase.stream().map(VentaReporteData::getCategoria).toList()));
-            reporte.setComprobantes(distintos(filasBase.stream()
-                    .map(row -> normalizarComprobante(row.getTipoComprobante()))
-                    .toList()));
 
             List<VentaReporteData> filas = filasBase.stream()
-                    .filter(row -> filtroComprobante == null
-                            || normalizarComprobante(row.getTipoComprobante()).equalsIgnoreCase(filtroComprobante))
                     .filter(row -> filtroCategoria == null
                             || valor(row.getCategoria()).equalsIgnoreCase(filtroCategoria))
                     .toList();
@@ -150,7 +144,6 @@ public class ReporteBLImpl implements ReporteBL {
                 dto.setFecha(row.getFechaPedido().toLocalDate().toString());
                 dto.setCliente(valor(row.getCliente()));
                 dto.setEstado(valor(row.getEstado()));
-                dto.setTipoComprobante(normalizarComprobante(row.getTipoComprobante()));
                 dto.setTotal(nvl(row.getTotalPedido()));
                 return dto;
             });
@@ -168,7 +161,6 @@ public class ReporteBLImpl implements ReporteBL {
                     dto.setPedidoId(row.getPedidoId());
                     dto.setFecha(row.getFechaPedido().toLocalDate().toString());
                     dto.setCliente(valor(row.getCliente()));
-                    dto.setTipoComprobante(normalizarComprobante(row.getTipoComprobante()));
                     dto.setProducto(valor(row.getProducto()));
                     dto.setMarca(valor(row.getMarca()));
                     dto.setCategoria(valor(row.getCategoria()));
@@ -360,13 +352,6 @@ public class ReporteBLImpl implements ReporteBL {
                 .distinct()
                 .sorted(String.CASE_INSENSITIVE_ORDER)
                 .toList();
-    }
-
-    private String normalizarComprobante(String comprobante) {
-        String valor = valor(comprobante);
-        if (valor.equalsIgnoreCase("Boleta de Venta")) return "BOLETA";
-        if (valor.equalsIgnoreCase("Factura Comercial")) return "FACTURA";
-        return valor.isBlank() ? "SIN_COMPROBANTE" : valor.toUpperCase();
     }
 
     private String normalizarImagen(String imagenUrl) {

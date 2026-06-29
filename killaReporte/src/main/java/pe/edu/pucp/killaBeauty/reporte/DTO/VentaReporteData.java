@@ -12,7 +12,6 @@ public class VentaReporteData {
     private LocalDateTime fechaPedido;
     private String estado;
     private String cliente;
-    private String tipoComprobante;
     private BigDecimal totalPedido;
     private int productoId;
     private String producto;
@@ -30,8 +29,6 @@ public class VentaReporteData {
     public void setEstado(String estado) { this.estado = estado; }
     public String getCliente() { return cliente; }
     public void setCliente(String cliente) { this.cliente = cliente; }
-    public String getTipoComprobante() { return tipoComprobante; }
-    public void setTipoComprobante(String tipoComprobante) { this.tipoComprobante = tipoComprobante; }
     public BigDecimal getTotalPedido() { return totalPedido; }
     public void setTotalPedido(BigDecimal totalPedido) { this.totalPedido = totalPedido; }
     public int getProductoId() { return productoId; }

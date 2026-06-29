@@ -66,17 +66,6 @@
                     </label>
 
                     <label class="inventory-filter-field">
-                        <span>Comprobante</span>
-                        <select class="filter-select" @bind="comprobanteVentaSeleccionado" @bind:after="RenderChartsAsync">
-                            <option value="Todos">Todos</option>
-                            @foreach (var comprobante in ComprobantesVenta)
-                            {
-                                <option value="@comprobante">@comprobante</option>
-                            }
-                        </select>
-                    </label>
-
-                    <label class="inventory-filter-field">
                         <span>Categoria</span>
                         <select class="filter-select" @bind="categoriaVentaSeleccionada" @bind:after="RenderChartsAsync">
                             <option value="Todas">Todas</option>
@@ -288,7 +277,6 @@
                                 <th>Pedido</th>
                                 <th>Fecha</th>
                                 <th>Cliente</th>
-                                <th>Comprobante</th>
                                 <th>Categorias</th>
                                 <th>Productos</th>
                                 <th>Total</th>
@@ -303,7 +291,6 @@
                                     </td>
                                     <td>@venta.Fecha.ToString("dd/MM/yyyy")</td>
                                     <td>@venta.Cliente</td>
-                                    <td>@venta.TipoComprobante</td>
                                     <td>@string.Join(", ", venta.Productos.Select(p => p.Categoria).Distinct())</td>
                                     <td>@venta.Productos.Sum(p => p.Cantidad) u.</td>
                                     <td>S/. @venta.Total.ToString("N2")</td>
@@ -312,7 +299,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="5">Totales del periodo</td>
+                                <td colspan="4">Totales del periodo</td>
                                 <td>@VentasFiltradas.Sum(v => v.Productos.Sum(p => p.Cantidad)).ToString("N0") u.</td>
                                 <td>S/. @VentasFiltradas.Sum(v => v.Total).ToString("N2")</td>
                             </tr>
@@ -473,7 +460,6 @@
 
     private DateTime fechaInicioVentas = new(2026, 6, 1);
     private DateTime fechaFinVentas = new(2026, 6, 30);
-    private string comprobanteVentaSeleccionado = "Todos";
     private string categoriaVentaSeleccionada = "Todas";
 
     private string estadoInventarioSeleccionado = "Todos";
@@ -490,7 +476,6 @@
     private List<TopCliente> clientesTop = new();
     private List<string> categoriasInventario = new();
     private List<string> subcategoriasInventario = new();
-    private List<string> comprobantesVenta = new();
     private List<string> categoriasVenta = new();
     private VentasKpis ventasKpis = new(0, 0, 0, 0);
     private InventarioKpis inventarioKpis = new(0, 0, 0, 0);
@@ -507,7 +492,6 @@
         : "Reporte de inventario";
 
     private List<string> CategoriasInventario => categoriasInventario;
-    private List<string> ComprobantesVenta => comprobantesVenta;
     private List<string> CategoriasVenta => categoriasVenta;
     private List<VentaReporte> VentasFiltradas => ventasReporte.OrderBy(v => v.Fecha).ToList();
     private List<string> SubcategoriasInventario => subcategoriasInventario;
@@ -550,7 +534,6 @@
     {
         fechaInicioVentas = new DateTime(2026, 6, 1);
         fechaFinVentas = new DateTime(2026, 6, 30);
-        comprobanteVentaSeleccionado = "Todos";
         categoriaVentaSeleccionada = "Todas";
 
         _ = InvokeAsync(RenderChartsAsync);
@@ -578,7 +561,6 @@
         var reporte = await ReporteService.ObtenerVentasAsync(
             fechaInicioVentas,
             fechaFinVentas,
-            comprobanteVentaSeleccionado,
             categoriaVentaSeleccionada);
 
         ventasKpis = new(
@@ -593,7 +575,6 @@
             p.Cliente,
             p.Estado,
             "",
-            p.TipoComprobante,
             p.Total,
             p.Productos.Select(prod => new ProductoVenta(
                 prod.Nombre,
@@ -615,7 +596,6 @@
         clientesTop = reporte.ClientesTop
             .Select(c => new TopCliente(c.Nombre, c.Pedidos, c.Unidades, c.TotalComprado))
             .ToList();
-        comprobantesVenta = reporte.Comprobantes;
         categoriasVenta = reporte.Categorias;
     }
 
@@ -680,7 +660,6 @@
         string Cliente,
         string Estado,
         string MetodoPago,
-        string TipoComprobante,
         decimal Total,
         List<ProductoVenta> Productos);
 
