@@ -547,3 +547,13 @@
         color: #666;
         margin-top: 10px;
     }
+
+.coupon-button.coupon-remove {
+    background-color: transparent;
+    color: var(--color-danger, #dc3545); 
+    border: 1px solid currentColor;
+}
+
+    .coupon-button.coupon-remove:hover {
+        background-color: rgba(220, 53, 69, 0.08);
+    }

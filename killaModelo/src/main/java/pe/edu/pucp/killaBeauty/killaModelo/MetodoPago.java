@@ -1,10 +1,8 @@
 package pe.edu.pucp.killaBeauty.killaModelo;
 
 public enum MetodoPago {
-    YAPE(1, "YAPE"),
-    PLIN(2, "PLIN"),
-    TRANSFERENCIA(3, "TRANSFERENCIA"),
-    TARJETA(4, "TARJETA");
+    YAPE_PLIN(1, "YAPE_PLIN"),
+    TARJETA(2, "TARJETA");
 
     private final int id;
     private final String nombre;
