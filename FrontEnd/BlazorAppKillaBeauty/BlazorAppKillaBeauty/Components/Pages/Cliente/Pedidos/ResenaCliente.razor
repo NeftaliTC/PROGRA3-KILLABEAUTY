@@ -1,214 +1,177 @@
-﻿@page "/review/{orderId}/{itemNombre}"
+﻿@page "/review/{OrderId}/{ProductName}"
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
+@using BlazorAppKillaBeauty.ClienteREST.Models
 @using BlazorAppKillaBeauty.ClienteREST.ServicesAct
 @inject NavigationManager Navigation
+@inject PedidoService PedidoService
+@inject ProductoService ProductoService
 @inject CartService CartService
+@inject AuthService AuthService
 
 <Navbar CantidadCarrito="@CartService.CantidadTotal" />
 
-<div class="review-page">
+<div class="killa-review-container">
+    <div class="review-wrapper">
+        <button type="button" class="btn-killa-back" @onclick="VolverAlPedido">
+            <i class="bi bi-arrow-left"></i> Volver al pedido
+        </button>
 
-    <button type="button" class="btn-back-review" @onclick="VolverAlPedido">
-        <i class="bi bi-arrow-left"></i>
-        Volver al pedido
-    </button>
+        <h1 class="main-title">Escribe una reseña</h1>
+        <p class="subtitle">Comparte tu experiencia con otros compradores</p>
 
-    <h1>Escribe una reseña</h1>
-    <p class="review-subtitle">Comparte tu experiencia con otros compradores</p>
-
-    @if (productoActual == null)
-    {
-        <div class="review-card">
-            <p>No se encontró el producto para reseñar.</p>
-        </div>
-    }
-    else
-    {
-        <div class="review-card">
-
-            <div class="review-product-header">
-                <img src="@productoActual.Imagen" alt="@productoActual.Nombre" class="review-product-img" />
-
-                <div>
-                    <p class="review-product-brand">@productoActual.Marca</p>
-                    <h3>@productoActual.Nombre</h3>
-                </div>
-            </div>
-
-            <hr />
-
-            <div class="form-group">
-                <label>Calificación</label>
-
-                <div class="stars-review">
-                    @for (int i = 1; i <= 5; i++)
+        <div class="review-card-body">
+            @if (producto != null)
+            {
+                <div class="product-preview-box">
+                    @if (producto.Imagenes != null && producto.Imagenes.Any())
                     {
-                        var valor = i;
-                        <button type="button"
-                                class="star-button @(calificacion >= valor ? "selected" : "")"
-                                @onclick="() => SeleccionarCalificacion(valor)">
-                            @(calificacion >= valor ? "★" : "☆")
-                        </button>
+                        <img src="@producto.Imagenes.FirstOrDefault()"
+                             alt="@producto.NombreProducto"
+                             class="product-thumbnail" />
                     }
+                    else
+                    {
+                        <div class="product-thumbnail-placeholder">
+                            <i class="bi bi-image"></i>
+                        </div>
+                    }
+                    <div class="product-details">
+                        <span class="product-brand">@producto.Marca</span>
+                        <h3 class="product-name">@producto.NombreProducto</h3>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label>Título de tu reseña</label>
-                <input class="review-input @(mostrarError && string.IsNullOrWhiteSpace(titulo) ? "input-error" : "")"
-                       placeholder="Resumen breve de tu experiencia"
-                       @bind="titulo" />
-            </div>
-
-            <div class="form-group">
-                <label>Tu opinión</label>
-                <textarea class="review-textarea  @(mostrarError && string.IsNullOrWhiteSpace(opinion) ? "input-error" : "")"
-                          placeholder="Cuéntanos qué te pareció el producto..."
-                              @bind="opinion">
-                </textarea>
+                <div class="form-section">
+                    <label class="form-label">Calificación</label>
+                    <div class="killa-stars">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            int rating = i;
+                            <i class="bi @(currentRating >= i ? "bi-star-fill" : "bi-star")"
+                               @onclick="() => currentRating = rating" style="cursor:pointer;"></i>
+                        }
+                    </div>
                 </div>
-                @if (mostrarError)
+
+                <div class="form-section">
+                    <label class="form-label">Título de tu reseña</label>
+                    <input @bind="titulo" class="killa-input" placeholder="Resumen breve de tu experiencia" />
+                </div>
+
+                <div class="form-section">
+                    <label class="form-label">Tu opinión</label>
+                    <textarea @bind="comentario" class="killa-textarea" placeholder="Cuéntanos qué te pareció el producto..."></textarea>
+                </div>
+
+                @if (showError)
                 {
-                    <div class="review-error-message">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        Debe completar todos los campos.
+                    <div class="killa-error-message">
+                        <i class="bi bi-exclamation-triangle"></i> Debe completar todos los campos.
                     </div>
                 }
-                <div class="review-actions">
-                    <button type="button" class="btn-cancel-review" @onclick="VolverAlPedido">
-                        Cancelar
-                    </button>
 
-                    <button type="button" class="btn-submit-review" @onclick="EnviarResena">
-                        Enviar reseña
-                    </button>
+                <div class="killa-actions-row">
+                    <button type="button" class="btn-killa-cancel" @onclick="VolverAlPedido">Cancelar</button>
+                    <button type="button" class="btn-killa-submit" @onclick="EnviarReseña">Enviar reseña</button>
                 </div>
+            }
+            else
+            {
+                <div class="killa-loading">Cargando información del producto...</div>
+            }
+        </div>
+    </div>
+</div>
 
-            </div>
-        }
-
-    </div>@if (mostrarModalExito)
-    {
-    <div class="review-modal-overlay">
-        <div class="review-success-modal">
-
-            <div class="success-title-row">
-                <span class="success-icon">
+@if (showSuccessModal)
+{
+    <div class="killa-modal-overlay">
+        <div class="killa-modal-card">
+            <div class="modal-icon-container">
+                <div class="success-checkmark">
                     <i class="bi bi-check-lg"></i>
-                </span>
-
-                <h2>Tu reseña se ha enviado correctamente</h2>
+                </div>
             </div>
-
+            <h2>Tu reseña se ha enviado correctamente</h2>
             <p>¡Gracias por compartir tu experiencia!</p>
-
-            <button type="button" class="btn-close-success" @onclick="CerrarModal">
+            
+            <button class="btn-killa-modal-close" @onclick="CerrarModal">
                 Cerrar
             </button>
-
         </div>
     </div>
 }
 
 @code {
-    [Parameter]
-    public string orderId { get; set; } = "";
-
-    [Parameter]
-    public string itemNombre { get; set; } = "";
-
-    private PedidoDetalle? pedidoActual;
-    private ProductoDetalle? productoActual;
-
-    private int calificacion = 0;
+    [Parameter] public string? OrderId { get; set; }
+    [Parameter] public string? ProductName { get; set; }
+    
+    private PedidoService.DetallePedidoAdminDto? producto;
+    
+    private int currentRating = 0;
     private string titulo = "";
-    private string opinion = "";
-    private bool mostrarError = false;
-    private bool mostrarModalExito = false;
+    private string comentario = "";
+    private bool showError = false;
+    private bool showSuccessModal = false;
+    private string errorMensaje = "";
 
-
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        var nombreBuscado = Uri.UnescapeDataString(itemNombre).Replace("-", " ");
-
-        pedidoActual = ObtenerCatalogoDetallesMock()
-            .FirstOrDefault(p => p.Id == orderId);
-
-        productoActual = pedidoActual?.Productos
-            .FirstOrDefault(p => p.Nombre == nombreBuscado);
-    }
-
-    private void VolverAlPedido()
-    {
-        Navigation.NavigateTo($"/orders/order-detail/{orderId}");
-    }
-    private void SeleccionarCalificacion(int valor)
-    {
-        calificacion = valor;
-        mostrarError = false;
-    }
-
-    private void EnviarResena()
-    {
-        if (calificacion == 0 ||
-         string.IsNullOrWhiteSpace(titulo) ||
-         string.IsNullOrWhiteSpace(opinion))
+        if (int.TryParse(OrderId, out int id))
         {
-            mostrarError = true;
+            var pedido = await PedidoService.ObtenerPorIdAsyncAdminDto(id);
+            if (pedido != null && pedido.Productos != null)
+            {
+                // Buscamos el producto
+                producto = pedido.Productos.FirstOrDefault(p => NormalizarTexto(p.NombreProducto) == ProductName);
+            }
+        }
+    }
+
+    private string NormalizarTexto(string texto) => texto.Trim().Replace(" ", "-").Replace("/", "-");
+
+    private async Task EnviarReseña()
+    {
+        if (currentRating == 0 || string.IsNullOrWhiteSpace(titulo) || string.IsNullOrWhiteSpace(comentario))
+        {
+            showError = true;
             return;
         }
 
-        mostrarError = false;
-        mostrarModalExito = true;
-    }
-    private void CerrarModal()
-    {
-        mostrarModalExito = false;
-        Navigation.NavigateTo($"/orders/order-detail/{orderId}");
-    }
-
-    public class PedidoDetalle
-    {
-        public string? Id { get; set; }
-        public List<ProductoDetalle> Productos { get; set; } = new();
-    }
-
-    public class ProductoDetalle
-    {
-        public string? Nombre { get; set; }
-        public string? Marca { get; set; }
-        public string? Imagen { get; set; }
-
-        public ProductoDetalle(string descripcion, string marca, string imagen)
+        var nuevaResena = new ResenaProducto
         {
-            Nombre = descripcion;
-            Marca = marca;
-            Imagen = imagen;
+            Calificacion = currentRating,
+            Titulo = titulo,
+            Comentario = comentario,
+            Cliente = new ClienteResenaDto
+            {
+                Id = AuthService.UsuarioId ?? 0
+            }
+        };
+
+        try
+        {
+            bool guardado = await ProductoService.RegistrarResenaAsync(producto!.ProductoId, nuevaResena);
+            
+            if (guardado)
+            {
+                showError = false;
+                showSuccessModal = true;
+            }
+            else
+            {
+                errorMensaje = "El servidor rechazó los datos.";
+                showError = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMensaje = "Error crítico: " + ex.Message;
+            showError = true;
         }
     }
 
-    public static List<PedidoDetalle> ObtenerCatalogoDetallesMock() => new()
-    {
-        new PedidoDetalle {
-            Id = "KIL-202610081",
-            Productos = new List<ProductoDetalle> {
-                new("Sérum Vitamina C Gold Kiwi", "Essence", "Images/Serum.jpg"),
-                new("Crema Hidratante Facial CeraVe", "CeraVe", "Images/Cerave.jpg")
-            }
-        },
-        new PedidoDetalle {
-            Id = "KIL-202605002",
-            Productos = new List<ProductoDetalle> {
-                new("Labial Matte Ink Mood PERIPERA", "Peripera", "Images/LabialPeripera.jpg"),
-                new("Máscara Essence Prince False Lash Effect", "Maybelline", "Images/Mascara.jpg")
-            }
-        },
-        new PedidoDetalle {
-            Id = "KIL-202626589",
-            Productos = new List<ProductoDetalle> {
-                new("Sérum Vitamina C Gold Kiwi", "Essence", "Images/Serum.jpg")
-            }
-        }
-    };
+    private void VolverAlPedido() => Navigation.NavigateTo($"/orders/order-detail/{OrderId}");
+    private void CerrarModal() => VolverAlPedido();
 }
