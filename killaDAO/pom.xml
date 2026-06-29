@@ -29,7 +29,13 @@
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-<!--        <dependency>-->
+        <dependency>
+            <groupId>pe.edu.pucp.killaBeauty.reporte</groupId>
+            <artifactId>killaReporte</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <!--        <dependency>-->
 <!--            <groupId>com.mysql</groupId>-->
 <!--            <artifactId>mysql-connector-j</artifactId>-->
 <!--            <version>8.4.0</version>-->

@@ -104,6 +104,84 @@
     color: #4f4148;
 }
 
+.filter-input {
+    min-height: 40px;
+    width: 100%;
+    border: 1px solid var(--gray-border);
+    border-radius: 12px;
+    background: var(--white);
+    padding: 0 12px;
+    font-weight: 800;
+    color: #4f4148;
+}
+
+.inventory-filters-panel {
+    display: block;
+    padding: 14px;
+    border: 1px solid #ead7de;
+    border-radius: 16px;
+    background: #fffafb;
+}
+
+.inventory-filter-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(145px, 1fr));
+    gap: 12px;
+    align-items: end;
+}
+
+.sales-filter-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(145px, 1fr));
+    gap: 12px;
+    align-items: end;
+}
+
+.inventory-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.inventory-filter-field > span {
+    color: #7a6b72;
+    font-size: 0.78rem;
+    font-weight: 900;
+}
+
+.inventory-filter-field .filter-select {
+    width: 100%;
+}
+
+.inventory-filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.btn-clear-filters {
+    min-height: 40px;
+    border: 1px solid var(--gray-border);
+    border-radius: 12px;
+    background: var(--white);
+    color: #4f4148;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    font-weight: 900;
+}
+
+.btn-clear-filters:hover {
+    background: var(--rose-pale);
+    color: var(--rose);
+}
+
 .filters-sale-type {
     display: inline-flex;
     align-items: center;
@@ -320,6 +398,101 @@
         color: var(--rose-soft);
     }
 
+.inventory-category-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px;
+}
+
+.inventory-category-row {
+    display: grid;
+    grid-template-columns: minmax(130px, 190px) 1fr;
+    gap: 14px;
+    align-items: center;
+}
+
+.inventory-category-label strong {
+    color: #2f252a;
+    display: block;
+    font-weight: 900;
+}
+
+.inventory-category-label span {
+    color: #7a6b72;
+    display: block;
+    font-size: 0.84rem;
+    font-weight: 800;
+    margin-top: 4px;
+}
+
+.inventory-category-track {
+    height: 12px;
+    border-radius: 999px;
+    background: #f3e8ec;
+    overflow: hidden;
+}
+
+.inventory-category-track span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--rose), #2f252a);
+}
+
+.inventory-report-table-section {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.sales-report-table-section {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-top: 16px;
+}
+
+.inventory-main-table-card {
+    max-height: 520px;
+}
+
+.sales-main-table-card {
+    max-height: 380px;
+}
+
+.sales-report-table th,
+.sales-report-table td {
+    white-space: nowrap;
+}
+
+.sales-report-table tfoot td,
+.inventory-stock-table tfoot td {
+    background: #fff8fa;
+    border-top: 1px solid #ead7de;
+    color: #2f252a;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.sales-report-table tfoot td:first-child,
+.inventory-stock-table tfoot td:first-child {
+    color: var(--rose);
+}
+
+.inventory-min-stock {
+    color: #7a6b72;
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 800;
+    margin-top: 2px;
+}
+
 /* Top products list */
 .admin-reports-list {
     margin-top: 10px;
@@ -389,6 +562,46 @@
     height: 1px;
     background: #f0e7eb;
     margin: 0 0;
+}
+
+.sales-summary-row {
+    display: grid;
+    grid-template-columns: 70px 1fr 220px;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 4px;
+}
+
+.sales-summary-main strong {
+    display: block;
+    font-weight: 900;
+    color: #2f252a;
+}
+
+.sales-summary-main span {
+    display: block;
+    color: #7a6b72;
+    font-weight: 800;
+    font-size: 0.86rem;
+    margin-top: 4px;
+}
+
+.sales-summary-meta {
+    text-align: right;
+}
+
+.sales-summary-meta span {
+    display: block;
+    color: #7a6b72;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.sales-summary-meta strong {
+    display: block;
+    color: #2f252a;
+    font-weight: 900;
+    margin-top: 3px;
 }
 
 /* Inventory stock modal */
@@ -568,6 +781,15 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .inventory-filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .sales-filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+    }
+
     .admin-reports-charts {
         grid-template-columns: 1fr;
     }
@@ -593,6 +815,22 @@
     }
 
     .admin-reports-kpis {
+        grid-template-columns: 1fr;
+    }
+
+    .inventory-filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sales-filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .inventory-filter-actions {
+        justify-content: flex-start;
+    }
+
+    .inventory-category-row {
         grid-template-columns: 1fr;
     }
 
