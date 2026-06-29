@@ -2,6 +2,10 @@ package pe.edu.pucp.killabeauty.killarest.dto;
 
 import pe.edu.pucp.killaBeauty.killaModelo.DetallePedido;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class DetalleItemDTO {
     private int productoId;
     private String nombreProducto;
@@ -10,6 +14,7 @@ public class DetalleItemDTO {
     private double precioUnitarioOrig;
     private double precioUnitarioDesc;
     private double subtotal;
+    private List<String> imagenes;
 
     public DetalleItemDTO(DetallePedido detalle) {
         this.productoId = detalle.getProducto() != null ? detalle.getProducto().getId() : 0;
@@ -21,6 +26,13 @@ public class DetalleItemDTO {
         this.precioUnitarioOrig = detalle.getProducto() != null ? detalle.getProducto().getPrecioBase() : 0;
         this.precioUnitarioDesc = detalle.getPrecioAplicado();
         this.subtotal = detalle.calcularSubtotal();
+        if (detalle.getProducto() != null && detalle.getProducto().getImagenes() != null) {
+            this.imagenes = detalle.getProducto().getImagenes().stream()
+                    .map(img -> img.getUrl())
+                    .collect(Collectors.toList());
+        } else {
+            this.imagenes = new ArrayList<>();
+        }
     }
 
     // Getters y Setters
@@ -38,4 +50,6 @@ public class DetalleItemDTO {
     public void setPrecioUnitarioDesc(double precioUnitarioDesc) { this.precioUnitarioDesc = precioUnitarioDesc; }
     public double getSubtotal() { return subtotal; }
     public void setSubtotal(double subtotal) { this.subtotal = subtotal; }
+    public List<String> getImagenes() { return imagenes; }
+    public void setImagenes(List<String> imagenes) { this.imagenes = imagenes; }
 }
