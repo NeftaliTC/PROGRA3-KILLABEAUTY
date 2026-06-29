@@ -1,6 +1,10 @@
 package pe.edu.pucp.killabeauty.killarest.dto;
 
+import pe.edu.pucp.killaBeauty.killaModelo.ImagenProducto;
 import pe.edu.pucp.killaBeauty.killaModelo.Producto;
+
+import java.util.List;
+
 public class ProductoCatalogoDTO {
     private int id;
     private String nombre;
@@ -10,6 +14,7 @@ public class ProductoCatalogoDTO {
     private String marca;
     //    private Boolean esPopular;
     private Boolean activo;
+    private List<ImagenProducto> imagenes;
 
     public ProductoCatalogoDTO() {
     }
@@ -38,6 +43,7 @@ public class ProductoCatalogoDTO {
 
 //        this.esPopular = producto.getPromocion() != null ? producto.getPromocion() : false;
         this.activo = producto.getDisponible() != null ? producto.getDisponible() : false;
+        this.imagenes = producto.getImagenes();
     }
 
     public double getPrecioBase() {
@@ -112,4 +118,7 @@ public class ProductoCatalogoDTO {
         this.marca = marca;
     }
 
+    public List<ImagenProducto> getImagenes() { return imagenes; }
+
+    public void setImagenes(List<ImagenProducto> imagenes) { this.imagenes = imagenes; }
 }

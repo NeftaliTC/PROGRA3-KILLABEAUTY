@@ -41,7 +41,9 @@ public class ProductoDAOImpl implements ProductoDAO {
             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                lista.add(mapRowConCatalogos(rs));
+                Producto p = mapRowConCatalogos(rs);
+                p.setImagenes(imagenDAO.listByProductoId(p.getId()));
+                lista.add(p);
             }
         }
         return lista;
