@@ -241,31 +241,25 @@ else
                     @foreach (var resena in ResenasFiltradas)
                     {
                         <article class="producto-resena-card">
-
-                            <div class="resena-avatar">
-                                @resena.Iniciales
-                            </div>
+                            <div class="resena-avatar">@resena.Iniciales</div>
 
                             <div class="resena-contenido">
-                                <h4>@resena.Cliente</h4>
-                                <p class="resena-fecha">
-                                    @resena.Fecha · Pedido #@resena.Pedido
-                                </p>
+                                <div class="resena-header">
+                                    <div>
+                                        <span class="resena-nombre">@resena.Cliente</span>
+                                        <p class="resena-fecha">@resena.Fecha · Pedido #@resena.Pedido</p>
+                                    </div>
+                                    <div class="resena-estrellas">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="bi @(i <= resena.Calificacion ? "bi-star-fill" : "bi-star")"></i>
+                                        }
+                                    </div>
+                                </div>
 
-                                <h5>@resena.Titulo</h5>
-
-                                <p class="resena-comentario">
-                                    @resena.Comentario
-                                </p>
+                                <h5 class="resena-titulo">@resena.Titulo</h5>
+                                <p class="resena-comentario">@resena.Comentario</p>
                             </div>
-
-                            <div class="resena-estrellas">
-                                @for (int i = 1; i <= 5; i++)
-                                {
-                                    <i class="bi @(i <= resena.Calificacion ? "bi-star-fill" : "bi-star")"></i>
-                                }
-                            </div>
-
                         </article>
                     }
                 </div>
@@ -292,6 +286,47 @@ else
     private int filtroCalificacion = 0;
     private string ordenResena = "recientes";
 
+    private string ObtenerIniciales(string nombre)
+    {
+        if (string.IsNullOrWhiteSpace(nombre)) return "??";
+        
+        var partes = nombre.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        
+        if (partes.Length >= 2)
+            return (partes[0][0].ToString() + partes[1][0].ToString()).ToUpper();
+            
+        return partes[0].Substring(0, Math.Min(2, partes[0].Length)).ToUpper();
+    }
+
+    private string TryParseFecha(string? fechaStr)
+    {
+        if (string.IsNullOrWhiteSpace(fechaStr)) return "Fecha no disponible";
+
+        // Limpia el sufijo [UTC] que manda Back
+        var limpia = fechaStr.Replace("[UTC]", "").Trim();
+
+        if (DateTime.TryParse(limpia,
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.RoundtripKind,
+                out DateTime dt))
+        {
+            return dt.ToString("d 'de' MMMM 'del' yyyy",
+                new System.Globalization.CultureInfo("es-ES"));
+        }
+
+        return "Fecha no disponible";
+    }
+
+    private DateTime ParseFechaDateTime(string? fechaStr)
+    {
+        if (string.IsNullOrWhiteSpace(fechaStr)) return DateTime.MinValue;
+        var limpia = fechaStr.Replace("[UTC]", "").Trim();
+        return DateTime.TryParse(limpia,
+            System.Globalization.CultureInfo.InvariantCulture,
+            System.Globalization.DateTimeStyles.RoundtripKind,
+            out DateTime dt) ? dt : DateTime.MinValue;
+    }
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -311,11 +346,16 @@ else
             resenas = (await ProductoService.ObtenerResenasAsync(producto.Id))
                 .Select((r, index) => new ResenaVista
                 {
-                    Cliente = "Cliente Killa",
-                    Iniciales = "CK",
+                    Cliente = (r.Cliente != null && !string.IsNullOrWhiteSpace(r.Cliente.Nombre))
+                              ? $"{r.Cliente.Nombre} {r.Cliente.ApellidoPaterno}"
+                              : $"Usuario {r.IdUsuario}",
+                    Iniciales = (r.Cliente != null && !string.IsNullOrWhiteSpace(r.Cliente.Nombre))
+                                ? ObtenerIniciales($"{r.Cliente.Nombre} {r.Cliente.ApellidoPaterno}")
+                                : "U" + r.IdUsuario,
                     Calificacion = r.Calificacion,
-                    Fecha = r.Fecha?.ToString("dd MMM yyyy") ?? "",
-                    Pedido = $"REST-{index + 1}",
+                    Fecha = TryParseFecha(r.FechaPublicacion),
+                    FechaDateTime = ParseFechaDateTime(r.FechaPublicacion),
+                    Pedido = $"KIL-{r.Id:D8}",
                     Titulo = string.IsNullOrWhiteSpace(r.Titulo) ? "Reseña del producto" : r.Titulo,
                     Comentario = r.Comentario
                 })
@@ -432,10 +472,9 @@ else
                 query = query.Where(r => r.Calificacion == filtroCalificacion);
             }
 
-            if (ordenResena == "antiguas")
-            {
-                query = query.Reverse();
-            }
+            query = ordenResena == "antiguas"
+            ? query.OrderBy(r => r.FechaDateTime)
+            : query.OrderByDescending(r => r.FechaDateTime);
 
             return query;
         }
@@ -539,6 +578,7 @@ else
         public string Iniciales { get; set; } = "";
         public int Calificacion { get; set; }
         public string Fecha { get; set; } = "";
+        public DateTime FechaDateTime { get; set; }
         public string Pedido { get; set; } = "";
         public string Titulo { get; set; } = "";
         public string Comentario { get; set; } = "";

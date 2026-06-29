@@ -3,6 +3,7 @@
 @using BlazorAppKillaBeauty.Services
 @inject NavigationManager Navigation
 @inject ProductoService ProductoService
+@inject IJSRuntime JS
 @using BlazorAppKillaBeauty.ClienteREST.Models
 
 <PageTitle>Productos Admin - Killa Beauty</PageTitle>
@@ -266,6 +267,20 @@
                         </select>
                     </div>
 
+                    <div class="admin-form-group">
+                        <label>Imágenes del producto</label>
+                        <button type="button" class="admin-upload-box" @onclick="AbrirWidgetCloudinaryProductos">
+                            <i class="bi bi-image"></i>
+                            <span>Seleccionar imágenes</span>
+                        </button>
+                        @if (imagenesSeleccionadas.Any())
+                        {
+                            <small class="admin-file-help">
+                                @imagenesSeleccionadas.Count imagen(es) seleccionada(s)
+                            </small>
+                        }
+                    </div>
+
                     <div class="admin-modal-actions" style="justify-content:flex-end; margin-top: 22px;">
                         <button type="button" class="admin-modal-btn-cancel" @onclick="CerrarModal">Cancelar</button>
                         <button type="submit" class="admin-primary-action" style="box-shadow:none;">
@@ -492,6 +507,7 @@
     private void AbrirCrear()
     {
         mensajeError = null;
+        imagenesSeleccionadas = new List<string>();
         modoModal = ModoModal.Crear;
         productoSeleccionado = new ProductoAdmin();
         modeloFormulario = new ProductoAdmin { Activo = true, Stock = 10, EnPromocion = false };
@@ -506,6 +522,7 @@
     private void AbrirEditar(ProductoAdmin p)
     {
         mensajeError = null;
+        imagenesSeleccionadas = new List<string>();
         modoModal = ModoModal.Editar;
         productoSeleccionado = p;
         modeloFormulario = new ProductoAdmin
@@ -571,25 +588,39 @@
             return;
         }
 
+        if (imagenesSeleccionadas.Count > 4)
+        {
+            mensajeError = "Máximo 4 imágenes por producto.";
+            return;
+        }
+
         if (modoModal == ModoModal.Crear)
         {
-            if (productos.Any(x => x.Codigo.Equals(modeloFormulario.Codigo, StringComparison.OrdinalIgnoreCase)))
+            var productoNuevo = new ProductoApi
             {
-                mensajeError = "Ya existe un producto con ese código.";
-                return;
-            }
-
-            productos.Add(new ProductoAdmin
-            {
-                Codigo = modeloFormulario.Codigo.Trim(),
                 Nombre = modeloFormulario.Nombre.Trim(),
-                Categoria = modeloFormulario.Categoria.Trim(),
-                Marca = modeloFormulario.Marca.Trim(),
                 PrecioBase = modeloFormulario.PrecioBase,
                 Stock = modeloFormulario.Stock,
-                EnPromocion = modeloFormulario.EnPromocion,
-                Activo = modeloFormulario.Activo
-            });
+                Promocion = modeloFormulario.EnPromocion,
+                Disponible = modeloFormulario.Activo,
+                Activo = modeloFormulario.Activo,
+                Marca = new Marca { Id = modeloFormulario.MarcaId },
+                Subcategoria = new Subcategoria { Id = modeloFormulario.SubcategoriaId }
+            };
+
+            try
+            {
+                var creado = imagenesSeleccionadas.Any()
+                    ? await ProductoService.CrearConImagenesAsync(productoNuevo, imagenesSeleccionadas)
+                    : await ProductoService.CrearAsync(productoNuevo);
+
+                productos.Add(MapearProductoAdmin(creado));
+            }
+            catch (Exception ex)
+            {
+                mensajeError = $"No se pudo crear el producto: {ex.Message}";
+                return;
+            }
         }
         else if (modoModal == ModoModal.Editar && productoSeleccionado != null)
         {
@@ -600,7 +631,7 @@
                 return;
             }
 
-            var actualizado = await ProductoService.ActualizarAsync(new ProductoApi
+            var productoApi = new ProductoApi
             {
                 Id = productoSeleccionado.Id,
                 Nombre = modeloFormulario.Nombre.Trim(),
@@ -611,7 +642,11 @@
                 Activo = modeloFormulario.Activo,
                 Marca = new Marca { Id = modeloFormulario.MarcaId > 0 ? modeloFormulario.MarcaId : productoSeleccionado.MarcaId },
                 Subcategoria = new Subcategoria { Id = modeloFormulario.SubcategoriaId > 0 ? modeloFormulario.SubcategoriaId : productoSeleccionado.SubcategoriaId }
-            });
+            };
+
+            var actualizado = imagenesSeleccionadas.Any()
+                ? await ProductoService.ActualizarConImagenesAsync(productoApi, imagenesSeleccionadas)
+                : await ProductoService.ActualizarAsync(productoApi);
 
             var index = productos.FindIndex(p => p.Id == productoSeleccionado.Id);
             if (index >= 0)
@@ -676,5 +711,36 @@
     private void IrANuevoProducto()
     {
         Navigation.NavigateTo("/admin/productos/nuevo");
+    }
+
+    //imagenes:
+    private List<string> imagenesSeleccionadas = new();
+
+    private async Task AbrirWidgetCloudinaryProductos()
+    {
+        if (imagenesSeleccionadas.Count >= 4)
+        {
+            mensajeError = "Máximo 4 imágenes permitidas.";
+            return;
+        }
+
+        try
+        {
+            var restantes = 4 - imagenesSeleccionadas.Count;
+            var urls = await JS.InvokeAsync<List<string>>(
+                "subirImagenesCloudinary", "dlkbckbdm", "killa_unsigned", restantes);
+
+            foreach (var url in urls)
+            {
+                if (!string.IsNullOrWhiteSpace(url))
+                    imagenesSeleccionadas.Add(url);
+            }
+
+            StateHasChanged(); // ← esto actualiza el contador en la UI
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al subir imagen: {ex.Message}";
+        }
     }
 }

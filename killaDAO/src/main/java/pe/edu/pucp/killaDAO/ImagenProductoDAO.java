@@ -9,4 +9,5 @@ import java.util.List;
 public interface ImagenProductoDAO extends BaseDAO<ImagenProducto, Integer> {
     List<ImagenProducto> listAll() throws SQLException;
     List<ImagenProducto> listByProductoId(Integer idProducto) throws SQLException;
+    void quitarPrincipalPorProducto(Integer idProducto) throws SQLException;
 }

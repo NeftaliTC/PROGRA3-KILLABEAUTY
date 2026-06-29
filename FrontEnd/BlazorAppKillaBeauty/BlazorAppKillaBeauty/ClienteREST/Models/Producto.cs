@@ -70,6 +70,18 @@ namespace BlazorAppKillaBeauty.ClienteREST.Models
 
         [JsonPropertyName("activo")]
         public bool Activo { get; set; } = true;
+
+        [JsonPropertyName("imagenes")]
+        public List<ImagenProductoApi> Imagenes { get; set; } = new();
+    }
+
+    public class ImagenProductoApi
+    {
+        [JsonPropertyName("url")]
+        public string Url { get; set; } = "";
+
+        [JsonPropertyName("principal")]
+        public bool Principal { get; set; }
     }
 
     public class Categoria
@@ -113,7 +125,28 @@ namespace BlazorAppKillaBeauty.ClienteREST.Models
         [JsonPropertyName("comentario")]
         public string Comentario { get; set; } = "";
 
-        [JsonPropertyName("fecha")]
-        public DateTime? Fecha { get; set; }
+        [JsonPropertyName("fechaPublicacion")]
+        public string? FechaPublicacion { get; set; }
+
+        [JsonPropertyName("verificado")]
+        public bool Verificado { get; set; }
+
+        [JsonPropertyName("idUsuario")]
+        public int IdUsuario { get; set; }
+
+        [JsonPropertyName("cliente")]
+        public ClienteResenaDto? Cliente { get; set; }
+    }
+
+    public class ClienteResenaDto
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("nombre")]
+        public string Nombre { get; set; } = "";
+
+        [JsonPropertyName("apellidoPaterno")]
+        public string ApellidoPaterno { get; set; } = "";
     }
 }

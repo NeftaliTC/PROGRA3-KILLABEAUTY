@@ -111,4 +111,38 @@ public class ImagenProductoDAOImpl implements ImagenProductoDAO {
         imagen.setProducto(producto);
         return imagen;
     }
+
+    public ImagenProducto getPrincipalByProductoId(Integer idProducto) throws SQLException {
+        String sql = """
+        SELECT id_imagen, url, titulo, orden, principal, activo, id_producto
+        FROM ImagenProducto
+        WHERE id_producto = ?
+          AND principal = 1
+          AND activo = 1
+        LIMIT 1
+    """;
+
+        try (Connection cn = DBManager.getInstance().getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+
+            ps.setInt(1, idProducto);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public void quitarPrincipalPorProducto(Integer idProducto) throws SQLException {
+        String sql = "UPDATE ImagenProducto SET principal = 0 WHERE id_producto = ?";
+
+        try (Connection cn = DBManager.getInstance().getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, idProducto);
+            ps.executeUpdate();
+        }
+    }
 }

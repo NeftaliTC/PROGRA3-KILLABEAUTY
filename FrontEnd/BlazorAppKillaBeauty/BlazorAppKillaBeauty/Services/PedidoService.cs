@@ -296,6 +296,9 @@ namespace BlazorAppKillaBeauty.Services
             [JsonPropertyName("nombreProducto")]
             public string NombreProducto { get; set; } = "";
 
+            [JsonPropertyName("imagenes")]
+            public List<string> Imagenes { get; set; } = new();
+
             [JsonPropertyName("marca")]
             public string Marca { get; set; } = "";
 
@@ -313,6 +316,15 @@ namespace BlazorAppKillaBeauty.Services
 
             [JsonPropertyName("subtotal")]
             public decimal Subtotal { get; set; }
+        }
+
+        public class ImagenProductoApi
+        {
+            [JsonPropertyName("url")]
+            public string Url { get; set; } = "";
+
+            [JsonPropertyName("principal")]
+            public bool Principal { get; set; }
         }
     }
 }

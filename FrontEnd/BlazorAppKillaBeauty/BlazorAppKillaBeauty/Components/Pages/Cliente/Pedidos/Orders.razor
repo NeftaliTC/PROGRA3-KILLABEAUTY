@@ -45,14 +45,9 @@
                         @* Mostramos máximo 3 imágenes *@
                         @foreach (var prod in p.Productos.Take(3))
                         {
-                            @*<img src="@prod.Imagen" alt="Producto" class="thumb" />*@
-                            <div class="thumb-placeholder">
-
-                                <i class="bi bi-image"></i>
-
-                            </div>
+                            var urlImagen = prod.Imagenes?.FirstOrDefault() ?? "/Images/Logo.png";
+                            <img src="@urlImagen" alt="@prod.NombreProducto" class="thumb" />
                         }
-    
                         @* Si hay más de 3, mostramos el contador +N *@
                         @if (p.Productos.Count > 3)
                         {
