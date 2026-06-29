@@ -110,11 +110,11 @@
                         </div>
                         <div class="discount-line">
                             <span>Descuentos aplicados</span>
-                            <strong>@(pedido.CuponId.HasValue ? $"Cupon #{pedido.CuponId}" : "Sin cupon")</strong>
+                            <strong>@ResumenDescuento(pedido)</strong>
                         </div>
                         <div>
                             <span>Costo de envio</span>
-                            <strong>No registrado</strong>
+                            <strong>@MontoOPendiente(pedido.CostoEnvio)</strong>
                         </div>
                         <div class="total-line">
                             <span>Total final</span>
@@ -157,9 +157,14 @@
                         </div>
 
                         <div class="admin-order-info-list">
-                            <div><span>Tipo</span><strong>No registrado</strong></div>
-                            <div><span>Operacion</span><strong>No registrado</strong></div>
-                            <div><span>Detalle</span><strong>Sin pago asociado al pedido</strong></div>
+                            <div><span>Metodo</span><strong>@Valor(pedido.MetodoPago)</strong></div>
+                            <div><span>Comprobante</span><strong>@Valor(pedido.TipoComprobante)</strong></div>
+                            <div><span>Serie y numero</span><strong>@SerieComprobante(pedido)</strong></div>
+                            <div><span>Documento</span><strong>@Valor(pedido.DocumentoIdentidad)</strong></div>
+                            @if (!string.IsNullOrWhiteSpace(pedido.RazonSocial))
+                            {
+                                <div><span>Razon social</span><strong>@pedido.RazonSocial</strong></div>
+                            }
                         </div>
                     </article>
                 </aside>
@@ -199,7 +204,9 @@
 
         try
         {
-            var idTexto = Codigo.Replace("PED-", "", StringComparison.OrdinalIgnoreCase);
+            var idTexto = Codigo
+                .Replace("PED-", "", StringComparison.OrdinalIgnoreCase)
+                .Replace("KIL-", "", StringComparison.OrdinalIgnoreCase);
             if (!int.TryParse(idTexto, out var id))
             {
                 mensajeError = "El codigo de pedido no es valido.";
@@ -252,5 +259,34 @@
     private static string Valor(string? value)
     {
         return string.IsNullOrWhiteSpace(value) ? "No registrado" : value;
+    }
+
+    private static string MontoOPendiente(decimal monto)
+    {
+        return monto > 0 ? $"S/ {monto:F2}" : "No registrado";
+    }
+
+    private static string ResumenDescuento(PedidoAdminDto pedido)
+    {
+        if (pedido.DescuentoCupon <= 0)
+        {
+            return pedido.CuponId.HasValue ? $"Cupon #{pedido.CuponId}" : "Sin cupon";
+        }
+
+        return pedido.CuponId.HasValue
+            ? $"S/ {pedido.DescuentoCupon:F2} (Cupon #{pedido.CuponId})"
+            : $"S/ {pedido.DescuentoCupon:F2}";
+    }
+
+    private static string SerieComprobante(PedidoAdminDto pedido)
+    {
+        if (string.IsNullOrWhiteSpace(pedido.SerieComprobante) &&
+            string.IsNullOrWhiteSpace(pedido.NumeroCorrelativo))
+        {
+            return "No registrado";
+        }
+
+        return string.Join("-", new[] { pedido.SerieComprobante, pedido.NumeroCorrelativo }
+            .Where(valor => !string.IsNullOrWhiteSpace(valor)));
     }
 }
