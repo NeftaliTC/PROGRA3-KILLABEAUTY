@@ -1,7 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @layout MainLayout
 @inject AuthService AuthService
-@using BlazorAppKillaBeauty.Services
+@using BlazorAppKillaBeauty.ClienteREST.ServicesAct
 @inject CartService CartService
 
 <Navbar CantidadCarrito="@CartService.CantidadTotal" />

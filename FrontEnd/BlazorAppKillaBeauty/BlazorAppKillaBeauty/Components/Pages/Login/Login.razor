@@ -2,11 +2,11 @@
 @rendermode InteractiveServer
 @using ClienteREST.Models;
 @using ClienteREST.ServicesAct
-
+@using BlazorAppKillaBeauty.Services
 @inject UsuarioService UsuarioService
 @inject AuthService AuthService
 @inject NavigationManager NavigationManager
-
+@inject CartService CartService
 
 
 <PageTitle>Iniciar Sesión - Killa Beauty</PageTitle>
@@ -51,25 +51,6 @@
             </button>
             </div>
         </div>
-        
- @*        <div class="form-group">
-            <label>Contraseña</label>
-            <div style="position: relative; display: flex; align-items: center;">
-                <InputText @bind-Value="user.Contrasena" type="@(mostrarContrasena ? "text" : "password")" 
-                    placeholder="Crea una contraseña" style="width: 100%; padding-right: 40px;" />
-                <button type="button"
-                        @onclick="TogglePassword"
-                        style="position: absolute; right: 10px; background: none; border: none; cursor: pointer; font-size: 1.2rem;">
-                    <i class="@(mostrarContrasena ? "bi bi-eye" : "bi bi-eye-slash")"></i>
-                </button>
-            </div>
-            <ValidationMessage For="@(() => user.Contrasena)" class="validation-message text-danger" />
-        </div>
- *@
-
-
-
-
 
 
         <div class="forgot-password">
@@ -127,6 +108,10 @@
                     usuarioLogueado.TipoUsuario,
                                     usuarioLogueado.CorreoElectronico, usuarioLogueado.Dni);
                 string rolReal = usuarioLogueado.TipoUsuario?.Trim().ToUpper() ?? "";
+
+                
+                await CartService.CargarCarritoAsync(usuarioLogueado.Id);
+
                 if (rolReal == "TRABAJADOR" || rolReal == "ADMINISTRADOR")
                 {
                     
@@ -154,60 +139,3 @@
         }
     }
 }
-@* @code {
-    private string usuario = "";
-    private string password = "";
-
-    private string mensajeError = "";
-
-    [SupplyParameterFromQuery(Name = "returnUrl")]
-    private string? ReturnUrl { get; set; }
-
-    private void IniciarSesion()
-    {
-        mensajeError = "";
-
-        // Validar vacíos
-        if (string.IsNullOrWhiteSpace(usuario) ||
-            string.IsNullOrWhiteSpace(password))
-        {
-            mensajeError =
-                "Ingrese usuario y contraseña.";
-            return;
-        }
-
-        // LOGIN CLIENTE
-        if (usuario == "cliente" &&
-            password == "cliente123")
-        {
-            AuthService.LoginCliente("Cliente");
-
-            Navigation.NavigateTo(ReturnUrl ?? "/", forceLoad: true);
-            return;
-        }
-
-        // LOGIN ADMIN
-        if (usuario == "admin" &&
-            password == "admin123")
-        {
-            AuthService.LoginAdmin("Administrador");
-
-            Navigation.NavigateTo("/admin");
-            return;
-        }
-
-        // LOGIN SUPERADMIN
-        if (usuario == "superadmin" &&
-            password == "super123")
-        {
-            AuthService.LoginSuperAdmin("Killa Beauty");
-
-            Navigation.NavigateTo("/admin/productos");
-            return;
-        }
-
-        // ERROR
-        mensajeError ="Usuario o contraseña incorrectos.";
-    }
-} *@
-

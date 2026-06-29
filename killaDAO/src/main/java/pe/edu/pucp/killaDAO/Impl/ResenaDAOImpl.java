@@ -37,7 +37,7 @@ public class ResenaDAOImpl implements ResenaDAO {
             setParams(ps, r);
             ps.executeUpdate();
             try (ResultSet keys = ps.getGeneratedKeys()) {
-                if (keys.next()) r.setIdResena(keys.getInt(1));
+                if (keys.next()) r.setId(keys.getInt(1));
             }
         }
         return r;
@@ -54,7 +54,7 @@ public class ResenaDAOImpl implements ResenaDAO {
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             setParams(ps, r);
-            ps.setInt(9, r.getIdResena());
+            ps.setInt(9, r.getId());
             ps.executeUpdate();
         }
         return r;
@@ -67,7 +67,7 @@ public class ResenaDAOImpl implements ResenaDAO {
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setBoolean(1, r.getActivo());
-            ps.setInt(2, r.getIdResena());
+            ps.setInt(2, r.getId());
             ps.executeUpdate();
         }
     }
@@ -75,7 +75,14 @@ public class ResenaDAOImpl implements ResenaDAO {
     @Override
     public List<Resena> listByProductoId(int idProducto) throws SQLException {
         List<Resena> lista = new ArrayList<>();
-        String sql = "SELECT id_resena, titulo, comentario, calificacion, verificado, fecha_publicacion, activo, id_usuario, id_producto FROM Resena WHERE id_producto = ?";
+        String sql = """
+            SELECT r.id_resena, r.titulo, r.comentario, r.calificacion, r.verificado,\s
+                       r.fecha_publicacion, r.activo, r.id_usuario, r.id_producto,
+                       u.nombre, u.apellido_paterno
+                FROM Resena r
+                INNER JOIN Usuario u ON r.id_usuario = u.id_usuario
+                WHERE r.id_producto = ?
+            """;
         try (Connection cn = DBManager.getInstance().getConnection();
              PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, idProducto);
@@ -114,7 +121,7 @@ public class ResenaDAOImpl implements ResenaDAO {
 
     private Resena mapRow(ResultSet rs) throws SQLException {
         Resena r = new Resena();
-        r.setIdResena(rs.getInt("id_resena"));
+        r.setId(rs.getInt("id_resena"));
         r.setTitulo(rs.getString("titulo"));
         r.setComentario(rs.getString("comentario"));
         r.setCalificacion(rs.getInt("calificacion"));
@@ -124,6 +131,8 @@ public class ResenaDAOImpl implements ResenaDAO {
 
         Usuario usuario = new Usuario();
         usuario.setId(rs.getInt("id_usuario"));
+        usuario.setNombre(rs.getString("nombre"));
+        usuario.setApellidoPaterno(rs.getString("apellido_paterno"));
         r.setCliente(usuario);
 
         Producto producto = new Producto();

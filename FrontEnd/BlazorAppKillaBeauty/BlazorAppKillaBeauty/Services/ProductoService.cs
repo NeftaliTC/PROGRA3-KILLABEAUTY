@@ -248,6 +248,12 @@ namespace BlazorAppKillaBeauty.Services
                     ? $"Error REST {(int)response.StatusCode} {response.ReasonPhrase}"
                     : body);
         }
+
+        public async Task<bool> RegistrarResenaAsync(int productoId, ResenaProducto resena)
+        {
+            using var response = await http.PostAsJsonAsync($"productos/{productoId}/resenas", resena, jsonOptions);
+            return response.IsSuccessStatusCode;
+        }
         private class ProductoRequest
         {
             [JsonPropertyName("id")]

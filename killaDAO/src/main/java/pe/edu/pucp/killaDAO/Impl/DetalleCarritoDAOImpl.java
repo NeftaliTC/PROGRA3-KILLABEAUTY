@@ -78,7 +78,7 @@ public class DetalleCarritoDAOImpl implements DetalleCarritoDAO {
         p.setId(rs.getInt("id_producto"));
         p.setNombre(rs.getString("nombre"));
         p.setPrecioBase(rs.getDouble("precio_base"));
-
+        p.setStock(rs.getInt("stock"));
         d.setProducto(p);
 
         CarritoDeCompras carrito = new CarritoDeCompras();
@@ -99,7 +99,8 @@ public class DetalleCarritoDAOImpl implements DetalleCarritoDAO {
             dc.id_carrito,
             p.id_producto,
             p.nombre,
-            p.precio_base
+            p.precio_base,
+            p.stock
         FROM DetalleCarrito dc
         INNER JOIN Producto p
             ON dc.id_producto = p.id_producto

@@ -1,6 +1,7 @@
 ﻿@page "/orders/order-detail/{OrderId}"
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
+@using BlazorAppKillaBeauty.ClienteREST.ServicesAct
 @inject CartService CartService
 @inject PedidoService PedidoService
 @inject NavigationManager Navigation
@@ -183,7 +184,7 @@
                     <div class="info-icon-block">
                         <i class="bi @(!string.IsNullOrEmpty(pedidoActual.NumeroSeguimiento) ? "bi-box-seam" : "bi-bag") icon-pink"></i>
                         <div class="block-text">
-                            @if (!string.IsNullOrEmpty(pedidoActual.NumeroSeguimiento))
+                            @if (!string.IsNullOrEmpty(pedidoActual.Direccion))
                             {
                                 <h3>Envío a domicilio</h3>
                                 @if (!string.IsNullOrEmpty(pedidoActual.Courier))

@@ -140,10 +140,20 @@ public class ProductoRS {
     @Path("{id}/resenas")
     public Response agregarResena(@PathParam("id") int idProducto, Resena resena) {
         try {
+            if (resena.getCliente() == null || resena.getCliente().getId() <= 0) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new ErrorDTO("No se identificó al usuario que reseña."))
+                        .build();
+            }
+
             Producto productoAsociado = new Producto();
             productoAsociado.setId(idProducto);
 
             resena.setProducto(productoAsociado);
+            resena.setVerificado(false);
+            resena.setActivo(true);
+            resena.setFechaPublicacion(new java.util.Date());
+
             Resena resenaCreada = resenaBL.create(resena);
             return Response.status(Response.Status.CREATED).entity(resenaCreada).build();
         } catch (BusinessLogicException ex) {

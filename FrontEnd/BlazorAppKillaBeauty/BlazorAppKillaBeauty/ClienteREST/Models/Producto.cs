@@ -36,6 +36,10 @@ namespace BlazorAppKillaBeauty.ClienteREST.Models
 
         [JsonPropertyName("esPopular")]
         public bool EsPopular { get; set; }
+
+        [JsonPropertyName("stock")]
+        public int Stock { get; set; }
+
     }
 
     public class ProductoApi
@@ -121,7 +125,28 @@ namespace BlazorAppKillaBeauty.ClienteREST.Models
         [JsonPropertyName("comentario")]
         public string Comentario { get; set; } = "";
 
-        [JsonPropertyName("fecha")]
-        public DateTime? Fecha { get; set; }
+        [JsonPropertyName("fechaPublicacion")]
+        public string? FechaPublicacion { get; set; }
+
+        [JsonPropertyName("verificado")]
+        public bool Verificado { get; set; }
+
+        [JsonPropertyName("idUsuario")]
+        public int IdUsuario { get; set; }
+
+        [JsonPropertyName("cliente")]
+        public ClienteResenaDto? Cliente { get; set; }
+    }
+
+    public class ClienteResenaDto
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("nombre")]
+        public string Nombre { get; set; } = "";
+
+        [JsonPropertyName("apellidoPaterno")]
+        public string ApellidoPaterno { get; set; } = "";
     }
 }
