@@ -11,10 +11,10 @@ builder.Services.AddRazorComponents()
 
 
 
-builder.Services.AddScoped(sp => new HttpClient
-{
-    BaseAddress = new Uri("http://localhost:8080/KillaREST-1.0-SNAPSHOT/services/")
-});
+//builder.Services.AddScoped(sp => new HttpClient
+//{
+//    BaseAddress = new Uri("http://localhost:8080/KillaREST-1.0-SNAPSHOT/services/")
+//});
 
 
 
@@ -34,15 +34,23 @@ builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<UbigeoService>();
 builder.Services.AddHttpClient("KillaApi", client =>
 {
-    var baseUrl = builder.Configuration["KillaApi:BaseUrl"]
-        ?? "http://localhost:8080/KillaREST-1.0-SNAPSHOT/services/";
+    var baseUrl = builder.Configuration["KillaApi:BaseUrl"];
+
+    if (string.IsNullOrWhiteSpace(baseUrl))
+    {
+        throw new InvalidOperationException("No se configuro KillaApi:BaseUrl en appsettings.json");
+    }
 
     client.BaseAddress = new Uri(baseUrl);
     client.Timeout = TimeSpan.FromSeconds(30);
 });
 
 
-builder.Services.AddScoped<HttpClientUtils>();
+builder.Services.AddScoped<HttpClientUtils>(sp =>
+{
+    var factory = sp.GetRequiredService<IHttpClientFactory>();
+    return new HttpClientUtils(factory.CreateClient("KillaApi"));
+});
 builder.Services.AddSingleton<AddressService>();
 builder.Services.AddScoped<ProductoService>();
 builder.Services.AddScoped<CourierService>();
