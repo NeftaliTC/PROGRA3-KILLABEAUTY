@@ -112,6 +112,14 @@ namespace BlazorAppKillaBeauty.Services
                    ?? throw new InvalidOperationException("No se recibio respuesta del checkout.");
         }
 
+        public async Task<PedidoAdminDto> ActualizarDespachoAsync(int idPedido, PedidoDespachoDto request)
+        {
+            using var response = await http.PutAsJsonAsync($"pedido/{idPedido}/despacho", request, jsonOptions);
+            await EnsureSuccessAsync(response);
+            return await response.Content.ReadFromJsonAsync<PedidoAdminDto>(jsonOptions)
+                   ?? throw new InvalidOperationException("No se recibio respuesta del despacho.");
+        }
+
         public class PedidoCheckoutDto
         {
             [JsonPropertyName("usuarioId")]
@@ -161,6 +169,18 @@ namespace BlazorAppKillaBeauty.Services
                 [JsonPropertyName("precioAplicado")]
                 public decimal PrecioAplicado { get; set; }
             }
+        }
+
+        public class PedidoDespachoDto
+        {
+            [JsonPropertyName("estadoEnvio")]
+            public string EstadoEnvio { get; set; } = "PENDIENTE";
+
+            [JsonPropertyName("fechaEntrega")]
+            public string FechaEntrega { get; set; } = "";
+
+            [JsonPropertyName("descripcion")]
+            public string Descripcion { get; set; } = "";
         }
 
         public class PedidoAdminDto
@@ -222,8 +242,20 @@ namespace BlazorAppKillaBeauty.Services
             [JsonPropertyName("costoEnvio")]
             public decimal CostoEnvio { get; set; }
 
+            [JsonPropertyName("courierId")]
+            public int CourierId { get; set; }
+
             [JsonPropertyName("courier")]
             public string Courier { get; set; } = "";
+
+            [JsonPropertyName("estadoEnvio")]
+            public string EstadoEnvio { get; set; } = "";
+
+            [JsonPropertyName("fechaEntrega")]
+            public string FechaEntrega { get; set; } = "";
+
+            [JsonPropertyName("pagoAprobado")]
+            public bool PagoAprobado { get; set; }
 
             [JsonPropertyName("metodoPago")]
             public string MetodoPago { get; set; } = "";

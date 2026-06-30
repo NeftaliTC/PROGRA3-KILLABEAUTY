@@ -28,7 +28,11 @@ public class PedidoDetalleDTO {
     private double descuentoCupon;
     private String numeroSeguimiento;
     private double costoEnvio;
+    private int courierId;
     private String courier;
+    private String estadoEnvio;
+    private String fechaEntrega;
+    private boolean pagoAprobado;
     private String metodoPago;
     private String tipoComprobante;
     private String serieComprobante;
@@ -86,14 +90,23 @@ public class PedidoDetalleDTO {
         if (envio != null) {
             this.numeroSeguimiento = envio.getNumeroSeguimiento();
             this.costoEnvio = envio.getCostoEnvio();
-            this.courier = envio.getCourier() != null ? envio.getCourier().getNombre() : "";
+            if (envio.getCourier() != null) {
+                this.courierId = envio.getCourier().getId();
+                this.courier = envio.getCourier().getNombre();
+            }
+            this.estadoEnvio = envio.getEstadoEnvio() != null ? envio.getEstadoEnvio().getNombre() : "";
+            this.fechaEntrega = envio.getFechaEnvio() != null
+                    ? new SimpleDateFormat("yyyy-MM-dd").format(envio.getFechaEnvio())
+                    : "";
         }
 
         // Pago
         if (pago != null && pago.getMetodoPago() != null) {
             this.metodoPago = pago.getMetodoPago().getNombre();
+            this.pagoAprobado = pago.isEstado();
         } else {
             this.metodoPago = "No registrado";
+            this.pagoAprobado = false;
         }
 
         // Comprobante
@@ -167,8 +180,16 @@ public class PedidoDetalleDTO {
     public void setNumeroSeguimiento(String numeroSeguimiento) { this.numeroSeguimiento = numeroSeguimiento; }
     public double getCostoEnvio() { return costoEnvio; }
     public void setCostoEnvio(double costoEnvio) { this.costoEnvio = costoEnvio; }
+    public int getCourierId() { return courierId; }
+    public void setCourierId(int courierId) { this.courierId = courierId; }
     public String getCourier() { return courier; }
     public void setCourier(String courier) { this.courier = courier; }
+    public String getEstadoEnvio() { return estadoEnvio; }
+    public void setEstadoEnvio(String estadoEnvio) { this.estadoEnvio = estadoEnvio; }
+    public String getFechaEntrega() { return fechaEntrega; }
+    public void setFechaEntrega(String fechaEntrega) { this.fechaEntrega = fechaEntrega; }
+    public boolean isPagoAprobado() { return pagoAprobado; }
+    public void setPagoAprobado(boolean pagoAprobado) { this.pagoAprobado = pagoAprobado; }
     public String getMetodoPago() { return metodoPago; }
     public void setMetodoPago(String metodoPago) { this.metodoPago = metodoPago; }
     public String getTipoComprobante() { return tipoComprobante; }

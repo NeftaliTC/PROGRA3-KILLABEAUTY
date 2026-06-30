@@ -177,6 +177,27 @@ public class PedidoBLImpl implements PedidoBL {
         }
     }
 
+    @Override
+    public void actualizarEstado(Integer idPedido, EstadoPedido estadoPedido) throws BusinessLogicException {
+        if (idPedido == null || idPedido <= 0) {
+            throw new BusinessLogicException("Debe indicar un pedido valido.");
+        }
+        if (estadoPedido == null) {
+            throw new BusinessLogicException("Debe indicar un estado de pedido valido.");
+        }
+
+        try {
+            TransactionContext.getConnection();
+            pedidoDAO.updateEstado(idPedido, estadoPedido.getId());
+            TransactionContext.commit();
+        } catch (SQLException e) {
+            TransactionContext.rollback();
+            throw new BusinessLogicException(e);
+        } finally {
+            TransactionContext.close();
+        }
+    }
+
     private void validarPedido(Pedido pedido) throws BusinessLogicException {
         if (pedido == null)
             throw new BusinessLogicException("El pedido no puede ser nulo.");

@@ -116,6 +116,27 @@ public class ProductoDAOImpl implements ProductoDAO {
         }
     }
 
+    @Override
+    public void descontarStock(Integer idProducto, Integer cantidad) throws SQLException {
+        String sql = """
+                UPDATE Producto
+                SET stock = stock - ?,
+                    disponible = CASE WHEN stock - ? > 0 THEN disponible ELSE 0 END
+                WHERE id_producto = ? AND stock >= ?
+                """;
+        try (Connection cn = DBManager.getInstance().getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, cantidad);
+            ps.setInt(2, cantidad);
+            ps.setInt(3, idProducto);
+            ps.setInt(4, cantidad);
+            int filas = ps.executeUpdate();
+            if (filas == 0) {
+                throw new SQLException("No hay stock suficiente para el producto " + idProducto + ".");
+            }
+        }
+    }
+
     private Producto mapRow(ResultSet rs, Map<Integer, Marca> marcas, Map<Integer, Subcategoria> subcategorias,
                             boolean cargarImagenes) throws SQLException {
         Producto p = new Producto();

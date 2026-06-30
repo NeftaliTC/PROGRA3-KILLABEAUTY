@@ -696,7 +696,6 @@
     private string errorComprobante = "";
     private bool validandoCompra = false;
     private string errorValidacionCompra = "";
-    private readonly Random random = new();
 
     private void SeleccionarComprobante(string tipo)
     {
@@ -778,50 +777,63 @@
         errorValidacionCompra = "";
         StateHasChanged();
 
-        await Task.Delay(2500);
+        try
+        {
+            // Construir items con precio con escala
+            var items = new List<PedidoService.PedidoCheckoutDto.ItemCarritoDto>();
+            foreach (var item in CartService.Productos.Where(i => i.Producto != null))
+            {
+                var precio = await CartService.ObtenerPrecioUnitarioAsync(item);
+                items.Add(new PedidoService.PedidoCheckoutDto.ItemCarritoDto
+                {
+                    ProductoId = item.Producto!.Id,
+                    Cantidad = item.Cantidad,
+                    PrecioAplicado = precio
+                });
+            }
 
-        bool compraValidada = random.Next(1, 101) <= 90;
-        if (!compraValidada)
+            var request = new PedidoService.PedidoCheckoutDto
+            {
+                UsuarioId = AuthService.UsuarioId.Value,
+                DireccionId = direccionSeleccionada?.Id ?? 0,
+                CuponId = cuponAplicado?.Id,
+                CostoEnvio = costoEnvio,
+                DescuentoCupon = descuentoCupon,
+                MetodoPago = metodoPago,
+                TipoComprobante = tipoComprobante,
+                Dni = dni,
+                Ruc = ruc,
+                RazonSocial = razonSocial,
+                DireccionFiscal = direccionFiscal,
+                Items = items
+            };
+
+            await PedidoService.CheckoutAsync(request);
+            await CartService.VaciarCarritoAsync(AuthService.UsuarioId.Value);
+
+            Navigation.NavigateTo("/order-confirmed", replace: true);
+        }
+        catch (Exception ex)
+        {
+            errorValidacionCompra = LimpiarMensajeError(ex.Message);
+        }
+        finally
         {
             validandoCompra = false;
-            errorValidacionCompra = "No se pudo validar el pago. Intenta nuevamente o usa otro método.";
-            return;
+        }
+    }
+
+    private static string LimpiarMensajeError(string mensaje)
+    {
+        if (string.IsNullOrWhiteSpace(mensaje))
+        {
+            return "No se pudo completar el pedido.";
         }
 
-        // Construir items con precio con escala
-        var items = new List<PedidoService.PedidoCheckoutDto.ItemCarritoDto>();
-        foreach (var item in CartService.Productos.Where(i => i.Producto != null))
-        {
-            var precio = await CartService.ObtenerPrecioUnitarioAsync(item);
-            items.Add(new PedidoService.PedidoCheckoutDto.ItemCarritoDto
-            {
-                ProductoId = item.Producto!.Id,
-                Cantidad = item.Cantidad,
-                PrecioAplicado = precio
-            });
-        }
-
-        var request = new PedidoService.PedidoCheckoutDto
-        {
-            UsuarioId = AuthService.UsuarioId.Value,
-            DireccionId = direccionSeleccionada?.Id ?? 0,
-            CuponId = cuponAplicado?.Id,
-            CostoEnvio = costoEnvio,
-            DescuentoCupon = descuentoCupon,
-            MetodoPago = metodoPago,
-            TipoComprobante = tipoComprobante,
-            Dni = dni,
-            Ruc = ruc,
-            RazonSocial = razonSocial,
-            DireccionFiscal = direccionFiscal,
-            Items = items
-        };
-
-        await PedidoService.CheckoutAsync(request);
-        await CartService.VaciarCarritoAsync(AuthService.UsuarioId.Value);
-
-        validandoCompra = false;
-        Navigation.NavigateTo("/order-confirmed", replace: true);
+        return mensaje
+            .Replace("{\"message\":\"", "", StringComparison.OrdinalIgnoreCase)
+            .Replace("\"}", "", StringComparison.OrdinalIgnoreCase)
+            .Replace("{\"mensaje\":\"", "", StringComparison.OrdinalIgnoreCase);
     }
 
     private void FiltrarDni(ChangeEventArgs e)

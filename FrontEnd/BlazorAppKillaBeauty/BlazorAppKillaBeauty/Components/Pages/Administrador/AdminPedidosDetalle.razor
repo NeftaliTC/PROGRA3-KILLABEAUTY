@@ -180,6 +180,10 @@
 
                         <div class="admin-order-info-list">
                             <div>
+                                <span>Estado pago</span>
+                                <strong>@(pedido.PagoAprobado ? "Aprobado" : "Rechazado o pendiente")</strong>
+                            </div>
+                            <div>
                                 <span>M&eacute;todo</span>
                                 <strong>
                                     @{
@@ -203,6 +207,53 @@
                                 <div><span>Razon social</span><strong>@pedido.RazonSocial</strong></div>
                             }
                         </div>
+                    </article>
+
+                    <article class="admin-order-panel">
+                        <div class="panel-heading">
+                            <i class="bi bi-truck"></i>
+                            <h2>Despacho</h2>
+                        </div>
+
+                        <div class="admin-order-info-list">
+                            <div>
+                                <span>Courier</span>
+                                <strong>@Valor(pedido.Courier)</strong>
+                            </div>
+                            <div>
+                                <span>Numero de seguimiento</span>
+                                <strong>@Valor(pedido.NumeroSeguimiento)</strong>
+                            </div>
+                            <div>
+                                <span>Estado despacho</span>
+                                <select class="form-select" @bind="estadoEnvio">
+                                    <option value="PENDIENTE">Pendiente</option>
+                                    <option value="EN_CAMINO">En camino</option>
+                                    <option value="ENTREGADO">Entregado</option>
+                                </select>
+                            </div>
+                            <div>
+                                <span>Fecha entrega/envio</span>
+                                <input type="date" class="form-control" @bind="fechaEntrega" />
+                            </div>
+                            <div>
+                                <span>Descripcion</span>
+                                <input class="form-control" @bind="descripcionDespacho" />
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(mensajeDespacho))
+                        {
+                            <p class="checkout-error" style="margin-top: 12px;">@mensajeDespacho</p>
+                        }
+
+                        <button type="button"
+                                class="admin-primary-action"
+                                style="width: 100%; margin-top: 14px;"
+                                disabled="@guardandoDespacho"
+                                @onclick="GuardarDespacho">
+                            @(guardandoDespacho ? "Guardando..." : "Actualizar despacho")
+                        </button>
                     </article>
                 </aside>
             </section>
@@ -232,6 +283,11 @@
     private PedidoAdminDto? pedido;
     private bool cargando = true;
     private string? mensajeError;
+    private bool guardandoDespacho;
+    private string? mensajeDespacho;
+    private string estadoEnvio = "PENDIENTE";
+    private DateTime? fechaEntrega;
+    private string descripcionDespacho = "";
     private readonly List<string> estadosProgreso = new() { "Pendiente", "Pagado", "En preparacion", "Enviado", "Entregado" };
 
     protected override async Task OnParametersSetAsync()
@@ -251,6 +307,7 @@
             }
 
             pedido = await PedidoService.ObtenerPorIdAsyncAdminDto(id);
+            CargarDatosDespacho();
         }
         catch (Exception ex)
         {
@@ -263,6 +320,51 @@
     }
 
     private void Volver() => Navigation.NavigateTo("/admin/pedidos");
+
+    private void CargarDatosDespacho()
+    {
+        if (pedido is null)
+        {
+            return;
+        }
+
+        estadoEnvio = string.IsNullOrWhiteSpace(pedido.EstadoEnvio) ? "PENDIENTE" : pedido.EstadoEnvio;
+        fechaEntrega = DateTime.TryParse(pedido.FechaEntrega, out var fecha)
+            ? fecha
+            : null;
+        descripcionDespacho = "";
+    }
+
+    private async Task GuardarDespacho()
+    {
+        if (pedido is null)
+        {
+            return;
+        }
+
+        mensajeDespacho = null;
+        guardandoDespacho = true;
+
+        try
+        {
+            pedido = await PedidoService.ActualizarDespachoAsync(pedido.Id, new PedidoDespachoDto
+            {
+                EstadoEnvio = estadoEnvio,
+                FechaEntrega = fechaEntrega?.ToString("yyyy-MM-dd") ?? "",
+                Descripcion = descripcionDespacho
+            });
+            CargarDatosDespacho();
+            mensajeDespacho = "Despacho actualizado correctamente.";
+        }
+        catch (Exception ex)
+        {
+            mensajeDespacho = $"No se pudo actualizar el despacho. {ex.Message}";
+        }
+        finally
+        {
+            guardandoDespacho = false;
+        }
+    }
 
     private string GetProgressClass(string estado)
     {
