@@ -3,6 +3,7 @@
 @rendermode InteractiveServer
 @inject AuthService AuthService
 @inject NavigationManager NavManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @using ClienteREST.ServicesAct
 @using ClienteREST.Models
 @inject UsuarioService UsuarioService
@@ -12,7 +13,7 @@
     <AdminNavbar />
 
     <section class="admin-content admin-employees-content">
-        @if (!AuthService.EstaLogueado || AuthService.Rol != "ADMINISTRADOR")
+        @if (!tienePermisoAdmin)
         {
             <div class="access-denied-container">
                 <div class="access-denied-icon">
@@ -20,7 +21,7 @@
                 </div>
                 <h2>Acceso Restringido</h2>
                 <p>
-                    Lo sentimos, tu usuario actual cuenta con el rol de <strong>@(AuthService.EstaLogueado ? AuthService.Rol : "Invitado")</strong>.
+                    Lo sentimos, tu usuario actual cuenta con el rol de <strong>@rolActual</strong>.
                     Se requieren permisos exclusivos de <strong>SuperAdmin</strong> para gestionar el personal.
                 </p>
                 <a href="/admin/productos" class="admin-primary-action text-decoration-none">
@@ -233,6 +234,8 @@
     private bool mostrarFormulario = false;
     private bool esEdicion = false;
     private bool cargando = true;
+    private bool tienePermisoAdmin = false;
+    private string rolActual = "Invitado";
 
     // --- VARIABLES PARA EL BUSCADOR DE CORREO ---
     private string emailBusqueda = "";
@@ -251,7 +254,20 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await CargarEmpleados();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        AuthService.LoadFromPrincipal(authState.User);
+
+        rolActual = AuthService.EstaLogueado ? AuthService.Rol : "Invitado";
+        tienePermisoAdmin = authState.User.IsInRole("ADMINISTRADOR") || AuthService.Rol == "ADMINISTRADOR";
+
+        if (tienePermisoAdmin)
+        {
+            await CargarEmpleados();
+        }
+        else
+        {
+            cargando = false;
+        }
     }
 
     private async Task CargarEmpleados()

@@ -1,5 +1,6 @@
 @inject NavigationManager NavManager
 @inject AuthService AuthService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <nav class="admin-navbar">
     <NavLink href="/admin/productos"
@@ -35,13 +36,13 @@
             <div class="killa-modal-icon">
                 <i class="bi bi-exclamation-circle-fill"></i>
             </div>
-            
-            <h3>¿Cerrar Sesión?</h3>
-            <p>¿Estás seguro de que deseas salir del panel de administración de Killa Beauty?</p>
-            
+
+            <h3>Cerrar Sesion?</h3>
+            <p>Estas seguro de que deseas salir del panel de administracion de Killa Beauty?</p>
+
             <div class="killa-modal-buttons">
                 <button class="btn-killa-cancel" @onclick="CerrarAviso">Cancelar</button>
-                <button class="btn-killa-confirm" @onclick="ConfirmarCierre">Sí, salir</button>
+                <button class="btn-killa-confirm" @onclick="ConfirmarCierre">Si, salir</button>
             </div>
         </div>
     </div>
@@ -61,9 +62,13 @@
         new MenuAdmin("Reportes", "/admin/reportes", "bi bi-bar-chart")
     };
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        if (AuthService.EstaLogueado && AuthService.Rol == "ADMINISTRADOR")
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        AuthService.LoadFromPrincipal(authState.User);
+
+        if ((authState.User.IsInRole("ADMINISTRADOR") || AuthService.Rol == "ADMINISTRADOR")
+            && !menu.Any(item => item.Url == "/admin/empleados"))
         {
             menu.Add(new MenuAdmin("Empleados", "/admin/empleados", "bi bi-people-fill"));
         }
