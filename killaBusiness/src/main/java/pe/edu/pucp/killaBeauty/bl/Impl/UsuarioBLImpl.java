@@ -169,6 +169,8 @@ public class UsuarioBLImpl implements UsuarioBL {
             if (!contrasenaValida) {
                 throw new BusinessLogicException("Correo o contrasena incorrectos.");
             }
+            usuarioBD.setUltimoAcceso(new java.util.Date());
+            usuarioDAO.actualizarUltimoAcceso(usuarioBD.getId());
             usuarioBD.setContrasena(null);
             return usuarioBD;
         } catch (SQLException e) {

@@ -89,6 +89,17 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     }
 
     @Override
+    public void actualizarUltimoAcceso(int idUsuario) throws SQLException {
+        String sql = "UPDATE Usuario SET ultimo_acceso = NOW() WHERE id_usuario = ?";
+
+        try (Connection cn = DBManager.getInstance().getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, idUsuario);
+            ps.executeUpdate();
+        }
+    }
+
+    @Override
     public Usuario loadByEmail(String email) throws SQLException {
         String sql = "SELECT * FROM Usuario WHERE correo_electronico = ?";
         try (Connection cn = DBManager.getInstance().getConnection();

@@ -8,4 +8,5 @@ import java.util.List;
 public interface UsuarioDAO extends BaseDAO<Usuario,Integer> {
     Usuario loadByEmail(String email) throws SQLException;
     List<Usuario> listByTipoUsuario(int idTipoUsuario) throws SQLException;
+    void actualizarUltimoAcceso(int idUsuario) throws SQLException;
 }
