@@ -26,6 +26,7 @@ builder.Services.AddScoped<MarcaService>();
 builder.Services.AddScoped<CategoriaService>();
 builder.Services.AddScoped<PaisService>();
 builder.Services.AddScoped<PedidoService>();
+builder.Services.AddScoped<ReporteService>();
 builder.Services.AddScoped<EscalaPrecioService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<UsuarioPerfilService>();
