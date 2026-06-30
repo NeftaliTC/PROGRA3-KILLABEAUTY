@@ -249,7 +249,9 @@
     private int productosPorPagina = 12;
 
     private List<Producto> productos = new();
-
+    private TablePage<Producto> paginaProductos = new();
+    private PageQuery queryActual = new(1, 12);
+    private int[] opcionesPaginaCatalogo = { 12, 24, 48 };
 
     private string categoriaSeleccionada = "Todas";
     private string subcategoriaSeleccionada = "";
