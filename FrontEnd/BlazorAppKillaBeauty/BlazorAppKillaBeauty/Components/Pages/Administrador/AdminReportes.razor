@@ -3,6 +3,7 @@
 @using BlazorAppKillaBeauty.ClienteREST.Models
 @inject IJSRuntime JS
 @inject ReporteService ReporteService
+@inject NavigationManager Navigation
 
 <PageTitle>Reportes Admin - Killa Beauty</PageTitle>
 
@@ -541,7 +542,15 @@
 
     private void DescargarReporte()
     {
-        // Luego puede conectarse a export real.
+        if (reporteActual == ReporteTipo.Ventas)
+        {
+            var url = ReporteService.ObtenerUrlPdfVentas(
+                fechaInicioVentas,
+                fechaFinVentas,
+                categoriaVentaSeleccionada);
+
+            Navigation.NavigateTo(url, forceLoad: true);
+        }
     }
 
     private async Task CargarReporteActualAsync()
