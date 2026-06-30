@@ -196,7 +196,7 @@ namespace BlazorAppKillaBeauty.ClienteREST.ServicesAct
             {
                 Id = producto.Id,
                 Nombre = producto.Nombre,
-                Imagen = producto.ImagenPrincipal,
+                Imagenes = producto.Imagenes,
                 PrecioBase = producto.PrecioBase,
                 Stock = producto.Stock 
             };
