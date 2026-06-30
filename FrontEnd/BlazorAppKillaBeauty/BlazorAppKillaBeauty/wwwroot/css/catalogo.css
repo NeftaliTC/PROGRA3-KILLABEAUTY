@@ -329,6 +329,46 @@
         color: #ffffff;
     }
 
+/*NO HAY RESULTADOS DE BSQUEDA*/
+.catalog-no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+    .catalog-no-results i {
+        font-size: 48px;
+        color: #f3d4dc;
+        display: block;
+        margin-bottom: 16px;
+    }
+
+    .catalog-no-results h3 {
+        color: #555;
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+
+    .catalog-no-results p {
+        font-size: 14px;
+    }
+
+.catalog-did-you-mean {
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #555;
+}
+
+    .catalog-did-you-mean button {
+        background: none;
+        border: none;
+        color: #e05a7a;
+        cursor: pointer;
+        text-decoration: underline;
+        padding: 0;
+        font-size: inherit;
+    }
+
 /* RESPONSIVE */
 
 @media (max-width: 1350px) {
