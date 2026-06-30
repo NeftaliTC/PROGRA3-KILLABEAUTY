@@ -1,4 +1,4 @@
-using System.Net;
+using System.Security.Claims;
 
 public class AuthService
 {
@@ -19,6 +19,28 @@ public class AuthService
         Dni = dni;
         Rol = rol ?? "Cliente";  // si llega null se le asigna cliente 
     }
+
+    public void LoadFromPrincipal(ClaimsPrincipal user)
+    {
+        if (user.Identity?.IsAuthenticated != true)
+        {
+            Logout();
+            return;
+        }
+
+        var idTexto = user.FindFirst("UserId")?.Value;
+        int.TryParse(idTexto, out var usuarioId);
+
+        EstaLogueado = true;
+        UsuarioId = usuarioId > 0 ? usuarioId : null;
+        NombreUsuario = user.FindFirst("DisplayName")?.Value
+            ?? user.Identity?.Name
+            ?? "";
+        CorreoElectronico = user.FindFirst(ClaimTypes.Email)?.Value ?? "";
+        Dni = user.FindFirst("Dni")?.Value ?? "";
+        Rol = user.FindFirst(ClaimTypes.Role)?.Value ?? "";
+    }
+
     public void Logout()
     {
         EstaLogueado = false;

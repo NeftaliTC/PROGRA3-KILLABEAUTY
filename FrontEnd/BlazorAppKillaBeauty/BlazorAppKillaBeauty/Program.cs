@@ -19,7 +19,7 @@ builder.Services.AddRazorComponents()
 
 
 // SERVICE
-builder.Services.AddSingleton<AuthService>();
+builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CuponService>();
 builder.Services.AddScoped<CampanaService>();
 builder.Services.AddScoped<MarcaService>();
@@ -52,7 +52,7 @@ builder.Services.AddScoped<HttpClientUtils>(sp =>
     var factory = sp.GetRequiredService<IHttpClientFactory>();
     return new HttpClientUtils(factory.CreateClient("KillaApi"));
 });
-builder.Services.AddSingleton<AddressService>();
+builder.Services.AddScoped<AddressService>();
 builder.Services.AddScoped<ProductoService>();
 builder.Services.AddScoped<CourierService>();
 
@@ -87,6 +87,7 @@ app.UseAuthorization();
 
 app.UseAntiforgery();
 
+app.MapAuthEndpoints();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

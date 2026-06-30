@@ -1,5 +1,6 @@
 @page "/account/coupons"
 @layout AccountLayout
+@attribute [Authorize(Roles = "CLIENTE,TRABAJADOR,ADMINISTRADOR")]
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
 @inject CuponService CuponService

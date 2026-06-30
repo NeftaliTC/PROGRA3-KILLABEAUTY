@@ -1,4 +1,5 @@
 @page "/admin"
+@attribute [Authorize(Roles = "ADMINISTRADOR,TRABAJADOR")]
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
 

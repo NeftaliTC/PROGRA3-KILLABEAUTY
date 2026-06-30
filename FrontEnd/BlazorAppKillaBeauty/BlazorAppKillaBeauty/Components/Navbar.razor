@@ -1,9 +1,10 @@
-﻿@inject AuthService AuthService
+@inject AuthService AuthService
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.ClienteREST.Models
-@inject ProductoService ProductoService
 @using BlazorAppKillaBeauty.Services
+@inject ProductoService ProductoService
 
 <link rel="stylesheet" href="@Assets["app.css"]" />
 
@@ -13,13 +14,13 @@
              class="logo"
              alt="Logo" />
     </a>
-    
+
     <SearchBox TodosLosProductos="@TodosLosProductos" />
 
     <div class="nav-links">
 
         <NavLink href="/catalogo">
-            Catálogo
+            Catalogo
         </NavLink>
 
         <NavLink href="/cart" class="cart-navbar-btn">
@@ -35,41 +36,54 @@
 
         </NavLink>
 
-        @if (AuthService.EstaLogueado)
-        {
-            <a href="/orders" class="nav-user-link">
-                <i class="bi bi-box-seam"></i>
-                Pedidos
-            </a>
+        <AuthorizeView>
+            <Authorized>
+                <a href="/orders" class="nav-user-link">
+                    <i class="bi bi-box-seam"></i>
+                    Pedidos
+                </a>
 
-            <NavLink href="/account/profile" class="user-profile-menu-link">
-                <div class="user-profile">
+                <NavLink href="/account/profile" class="user-profile-menu-link">
+                    <div class="user-profile">
 
-                    <div class="user-avatar">
-                        @AuthService.NombreUsuario.Substring(0, 1).ToUpper()
+                        <div class="user-avatar">
+                            @InicialUsuario
+                        </div>
+
+                        <span class="user-name">
+                            @NombreUsuarioActual
+                        </span>
+
                     </div>
+                </NavLink>
+            </Authorized>
+            <NotAuthorized>
+                <NavLink href="/login">
+                    Iniciar Sesion
+                </NavLink>
 
-                    <span class="user-name">
-                        @AuthService.NombreUsuario
-                    </span>
-
-                </div>
-            </NavLink>
-        }
-        else
-        {
-            <NavLink href="/login">
-                Iniciar Sesión
-            </NavLink>
-
-            <NavLink href="/register" class="btn-register">
-                Registrarse
-            </NavLink>
-        }
+                <NavLink href="/register" class="btn-register">
+                    Registrarse
+                </NavLink>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
 </nav>
 
 @code {
     [Parameter] public int CantidadCarrito { get; set; }
     [Parameter] public List<Producto> TodosLosProductos { get; set; } = new();
+
+    private string NombreUsuarioActual =>
+        string.IsNullOrWhiteSpace(AuthService.NombreUsuario)
+            ? "Usuario"
+            : AuthService.NombreUsuario;
+
+    private string InicialUsuario => NombreUsuarioActual[..1].ToUpperInvariant();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        AuthService.LoadFromPrincipal(authState.User);
+    }
 }

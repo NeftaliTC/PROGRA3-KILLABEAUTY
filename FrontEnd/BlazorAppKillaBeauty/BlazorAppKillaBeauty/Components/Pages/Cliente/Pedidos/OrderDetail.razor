@@ -1,4 +1,5 @@
 ﻿@page "/orders/order-detail/{OrderId}"
+@attribute [Authorize(Roles = "CLIENTE,TRABAJADOR,ADMINISTRADOR")]
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
 @using BlazorAppKillaBeauty.ClienteREST.ServicesAct

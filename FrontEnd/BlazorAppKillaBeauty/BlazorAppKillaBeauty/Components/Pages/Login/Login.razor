@@ -1,141 +1,75 @@
-﻿@page "/login"
+@page "/login"
+@attribute [AllowAnonymous]
 @rendermode InteractiveServer
-@using ClienteREST.Models;
-@using ClienteREST.ServicesAct
-@using BlazorAppKillaBeauty.Services
-@inject UsuarioService UsuarioService
-@inject AuthService AuthService
 @inject NavigationManager NavigationManager
-@inject CartService CartService
 
-
-<PageTitle>Iniciar Sesión - Killa Beauty</PageTitle>
+<PageTitle>Iniciar Sesion - Killa Beauty</PageTitle>
 
 <section class="login-page">
-
     <div class="login-card">
-
         <NavLink href="/" class="back-home">
             <i class="bi bi-arrow-left"></i>
             Volver al inicio
         </NavLink>
 
         <div class="login-icon">
-            <img src="Images/ImagenInicio.png" alt="Inicio sesión" />
+            <img src="Images/ImagenInicio.png" alt="Inicio sesion" />
         </div>
 
-        <h1>Iniciar Sesión</h1>
+        <h1>Iniciar Sesion</h1>
 
         <p class="login-subtitle">
             Bienvenido a Killa Beauty
         </p>
 
-        <div class="form-group">
-            <label>Correo Electrónico</label>
-            <input type="email"
-                   placeholder="Ingresa tu correo" @bind="credenciales.CorreoElectronico" />
-        </div>
+        <form method="post" action="/auth/login" id="loginForm" @formname="loginForm">
+            <AntiforgeryToken />
+            <input type="hidden" name="returnUrl" value="@ReturnUrl" />
 
-        @*  cambiada  *@
-        <div class="form-group">
-            <label>Contraseña</label>
-            <div style="position: relative; display: flex; align-items: center; width: 100%;">
-            <input type="@(mostrarContrasena ? "text" : "password")"
-                   placeholder="Ingresa tu contraseña" 
-                   @bind="credenciales.Contrasena"
-                style="width: 100%; padding-right: 40px;" />
-            <button type="button"
-                    @onclick="TogglePassword"
-                    style="position: absolute; right: 10px; background: none; border: none; cursor: pointer; font-size: 1.2rem;">
-                <i class="@(mostrarContrasena ? "bi bi-eye" : "bi bi-eye-slash")"></i>
-            </button>
+            <div class="form-group">
+                <label>Correo Electronico</label>
+                <input type="email"
+                       name="correoElectronico"
+                       placeholder="Ingresa tu correo"
+                       required />
             </div>
-        </div>
 
+            <div class="form-group">
+                <label>Contrasena</label>
+                <div style="position: relative; display: flex; align-items: center; width: 100%;">
+                    <input type="password"
+                           name="contrasena"
+                           placeholder="Ingresa tu contrasena"
+                           style="width: 100%; padding-right: 40px;"
+                           required />
+                </div>
+            </div>
 
-        <div class="forgot-password">
-            <a href="/forgot-password">¿Olvidaste tu contraseña?</a>
-        </div>
+            <div class="forgot-password">
+                <a href="/forgot-password">Olvidaste tu contrasena?</a>
+            </div>
 
-        @if (!string.IsNullOrEmpty(mensajeError))
-        {
-            <p class="validation-message">@mensajeError</p>
-        }
+            @if (!string.IsNullOrWhiteSpace(Error))
+            {
+                <p class="validation-message">Correo o contrasena incorrectos.</p>
+            }
 
-        <button type="button"
-                class="login-button"
-                @onclick="IniciarSesion"
-                disabled="@loading">
-            @(loading ? "Ingresando..." : "Iniciar Sesión")
-        </button>
+            <button type="submit" class="login-button">
+                Iniciar Sesion
+            </button>
+        </form>
 
         <p class="register-text">
-            ¿No tienes cuenta?
-            <a href="/register">Regístrate aquí</a>
+            No tienes cuenta?
+            <a href="/register">Registrate aqui</a>
         </p>
-
     </div>
-
 </section>
+
 @code {
-    // Usamos el mismo modelo, pero Blazor solo validará los campos que toquemos (Correo y Contraseña)
-    private Usuario credenciales = new Usuario();
-    private bool loading = false;
-    private string mensajeError;
-    private bool mostrarContrasena = false;
+    [SupplyParameterFromQuery(Name = "error")]
+    public string? Error { get; set; }
 
-    // para activar el ojito de la contraseña 
-    private void TogglePassword()
-    {
-        mostrarContrasena = !mostrarContrasena;
-    }
-
-    private async Task IniciarSesion()
-    {
-        loading = true;
-        mensajeError = null;
-
-        try
-        {
-            var usuarioLogueado = await UsuarioService.LoginAsync(credenciales);
-
-            if (usuarioLogueado != null)
-            {
-               
-                AuthService.Login(
-                    usuarioLogueado.Nombre,
-                    usuarioLogueado.Id,
-                    usuarioLogueado.TipoUsuario,
-                                    usuarioLogueado.CorreoElectronico, usuarioLogueado.Dni);
-                string rolReal = usuarioLogueado.TipoUsuario?.Trim().ToUpper() ?? "";
-
-                
-                await CartService.CargarCarritoAsync(usuarioLogueado.Id);
-
-                if (rolReal == "TRABAJADOR" || rolReal == "ADMINISTRADOR")
-                {
-                    
-                    NavigationManager.NavigateTo("/admin");
-                }
-                else
-                {
-                    
-                    NavigationManager.NavigateTo("/");
-                }
-               
-                // NavigationManager.NavigateTo("/"); // Redirigir al Home
-            }
-        }
-        catch (Exception ex)
-        {
-            // Captura errores como "Credenciales incorrectas" o "Usuario no encontrado"
-            mensajeError = ex.Message.Contains("400") || ex.Message.Contains("401") || ex.Message.Contains("404")
-                ? "Correo o contraseña incorrectos."
-                : ex.Message;
-        }
-        finally
-        {
-            loading = false;
-        }
-    }
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    public string? ReturnUrl { get; set; }
 }

@@ -1,6 +1,7 @@
 @page "/admin/marcas"
 @page "/admin/marcas/{Accion}"
 @page "/admin/marcas/{Accion}/{IdParam:int}"
+@attribute [Authorize(Roles = "ADMINISTRADOR,TRABAJADOR")]
 @rendermode InteractiveServer
 
 @using BlazorAppKillaBeauty.Services

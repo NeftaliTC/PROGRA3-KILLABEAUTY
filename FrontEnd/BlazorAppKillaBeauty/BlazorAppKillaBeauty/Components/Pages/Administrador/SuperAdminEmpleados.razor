@@ -1,4 +1,5 @@
 ﻿@page "/admin/empleados"
+@attribute [Authorize(Roles = "ADMINISTRADOR")]
 @rendermode InteractiveServer
 @inject AuthService AuthService
 @inject NavigationManager NavManager

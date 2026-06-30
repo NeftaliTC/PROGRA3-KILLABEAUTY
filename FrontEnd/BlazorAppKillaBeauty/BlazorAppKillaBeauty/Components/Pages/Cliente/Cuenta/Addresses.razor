@@ -1,5 +1,6 @@
 @page "/account/addresses"
 @layout AccountLayout
+@attribute [Authorize(Roles = "CLIENTE,TRABAJADOR,ADMINISTRADOR")]
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
 @using BlazorAppKillaBeauty.ClienteREST.ServicesAct

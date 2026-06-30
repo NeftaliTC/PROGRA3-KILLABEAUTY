@@ -26,6 +26,6 @@
     private void CerrarSesion()
     {
         AuthService.Logout();
-        Navigation.NavigateTo("/", replace:true);
+        Navigation.NavigateTo("/auth/logout", true);
     }
 }
