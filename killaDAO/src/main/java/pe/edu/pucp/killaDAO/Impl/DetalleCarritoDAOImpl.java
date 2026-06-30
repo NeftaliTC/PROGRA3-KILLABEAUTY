@@ -6,12 +6,15 @@ import pe.edu.pucp.killaBeauty.killaModelo.CarritoDeCompras;
 import pe.edu.pucp.killaBeauty.killaModelo.DetalleCarrito;
 import pe.edu.pucp.killaBeauty.killaModelo.Producto;
 import pe.edu.pucp.killaDAO.DetalleCarritoDAO;
+import pe.edu.pucp.killaDAO.ImagenProductoDAO;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DetalleCarritoDAOImpl implements DetalleCarritoDAO {
+
+    private ImagenProductoDAO imagenDAO = new ImagenProductoDAOImpl();
 
     @Override
     public DetalleCarrito load(Integer id) throws SQLException {
@@ -79,6 +82,7 @@ public class DetalleCarritoDAOImpl implements DetalleCarritoDAO {
         p.setNombre(rs.getString("nombre"));
         p.setPrecioBase(rs.getDouble("precio_base"));
         p.setStock(rs.getInt("stock"));
+        p.setImagenes(imagenDAO.listByProductoId(p.getId()));
         d.setProducto(p);
 
         CarritoDeCompras carrito = new CarritoDeCompras();
