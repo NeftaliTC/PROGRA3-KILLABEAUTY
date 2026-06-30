@@ -9,7 +9,8 @@
 @inject CartService CartService
 @inject AuthService AuthService
 
-<Navbar CantidadCarrito="@CartService.CantidadTotal" />
+<Navbar CantidadCarrito="@CartService.CantidadTotal"
+        TodosLosProductos="@(new List<Producto>())" />
 
 <div class="killa-review-container">
     <div class="review-wrapper">

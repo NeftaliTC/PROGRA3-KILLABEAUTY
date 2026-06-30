@@ -60,6 +60,12 @@ public class UsuarioBLImpl implements UsuarioBL {
             usuarioActual.setGenero(usuario.getGenero());
             usuarioActual.setTelefono(usuario.getTelefono());
 
+
+            if (usuario.getTipoUsuario() != null) {
+                usuarioActual.setTipoUsuario(usuario.getTipoUsuario());
+            }
+            usuarioActual.setActivo(usuario.getActivo());
+
             usuarioDAO.update(usuarioActual);
             usuarioActual.setContrasena(null);
             return usuarioActual;

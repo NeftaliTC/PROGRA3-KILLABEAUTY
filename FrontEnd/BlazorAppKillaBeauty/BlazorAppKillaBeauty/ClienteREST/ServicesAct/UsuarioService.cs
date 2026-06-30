@@ -40,7 +40,7 @@ namespace BlazorAppKillaBeauty.ClienteREST.ServicesAct
         // PUT: /usuarios/{id}
         public async Task<Usuario> ActualizarUsuarioAsync(int id, Usuario usuario)
         {
-            return await _httpClientUtils.PutAsync<Usuario>($"usuarios/{id}", usuario);
+            return await _httpClientUtils.PutAsync<Usuario>($"usuarios/{id}/perfil", usuario);
         }
 
         // DELETE: /usuarios/{id}

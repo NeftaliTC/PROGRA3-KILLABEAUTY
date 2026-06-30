@@ -24,7 +24,7 @@
             <header class="admin-order-detail-header">
                 <div>
                     <h1>Detalle de pedido @Codigo</h1>
-                    <p>Cargando informacion del pedido...</p>
+                    <p>Cargando informaci&oacute;n del pedido...</p>
                 </div>
             </header>
         }
@@ -87,7 +87,11 @@
                         @foreach (var item in pedido.Productos)
                         {
                             <div class="admin-order-product-row">
-                                <img src="/Images/Logo.png" alt="@item.NombreProducto" />
+                                @{
+                                    var urlImagen = item.Imagenes?.FirstOrDefault() ?? "/Images/Logo.png";
+                                }
+
+                                <img src="@urlImagen" alt="@item.NombreProducto" class="admin-product-thumbnail" />
                                 <div class="product-info">
                                     <strong>@item.NombreProducto</strong>
                                     <span>@(string.IsNullOrWhiteSpace(item.Marca) ? "Sin marca registrada" : item.Marca)</span>
@@ -113,8 +117,8 @@
                             <strong>@ResumenDescuento(pedido)</strong>
                         </div>
                         <div>
-                            <span>Costo de envio</span>
-                            <strong>@MontoOPendiente(pedido.CostoEnvio)</strong>
+                            <span>Costo de env&iacute;o</span>
+                            <strong>@MontoOPendiente(pedido.CostoEnvio, string.IsNullOrWhiteSpace(pedido.Direccion))</strong>
                         </div>
                         <div class="total-line">
                             <span>Total final</span>
@@ -139,27 +143,59 @@
 
                     <article class="admin-order-panel">
                         <div class="panel-heading">
-                            <i class="bi bi-geo-alt"></i>
-                            <h2>Direccion de envio</h2>
+                            @if (string.IsNullOrWhiteSpace(pedido.Direccion))
+                            {
+                                <i class="bi bi-shop"></i>
+                                <h2>Direcci&oacute;n de recojo</h2>
+                            }
+                            else
+                            {
+                                <i class="bi bi-geo-alt"></i>
+                                <h2>Direcci&oacute;n de envio</h2>
+                            }
                         </div>
 
                         <div class="admin-order-info-list">
-                            <div><span>Direccion</span><strong>@Valor(pedido.Direccion)</strong></div>
-                            <div><span>Referencia</span><strong>@Valor(pedido.Referencia)</strong></div>
-                            <div><span>Ubicacion</span><strong>@Valor(pedido.Ubicacion)</strong></div>
+                            @if (string.IsNullOrWhiteSpace(pedido.Direccion))
+                            {
+                                <div><span>Direcci&oacute;n</span><strong>Killa Beauty Store - Av. Javier Prado Este 4200</strong></div>
+                                <div><span>Referencia</span><strong>Frente al Centro Comercial La Rambla</strong></div>
+                                <div><span>Ubicacion</span><strong>San Borja, Lima, Lima</strong></div>
+                            }
+                            else
+                            {
+                                <div><span>Direcci&oacute;n</span><strong>@Valor(pedido.Direccion)</strong></div>
+                                <div><span>Referencia</span><strong>@Valor(pedido.Referencia)</strong></div>
+                                <div><span>Ubicaci&oacute;n</span><strong>@Valor(pedido.Ubicacion)</strong></div>
+                            }
                         </div>
                     </article>
 
                     <article class="admin-order-panel">
                         <div class="panel-heading">
                             <i class="bi bi-credit-card"></i>
-                            <h2>Metodo de pago</h2>
+                            <h2>M&eacute;todo de pago</h2>
                         </div>
 
                         <div class="admin-order-info-list">
-                            <div><span>Metodo</span><strong>@Valor(pedido.MetodoPago)</strong></div>
+                            <div>
+                                <span>M&eacute;todo</span>
+                                <strong>
+                                    @{
+                                        var metodo = pedido.MetodoPago ?? "No registrado";
+                                        var textoAmigable = metodo switch
+                                        {
+                                            "TARJETA" => "Tarjeta de Crédito/Débito",
+                                            "YAPE" => "Yape / Plin",
+                                            "PLIN" => "Yape / Plin",
+                                            _ => metodo
+                                        };
+                                    }
+                                    @textoAmigable
+                                </strong>
+                            </div>
                             <div><span>Comprobante</span><strong>@Valor(pedido.TipoComprobante)</strong></div>
-                            <div><span>Serie y numero</span><strong>@SerieComprobante(pedido)</strong></div>
+                            <div><span>Serie y n&uacute;mero</span><strong>@SerieComprobante(pedido)</strong></div>
                             <div><span>Documento</span><strong>@Valor(pedido.DocumentoIdentidad)</strong></div>
                             @if (!string.IsNullOrWhiteSpace(pedido.RazonSocial))
                             {
@@ -261,9 +297,10 @@
         return string.IsNullOrWhiteSpace(value) ? "No registrado" : value;
     }
 
-    private static string MontoOPendiente(decimal monto)
+    private static string MontoOPendiente(decimal monto, bool esRetiro)
     {
-        return monto > 0 ? $"S/ {monto:F2}" : "No registrado";
+        if (esRetiro) return "Gratis";
+        return monto > 0 ? $"S/ {monto:F2}" : "Por determinar";
     }
 
     private static string ResumenDescuento(PedidoAdminDto pedido)

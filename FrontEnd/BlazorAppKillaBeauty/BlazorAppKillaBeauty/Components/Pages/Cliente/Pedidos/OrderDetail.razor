@@ -2,11 +2,15 @@
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
 @using BlazorAppKillaBeauty.ClienteREST.ServicesAct
+@using BlazorAppKillaBeauty.ClienteREST.Models
 @inject CartService CartService
 @inject PedidoService PedidoService
 @inject NavigationManager Navigation
+@inject ProductoService ProductoService
 
-<Navbar CantidadCarrito="@CartService.CantidadTotal" />
+<Navbar CantidadCarrito="@CartService.CantidadTotal"
+        TodosLosProductos="@(new List<Producto>())" />
+
 <div class="order-detail-container">
     <div class="breadcrumb-nav">
         <a href="/orders" class="btn-back">
@@ -220,7 +224,7 @@
                     <div class="info-icon-block">
                         <i class="bi @(pedidoActual.MetodoPago == "TARJETA" ? "bi-credit-card-2-front" : "bi-phone") icon-pink"></i>
                         <div class="block-text">
-                            <h3>@(pedidoActual.MetodoPago == "TARJETA" ? "Tarjeta de Crédito/Débito" : pedidoActual.MetodoPago == "YAPE" ? "Yape / Plin" : pedidoActual.MetodoPago)</h3>
+                            <h3>@(pedidoActual.MetodoPago == "TARJETA" ? "Tarjeta de Crédito/Débito" : pedidoActual.MetodoPago == "YAPE_PLIN" ? "Yape / Plin" : pedidoActual.MetodoPago)</h3>
                             <p>Pago procesado correctamente</p>
                         </div>
                     </div>

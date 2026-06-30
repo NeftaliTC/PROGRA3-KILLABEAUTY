@@ -198,9 +198,7 @@ public class PedidoRS {
     private MetodoPago resolverMetodoPago(String metodoPago) {
         if (metodoPago == null) return MetodoPago.TARJETA;
         return switch (metodoPago.toUpperCase()) {
-            case "YAPE" -> MetodoPago.YAPE;
-            case "PLIN" -> MetodoPago.PLIN;
-            case "TRANSFERENCIA" -> MetodoPago.TRANSFERENCIA;
+            case "YAPE_PLIN" -> MetodoPago.YAPE_PLIN;
             case "TARJETA" -> MetodoPago.TARJETA;
             default -> MetodoPago.TARJETA;
         };
@@ -242,9 +240,11 @@ public class PedidoRS {
         if (request == null) {
             throw new BusinessLogicException("La solicitud de checkout no puede ser nula.");
         }
+        //El checkout siempre necesita saber qué usuario está comprando. no puede ser nulo
         if (request.getUsuarioId() == null || request.getUsuarioId() <= 0) {
             throw new BusinessLogicException("El usuario del checkout debe ser valido.");
         }
+        // si no es nulo debe ser válido (puede ser nulo)
         if (request.getDireccionId() != null && request.getDireccionId() < 0) {
             throw new BusinessLogicException("La direccion seleccionada debe ser valida.");
         }
@@ -290,9 +290,7 @@ public class PedidoRS {
 
         String metodoPago = request.getMetodoPago().trim().toUpperCase();
         if (!metodoPago.equals("TARJETA")
-                && !metodoPago.equals("TRANSFERENCIA")
-                && !metodoPago.equals("YAPE")
-                && !metodoPago.equals("PLIN")) {
+                && !metodoPago.equals("YAPE_PLIN")) {
             throw new BusinessLogicException("El metodo de pago seleccionado no es valido.");
         }
         request.setMetodoPago(metodoPago);

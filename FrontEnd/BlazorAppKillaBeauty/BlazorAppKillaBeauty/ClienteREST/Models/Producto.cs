@@ -82,6 +82,9 @@ namespace BlazorAppKillaBeauty.ClienteREST.Models
 
         [JsonPropertyName("principal")]
         public bool Principal { get; set; }
+
+        [JsonPropertyName("orden")]
+        public int Orden { get; set; }
     }
 
     public class Categoria

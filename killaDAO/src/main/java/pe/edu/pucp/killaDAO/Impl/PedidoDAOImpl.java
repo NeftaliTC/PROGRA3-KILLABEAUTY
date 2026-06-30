@@ -32,7 +32,7 @@ public class PedidoDAOImpl implements PedidoDAO {
             LEFT JOIN DetallePedido dp ON p.id_pedido = dp.id_pedido
             LEFT JOIN Producto pr ON dp.id_producto = pr.id_producto
             LEFT JOIN Marca m ON pr.id_marca = m.id_marca
-            LEFT JOIN ImagenProducto img ON pr.id_producto = img.id_producto AND img.activo = 1
+            LEFT JOIN ImagenProducto img ON pr.id_producto = img.id_producto AND img.activo = 1 AND img.principal = 1
             LEFT JOIN Cupon c ON p.id_cupon = c.id_cupon
             ORDER BY p.id_pedido DESC
             """;
@@ -115,7 +115,7 @@ public class PedidoDAOImpl implements PedidoDAO {
             LEFT JOIN DetallePedido dp ON p.id_pedido = dp.id_pedido
             LEFT JOIN Producto pr ON dp.id_producto = pr.id_producto
             LEFT JOIN Marca m ON pr.id_marca = m.id_marca
-            LEFT JOIN ImagenProducto img ON pr.id_producto = img.id_producto AND img.activo = 1
+            LEFT JOIN ImagenProducto img ON pr.id_producto = img.id_producto AND img.activo = 1 AND img.principal = 1
             LEFT JOIN Cupon c ON p.id_cupon = c.id_cupon
             WHERE p.id_usuario = ?
             ORDER BY p.id_pedido DESC
