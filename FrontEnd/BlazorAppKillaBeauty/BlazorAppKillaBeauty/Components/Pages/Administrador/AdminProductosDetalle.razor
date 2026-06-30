@@ -2,8 +2,10 @@
 @attribute [Authorize(Roles = "ADMINISTRADOR,TRABAJADOR")]
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
+@using BlazorAppKillaBeauty.ClienteREST.ServicesAct
 @inject NavigationManager Navigation
 @inject ProductoService ProductoService
+@inject EscalaPrecioService EscalaPrecioService
 @inject IJSRuntime JS
 @using BlazorAppKillaBeauty.ClienteREST.Models
 @using Microsoft.AspNetCore.Components.Forms
@@ -315,33 +317,33 @@
 
                     <div class="admin-product-edit-field">
                         <label>Categoría <span class="req">*</span></label>
-                        <select @bind="formEditar.Categoria">
-                            <option value="">Seleccionar</option>
+                        <select @bind="formEditar.CategoriaId">
+                            <option value="0">Seleccionar</option>
                             @foreach (var c in categorias)
                             {
-                                <option value="@c">@c</option>
+                                <option value="@c.Id">@c.Descripcion</option>
                             }
                         </select>
                     </div>
 
                     <div class="admin-product-edit-field">
                         <label>Subcategoría <span class="req">*</span></label>
-                        <select @bind="formEditar.Subcategoria" disabled="@(string.IsNullOrWhiteSpace(formEditar.Categoria))">
-                            <option value="">Seleccionar</option>
+                        <select @bind="formEditar.SubcategoriaId" disabled="@(formEditar.CategoriaId <= 0)">
+                            <option value="0">Seleccionar</option>
                             @foreach (var s in SubcategoriasFiltradas)
                             {
-                                <option value="@s">@s</option>
+                                <option value="@s.Id">@s.Descripcion</option>
                             }
                         </select>
                     </div>
 
                     <div class="admin-product-edit-field">
                         <label>Marca <span class="req">*</span></label>
-                        <select @bind="formEditar.Marca">
-                            <option value="">Seleccionar</option>
+                        <select @bind="formEditar.MarcaId">
+                            <option value="0">Seleccionar</option>
                             @foreach (var m in marcas)
                             {
-                                <option value="@m">@m</option>
+                                <option value="@m.Id">@m.Descripcion</option>
                             }
                         </select>
                     </div>
@@ -410,7 +412,6 @@
     private string tabActual = "escalas";
     private bool mostrarModalBaja = false;
 
-    // filtros reseñas (mock)
     private int filtroCalificacion = 0;        // 0 = todas
     private string filtroOrden = "recientes";  // recientes/antiguas/mejor/peor
     private string filtroVerificadas = "todas"; // todas/verificadas/noverificadas
@@ -435,6 +436,7 @@
             }
 
             producto = MapearDetalle(productoApi);
+            await CargarOpcionesFormulario();
 
             resenas = (await ProductoService.ObtenerResenasAsync(id))
                 .Select((r, index) => new ResenaDetalle(
@@ -453,6 +455,16 @@
                         : DateTime.Today,
                     $"KIL-{r.Id:D8}"))
                 .ToList();
+
+            escalas = (await EscalaPrecioService.ListarPorProductoAsync(id))
+                .Where(e => e.Activo)
+                .OrderBy(e => e.CantidadMinima)
+                .Select(e => new EscalaDetalle(
+                    NombreEscala(e.CantidadMinima),
+                    e.CantidadMinima,
+                    e.PrecioUnitario,
+                    CalcularAhorroTexto(e.PrecioUnitario, producto.PrecioBase)))
+                .ToList();
         }
         catch (Exception ex)
         {
@@ -464,13 +476,6 @@
                 ImagenUrl = "/Images/placeholder-product.png"
             };
         }
-
-        escalas = new()
-        {
-            new EscalaDetalle("Precio unitario", 1,  producto.PrecioBase, "—"),
-            new EscalaDetalle("Media docena", 6,  decimal.Round(producto.PrecioBase * 0.89m, 2), "-11%"),
-            new EscalaDetalle("Cajón", 24, decimal.Round(producto.PrecioBase * 0.78m, 2), "-22%")
-        };
     }
 
     private int ObtenerIdProducto()
@@ -501,6 +506,7 @@
             Marca = producto.Marca?.Descripcion ?? "",
             MarcaId = producto.Marca?.Id ?? 0,
             SubcategoriaId = producto.Subcategoria?.Id ?? 0,
+            SubcategoriaCategoriaId = producto.Subcategoria?.Categoria?.Id ?? 0,
             PrecioBase = producto.PrecioBase,
             Stock = producto.Stock,
             Disponible = producto.Disponible,
@@ -588,6 +594,7 @@
         public string Marca { get; set; } = "";
         public int MarcaId { get; set; }
         public int SubcategoriaId { get; set; }
+        public int SubcategoriaCategoriaId { get; set; }
         public decimal PrecioBase { get; set; }
         public int Stock { get; set; }
         public bool Disponible { get; set; }
@@ -596,6 +603,24 @@
     }
 
     private record EscalaDetalle(string Nombre, int CantidadMinima, decimal PrecioUnitario, string Ahorro);
+
+    private static string NombreEscala(int cantidadMinima)
+    {
+        return cantidadMinima <= 1
+            ? "Precio unitario"
+            : $"Desde {cantidadMinima} unidades";
+    }
+
+    private static string CalcularAhorroTexto(decimal precioUnitario, decimal precioBase)
+    {
+        if (precioBase <= 0 || precioUnitario >= precioBase)
+        {
+            return "-";
+        }
+
+        var porcentaje = (1 - precioUnitario / precioBase) * 100;
+        return $"-{decimal.Round(porcentaje, 0)}%";
+    }
 
     private record ResenaDetalle(
         string Cliente,
@@ -612,21 +637,35 @@
     private string? mensajeErrorEditar;
     private ProductoEditForm formEditar = new();
 
-    // data mock para selects (estilo igual al registrar)
-    private List<string> categorias = new() { "Skincare", "Maquillaje", "Cabello" };
+    private List<Categoria> categorias = new();
+    private List<Subcategoria> subcategorias = new();
+    private List<Marca> marcas = new();
 
-    private Dictionary<string, List<string>> subcategoriasPorCategoria = new()
+    private List<Subcategoria> SubcategoriasFiltradas =>
+        formEditar.CategoriaId <= 0
+            ? new List<Subcategoria>()
+            : subcategorias
+                .Where(s => s.Categoria != null && s.Categoria.Id == formEditar.CategoriaId)
+                .OrderBy(s => s.Descripcion)
+                .ToList();
+
+    private async Task CargarOpcionesFormulario()
     {
-        ["Skincare"] = new() { "Limpieza", "Hidratación", "Protección solar", "Serums" },
-        ["Maquillaje"] = new() { "Base", "Labios", "Ojos" },
-        ["Cabello"] = new() { "Shampoo", "Mascarillas", "Tratamientos" }
-    };
+        categorias = (await ProductoService.ObtenerCategoriasAsync())
+            .Where(c => c.Activo)
+            .OrderBy(c => c.Descripcion)
+            .ToList();
 
-    private List<string> marcas = new() { "The Ordinary", "Maybelline", "Pantene", "NYX", "CeraVe", "MAC" };
+        subcategorias = (await ProductoService.ObtenerSubcategoriasAsync())
+            .Where(s => s.Activo)
+            .OrderBy(s => s.Descripcion)
+            .ToList();
 
-    private List<string> SubcategoriasFiltradas =>
-        string.IsNullOrWhiteSpace(formEditar.Categoria) ? new List<string>() :
-        (subcategoriasPorCategoria.TryGetValue(formEditar.Categoria, out var list) ? list : new List<string>());
+        marcas = (await ProductoService.ObtenerMarcasAsync())
+            .Where(m => m.Activo)
+            .OrderBy(m => m.Descripcion)
+            .ToList();
+    }
 
     private void AbrirEditarProducto()
     {
@@ -637,9 +676,9 @@
         formEditar = new ProductoEditForm
         {
             Nombre = producto.Nombre,
-            Categoria = producto.Categoria,
-            Subcategoria = producto.Subcategoria,
-            Marca = producto.Marca,
+            CategoriaId = producto.SubcategoriaCategoriaId,
+            SubcategoriaId = producto.SubcategoriaId,
+            MarcaId = producto.MarcaId,
             PrecioBase = producto.PrecioBase,
             Stock = producto.Stock,
             Disponible = producto.Disponible,
@@ -665,19 +704,25 @@
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(formEditar.Categoria))
+        if (formEditar.CategoriaId <= 0)
         {
             mensajeErrorEditar = "Selecciona una categoría.";
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(formEditar.Subcategoria))
+        if (formEditar.SubcategoriaId <= 0)
         {
-            mensajeErrorEditar = "Selecciona una subcategoría.";
+            mensajeErrorEditar = "Selecciona una subcategoria.";
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(formEditar.Marca))
+        if (!SubcategoriasFiltradas.Any(s => s.Id == formEditar.SubcategoriaId))
+        {
+            mensajeErrorEditar = "Selecciona una subcategoria valida para la categoria.";
+            return;
+        }
+
+        if (formEditar.MarcaId <= 0)
         {
             mensajeErrorEditar = "Selecciona una marca.";
             return;
@@ -706,8 +751,8 @@
                 Disponible = formEditar.Disponible,
                 Activo = formEditar.Disponible,
                 Promocion = formEditar.EnPromocion,
-                Marca = new Marca { Id = producto.MarcaId },
-                Subcategoria = new Subcategoria { Id = producto.SubcategoriaId }
+                Marca = new Marca { Id = formEditar.MarcaId },
+                Subcategoria = new Subcategoria { Id = formEditar.SubcategoriaId }
             };
 
             productoApi = urlsImagenesEditar.Any()
@@ -727,9 +772,9 @@
     private class ProductoEditForm
     {
         public string Nombre { get; set; } = "";
-        public string Categoria { get; set; } = "";
-        public string Subcategoria { get; set; } = "";
-        public string Marca { get; set; } = "";
+        public int CategoriaId { get; set; }
+        public int SubcategoriaId { get; set; }
+        public int MarcaId { get; set; }
         public decimal PrecioBase { get; set; }
         public int Stock { get; set; }
         public bool Disponible { get; set; }

@@ -194,7 +194,6 @@
 }
 
 @code {
-    private const int ClienteDemoId = 2;
     private List<Address> UserAddresses => AddressService.UserAddresses;
     private Address editingAddress = new();
     private Address? addressToDelete;
@@ -202,7 +201,7 @@
     private string loadError = "";
     private string saveError = "";
 
-    private int UsuarioId => AuthService.UsuarioId ?? ClienteDemoId;
+    private int? UsuarioId => AuthService.UsuarioId;
 
     private List<string> departamentos = new();
     private List<string> provincias = new();
@@ -232,7 +231,14 @@
         {
             isLoading = true;
             loadError = "";
-            await AddressService.CargarPorUsuarioAsync(UsuarioId);
+            if (!TryObtenerUsuarioId(out var usuarioId))
+            {
+                AddressService.UserAddresses.Clear();
+                loadError = "Inicia sesion para ver tus direcciones.";
+                return;
+            }
+
+            await AddressService.CargarPorUsuarioAsync(usuarioId);
         }
         catch (Exception ex)
         {
@@ -262,16 +268,22 @@
 
         try
         {
+            if (!TryObtenerUsuarioId(out var usuarioId))
+            {
+                saveError = "Inicia sesion para guardar direcciones.";
+                return;
+            }
+
             editingAddress.CodigoPostal = string.IsNullOrWhiteSpace(editingAddress.CodigoPostal) ? "15000" : editingAddress.CodigoPostal;
-            editingAddress.Usuario = new UsuarioDireccion { Id = UsuarioId };
+            editingAddress.Usuario = new UsuarioDireccion { Id = usuarioId };
 
             if (editingAddress.Id == 0)
             {
-                await AddressService.CrearAsync(editingAddress, UsuarioId);
+                await AddressService.CrearAsync(editingAddress, usuarioId);
             }
             else
             {
-                await AddressService.ActualizarAsync(editingAddress, UsuarioId);
+                await AddressService.ActualizarAsync(editingAddress, usuarioId);
             }
 
             CerrarModal();
@@ -351,7 +363,13 @@
 
         try
         {
-            await AddressService.EliminarAsync(addressToDelete.Id, UsuarioId);
+            if (!TryObtenerUsuarioId(out var usuarioId))
+            {
+                saveError = "Inicia sesion para eliminar direcciones.";
+                return;
+            }
+
+            await AddressService.EliminarAsync(addressToDelete.Id, usuarioId);
             showDeleteModal = false;
             addressToDelete = null;
         }
@@ -366,6 +384,11 @@
         try
         {
             saveError = "";
+            if (!TryObtenerUsuarioId(out var usuarioId))
+            {
+                saveError = "Inicia sesion para actualizar direcciones.";
+                return;
+            }
           
             foreach (var a in AddressService.UserAddresses)
             {
@@ -383,14 +406,23 @@
             AddressService.UserAddresses.AddRange(listaOrdenada);
 
             StateHasChanged();
-            await AddressService.MarcarPredeterminadaAsync(addr, UsuarioId);
+            await AddressService.MarcarPredeterminadaAsync(addr, usuarioId);
         }
         catch (Exception ex)
         {
             saveError = $"No se pudo predeterminar la dirección: {ex.Message}";
             
-            await AddressService.CargarPorUsuarioAsync(UsuarioId);
+            if (TryObtenerUsuarioId(out var usuarioId))
+            {
+                await AddressService.CargarPorUsuarioAsync(usuarioId);
+            }
         }
+    }
+
+    private bool TryObtenerUsuarioId(out int usuarioId)
+    {
+        usuarioId = AuthService.UsuarioId ?? 0;
+        return usuarioId > 0;
     }
 
     private void OnDepartamentoChanged(ChangeEventArgs e)

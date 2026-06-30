@@ -2,8 +2,11 @@
 @attribute [Authorize(Roles = "ADMINISTRADOR,TRABAJADOR")]
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
+@using BlazorAppKillaBeauty.ClienteREST.Models
+@using BlazorAppKillaBeauty.ClienteREST.ServicesAct
 @inject NavigationManager Navigation
 @inject ProductoService ProductoService
+@inject EscalaPrecioService EscalaPrecioService
 
 <PageTitle>Escalas de precio - Killa Beauty</PageTitle>
 
@@ -51,7 +54,7 @@
                 <thead>
                     <tr>
                         <th>Nombre escala</th>
-                        <th>Cantidad mínima</th>
+                        <th>Cantidad minima</th>
                         <th>Precio unitario (S/)</th>
                         <th>Descuento vs. base</th>
                         <th>Estado</th>
@@ -62,13 +65,13 @@
                     @foreach (var e in escalas.OrderBy(x => x.CantidadMinima))
                     {
                         <tr>
-                            <td class="td-strong">@e.Nombre</td>
+                            <td class="td-strong">@NombreEscala(e.CantidadMinima)</td>
                             <td>@e.CantidadMinima unidad</td>
                             <td>S/. @e.PrecioUnitario.ToString("F2")</td>
                             <td>@CalcularDescuentoTexto(e)</td>
                             <td>
-                                <span class="pill-state @(e.Activa ? "pill-active" : "pill-inactive")">
-                                    @(e.Activa ? "Activa" : "Inactiva")
+                                <span class="pill-state @(e.Activo ? "pill-active" : "pill-inactive")">
+                                    @(e.Activo ? "Activa" : "Inactiva")
                                 </span>
                             </td>
                             <td style="text-align:right;">
@@ -128,14 +131,9 @@
 
             <div class="scales-modal-body">
                 <div class="scales-form-field">
-                    <label>Nombre de la escala <span class="req">*</span></label>
-                    <input type="text" placeholder="Ej: Mayorista / Cajón" @bind="form.Nombre" />
-                </div>
-
-                <div class="scales-form-field">
-                    <label>Cantidad mínima <span class="req">*</span></label>
+                    <label>Cantidad minima <span class="req">*</span></label>
                     <input type="number" placeholder="Ej: 24" @bind="form.CantidadMinima" />
-                    <small>Mínimo de unidades para aplicar este precio.</small>
+                    <small>Minimo de unidades para aplicar este precio.</small>
                 </div>
 
                 <div class="scales-form-field">
@@ -166,7 +164,7 @@
             </div>
             <h2>¿Eliminar escala?</h2>
             <p class="admin-modal-text">
-                Se eliminará la escala <strong>@escalaSeleccionada.Nombre</strong>.
+                Se eliminará la escala <strong>@NombreEscala(escalaSeleccionada.CantidadMinima)</strong>.
             </p>
             <div class="admin-modal-actions">
                 <button class="admin-modal-btn-cancel" @onclick="CerrarEliminar">Cancelar</button>
@@ -181,13 +179,14 @@
 
     private string? mensajeError;
 
-    private ProductoMock producto = new();
-    private List<EscalaMock> escalas = new();
+    private ProductoResumen producto = new();
+    private List<EscalaPrecio> escalas = new();
+    private int productoId;
 
     private bool mostrarModalFormulario = false;
     private bool mostrarModalEliminar = false;
     private string modoFormulario = "crear"; // crear | editar
-    private EscalaMock? escalaSeleccionada;
+    private EscalaPrecio? escalaSeleccionada;
 
     private EscalaForm form = new();
 
@@ -195,22 +194,25 @@
     {
         try
         {
-            var productoApi = await ProductoService.ObtenerPorIdAsync(ObtenerIdProducto());
+            productoId = ObtenerIdProducto();
+            var productoApi = await ProductoService.ObtenerPorIdAsync(productoId);
             producto = productoApi == null
-                ? new ProductoMock(Codigo, $"Producto {Codigo}", 0m, 0)
-                : new ProductoMock($"KB-{productoApi.Id:000}", productoApi.Nombre, productoApi.PrecioBase, productoApi.Stock);
+                ? new ProductoResumen(Codigo, $"Producto {Codigo}", 0m, 0)
+                : new ProductoResumen($"KB-{productoApi.Id:000}", productoApi.Nombre, productoApi.PrecioBase, productoApi.Stock);
+            await CargarEscalas();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            producto = new ProductoMock(Codigo, $"Producto {Codigo}", 0m, 0);
+            producto = new ProductoResumen(Codigo, $"Producto {Codigo}", 0m, 0);
+            mensajeError = $"No se pudieron cargar las escalas: {ex.Message}";
         }
+    }
 
-        escalas = new()
-        {
-            new EscalaMock { Id = 1, Nombre = "Precio unitario", CantidadMinima = 1,  PrecioUnitario = producto.PrecioBase, Activa = true },
-            new EscalaMock { Id = 2, Nombre = "Media docena",    CantidadMinima = 6,  PrecioUnitario = decimal.Round(producto.PrecioBase * 0.89m, 2), Activa = true },
-            new EscalaMock { Id = 3, Nombre = "Cajón",            CantidadMinima = 24, PrecioUnitario = decimal.Round(producto.PrecioBase * 0.78m, 2), Activa = true },
-        };
+    private async Task CargarEscalas()
+    {
+        escalas = (await EscalaPrecioService.ListarPorProductoAsync(productoId))
+            .OrderBy(e => e.CantidadMinima)
+            .ToList();
     }
 
     private int ObtenerIdProducto()
@@ -240,7 +242,7 @@
         mostrarModalFormulario = true;
     }
 
-    private void AbrirEditar(EscalaMock e)
+    private void AbrirEditar(EscalaPrecio e)
     {
         mensajeError = null;
         modoFormulario = "editar";
@@ -248,7 +250,6 @@
 
         form = new EscalaForm
         {
-            Nombre = e.Nombre,
             CantidadMinima = e.CantidadMinima,
             PrecioUnitario = e.PrecioUnitario
         };
@@ -258,18 +259,11 @@
 
     private void CerrarFormulario() => mostrarModalFormulario = false;
 
-    private void GuardarEscala()
+    private async Task GuardarEscala()
     {
-        // Validaciones interactivas (front)
-        if (string.IsNullOrWhiteSpace(form.Nombre))
-        {
-            mensajeError = "El descripcion de la escala es obligatorio.";
-            return;
-        }
-
         if (form.CantidadMinima <= 0)
         {
-            mensajeError = "La cantidad mínima debe ser mayor a 0.";
+            mensajeError = "La cantidad minima debe ser mayor a 0.";
             return;
         }
 
@@ -285,44 +279,63 @@
             return;
         }
 
-        // Evitar duplicados de cantidad mínima
+        // Evitar duplicados de cantidad minima
         if (modoFormulario == "crear" && escalas.Any(x => x.CantidadMinima == form.CantidadMinima))
         {
-            mensajeError = "Ya existe una escala con esa cantidad mínima.";
+            mensajeError = "Ya existe una escala con esa cantidad minima.";
             return;
         }
 
-        if (modoFormulario == "editar" && escalaSeleccionada != null)
+        try
         {
-            var existeOtro = escalas.Any(x => x.Id != escalaSeleccionada.Id && x.CantidadMinima == form.CantidadMinima);
-            if (existeOtro)
+            if (modoFormulario == "editar" && escalaSeleccionada != null)
             {
-                mensajeError = "Ya existe otra escala con esa cantidad mínima.";
-                return;
+                var existeOtro = escalas.Any(x => x.Id != escalaSeleccionada.Id && x.CantidadMinima == form.CantidadMinima);
+                if (existeOtro)
+                {
+                    mensajeError = "Ya existe otra escala con esa cantidad minima.";
+                    return;
+                }
+
+                var escala = CrearEscalaDesdeFormulario(escalaSeleccionada.Id);
+                var actualizada = await EscalaPrecioService.ActualizarAsync(escalaSeleccionada.Id, escala);
+                if (actualizada == null)
+                {
+                    throw new InvalidOperationException("No se recibio respuesta al actualizar la escala.");
+                }
+            }
+            else
+            {
+                var creada = await EscalaPrecioService.CrearAsync(CrearEscalaDesdeFormulario(0));
+                if (creada == null)
+                {
+                    throw new InvalidOperationException("No se recibio respuesta al crear la escala.");
+                }
             }
 
-            escalaSeleccionada.Nombre = form.Nombre.Trim();
-            escalaSeleccionada.CantidadMinima = form.CantidadMinima;
-            escalaSeleccionada.PrecioUnitario = form.PrecioUnitario;
+            await CargarEscalas();
+            mensajeError = null;
+            mostrarModalFormulario = false;
         }
-        else
+        catch (Exception ex)
         {
-            var nextId = escalas.Any() ? escalas.Max(x => x.Id) + 1 : 1;
-            escalas.Add(new EscalaMock
-            {
-                Id = nextId,
-                Nombre = form.Nombre.Trim(),
-                CantidadMinima = form.CantidadMinima,
-                PrecioUnitario = form.PrecioUnitario,
-                Activa = true
-            });
+            mensajeError = $"No se pudo guardar la escala: {ex.Message}";
         }
-
-        mensajeError = null;
-        mostrarModalFormulario = false;
     }
 
-    private void AbrirEliminar(EscalaMock e)
+    private EscalaPrecio CrearEscalaDesdeFormulario(int id)
+    {
+        return new EscalaPrecio
+        {
+            Id = id,
+            CantidadMinima = form.CantidadMinima,
+            PrecioUnitario = form.PrecioUnitario,
+            Activo = true,
+            Producto = new ProductoRef { Id = productoId }
+        };
+    }
+
+    private void AbrirEliminar(EscalaPrecio e)
     {
         escalaSeleccionada = e;
         mostrarModalEliminar = true;
@@ -334,16 +347,25 @@
         escalaSeleccionada = null;
     }
 
-    private void ConfirmarEliminar()
+    private async Task ConfirmarEliminar()
     {
-        if (escalaSeleccionada != null)
+        try
         {
-            escalas.Remove(escalaSeleccionada);
+            if (escalaSeleccionada != null)
+            {
+                await EscalaPrecioService.EliminarAsync(escalaSeleccionada.Id);
+                await CargarEscalas();
+            }
+            CerrarEliminar();
         }
-        CerrarEliminar();
+        catch (Exception ex)
+        {
+            mensajeError = $"No se pudo eliminar la escala: {ex.Message}";
+            mostrarModalEliminar = false;
+        }
     }
 
-    private string CalcularDescuentoTexto(EscalaMock e)
+    private string CalcularDescuentoTexto(EscalaPrecio e)
     {
         if (e.CantidadMinima == 1) return "—";
         if (producto.PrecioBase <= 0) return "—";
@@ -356,23 +378,20 @@
         return $"+{Math.Abs(rounded)}%";
     }
 
-    private record ProductoMock(string Codigo, string Nombre, decimal PrecioBase, int Stock)
+    private record ProductoResumen(string Codigo, string Nombre, decimal PrecioBase, int Stock)
     {
-        public ProductoMock() : this("", "", 0m, 0) { }
+        public ProductoResumen() : this("", "", 0m, 0) { }
     }
 
-    private class EscalaMock
+    private static string NombreEscala(int cantidadMinima)
     {
-        public int Id { get; set; }
-        public string Nombre { get; set; } = "";
-        public int CantidadMinima { get; set; }
-        public decimal PrecioUnitario { get; set; }
-        public bool Activa { get; set; }
+        return cantidadMinima <= 1
+            ? "Precio unitario"
+            : $"Desde {cantidadMinima} unidades";
     }
 
     private class EscalaForm
     {
-        public string Nombre { get; set; } = "";
         public int CantidadMinima { get; set; }
         public decimal PrecioUnitario { get; set; }
     }

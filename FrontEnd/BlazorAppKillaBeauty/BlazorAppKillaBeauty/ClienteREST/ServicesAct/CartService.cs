@@ -330,20 +330,16 @@ namespace BlazorAppKillaBeauty.ClienteREST.ServicesAct
 
             var siguiente = siguienteEscala == null
                 ? ""
-                : $"Agrega {siguienteEscala.CantidadMinima - item.Cantidad} más para {NombreEscala(siguienteEscala.CantidadMinima)}";
+                : $"Agrega {siguienteEscala.CantidadMinima - item.Cantidad} mas para {NombreEscala(siguienteEscala.CantidadMinima)}";
 
             return new InfoEscalaCarrito(precio, ahorro, etiqueta, siguiente);
         }
 
         private string NombreEscala(int cantidad)
         {
-            return cantidad switch
-            {
-                1 => "Unidad",
-                6 => "Media docena",
-                24 => "Cajón",
-                _ => $"{cantidad}+ unidades"
-            };
+            return cantidad <= 1
+                ? "Unidad"
+                : $"Desde {cantidad} unidades";
         }
 
         public async Task MigrarCarritoLocalAUsuarioAsync(int idUsuario)

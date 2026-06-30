@@ -13,7 +13,10 @@ namespace BlazorAppKillaBeauty.ClienteREST.Models
         [JsonPropertyName("precioUnitario")]
         public decimal PrecioUnitario { get; set; }
 
-        [JsonIgnore]
-        public Producto? Producto { get; set; }
+        [JsonPropertyName("activo")]
+        public bool Activo { get; set; } = true;
+
+        [JsonPropertyName("producto")]
+        public ProductoRef Producto { get; set; } = new();
     }
 }

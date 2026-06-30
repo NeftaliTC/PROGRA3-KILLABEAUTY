@@ -373,38 +373,6 @@ else
         }
     }
 
-    private bool EsProductoConDetalleHardcodeado =>
-        producto != null &&
-        producto.Nombre.Contains("Sérum Vitamina C Gold Kiwi", StringComparison.OrdinalIgnoreCase);
-
-
-
-    /*private List<string> ImagenesProducto
-    {
-        get
-        {
-            if (producto == null)
-            {
-                return new List<string>();
-            }
-
-            if (EsProductoConDetalleHardcodeado)
-            {
-                return new List<string>
-                {
-                    producto.ImagenPrincipal,
-                    "Images/Logo.png",
-                    "Images/Transporte.png"
-                };
-            }
-
-            return new List<string>
-            {
-                producto.ImagenPrincipal
-            };
-        }
-    }*/
-
     private List<string> ImagenesProducto
     {
         get
