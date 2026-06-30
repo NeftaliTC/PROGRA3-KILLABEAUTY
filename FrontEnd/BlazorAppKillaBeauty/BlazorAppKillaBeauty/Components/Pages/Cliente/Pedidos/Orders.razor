@@ -2,11 +2,14 @@
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.ClienteREST.ServicesAct
 @using BlazorAppKillaBeauty.Services
+@using BlazorAppKillaBeauty.ClienteREST.Models
 @inject CartService CartService
 @inject PedidoService PedidoService
 @inject AuthService AuthService
+@inject ProductoService ProductoService
 
-<Navbar CantidadCarrito="@CartService.CantidadTotal" />
+<Navbar CantidadCarrito="@CartService.CantidadTotal"
+        TodosLosProductos="@(new List<Producto>())" />
 
 <div class="orders-page-container">
     <section class="orders-header">

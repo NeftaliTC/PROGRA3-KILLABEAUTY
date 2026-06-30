@@ -6,6 +6,7 @@ import pe.edu.pucp.killabeauty.killarest.services.logistica.CourierRS;
 import pe.edu.pucp.killabeauty.killarest.services.productos.*;
 import pe.edu.pucp.killabeauty.killarest.services.promocionales.CampanaRS;
 import pe.edu.pucp.killabeauty.killarest.services.promocionales.CuponRS;
+import pe.edu.pucp.killabeauty.killarest.services.reportes.ReporteRS;
 import pe.edu.pucp.killabeauty.killarest.services.usuarios.DireccionRS;
 import pe.edu.pucp.killabeauty.killarest.services.usuarios.PermisoRS;
 import pe.edu.pucp.killabeauty.killarest.services.usuarios.UsuarioRS;
@@ -35,6 +36,7 @@ public class KillaRestApplication extends Application {
         resources.add(CarritoRS.class);
         resources.add(DetalleCarritoRS.class);
         resources.add(EscalaPrecioRS.class);
+        resources.add(ReporteRS.class);
         return resources;
     }
 }

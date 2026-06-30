@@ -13,7 +13,8 @@
 @inject AuthService AuthService
 @inject EscalaPrecioService EscalaPrecioService
 
-<Navbar CantidadCarrito="@CartService.CantidadTotal" />
+<Navbar CantidadCarrito="@CartService.CantidadTotal"
+        TodosLosProductos="@(new List<Producto>())" />
 
 @if (cargandoProducto)
 {
@@ -247,7 +248,7 @@ else
                                 <div class="resena-header">
                                     <div>
                                         <span class="resena-nombre">@resena.Cliente</span>
-                                        <p class="resena-fecha">@resena.Fecha · Pedido #@resena.Pedido</p>
+                                        <p class="resena-fecha">@resena.Fecha</p>
                                     </div>
                                     <div class="resena-estrellas">
                                         @for (int i = 1; i <= 5; i++)
@@ -355,7 +356,6 @@ else
                     Calificacion = r.Calificacion,
                     Fecha = TryParseFecha(r.FechaPublicacion),
                     FechaDateTime = ParseFechaDateTime(r.FechaPublicacion),
-                    Pedido = $"KIL-{r.Id:D8}",
                     Titulo = string.IsNullOrWhiteSpace(r.Titulo) ? "Reseña del producto" : r.Titulo,
                     Comentario = r.Comentario
                 })
@@ -601,7 +601,6 @@ else
         public int Calificacion { get; set; }
         public string Fecha { get; set; } = "";
         public DateTime FechaDateTime { get; set; }
-        public string Pedido { get; set; } = "";
         public string Titulo { get; set; } = "";
         public string Comentario { get; set; } = "";
     }

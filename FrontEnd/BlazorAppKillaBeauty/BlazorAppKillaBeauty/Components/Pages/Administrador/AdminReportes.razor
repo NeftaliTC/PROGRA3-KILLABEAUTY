@@ -1,6 +1,8 @@
 @page "/admin/reportes"
 @rendermode InteractiveServer
+@using BlazorAppKillaBeauty.ClienteREST.Models
 @inject IJSRuntime JS
+@inject ReporteService ReporteService
 
 <PageTitle>Reportes Admin - Killa Beauty</PageTitle>
 
@@ -49,72 +51,92 @@
             </div>
         </header>
 
-        <section class="admin-reports-filters">
-            <div class="filters-left">
-                <div class="filter-inline">
-                    <i class="bi bi-calendar3"></i>
+        <section class="admin-reports-filters @(reporteActual == ReporteTipo.Inventario ? "inventory-filters-panel" : "")">
+            @if (reporteActual == ReporteTipo.Ventas)
+            {
+                <div class="sales-filter-grid">
+                    <label class="inventory-filter-field">
+                        <span>Desde</span>
+                        <input class="filter-input" type="date" @bind="fechaInicioVentas" @bind:after="RenderChartsAsync" />
+                    </label>
 
-                    <select class="filter-select" @bind="mesSeleccionado">
-                        @foreach (var mes in meses)
-                        {
-                            <option value="@mes.Valor">@mes.Texto</option>
-                        }
-                    </select>
+                    <label class="inventory-filter-field">
+                        <span>Hasta</span>
+                        <input class="filter-input" type="date" @bind="fechaFinVentas" @bind:after="RenderChartsAsync" />
+                    </label>
 
-                    <select class="filter-select" @bind="anioSeleccionado">
-                        @foreach (var anio in anios)
-                        {
-                            <option value="@anio">@anio</option>
-                        }
-                    </select>
+                    <label class="inventory-filter-field">
+                        <span>Categoria</span>
+                        <select class="filter-select" @bind="categoriaVentaSeleccionada" @bind:after="RenderChartsAsync">
+                            <option value="Todas">Todas</option>
+                            @foreach (var categoria in CategoriasVenta)
+                            {
+                                <option value="@categoria">@categoria</option>
+                            }
+                        </select>
+                    </label>
                 </div>
-            </div>
 
-            <div class="filters-right">
-                @if (reporteActual == ReporteTipo.Ventas)
-                {
-                    <div class="filters-sale-type">
-                        <span class="filter-label">Tipo de venta:</span>
+                <div class="inventory-filter-actions">
+                    <button type="button" class="btn-clear-filters" @onclick="LimpiarFiltrosVentas">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        Limpiar
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="inventory-filter-grid">
+                    <label class="inventory-filter-field">
+                        <span>Estado</span>
+                        <select class="filter-select" @bind="estadoInventarioSeleccionado" @bind:after="RenderChartsAsync">
+                            <option value="Todos">Todos</option>
+                            <option value="Agotado">Agotado</option>
+                            <option value="Critico">Critico</option>
+                            <option value="Saludable">Saludable</option>
+                        </select>
+                    </label>
 
-                        <label class="check-pill">
-                            <input type="checkbox" @bind="ventasMayorista" />
-                            <span>Mayorista</span>
-                        </label>
+                    <label class="inventory-filter-field">
+                        <span>Categoria</span>
+                        <select class="filter-select" @bind="categoriaInventarioSeleccionada" @bind:after="ActualizarCategoriaInventarioAsync">
+                            <option value="Todas">Todas</option>
+                            @foreach (var categoria in CategoriasInventario)
+                            {
+                                <option value="@categoria">@categoria</option>
+                            }
+                        </select>
+                    </label>
 
-                        <label class="check-pill">
-                            <input type="checkbox" @bind="ventasMinorista" />
-                            <span>Minorista</span>
-                        </label>
+                    <label class="inventory-filter-field">
+                        <span>Subcategoria</span>
+                        <select class="filter-select" @bind="subcategoriaInventarioSeleccionada" @bind:after="RenderChartsAsync">
+                            <option value="Todas">Todas</option>
+                            @foreach (var subcategoria in SubcategoriasInventario)
+                            {
+                                <option value="@subcategoria">@subcategoria</option>
+                            }
+                        </select>
+                    </label>
 
-                        <label class="check-pill">
-                            <input type="checkbox" @bind="ventasTodas" />
-                            <span>Todas las ventas</span>
-                        </label>
-                    </div>
-                }
-                else
-                {
-                    <div class="filters-sale-type">
-                        <span class="filter-label">Tipo de venta:</span>
+                    <label class="inventory-filter-field">
+                        <span>Ordenar por</span>
+                        <select class="filter-select" @bind="ordenInventarioSeleccionado" @bind:after="RenderChartsAsync">
+                            <option value="Estado">Estado de stock</option>
+                            <option value="MenorStock">Menor stock</option>
+                            <option value="MayorValor">Mayor valor</option>
+                            <option value="Categoria">Categoria</option>
+                        </select>
+                    </label>
+                </div>
 
-                        <label class="switch-pill">
-                            <span>Mayorista</span>
-                            <label class="switch">
-                                <input type="checkbox" @bind="inventarioMayorista" />
-                                <span class="slider"></span>
-                            </label>
-                        </label>
-
-                        <label class="switch-pill">
-                            <span>Minorista</span>
-                            <label class="switch">
-                                <input type="checkbox" @bind="inventarioMinorista" />
-                                <span class="slider"></span>
-                            </label>
-                        </label>
-                    </div>
-                }
-            </div>
+                <div class="inventory-filter-actions">
+                    <button type="button" class="btn-clear-filters" @onclick="LimpiarFiltrosInventario">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        Limpiar
+                    </button>
+                </div>
+            }
         </section>
 
         @if (reporteActual == ReporteTipo.Ventas)
@@ -124,9 +146,6 @@
                     <div>
                         <span>Ingresos totales</span>
                         <strong>S/. @ventasKpis.Ingresos.ToString("N2")</strong>
-                        <small class="kpi-pill-success">
-                            +@ventasKpis.CrecimientoVsMesAnterior% más vs mes anterior
-                        </small>
                     </div>
                     <i class="bi bi-cash-stack"></i>
                 </article>
@@ -141,16 +160,16 @@
 
                 <article class="report-kpi-card">
                     <div>
-                        <span>Tiket promedio</span>
-                        <strong>S/. @ventasKpis.TicketPromedio.ToString("N2")</strong>
+                        <span>Pedido promedio</span>
+                        <strong>S/. @ventasKpis.PedidoPromedio.ToString("N2")</strong>
                     </div>
                     <i class="bi bi-basket2"></i>
                 </article>
 
                 <article class="report-kpi-card">
                     <div>
-                        <span>Descuento promedio</span>
-                        <strong>@ventasKpis.DescuentoPromedio.ToString("0.0")%</strong>
+                        <span>Unidades vendidas</span>
+                        <strong>@ventasKpis.UnidadesVendidas.ToString("N0")</strong>
                     </div>
                     <i class="bi bi-gift"></i>
                 </article>
@@ -159,23 +178,15 @@
             <section class="admin-reports-charts">
                 <article class="chart-card chart-wide">
                     <header class="chart-title">
-                        Ventas en el tiempo (@MesTexto @anioSeleccionado)
+                        Ventas en el tiempo (@RangoVentasTexto)
                     </header>
-                    @* <div class="chart-placeholder">
-                        <i class="bi bi-graph-up"></i>
-                        <span>Gráfico de líneas (placeholder)</span>
-                    </div> *@
                     <div class="chart-canvas-box">
                         <canvas id="ventasLineChart"></canvas>
                     </div>
                 </article>
 
                 <article class="chart-card">
-                    <header class="chart-title">Comparación semanal</header>
-                    @* <div class="chart-placeholder">
-                        <i class="bi bi-bar-chart"></i>
-                        <span>Gráfico de barras (placeholder)</span>
-                    </div> *@
+                    <header class="chart-title">Ventas por categoria</header>
                     <div class="chart-canvas-box">
                         <canvas id="ventasBarChart"></canvas>
                     </div>
@@ -184,7 +195,7 @@
 
             <section class="admin-reports-list">
                 <header class="list-title">
-                    Productos más vendidos (@MesTexto @anioSeleccionado)
+                    Productos mas vendidos (@RangoVentasTexto)
                 </header>
 
                 <div class="list-card">
@@ -201,7 +212,7 @@
 
                             <div class="top-product-main">
                                 <strong>@p.Nombre</strong>
-                                <span>@p.CantidadVendida unidades · @p.Categoria</span>
+                                <span>@p.CantidadVendida unidades - @p.Categoria</span>
                             </div>
 
                             <div class="top-product-meta">
@@ -217,13 +228,92 @@
                     }
                 </div>
             </section>
+
+            <section class="admin-reports-list">
+                <header class="list-title">
+                    Clientes con mayor compra (@RangoVentasTexto)
+                </header>
+
+                <div class="list-card">
+                    @for (int i = 0; i < clientesTop.Count; i++)
+                    {
+                        var cliente = clientesTop[i];
+
+                        <div class="sales-summary-row">
+                            <div class="top-rank">#@(i + 1)</div>
+
+                            <div class="sales-summary-main">
+                                <strong>@cliente.Nombre</strong>
+                                <span>@cliente.Pedidos pedido@(cliente.Pedidos == 1 ? "" : "s") - @cliente.Unidades unidades</span>
+                            </div>
+
+                            <div class="sales-summary-meta">
+                                <span>Total comprado</span>
+                                <strong>S/. @cliente.TotalComprado.ToString("N2")</strong>
+                            </div>
+                        </div>
+
+                        @if (i < clientesTop.Count - 1)
+                        {
+                            <div class="row-divider"></div>
+                        }
+                    }
+                </div>
+            </section>
+
+            <section class="sales-report-table-section">
+                <header class="inventory-stock-header">
+                    <div>
+                        <h2>Pedidos del periodo</h2>
+                        <p>Resumen de las ventas que alimentan los indicadores del reporte.</p>
+                    </div>
+                    <span>@VentasFiltradas.Count pedido@(VentasFiltradas.Count == 1 ? "" : "s")</span>
+                </header>
+
+                <div class="inventory-stock-table-card sales-main-table-card">
+                    <table class="admin-table sales-report-table">
+                        <thead>
+                            <tr>
+                                <th>Pedido</th>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Categorias</th>
+                                <th>Productos</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var venta in VentasFiltradas.OrderByDescending(v => v.Fecha))
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>KIL-@venta.Id.ToString("000000")</strong>
+                                    </td>
+                                    <td>@venta.Fecha.ToString("dd/MM/yyyy")</td>
+                                    <td>@venta.Cliente</td>
+                                    <td>@string.Join(", ", venta.Productos.Select(p => p.Categoria).Distinct())</td>
+                                    <td>@venta.Productos.Sum(p => p.Cantidad) u.</td>
+                                    <td>S/. @venta.Total.ToString("N2")</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4">Totales del periodo</td>
+                                <td>@VentasFiltradas.Sum(v => v.Productos.Sum(p => p.Cantidad)).ToString("N0") u.</td>
+                                <td>S/. @VentasFiltradas.Sum(v => v.Total).ToString("N2")</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
         }
         else
         {
             <section class="admin-reports-kpis">
                 <article class="report-kpi-card">
                     <div>
-                        <span>Valor total de inventario</span>
+                        <span>Valor inventario filtrado</span>
                         <strong>S/. @inventarioKpis.ValorTotal.ToString("N2")</strong>
                     </div>
                     <i class="bi bi-box-seam"></i>
@@ -231,12 +321,12 @@
 
                 <article class="report-kpi-card">
                     <div>
-                        <span>Productos con stock crítico</span>
+                        <span>Stock critico</span>
                         <strong>@inventarioKpis.StockCritico</strong>
                         <button type="button"
                                 class="kpi-review-button kpi-pill-warning"
-                                @onclick="() => SeleccionarStockTab(StockTab.Critico)">
-                            revisar más
+                                @onclick="() => FiltrarPorEstado(StockTab.Critico)">
+                            revisar
                         </button>
                     </div>
                     <i class="bi bi-exclamation-triangle"></i>
@@ -244,12 +334,12 @@
 
                 <article class="report-kpi-card">
                     <div>
-                        <span>Productos agotados</span>
+                        <span>Agotados</span>
                         <strong>@inventarioKpis.Agotados</strong>
                         <button type="button"
                                 class="kpi-review-button kpi-pill-danger"
-                                @onclick="() => SeleccionarStockTab(StockTab.Agotado)">
-                            revisar más
+                                @onclick="() => FiltrarPorEstado(StockTab.Agotado)">
+                            revisar
                         </button>
                     </div>
                     <i class="bi bi-x-circle"></i>
@@ -257,13 +347,8 @@
 
                 <article class="report-kpi-card">
                     <div>
-                        <span>Productos con stock saludable</span>
-                        <strong>@inventarioKpis.Saludable</strong>
-                        <button type="button"
-                                class="kpi-review-button kpi-pill-success"
-                                @onclick="() => SeleccionarStockTab(StockTab.Saludable)">
-                            revisar más
-                        </button>
+                        <span>Unidades totales</span>
+                        <strong>@inventarioKpis.UnidadesTotales.ToString("N0")</strong>
                     </div>
                     <i class="bi bi-check2-circle"></i>
                 </article>
@@ -271,143 +356,132 @@
 
             <section class="admin-reports-charts">
                 <article class="chart-card chart-wide">
-                    <header class="chart-title">Niveles de Stock por Categoría</header>
-                    <div class="chart-placeholder">
-                        <i class="bi bi-bar-chart-steps"></i>
-                        <span>Gráfico apilado (placeholder)</span>
+                    <header class="chart-title">Stock por categoria</header>
+                    <div class="inventory-category-bars">
+                        @foreach (var categoria in StockPorCategoria)
+                        {
+                            <div class="inventory-category-row">
+                                <div class="inventory-category-label">
+                                    <strong>@categoria.Categoria</strong>
+                                    <span>@categoria.Unidades unidades</span>
+                                </div>
+                                <div class="inventory-category-track">
+                                    <span style="width: @categoria.Porcentaje%"></span>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </article>
 
                 <article class="chart-card">
-                    <header class="chart-title">Análisis de Rotación de Inventario</header>
-                    @* <div class="chart-placeholder">
-                        <i class="bi bi-pie-chart"></i>
-                        <span>Gráfico donut (placeholder)</span>
-                    </div> *@
+                    <header class="chart-title">Resumen de stock actual</header>
                     <div class="chart-canvas-box">
                         <canvas id="inventarioDonutChart"></canvas>
                     </div>
                 </article>
             </section>
 
+            <section class="inventory-report-table-section">
+                <header class="inventory-stock-header">
+                    <div>
+                        <h2>Productos filtrados</h2>
+                        <p>Vista agrupada del stock actual por categoria, subcategoria y estado.</p>
+                    </div>
+                    <span>@ProductosInventarioFiltrados.Count producto@(ProductosInventarioFiltrados.Count == 1 ? "" : "s")</span>
+                </header>
+
+                <div class="inventory-stock-table-card inventory-main-table-card">
+                    <table class="admin-table inventory-stock-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Categoria</th>
+                                <th>Subcategoria</th>
+                                <th>Marca</th>
+                                <th>Stock</th>
+                                <th>Precio</th>
+                                <th>Valor</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var producto in ProductosInventarioFiltrados)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="inventory-product-cell">
+                                            <img src="@producto.ImagenUrl" alt="@producto.Nombre" />
+                                            <div>
+                                                <strong>@producto.Nombre</strong>
+                                                <span>@producto.Sku</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@producto.Categoria</td>
+                                    <td>@producto.Subcategoria</td>
+                                    <td>@producto.Marca</td>
+                                    <td>
+                                        <strong>@producto.StockActual u.</strong>
+                                        <small class="inventory-min-stock">min. @producto.StockMinimo</small>
+                                    </td>
+                                    <td>S/. @producto.PrecioUnitario.ToString("N2")</td>
+                                    <td>S/. @producto.ValorInventario.ToString("N2")</td>
+                                    <td>
+                                        <span class="inventory-stock-badge @GetStockBadgeClass(producto.StockEstado)">
+                                            @GetStockEstadoTexto(producto.StockEstado)
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4">Totales filtrados</td>
+                                <td>@ProductosInventarioFiltrados.Sum(p => p.StockActual).ToString("N0") u.</td>
+                                <td></td>
+                                <td>S/. @ProductosInventarioFiltrados.Sum(p => p.ValorInventario).ToString("N2")</td>
+                                <td>@ProductosInventarioFiltrados.Count producto@(ProductosInventarioFiltrados.Count == 1 ? "" : "s")</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
         }
 
     </section>
 </main>
 
-@if (mostrarModalInventario)
-{
-    <div class="inventory-stock-modal-overlay" @onclick="CerrarStockModal">
-        <section class="inventory-stock-modal-card" @onclick:stopPropagation="true">
-            <header class="inventory-stock-modal-title">
-                <div>
-                    <h2>Detalle de inventario</h2>
-                    <p>Revisa los productos según su estado de stock.</p>
-                </div>
-
-                <button type="button" @onclick="CerrarStockModal" aria-label="Cerrar">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </header>
-
-            <section class="inventory-stock-table-card">
-                <header class="inventory-stock-header">
-                    <div>
-                        <h2>@TituloStockTab</h2>
-                        <p>@DescripcionStockTab</p>
-                    </div>
-                    <span>@ProductosInventarioFiltrados.Count producto@(ProductosInventarioFiltrados.Count == 1 ? "" : "s")</span>
-                </header>
-
-                <table class="admin-table inventory-stock-table">
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Categoría</th>
-                            <th>Marca</th>
-                            <th>Stock</th>
-                            <th>Precio unitario</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var producto in ProductosInventarioFiltrados)
-                        {
-                            <tr>
-                                <td>
-                                    <div class="inventory-product-cell">
-                                        <img src="@producto.ImagenUrl" alt="@producto.Nombre" />
-                                        <div>
-                                            <strong>@producto.Nombre</strong>
-                                            <span>@producto.Sku</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>@producto.Categoria</td>
-                                <td>@producto.Marca</td>
-                                <td>@producto.StockActual u.</td>
-                                <td>S/. @producto.PrecioUnitario.ToString("N2")</td>
-                                <td>
-                                    <span class="inventory-stock-badge @GetStockBadgeClass(producto.StockEstado)">
-                                        @GetStockEstadoTexto(producto.StockEstado)
-                                    </span>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </section>
-        </section>
-    </div>
-}
-
 @code {
     private enum ReporteTipo { Ventas, Inventario }
     private enum StockTab { Critico, Agotado, Saludable }
 
-    private ReporteTipo reporteActual = ReporteTipo.Ventas;
-    private StockTab stockTabActual = StockTab.Critico;
-    private bool mostrarModalInventario = false;
+    private ReporteTipo reporteActual = ReporteTipo.Inventario;
     private bool mostrarMenuReportes = false;
 
-    private int mesSeleccionado = 5;
-    private int anioSeleccionado = 2025;
+    private DateTime fechaInicioVentas = new(2026, 6, 1);
+    private DateTime fechaFinVentas = new(2026, 6, 30);
+    private string categoriaVentaSeleccionada = "Todas";
 
-    private List<int> anios = new() { 2026, 2025, 2024 };
+    private string estadoInventarioSeleccionado = "Todos";
+    private string categoriaInventarioSeleccionada = "Todas";
+    private string subcategoriaInventarioSeleccionada = "Todas";
+    private string ordenInventarioSeleccionado = "Estado";
 
-    private List<MesFiltro> meses = new()
-    {
-        new(1, "Enero"), new(2, "Febrero"), new(3, "Marzo"), new(4, "Abril"),
-        new(5, "Mayo"), new(6, "Junio"), new(7, "Julio"), new(8, "Agosto"),
-        new(9, "Septiembre"), new(10, "Octubre"), new(11, "Noviembre"), new(12, "Diciembre")
-    };
+    private List<VentaReporte> ventasReporte = new();
+    private List<ProductoInventario> productosInventario = new();
+    private List<CategoriaStock> stockPorCategoria = new();
+    private List<VentaChartPoint> ventasPorDia = new();
+    private List<VentaCategoriaChartPoint> ventasPorCategoria = new();
+    private List<TopProducto> productosMasVendidos = new();
+    private List<TopCliente> clientesTop = new();
+    private List<string> categoriasInventario = new();
+    private List<string> subcategoriasInventario = new();
+    private List<string> categoriasVenta = new();
+    private VentasKpis ventasKpis = new(0, 0, 0, 0);
+    private InventarioKpis inventarioKpis = new(0, 0, 0, 0);
+    private ResumenStockDto resumenStock = new();
 
-    // filtros “tipo de venta”
-    private bool ventasMayorista = true;
-    private bool ventasMinorista = true;
-    private bool ventasTodas = true;
-
-    private bool inventarioMayorista = false;
-    private bool inventarioMinorista = true;
-
-    // mock data
-    private VentasKpis ventasKpis = new(50560.00m, 1138, 122.50m, 5.4m, 5);
-    private InventarioKpis inventarioKpis => new(
-        productosInventario.Sum(p => p.StockActual * p.PrecioUnitario),
-        productosInventario.Count(p => p.StockEstado == StockTab.Critico),
-        productosInventario.Count(p => p.StockEstado == StockTab.Agotado),
-        productosInventario.Count(p => p.StockEstado == StockTab.Saludable));
-
-    private List<TopProducto> productosMasVendidos = new()
-    {
-        new TopProducto("Agua Micelar con Aceite Óleo Garnier Skin Active 100 ml", "Garnier", "Skincare", 320, 19.50m, "/Images/placeholder-product.png"),
-        new TopProducto("Máscara Essence Prince False Lash Effect", "Essence", "Maquillaje", 285, 52.90m, "/Images/placeholder-product.png"),
-        new TopProducto("Protector Solar SPF50", "La Roche-Posay", "Skincare", 210, 79.00m, "/Images/placeholder-product.png"),
-    };
-
-    private List<ProductoInventario> productosInventario = CrearProductosInventario();
-
-    private string MesTexto => meses.First(m => m.Valor == mesSeleccionado).Texto;
+    private string RangoVentasTexto => $"{fechaInicioVentas:dd/MM/yyyy} - {fechaFinVentas:dd/MM/yyyy}";
 
     private string TituloReporte => reporteActual == ReporteTipo.Ventas
         ? "Reporte de ventas"
@@ -416,6 +490,13 @@
     private string TextoDropdown => reporteActual == ReporteTipo.Ventas
         ? "Reporte de ventas"
         : "Reporte de inventario";
+
+    private List<string> CategoriasInventario => categoriasInventario;
+    private List<string> CategoriasVenta => categoriasVenta;
+    private List<VentaReporte> VentasFiltradas => ventasReporte.OrderBy(v => v.Fecha).ToList();
+    private List<string> SubcategoriasInventario => subcategoriasInventario;
+    private List<ProductoInventario> ProductosInventarioFiltrados => productosInventario;
+    private List<CategoriaStock> StockPorCategoria => stockPorCategoria;
 
     private void ToggleMenuReportes() => mostrarMenuReportes = !mostrarMenuReportes;
 
@@ -427,62 +508,187 @@
         _ = InvokeAsync(RenderChartsAsync);
     }
 
-    private void SeleccionarStockTab(StockTab tab)
+    private void FiltrarPorEstado(StockTab estado)
     {
-        stockTabActual = tab;
-        mostrarModalInventario = true;
+        estadoInventarioSeleccionado = estado.ToString();
+        _ = InvokeAsync(RenderChartsAsync);
     }
 
-    private void CerrarStockModal() => mostrarModalInventario = false;
+    private async Task ActualizarCategoriaInventarioAsync()
+    {
+        subcategoriaInventarioSeleccionada = "Todas";
+        await RenderChartsAsync();
+    }
+
+    private void LimpiarFiltrosInventario()
+    {
+        estadoInventarioSeleccionado = "Todos";
+        categoriaInventarioSeleccionada = "Todas";
+        subcategoriaInventarioSeleccionada = "Todas";
+        ordenInventarioSeleccionado = "Estado";
+
+        _ = InvokeAsync(RenderChartsAsync);
+    }
+
+    private void LimpiarFiltrosVentas()
+    {
+        fechaInicioVentas = new DateTime(2026, 6, 1);
+        fechaFinVentas = new DateTime(2026, 6, 30);
+        categoriaVentaSeleccionada = "Todas";
+
+        _ = InvokeAsync(RenderChartsAsync);
+    }
 
     private void DescargarReporte()
     {
-        // interacción mock
-        // luego pueden implementarlo con export real
+        // Luego puede conectarse a export real.
     }
 
-    private record MesFiltro(int Valor, string Texto);
+    private async Task CargarReporteActualAsync()
+    {
+        if (reporteActual == ReporteTipo.Ventas)
+        {
+            await CargarVentasAsync();
+        }
+        else
+        {
+            await CargarInventarioAsync();
+        }
+    }
 
-    private record VentasKpis(decimal Ingresos, int PedidosTotales, decimal TicketPromedio, decimal DescuentoPromedio, int CrecimientoVsMesAnterior);
+    private async Task CargarVentasAsync()
+    {
+        var reporte = await ReporteService.ObtenerVentasAsync(
+            fechaInicioVentas,
+            fechaFinVentas,
+            categoriaVentaSeleccionada);
 
-    private record InventarioKpis(decimal ValorTotal, int StockCritico, int Agotados, int Saludable);
+        ventasKpis = new(
+            reporte.Kpis.Ingresos,
+            reporte.Kpis.PedidosTotales,
+            reporte.Kpis.PedidoPromedio,
+            reporte.Kpis.UnidadesVendidas);
+
+        ventasReporte = reporte.Pedidos.Select(p => new VentaReporte(
+            p.Id,
+            p.FechaPedido,
+            p.Cliente,
+            p.Estado,
+            "",
+            p.Total,
+            p.Productos.Select(prod => new ProductoVenta(
+                prod.Nombre,
+                prod.Marca,
+                prod.Categoria,
+                prod.Cantidad,
+                prod.PrecioUnitario,
+                prod.ImagenUrl)).ToList())).ToList();
+
+        ventasPorDia = reporte.VentasPorDia
+            .Select(v => new VentaChartPoint(v.Fecha, v.Total))
+            .ToList();
+        ventasPorCategoria = reporte.VentasPorCategoria
+            .Select(v => new VentaCategoriaChartPoint(v.Categoria, v.Total))
+            .ToList();
+        productosMasVendidos = reporte.ProductosMasVendidos
+            .Select(p => new TopProducto(p.Nombre, p.Marca, p.Categoria, p.CantidadVendida, p.PrecioUnitario, p.ImagenUrl))
+            .ToList();
+        clientesTop = reporte.ClientesTop
+            .Select(c => new TopCliente(c.Nombre, c.Pedidos, c.Unidades, c.TotalComprado))
+            .ToList();
+        categoriasVenta = reporte.Categorias;
+    }
+
+    private async Task CargarInventarioAsync()
+    {
+        var reporte = await ReporteService.ObtenerInventarioAsync(
+            estadoInventarioSeleccionado,
+            categoriaInventarioSeleccionada,
+            subcategoriaInventarioSeleccionada,
+            ordenInventarioSeleccionado);
+
+        inventarioKpis = new(
+            reporte.Kpis.ValorTotal,
+            reporte.Kpis.StockCritico,
+            reporte.Kpis.Agotados,
+            reporte.Kpis.UnidadesTotales);
+
+        productosInventario = reporte.Productos.Select(p => new ProductoInventario(
+            p.Sku,
+            p.Nombre,
+            p.Marca,
+            p.Categoria,
+            p.Subcategoria,
+            p.StockActual,
+            10,
+            p.PrecioUnitario,
+            ParseStockTab(p.StockEstado),
+            p.ImagenUrl)).ToList();
+
+        stockPorCategoria = reporte.StockPorCategoria
+            .Select(c => new CategoriaStock(c.Categoria, c.Unidades, c.Porcentaje))
+            .ToList();
+        resumenStock = reporte.ResumenStock;
+        categoriasInventario = reporte.Categorias;
+        subcategoriasInventario = reporte.Subcategorias;
+    }
+
+    private static StockTab ParseStockTab(string estado) => estado switch
+    {
+        "Agotado" => StockTab.Agotado,
+        "Critico" => StockTab.Critico,
+        _ => StockTab.Saludable
+    };
+
+    private record VentasKpis(decimal Ingresos, int PedidosTotales, decimal PedidoPromedio, int UnidadesVendidas);
+
+    private record InventarioKpis(decimal ValorTotal, int StockCritico, int Agotados, int UnidadesTotales);
+
+    private record CategoriaStock(string Categoria, int Unidades, int Porcentaje);
+
+    private record VentaChartPoint(string Fecha, decimal Total);
+
+    private record VentaCategoriaChartPoint(string Categoria, decimal Total);
 
     private record TopProducto(string Nombre, string Marca, string Categoria, int CantidadVendida, decimal PrecioUnitario, string ImagenUrl);
+
+    private record TopCliente(string Nombre, int Pedidos, int Unidades, decimal TotalComprado);
+
+    private record VentaReporte(
+        int Id,
+        DateTime Fecha,
+        string Cliente,
+        string Estado,
+        string MetodoPago,
+        decimal Total,
+        List<ProductoVenta> Productos);
+
+    private record ProductoVenta(
+        string Nombre,
+        string Marca,
+        string Categoria,
+        int Cantidad,
+        decimal PrecioUnitario,
+        string ImagenUrl);
 
     private record ProductoInventario(
         string Sku,
         string Nombre,
         string Marca,
         string Categoria,
+        string Subcategoria,
         int StockActual,
+        int StockMinimo,
         decimal PrecioUnitario,
         StockTab StockEstado,
-        string ImagenUrl);
-
-    private List<ProductoInventario> ProductosInventarioFiltrados =>
-        productosInventario
-            .Where(p => p.StockEstado == stockTabActual)
-            .OrderBy(p => p.StockActual)
-            .ThenBy(p => p.Nombre)
-            .ToList();
-
-    private string TituloStockTab => stockTabActual switch
+        string ImagenUrl)
     {
-        StockTab.Critico => "Productos con stock crítico",
-        StockTab.Agotado => "Productos agotados",
-        _ => "Productos con stock saludable"
-    };
-
-    private string DescripcionStockTab => stockTabActual switch
-    {
-        StockTab.Critico => "Productos que necesitan reposición pronto por estar debajo del umbral mínimo.",
-        StockTab.Agotado => "Productos sin unidades disponibles para venta.",
-        _ => "Productos con disponibilidad suficiente para atender pedidos."
-    };
+        public decimal ValorInventario => StockActual * PrecioUnitario;
+    }
 
     private static string GetStockEstadoTexto(StockTab estado) => estado switch
     {
-        StockTab.Critico => "Crítico",
+        StockTab.Critico => "Critico",
         StockTab.Agotado => "Agotado",
         _ => "Saludable"
     };
@@ -494,51 +700,8 @@
         _ => "stock-success"
     };
 
-    private static List<ProductoInventario> CrearProductosInventario()
-    {
-        var productos = new List<ProductoInventario>
-        {
-            new("KB-SK-001", "Sérum vitamina C 30ml", "The Ordinary", "Skincare", 4, 45.00m, StockTab.Critico, "/Images/Serum.jpg"),
-            new("KB-SK-002", "Crema hidratante CeraVe", "CeraVe", "Skincare", 7, 69.90m, StockTab.Critico, "/Images/Cerave.jpg"),
-            new("KB-MQ-003", "Máscara Essence Lash Effect", "Essence", "Maquillaje", 5, 52.90m, StockTab.Critico, "/Images/Mascara.jpg"),
-            new("KB-CB-004", "Tratamiento Lorinique cabello", "Lorinique", "Cabello", 3, 88.00m, StockTab.Critico, "/Images/LoriniqueCabello.jpg"),
-            new("KB-MQ-005", "Labial Peripera Ink", "Peripera", "Maquillaje", 6, 40.00m, StockTab.Critico, "/Images/LabialPeripera.jpg"),
-            new("KB-SK-006", "Agua micelar Garnier 100ml", "Garnier", "Skincare", 8, 19.50m, StockTab.Critico, "/Images/CuidadoPiel.png"),
-            new("KB-MQ-007", "Paleta básica de maquillaje", "Killa Beauty", "Maquillaje", 2, 79.90m, StockTab.Critico, "/Images/Maquillaje.png"),
-            new("KB-FR-008", "Fragancia floral compacta", "Killa Beauty", "Fragancias", 1, 59.00m, StockTab.Critico, "/Images/Fragancia.png"),
-
-            new("KB-SK-009", "Protector solar SPF50", "La Roche-Posay", "Skincare", 0, 79.00m, StockTab.Agotado, "/Images/CuidadoPiel.png"),
-            new("KB-CB-010", "Shampoo reparador premium", "Lorinique", "Cabello", 0, 36.90m, StockTab.Agotado, "/Images/CuidadoCabello.png"),
-            new("KB-MQ-011", "Delineador negro waterproof", "NYX", "Maquillaje", 0, 29.90m, StockTab.Agotado, "/Images/Maquillaje.png"),
-            new("KB-SK-012", "Tónico hidratante facial", "CeraVe", "Skincare", 0, 49.90m, StockTab.Agotado, "/Images/Cerave.jpg"),
-            new("KB-FR-013", "Body mist vainilla", "Killa Beauty", "Fragancias", 0, 34.90m, StockTab.Agotado, "/Images/Fragancia.png"),
-        };
-
-        productos.AddRange(Enumerable.Range(1, 118).Select(i =>
-        {
-            var categoria = i % 3 == 0 ? "Skincare" : i % 3 == 1 ? "Maquillaje" : "Cabello";
-            var marca = i % 4 == 0 ? "CeraVe" : i % 4 == 1 ? "Killa Beauty" : i % 4 == 2 ? "Essence" : "Lorinique";
-            var imagen = categoria == "Skincare" ? "/Images/CuidadoPiel.png" :
-                         categoria == "Maquillaje" ? "/Images/Maquillaje.png" :
-                         "/Images/CuidadoCabello.png";
-
-            return new ProductoInventario(
-                $"KB-ST-{i:000}",
-                $"Producto saludable {i:000}",
-                marca,
-                categoria,
-                20 + (i % 60),
-                24.90m + (i % 9) * 5,
-                StockTab.Saludable,
-                imagen);
-        }));
-
-        return productos;
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // La primera vez, dibuja
         if (firstRender)
         {
             await RenderChartsAsync();
@@ -547,24 +710,33 @@
 
     private async Task RenderChartsAsync()
     {
+        await CargarReporteActualAsync();
+
         if (reporteActual == ReporteTipo.Ventas)
         {
-            var labels = Enumerable.Range(1, 12).Select(d => $"{d} May").ToArray();
-            var values = new[] { 50, 70, 85, 60, 95, 110, 90, 105, 80, 120, 95, 100 };
+            var labels = ventasPorDia
+                .Select(v => DateTime.TryParse(v.Fecha, out var fecha) ? fecha.ToString("dd/MM") : v.Fecha)
+                .ToArray();
+            var values = ventasPorDia.Select(v => decimal.ToDouble(v.Total)).ToArray();
 
             await JS.InvokeVoidAsync("killaCharts.createOrUpdateLineChart",
-                "ventasLineChart", labels, values, "Unidades vendidas");
+                "ventasLineChart", labels, values, "Ingresos");
 
-            var labelsBar = new[] { "Abril / Semana 4", "Mayo / Semana 1", "Mayo / Semana 2", "Mayo / Semana 3" };
-            var valuesBar = new[] { 90, 120, 135, 110 };
+            var labelsBar = ventasPorCategoria.Select(v => v.Categoria).ToArray();
+            var valuesBar = ventasPorCategoria.Select(v => decimal.ToDouble(v.Total)).ToArray();
 
             await JS.InvokeVoidAsync("killaCharts.createOrUpdateBarChart",
-                "ventasBarChart", labelsBar, valuesBar, "Unidades");
+                "ventasBarChart", labelsBar, valuesBar, "Ingresos");
         }
         else
         {
-            var labels = new[] { "SKU mov fast", "SKU promedio", "SKU lento moving", "Sin movimiento" };
-            var values = new[] { 55, 45, 19, 0 };
+            var labels = new[] { "Agotado", "Critico", "Saludable" };
+            var values = new[]
+            {
+                resumenStock.Agotado,
+                resumenStock.Critico,
+                resumenStock.Saludable
+            };
 
             await JS.InvokeVoidAsync("killaCharts.createOrUpdateDonutChart",
                 "inventarioDonutChart", labels, values);

@@ -1,36 +1,55 @@
 @typeparam TItem
 
 <div class="killa-paginated-table">
-    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-        @RenderPageSizeSelector
-        <span class="text-muted small">@SummaryRecords</span>
-        @RenderPagination
-    </div>
+    @if (ShowTopControls)
+    {
+        <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+            @RenderPageSizeSelector
+            <span class="text-muted small">@SummaryRecords</span>
+            @RenderPagination
+        </div>
+    }
 
-    <div class="@ContainerClass">
-        <table class="@TableClass">
-            <thead class="@HeaderClass">
-                @TableHeader
-            </thead>
-            <tbody>
-                @if (Page.Items.Any())
-                {
-                    @foreach (var item in Page.Items)
+    @if (ItemsTemplate is not null)
+    {
+        @if (Page.Items.Any())
+        {
+            @ItemsTemplate(Page.Items)
+        }
+        else
+        {
+            <div class="@EmptyContainerClass">
+                <i class="bi bi-inbox me-2"></i>@EmptyMessage
+            </div>
+        }
+    }
+    else
+    {
+        <div class="@ContainerClass">
+            <table class="@TableClass">
+                <thead class="@HeaderClass">
+                    @TableHeader
+                </thead>
+                <tbody>
+                    @if (Page.Items.Any())
                     {
-                        @RowTemplate(item)
+                        @foreach (var item in Page.Items)
+                        {
+                            @RowTemplate(item)
+                        }
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="@ColSpan" class="text-center py-5 text-muted">
-                            <i class="bi bi-inbox me-2"></i>@EmptyMessage
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                    else
+                    {
+                        <tr>
+                            <td colspan="@ColSpan" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox me-2"></i>@EmptyMessage
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 
     <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
         @RenderPageSizeSelector
@@ -43,14 +62,19 @@
     [Parameter] public TablePage<TItem> Page { get; set; } = new();
     [Parameter] public RenderFragment? TableHeader { get; set; }
     [Parameter] public RenderFragment<TItem> RowTemplate { get; set; } = default!;
+    [Parameter] public RenderFragment<List<TItem>>? ItemsTemplate { get; set; }
     [Parameter] public EventCallback<PageQuery> OnChanged { get; set; }
     [Parameter] public int ColSpan { get; set; } = 5;
     [Parameter] public string EmptyMessage { get; set; } = "No se encontraron registros.";
+    [Parameter] public string EmptyContainerClass { get; set; } = "text-center py-5 text-muted";
     [Parameter] public string ContainerClass { get; set; } = "table-responsive shadow-sm rounded";
     [Parameter] public string TableClass { get; set; } = "table table-hover align-middle mb-0 bg-white";
     [Parameter] public string HeaderClass { get; set; } = "table-dark";
     [Parameter] public int InitialPageSize { get; set; } = 3;
     [Parameter] public int[] PageSizeOptions { get; set; } = new[] { 3, 10, 25, 50, 100 };
+    [Parameter] public string RecordLabel { get; set; } = "registros";
+    [Parameter] public bool ShowPageSizeSelector { get; set; } = true;
+    [Parameter] public bool ShowTopControls { get; set; } = true;
 
     private int pageSize;
     private int currentPage = 1;
@@ -67,12 +91,12 @@
     private int EndRecord => Math.Min(currentPage * pageSize, Page.TotalRecords);
 
     private string SummaryRecords => Page.TotalRecords > 0
-        ? $"Mostrando {StartRecord}-{EndRecord} de {Page.TotalRecords} registros"
-        : "Sin registros";
+        ? $"Mostrando {StartRecord}-{EndRecord} de {Page.TotalRecords} {RecordLabel}"
+        : $"Sin {RecordLabel}";
 
     private string SummaryWithPage => Page.TotalRecords > 0
-        ? $"Mostrando {StartRecord}-{EndRecord} de {Page.TotalRecords} registros - Pagina {currentPage} de {TotalPages}"
-        : "Sin registros";
+        ? $"Mostrando {StartRecord}-{EndRecord} de {Page.TotalRecords} {RecordLabel} - Pagina {currentPage} de {TotalPages}"
+        : $"Sin {RecordLabel}";
 
     protected override void OnParametersSet()
     {
@@ -161,16 +185,19 @@
 
     private RenderFragment RenderPageSizeSelector => __builder =>
     {
-        <div class="d-flex align-items-center gap-2">
-            <label class="form-label mb-0 text-muted small fw-bold">Registros por pagina:</label>
-            <select class="form-select form-select-sm" style="width: auto;"
-                    @bind="pageSize" @bind:after="ChangePageSize">
-                @foreach (var option in PageSizeOptions)
-                {
-                    <option value="@option">@option</option>
-                }
-            </select>
-        </div>
+        @if (ShowPageSizeSelector)
+        {
+            <div class="d-flex align-items-center gap-2">
+                <label class="form-label mb-0 text-muted small fw-bold">Registros por pagina:</label>
+                <select class="form-select form-select-sm" style="width: auto;"
+                        @bind="pageSize" @bind:after="ChangePageSize">
+                    @foreach (var option in PageSizeOptions)
+                    {
+                        <option value="@option">@option</option>
+                    }
+                </select>
+            </div>
+        }
     };
 
     private RenderFragment RenderPagination => __builder =>
