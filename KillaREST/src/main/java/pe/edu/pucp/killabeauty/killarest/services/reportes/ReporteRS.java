@@ -10,6 +10,8 @@ import jakarta.ws.rs.core.Response;
 import pe.edu.pucp.killaBeauty.bl.Impl.ReporteBLImpl;
 import pe.edu.pucp.killaBeauty.bl.ReporteBL;
 import pe.edu.pucp.killaBeauty.bl.exception.BusinessLogicException;
+import pe.edu.pucp.killaBeauty.reporte.GeneradorReporteVentas;
+import pe.edu.pucp.killaBeauty.reporte.DTO.ReporteVentasDTO;
 import pe.edu.pucp.killabeauty.killarest.dto.ErrorDTO;
 
 @Path("/reportes")
@@ -17,6 +19,7 @@ import pe.edu.pucp.killabeauty.killarest.dto.ErrorDTO;
 @Produces(MediaType.APPLICATION_JSON)
 public class ReporteRS {
     private final ReporteBL reporteBL = new ReporteBLImpl();
+    private final GeneradorReporteVentas generadorReporteVentas = new GeneradorReporteVentas();
 
     @GET
     @Path("/ventas")
@@ -25,6 +28,26 @@ public class ReporteRS {
                                   @QueryParam("categoria") String categoria) {
         try {
             return Response.ok(reporteBL.obtenerReporteVentas(desde, hasta, categoria)).build();
+        } catch (BusinessLogicException ex) {
+            return badRequest(ex);
+        } catch (Exception ex) {
+            return serverError(ex);
+        }
+    }
+
+    @GET
+    @Path("/ventas/pdf")
+    @Produces("application/pdf")
+    public Response descargarVentasPdf(@QueryParam("desde") String desde,
+                                       @QueryParam("hasta") String hasta,
+                                       @QueryParam("categoria") String categoria) {
+        try {
+            ReporteVentasDTO reporte = reporteBL.obtenerReporteVentas(desde, hasta, categoria);
+            byte[] pdf = generadorReporteVentas.generarReporteVentas(reporte, desde, hasta, categoria);
+
+            return Response.ok(pdf, "application/pdf")
+                    .header("Content-Disposition", "attachment; filename=\"reporte_ventas.pdf\"")
+                    .build();
         } catch (BusinessLogicException ex) {
             return badRequest(ex);
         } catch (Exception ex) {
@@ -49,12 +72,15 @@ public class ReporteRS {
 
     private Response badRequest(Exception ex) {
         return Response.status(Response.Status.BAD_REQUEST)
+                .type(MediaType.APPLICATION_JSON)
                 .entity(new ErrorDTO(ex.getMessage()))
                 .build();
     }
 
     private Response serverError(Exception ex) {
+        ex.printStackTrace();
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .type(MediaType.APPLICATION_JSON)
                 .entity(new ErrorDTO(ex.getMessage()))
                 .build();
     }

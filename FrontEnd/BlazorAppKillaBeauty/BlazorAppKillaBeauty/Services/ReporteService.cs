@@ -32,6 +32,16 @@ namespace BlazorAppKillaBeauty.Services
             return await GetAsync<ReporteVentasDto>(url) ?? new ReporteVentasDto();
         }
 
+        public string ObtenerUrlPdfVentas(DateTime desde, DateTime hasta, string categoria)
+        {
+            var url = "reportes/ventas/pdf"
+                      + $"?desde={desde:yyyy-MM-dd}"
+                      + $"&hasta={hasta:yyyy-MM-dd}"
+                      + $"&categoria={Uri.EscapeDataString(categoria)}";
+
+            return new Uri(http.BaseAddress!, url).ToString();
+        }
+
         public async Task<ReporteInventarioDto> ObtenerInventarioAsync(
             string estado,
             string categoria,
