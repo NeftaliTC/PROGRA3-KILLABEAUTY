@@ -117,7 +117,7 @@
                                     <td>
                                         <span class="badge-role @(emp.TipoUsuario == "ADMINISTRADOR" ? "role-super" : "role-admin")">
                                             <i class="@(emp.TipoUsuario == "ADMINISTRADOR" ? "bi bi-crown-fill" : "bi bi-person-badge-fill")"></i>
-                                            @(emp.TipoUsuario == "VENDEDOR" ? "Trabajador" : emp.TipoUsuario)
+                                            @(emp.TipoUsuario == "TRABAJADOR" ? "Trabajador" : emp.TipoUsuario)
                                         </span>
                                     </td>
                                     <td>
@@ -204,7 +204,7 @@
                     <label style="font-weight: bold; display: block; margin-bottom: 5px;">Asignar Nuevo Rol</label>
                     <select @bind="modeloFormulario.TipoUsuario" class="admin-form-select">
                         <option value="ADMINISTRADOR">Administrador</option>
-                        <option value="VENDEDOR">Trabajador</option>
+                        <option value="TRABAJADOR">Trabajador</option>
                     </select>
                 </div>
 
