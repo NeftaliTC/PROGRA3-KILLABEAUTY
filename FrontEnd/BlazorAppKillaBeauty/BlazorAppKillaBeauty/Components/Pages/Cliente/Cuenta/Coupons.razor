@@ -4,6 +4,7 @@
 @rendermode InteractiveServer
 @using BlazorAppKillaBeauty.Services
 @inject CuponService CuponService
+@inject AuthService AuthService
 
 <div class="account-content-inner">
     <h2 class="content-section-title">Cupones Disponibles</h2>
@@ -78,10 +79,20 @@
     {
         try
         {
-            listaCupones = (await CuponService.ObtenerTodosAsync())
-                .Where(c => c.Activo && (!c.FechaFin.HasValue || c.FechaFin.Value.Date >= DateTime.Today))
-                .OrderBy(c => c.FechaFin ?? DateTime.MaxValue)
-                .ToList();
+            if (AuthService.UsuarioId.HasValue)
+            {
+                listaCupones = (await CuponService.ObtenerDisponiblesParaUsuarioAsync(AuthService.UsuarioId.Value))
+                    .Where(c => !c.FechaFin.HasValue || c.FechaFin.Value.Date >= DateTime.Today)
+                    .OrderBy(c => c.FechaFin ?? DateTime.MaxValue)
+                    .ToList();
+            }
+            else
+            {
+                listaCupones = (await CuponService.ObtenerTodosAsync())
+                    .Where(c => c.Activo && (!c.FechaFin.HasValue || c.FechaFin.Value.Date >= DateTime.Today))
+                    .OrderBy(c => c.FechaFin ?? DateTime.MaxValue)
+                    .ToList();
+            }
         }
         catch (Exception ex)
         {
