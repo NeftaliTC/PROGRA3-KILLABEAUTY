@@ -552,6 +552,16 @@
 
             Navigation.NavigateTo(url, forceLoad: true);
         }
+        else
+        {
+            var url = ReporteService.ObtenerUrlPdfInventario(
+                estadoInventarioSeleccionado,
+                categoriaInventarioSeleccionada,
+                subcategoriaInventarioSeleccionada,
+                ordenInventarioSeleccionado);
+
+            Navigation.NavigateTo(url, forceLoad: true);
+        }
     }
 
     private async Task CargarReporteActualAsync()
