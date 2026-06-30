@@ -55,8 +55,10 @@ builder.Services.AddScoped<HttpClientUtils>(sp =>
 builder.Services.AddSingleton<AddressService>();
 builder.Services.AddScoped<ProductoService>();
 builder.Services.AddScoped<CourierService>();
-builder.Services.AddCookieAuth();
 
+builder.Services.AddCookieAuth();
+builder.Services.AddAuthorization();
+builder.Services.AddCascadingAuthenticationState();
 
 
 var app = builder.Build();
@@ -73,8 +75,9 @@ app.UseHttpsRedirection();
 
 
 
-
+//te identifica
 app.UseAuthentication();
+//revisa permisos 
 app.UseAuthorization();
 
 
