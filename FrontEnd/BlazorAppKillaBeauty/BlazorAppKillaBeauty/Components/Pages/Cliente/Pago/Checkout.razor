@@ -561,6 +561,18 @@
                 return;
             }
 
+            if (AuthService.UsuarioId.HasValue)
+            {
+                var (disponible, motivo) = await cuponService.VerificarDisponibilidadAsync(
+                    encontrado.Codigo, AuthService.UsuarioId.Value);
+
+                if (!disponible)
+                {
+                    errorCupon = motivo ?? "Este cupón ya no está disponible.";
+                    return;
+                }
+            }
+
             descuentoCupon = cuponService.CalcularDescuento(encontrado, CartService.Total);
 
             if (descuentoCupon <= 0)

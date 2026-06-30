@@ -41,6 +41,20 @@ namespace BlazorAppKillaBeauty.Services
                 c.Codigo.Equals(codigo.Trim(), StringComparison.OrdinalIgnoreCase));
         }
 
+        public async Task<(bool Disponible, string? Motivo)> VerificarDisponibilidadAsync(string codigo, int idUsuario)
+        {
+            var resultado = await GetAsync<DisponibilidadCuponDto>(
+                $"cupones/codigo/{Uri.EscapeDataString(codigo)}/usuario/{idUsuario}");
+            return resultado != null
+                ? (resultado.Disponible, resultado.Motivo)
+                : (true, null);
+        }
+
+        public async Task<List<Cupon>> ObtenerDisponiblesParaUsuarioAsync(int idUsuario)
+        {
+            return await GetAsync<List<Cupon>>($"cupones/disponibles/usuario/{idUsuario}") ?? new List<Cupon>();
+        }
+
         public decimal CalcularDescuento(Cupon cupon, decimal subtotal)
         {
             if (subtotal < (cupon.MontoMinimoCompra ?? 0))
@@ -172,6 +186,15 @@ namespace BlazorAppKillaBeauty.Services
         {
             [JsonPropertyName("idCampana")]
             public int IdCampana { get; set; }
+        }
+
+        private class DisponibilidadCuponDto
+        {
+            [JsonPropertyName("disponible")]
+            public bool Disponible { get; set; }
+
+            [JsonPropertyName("motivo")]
+            public string? Motivo { get; set; }
         }
     }
 
