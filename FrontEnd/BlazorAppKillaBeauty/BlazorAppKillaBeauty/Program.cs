@@ -2,7 +2,7 @@
 using BlazorAppKillaBeauty.ClienteREST.Utils.BlazorAppKillaBeauty.Utils;
 using BlazorAppKillaBeauty.Components;
 using BlazorAppKillaBeauty.Services;
-
+using BlazorAppKillaBeauty.Security;
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -46,6 +46,10 @@ builder.Services.AddScoped<HttpClientUtils>();
 builder.Services.AddSingleton<AddressService>();
 builder.Services.AddScoped<ProductoService>();
 builder.Services.AddScoped<CourierService>();
+builder.Services.AddCookieAuth();
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -57,6 +61,17 @@ if (!app.Environment.IsDevelopment())
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
+
+
+
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+
+
+
+
 
 app.UseAntiforgery();
 
